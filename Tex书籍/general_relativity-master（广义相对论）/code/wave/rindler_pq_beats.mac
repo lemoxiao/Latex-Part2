@@ -1,0 +1,40 @@
+p(u) := 1+A*cos(u);
+q2(u) := A*cos(u)*cos(A*u)-2*A^2*cos(A*u);
+
+/*
+integrate(q2(u),u);
+grind(integrate(%,u));
+*/
+/* ... gives A*(-cos(u*(A+1))/(2*(A+1)^2)-cos(u*(1-A))/(2*(1-A)^2))+2*cos(u*A) */
+
+c : -A/(2*(1+A)^2)-A/(2*(1-A)^2)+2;
+
+d : - c + 2-(1+A);
+
+foo : -2*(A/(2*%pi))^2;
+
+q(u) := A*(-cos(u*(A+1))/(2*(A+1)^2)-cos(u*(1-A))/(2*(1-A)^2))+2*cos(u*A) +d + foo*u^2;
+
+/*
+  taylor(diff(q(x),x,2)-q2(x),x,0,6);
+  ... verified that it's zero
+*/
+
+pp(x) := diff(p(x),x,2);
+qq(x) := diff(q(x),x,2);
+e(x) := q(x)*pp(x)+p(x)*qq(x);
+A : .1;
+cycles : 1/A;
+total_phase : cycles*2.*%pi;
+quad_qag(abs(e(x))/total_phase,x,0,total_phase,6);
+
+/*
+A    mean error
+.1     
+.01    0.010616
+.001   
+
+mse ~ A^4
+rms err ~ A^2
+
+*/

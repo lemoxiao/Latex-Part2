@@ -1,0 +1,1205 @@
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '07',
+    %q{Symmetries},
+    'ch:symmetries'
+  )
+%>
+
+This chapter is not required in order to understand the later material.
+
+<% begin_sec("Killing vectors",nil,'killing-vectors') %>\index{Killing vector}%\label{sec:killing-vectors}
+The Schwarzschild metric is an example of a highly symmetric spacetime. It has
+continuous symmetries in space (under rotation) and in time (under translation
+in time). In addition, it has discrete symmetries under spatial reflection and
+time reversal. In section \ref{sec:schwarzschild-orbits}, we saw that the two
+continuous symmetries led to the existence of conserved quantities for the trajectories
+of test particles, and that these could be interpreted as mass-energy and angular momentum.
+
+Generalizing, we want to consider the idea that a metric may be invariant
+when every point in spacetime is systematically shifted by some infinitesimal
+amount. For example, the Schwarzschild metric is invariant under $t\rightarrow t+\der t$.
+In coordinates $(x^0,x^1,x^2,x^3)=(t,r,\theta,\phi)$, we have a vector field  $(\der t,0,0,0)$
+that defines the time-translation symmetry, and it is conventional to split this into
+two factors, a finite vector field
+$\boldsymbol{\xi}$ and an infinitesimal scalar, so that the displacement vector is
+\begin{equation*}
+  \boldsymbol{\xi}\der t = (1,0,0,0)\der t\eqquad.
+\end{equation*}
+Such a field is called a Killing vector field, or simply a Killing
+vector, after Wilhelm Killing. When all the points in a space are displaced as specified by the Killing vector, they flow without expansion
+or compression. The path of a particular point, such as the dashed line in figure \figref{killing-vector}, under this flow is called
+its orbit.\index{orbit!Killing vector}\index{Killing vector!orbit} Although the term ``Killing vector'' is singular, it refers to the
+entire field of vectors, each of which differs in general from the others. For example, the $\boldsymbol{\xi}$ shown in figure \figref{killing-vector} has a greater
+magnitude than a $\boldsymbol{\xi}$ near the neck of the surface.
+<% marg(160) %>
+<%
+  fig(
+    'killing-vector',
+    %q{The two-dimensional space has a symmetry which can be visualized by imagining it as a surface of revolution embedded in three-space.
+       Without reference to any extrinsic features such as coordinates or embedding, an observer on this surface can detect the symmetry,
+       because there exists a vector field $\boldsymbol{\xi}\der u$ such that translation by $\boldsymbol{\xi}\der u$ doesn't change the distance between nearby points.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'killing-portrait',
+    %q{Wilhelm Killing (1847-1923).}
+  )
+%>
+<% end_marg %>
+
+The infinitesimal notation is designed to describe a continuous symmetry, not a discrete one. For example, the Schwarzschild spacetime
+also has a discrete time-reversal symmetry $t \rightarrow -t$. This can't be described by a Killing vector, because the
+displacement in time is not infinitesimal. 
+
+\pagebreak[4]
+
+\begin{eg}{The Euclidean plane}\label{eg:euclidean-killing}
+The Euclidean plane has two Killing vectors corresponding to translation in two linearly independent directions, plus
+a third Killing vector for rotation about some arbitrarily chosen origin O. In Cartesian coordinates, one way of writing a complete
+set of these is is
+\begin{align*}
+  \boldsymbol{\xi}_1 &= (1,0) \\
+  \boldsymbol{\xi}_2 &= (0,1) \\
+  \boldsymbol{\xi}_3 &= (-y,x)\eqquad.
+\end{align*}
+A theorem from classical geometry\footnote{Coxeter, \emph{Introduction to Geometry}, ch.~3} states that any transformation in the Euclidean plane that preserves distances
+and handedness can be expressed either as a translation or as a rotation about some point. The transformations that
+do not preserve handedness, such as reflections, are discrete, not continuous. This theorem tells us that there are no
+more Killing vectors to be found beyond these three, since any translation can be accomplished using $\boldsymbol{\xi}_1$
+and $\boldsymbol{\xi}_2$, while a rotation about a point P can be done by translating P to O, rotating, and then
+translating O back to P.
+\end{eg}
+
+In the example of the Schwarzschild spacetime, the components
+of the metric happened to be independent of $t$ when expressed in our coordinates.
+This is a sufficient condition for the existence of a Killing vector, but not a necessary one.
+For example, it is possible to write the metric of the Euclidean plane in various forms such as
+$\der s^2=\der x^2+\der y^2$ and $\der s^2=\der r^2+r^2\der\phi^2$. The first form is independent of
+$x$ and $y$, which demonstrates that $x\rightarrow x+\der x$ and $y\rightarrow y+\der y$
+are Killing vectors, while the second form gives us $\phi\rightarrow \phi+\der\phi$.
+Although we may be able to find a particular coordinate system in which the existence of a Killing vector is manifest,
+its existence is an intrinsic property that holds regardless of whether we even employ coordinates.
+In general, we define a Killing vector not in terms of a particular
+system of coordinates but in purely geometrical terms: a space has a Killing vector $\boldsymbol{\xi}$ if translation by
+an infinitesimal amount $\boldsymbol{\xi}\der u$ doesn't change the distance between nearby points.
+Statements such as ``the spacetime has a timelike Killing vector''
+are therefore intrinsic, since both the timelike property and the property of being a Killing vector are
+coordinate-independent.
+<% marg(-10) %>
+<%
+  fig(
+    'tangent-space',
+    %q{Vectors at a point P on a sphere can be visualized as occupying a Euclidean plane that is particular
+       to P.}
+  )
+%>
+<% end_marg %>
+
+Killing vectors, like all vectors, have to live in some kind of vector space. On a manifold, this vector
+space is particular to a given point, figure \figref{tangent-space}. A different vector space exists at
+every point, so that vectors at different points, occupying different spaces, can be compared
+only by parallel transport. Furthermore, we really have \emph{two} such spaces at a given point,
+a space of contravariant vectors and a space of covariant ones. These are referred to as the
+tangent and cotangent spaces.\index{tangent vector}\label{tangent-space}% index entry for tangent space is a cross ref
+The infinitesimal displacements
+we've been discussing belong to the contravariant (upper-index) space, but by lowering and index
+we can just as well discuss them as covariant vectors. The customary way of notating Killing vectors
+makes use of the fact, mentioned in passing on p.~\pageref{partials-as-basis-of-tangent-space},
+that the partial derivative operators
+${\partial_0,\partial_1,\partial_2,\partial_3}$ form the basis for a vector space.
+In this notation,
+the Killing vector of the Schwarzschild metric we've been discussing can be notated simply as
+\begin{equation*}
+      \boldsymbol{\xi} =  \partial_t\eqquad.
+\end{equation*}
+
+The partial derivative notation, like the infinitesimal notation, implicitly refers to continuous symmetries rather than discrete ones.
+If a discrete symmetry carries a point $\zu{P}_1$ to some distant point $\zu{P}_2$, then $\zu{P}_1$ and $\zu{P}_2$
+have two different tangent planes, so there is not a uniquely defined notion
+of whether vectors $\boldsymbol{\xi}_1$ and $\boldsymbol{\xi}_2$ at these two points are equal --- or even approximately equal. 
+There can therefore be no well-defined way to construe a statement such as, ``$\zu{P}_1$ and $\zu{P}_2$
+are separated by a displacement $\boldsymbol{\xi}$.'' In the case of a
+continuous symmetry, on the other hand, the two tangent planes come closer and closer to coinciding as the distance $s$ between
+two points on an orbit approaches zero, and in this limit we recover an approximate notion of being able to
+compare vectors in the two tangent planes. They can be compared by parallel transport, and although parallel
+transport is path-dependent, the difference bewteen paths is proportional to the area they enclose,
+which varies as $s^2$, and therefore becomes negligible in the limit $s\rightarrow0$.
+
+Self-check: Find another Killing vector of the Schwarzschild metric, and express it in the tangent-vector notation.
+
+
+It can be shown that an equivalent condition for a field to be a Killing vector is $\nabla_a \boldsymbol{\xi}_b+\nabla_b \boldsymbol{\xi}_a = 0$.
+This relation, called the Killing equation,\index{Killing equation}
+is written without reference to any coordinate system, in keeping with the coordinate-independence of the notion.
+
+When a spacetime has more than one Killing vector, any linear combination of them is also a Killing vector.
+This means that although the existence of certain types of Killing vectors may be intrinsic, the exact
+choice of those vectors is not. 
+
+\begin{eg}{Euclidean translations}
+The Euclidean plane has two translational Killing vectors $(1,0)$ and $(0,1)$, i.e., $\partial_x$ and $\partial_y$. 
+These same vectors could be expressed as $(1,1)$ and $(1,-1)$ in coordinate system that was rescaled and
+rotated by 45 degrees.
+\end{eg}
+
+\begin{eg}{A cylinder}\label{eg:cylinder-killing}
+The local properties of a cylinder, such as intrinsic flatness, are the same as the local properties of
+a Euclidean plane. Since the definition of a Killing vector is local and intrinsic, a cylinder has
+the same three Killing vectors as a plane, if we consider only a patch on the cylinder that is small enough so
+that it doesn't wrap all the way around. However, only two of these --- the translations ---
+can be extended to form a smooth vector field on the entire surface of the cylinder.
+These might be more naturally notated in $(\phi,z)$ coordinates
+rather than $(x,y)$, giving $\partial_z$ and $\partial_\phi$.
+\end{eg}
+<% marg(50) %>
+<%
+  fig(
+    'cylinder-killing',
+    %q{Example \ref{eg:cylinder-killing}: A cylinder has three local symmetries, but only two that can be extended globally
+       to make Killing vectors.}
+  )
+%>
+<% end_marg %>
+
+\begin{eg}{A sphere}\label{eg:sphere-killing}
+A sphere is like a plane or a cylinder in that it is a two-dimensional space in which no point has
+any properties that are intrinsically different than any other. We might expect, then, that it would
+have two Killing vectors. Actually it has three, $\boldsymbol{\xi}_x$, $\boldsymbol{\xi}_y$, and $\boldsymbol{\xi}_z$, corresponding to
+infinitesimal rotations about the $x$, $y$, and $z$ axes. To show that these are all independent Killing
+vectors, we need to demonstrate that we can't, for example, have $\boldsymbol{\xi}_x=c_1\boldsymbol{\xi}_y+c_2\boldsymbol{\xi}_z$ for some
+constants $c_1$ and $c_2$. To see this, consider the actions of $\boldsymbol{\xi}_y$ and $\boldsymbol{\xi}_z$ on the point $P$ where
+the $x$ axis intersects the sphere. (References to the axes and their intersection with the sphere are
+extrinsic, but this is only for convenience of description and visualization.) Both $\boldsymbol{\xi}_y$ and $\boldsymbol{\xi}_z$
+move P around a little, and these motions are in orthogonal directions, wherease $\boldsymbol{\xi}_x$ leaves P fixed.
+This proves that we can't have $\boldsymbol{\xi}_x=c_1\boldsymbol{\xi}_y+c_2\boldsymbol{\xi}_z$. All three Killing vectors are linearly independent.
+
+This example shows that linear independence of Killing vectors can't be visualized simply by thinking about
+the vectors in the tangent plane at one point. If that were the case, then we could have at most two
+linearly independent Killing vectors in this two-dimensional space. When we say ``Killing vector'' we're really referring to the
+Killing vector \emph{field}, which is defined everywhere on the space.
+\end{eg}
+
+\begin{eg}{Proving nonexistence of Killing vectors}
+\egquestion Find all Killing vectors of these two metrics:
+\begin{align*}
+\der s^2 &= e^{-x}\der x^2+e^x\der y^2 \\
+\der s^2 &= \der x^2+x^2\der y^2\eqquad.
+\end{align*}
+
+\eganswer Since both metrics are manifestly independent of $y$, it follows that $\partial_y$ is a Killing vector for both of them.
+Neither one has any other manifest symmetry, so we can reasonably conjecture that this is the only Killing vector either one of
+them has. However, one can have symmetries that are not manifest, so it is also possible that there are more.
+
+One way to attack
+this would be to use the Killing equation to find a system of differential equations, and then determine how many linearly
+independent solutions there were.
+
+But there is a simpler approach. The dependence of these metrics on $x$ suggests
+that the spaces may have intrinsic properties that depend on $x$; if so, then this demonstrates a lower symmetry
+than that of the Euclidean plane, which has three Killing vectors. One intrinsic property we can check is the scalar
+curvature $R$. The following Maxima code calculates $R$ for the first metric.
+
+\begin{listing}{1}
+load(ctensor);
+dim:2;
+ct_coords:[x,y];
+lg:matrix([exp(-x),0],[0,exp(x)]);
+cmetric();
+R:scurvature(); /* scalar curvature */
+\end{listing}
+% killing.mac
+
+The result is $R=-e^x$, which demonstrates that points that differ in $x$ have different intrinsic properties.
+Since the flow of a Killing field $\xi$ can never connect points that have different properties, we conclude
+that $\xi_x=0$. If only $\xi_y$ can be nonzero, the Killing equation $\nabla_a \xi_b+\nabla_b \xi_a = 0$
+simplifies to $\nabla_x\xi_y=\nabla_y\xi_y=0$. These equations constrain both $\partial_x\xi_y$
+and $\partial_y\xi_y$, which means that given a value of $\xi_y$ at some point in the plane,
+its value everywhere else is determined. Therefore the only possible Killing vectors are scalar multiples of the Killing vector already found.
+Since we don't consider Killing vectors to be distinct unless they are linearly independent, the first metric only has one Killing vector.
+
+A similar calculation for the second metric shows that $R=0$, and an explicit calculation of its Riemann tensor shows that
+in fact the space is flat. It is simply the Euclidean plane written in funny coordinates. This metric has the same three
+Killing vectors as the Euclidean plane. 
+
+It would have been tempting to leap to the wrong conclusion about the second metric by the following
+reasoning. The signature of a metric is an intrinsic property. The metric has signature $++$ everywhere in the plane
+except on the $y$ axis, where it has signature $+0$. This shows that the $y$ axis has different intrinsic properties than
+the rest of the plane, and therefore the metric must have a lower symmetry than the Euclidean plane. It can have at most
+two Killing vectors, not three. This contradicts our earlier conclusion. The resolution of this paradox is that
+this metric has a removable degeneracy of the same type as the one described in section \ref{sec:degeneracy}.
+As discussed in that section, the signature is invariant only under \emph{nonsingular} transformations, but the
+transformation that converts these coordinates to Cartesian ones is singular.
+\end{eg}
+
+<% begin_sec("Inappropriate mixing of notational systems") %>
+Confusingly, it is customary to express vectors and dual vectors by summing over basis vectors
+like this:\label{abuse-of-notation}
+\begin{align*}
+  \vc{v} &= v^\mu \partial_\mu \\
+  \boldsymbol{\omega} &= \omega_\mu \der x^\mu\eqquad.
+\end{align*}
+This is an abuse of notation, driven by the desire to have up-down pairs of indices to sum
+according to the usual rules of the Einstein notation convention. But by that convention, a quantity like
+$\vc{v}$ or $\boldsymbol{\omega}$ with no indices is a scalar, and that's not the case here. The
+products on the right are not tensor products, i.e., the indices aren't being contracted.
+
+This muddle is the result of trying to make the
+Einstein notation do too many things at once and of trying to preserve a clumsy and outdated system of notation and
+terminology originated by Sylvester in 1853. 
+In pure abstract index notation, there are not
+six flavors of objects as in the two equations above but only two: vectors like $v^a$ and dual vectors
+like $\omega_a$. The Sylvester notation is the prevalent one among
+mathematicians today, because their predecessors committed themselves to it a century before the
+development of alternatives like abstract index notation and birdtracks. The Sylvester system is inconsistent with
+the way physicists today think of vectors and dual vectors as being defined by their transformation
+properties, because Sylvester considers
+$\vc{v}$ and $\boldsymbol{\omega}$ to be invariant. 
+
+Mixing the two systems
+leads to the kinds of notational clashes described above. As a particularly absurd example, a physicist
+who is asked to suggest a notation for a vector will typically pick up a pen
+and write $v^\mu$. We are then led to say that a vector is written in a concrete basis as
+a linear combination of dual vectors $\partial_\mu$!
+<% end_sec %>
+
+<% begin_sec("Conservation laws") %>\label{sec:killing-conservation}\index{conservation laws!from Killing vectors}
+Whenever a spacetime has a Killing vector, geodesics have a constant value of $v^b \xi_b$, where $v^b$ is
+the velocity four-vector. For example, because the Schwarzschild metric has a Killing vector $\boldsymbol{\xi} = \partial_t$,
+test particles have a conserved value of $v^t$, and therefore we also have conservation of $p^t$, interpreted
+as the mass-energy.
+
+\begin{eg}{Energy-momentum in flat 1+1 spacetime}
+A flat 1+1-dimensional spacetime has Killing vectors $\partial_x$ and $\partial_t$.
+Corresponding to these are the conserved momentum and mass-energy, $p$ and $E$. If we do a Lorentz boost, these
+two Killing vectors get mixed together by a linear transformation, corresponding to
+a transformation of $p$ and $E$ into a new frame.
+\end{eg}
+
+In addition, one can define a globally conserved quantity found by integrating the flux density $P^a=T^{ab}\xi_b$ over the
+boundary of any compact orientable region.\footnote{Hawking and Ellis, \emph{The Large Scale Structure of Space-Time}, p.~62,
+give a succinct treatment that
+describes the flux densities and proves that Gauss's theorem, which ordinarily fails in curved spacetime for a non-scalar flux,
+holds in the case where the appropriate Killing vectors exist. For an explicit description
+of how one can integrate to find a scalar mass-energy, see Winitzki, \emph{Topics in General Relativity}, section 3.1.5, available for free online.} In case
+of a flat spacetime, there are enough Killing vectors to give conservation of energy-momentum and angular momentum.
+
+<% end_sec %> % Conservation laws for test particles
+<% end_sec %> % Killing vectors
+
+<% begin_sec("Spherical symmetry") %>\label{sec:spherical-symmetry}\index{spherical symmetry}\index{symmetry!spherical}
+A little more work is required if we want to link the existence of Killing vectors to the existence
+of a specific symmetry such as spherical symmetry. When we talk about spherical symmetry in the context
+of Newtonian gravity or Maxwell's equations, we may say, ``The fields only depend on
+$r$,'' implicitly assuming that there is an $r$ coordinate that has a definite meaning for a given choice
+of origin. But coordinates in relativity are not guaranteed to have any particular physical
+interpretation such as distance from a particular origin. The origin may not even exist as part of the spacetime, as in the Schwarzschild metric,
+which has a singularity at the center.
+Another possibility is that the origin
+may not be unique, as on a Euclidean two-sphere like the earth's surface, where a circle centered
+on the north pole is also a circle centered on the south pole; this can also occur
+in certain cosmological spacetimes that describe a universe that wraps around on itself spatially.
+
+We therefore define spherical symmetry as follows. A spacetime $S$ is spherically symmetric if we can
+write it as a union $S=\cup s_{r,t}$ of nonintersecting subsets $s_{r,t}$,
+where each $s$ has the structure of a two-sphere, and the real numbers $r$ and $t$ have
+no preassigned physical interpretation, but $s_{r,t}$ is required to vary smoothly as a function of them.
+By ``has the structure of a two-sphere,'' we mean that no intrinsic measurement on $s$ will produce any
+result different from the result we would have obtained on some two-sphere. A two-sphere has only
+two intrinsic properties: (1) it is spacelike, i.e., locally its geometry is approximately that of the Euclidean plane;
+(2) it has a constant positive curvature. If we like, we can require that the parameter $r$ be
+the corresponding radius of curvature, in which case $t$ is some timelike coordinate.
+
+To link this definition to Killing vectors, we note that condition 2 is equivalent to the following alternative condition:
+($2'$) The set $s$ should have three Killing vectors (which by condition 1 are both spacelike), and it should be possible to choose these
+Killing vectors such that algebraically they act the same as the ones constructed explicitly in example \ref{eg:sphere-killing} on p.~\pageref{eg:sphere-killing}. As an example
+of such an algebraic property, figure \figref{noncommuting-rotations} shows that rotations are noncommutative.
+
+<%
+  fig(
+    'noncommuting-rotations',
+    %q{%
+      Performing the rotations in one order gives
+      one result, 3, while reversing the order gives a different result, 5.
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+    }
+  )
+%>
+
+\pagebreak[4]
+
+\begin{eg}{A cylinder is not a sphere}
+\egquestion Show that a cylinder does not have the structure of a two-\linebreak[3]sphere.
+
+\eganswer
+The cylinder passes condition 1. It fails condition 2 because its Gaussian curvature is zero. Alternatively,
+it fails condition $2'$ because it has only two independent Killing vectors (example \ref{eg:cylinder-killing}).
+\end{eg}
+
+\begin{eg}{A plane is not a sphere}
+\egquestion Show that the Euclidean plane does not have the structure of a two-\linebreak[3]sphere.
+
+\eganswer
+Condition 2 is violated because the Gaussian curvature is zero. Or if we wish, the plane violates
+$2'$ because $\partial_x$ and $\partial_y$ commute, but none of the Killing vectors of a 2-sphere commute.
+\end{eg}
+<% end_sec %> % Spherical symmetry
+
+
+<% begin_sec("Penrose diagrams and causality",nil,'penrose-diagrams') %>\index{Penrose diagram}\index{causal diagram}
+We can't directly visualize a four-dimensional manifold. When a spacetime has a symmetry, however, we may
+be able to visualize the relevant properties the whole thing by considering a lower-dimensional part of it.
+By analogy, if we wanted to visualize the structure of the earth's interior, we might draw a diagram showing
+a two-dimensional section through its center. In fact, we could get rid of two dimensions and simply draw
+a diagram of a single radial line running from the earth's core to its surface; each point on this line would
+then represent a sphere. If we do this in general relativity, for a spacetime that is spherically symmetric,
+then we can reduce the four-dimensional to a two-dimensional one, with each point representing a two-sphere.
+By applying some further tricks, we will see that we can end up with
+a very convenient and useful visualization called a
+Penrose diagram, also known as a Penrose-Carter diagram or causal diagram.
+
+<% begin_sec("Flat spacetime",nil,'penrose-minkowski') %>
+As a warmup, figure \figref{penrose-minkowski} shows a Penrose diagram for flat (Minkowski) spacetime.
+The diagram looks $1+1$-dimensional, but the convention is that spherical
+symmetry is assumed, so two more dimensions are hidden, and we're really portraying $3+1$ dimensions. A typical point
+on the interior of the diamond region represents a 2-sphere.
+On this type of diagram, light cones look just like they would on a
+ normal spacetime diagram of Minkowski space, but distance scales are highly distorted.
+The diamond represents the entire spacetime, with the distortion fitting
+ this entire infinite region into that
+ finite area on the page. Despite the distortion, the diagram shows lightlike surfaces as 45-degree diagonals.
+Spacelike and timelike geodesics, however, are distorted, as shown by the curves in the diagram.
+
+<% marg(300) %>
+<%
+  fig(
+    'penrose-minkowski',
+    %q{Penrose diagram for flat spacetime.}
+  )
+%>
+<% end_marg %>
+
+The distortion becomes greater as we move away from the center of the diagram, and becomes infinite near the
+edges. Because of this infinite distortion, the points $i^-$ and $i^+$ actually represent 3-spheres. All timelike
+curves start at $i^-$ and end at $i^+$, which are
+idealized points at infinity, like the vanishing points in perspective drawings. We can think of $i^+$ as the
+``Elephants' graveyard,'' where massive particles go when they die. Similarly, lightlike curves 
+end on $\mathscr{I}^+$ (which
+includes its mirror image on the left), referred to as \emph{null infinity}.\footnote{See also
+p.~\pageref{no-hair-null-infinity}.}\label{null-infinity-intro}
+The point at $i^0$ is an infinitely distant endpoint for spacelike curves.
+Because of the spherical symmetry, the left and right halves of the diagram are redundant. 
+
+It is possible to make
+up explicit formulae that translate back and forth between Minkowski coordinates and points on the diamond, but in
+general this is not necessary. In fact, the utility of the diagrams is that they let us think about causal relationships
+in coordinate-independent ways. A light cone on the diagram looks exactly like a normal light cone.
+
+Since this particular spacetime is homogeneous, it makes no difference what spatial
+location on the diagram we pick as our axis of symmetry.
+For example, we could arbitrarily pick the left-hand corner,
+the central timelike geodesic (drawn straight)
+or one of the other timelike geodesics (represented as if it were curved).
+<% end_sec('penrose-minkowski') %>
+
+<% marg(-300) %>
+<%
+  fig(
+    'penrose-schwarzschild',
+    %q{Penrose diagram for Schwarzschild spacetime: a black hole that didn't form by gravitational collapse.}
+  )
+%>
+<% end_marg %>
+
+<% begin_sec("Schwarzschild spacetime",nil,'penrose-schwarzschild') %>
+Figure \figref{penrose-schwarzschild} is a Penrose diagram for the Schwarzschild spacetime, i.e., a 
+spacetime that looks like Minkowski space, except that it has one eternal black hole in it.
+This is a black hole that did not form by gravitational collapse.
+This spacetime isn't homogeneous; it has a specific location that is its center of spherical symmetry, and this
+is the vertical line on the left marked $r=0$.
+The triangle is the spacetime inside the event horizon; we could have copied it across
+the $r=0$ line if we had so desired, but the copies would have been redundant.
+
+
+The Penrose diagram makes it easy to
+reason about causal relationships. For example, we can see that if a particle reaches a point inside the event
+horizon, its entire causal future lies inside the horizon, and all of its possible future world-lines intersect
+the singularity. The horizon is a lightlike surface, which makes sense, because it's defined as
+the boundary of the set of points from which a light ray could reach $\mathscr{I}^+$.
+<% end_sec('penrose-schwarzschild') %>
+
+
+<% begin_sec("Astrophysical black hole",nil,'penrose-black-hole') %>
+Figure \figref{penrose-black-hole} is a Penrose diagram for a black hole that has formed by gravitational collapse.
+Using this type of diagram, we can succinctly address one of the most vexing FAQs about black holes. (Cf.~section
+\ref{subsec:black-hole-infalling-matter}, p.~\pageref{subsec:black-hole-infalling-matter},
+where we took a more cumbersome approach without Penrose diagrams.)
+If a distant observer watches the collapsing cloud of matter from which the black hole forms, her
+optical observations will show that the light from the matter becomes more and more gravitationally
+redshifted, and if she wishes, she can interpret this as an example of gravitational time dilation.
+As she waits longer and longer, the light signals from the infalling matter take longer and longer to arrive.
+The redshift approaches infinity as the matter approaches the horizon, so the light waves ultimately become too
+low in energy to be detectable by any given instrument. Furthermore, her patience (or her lifetime) will run out,
+because the time on her clock approaches infinity as she waits to get signals from matter that is approaching
+the horizon. This is all exactly as it should be, since the horizon is by definition the boundary of her observable
+universe. (A light ray emitted from the horizon will end up at $i^+$, which is
+an end-point of timelike world-lines reached only by observers who have experienced an infinite amount of proper time.)
+
+<% marg(300) %>
+<%
+  fig(
+    'penrose-black-hole',
+    %q{Penrose diagram for a black hole formed by gravitational collapse.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'penrose-black-hole-2',
+    %q{According to the distant observer, does the infalling matter ever reach the singularity?}
+  )
+%>
+<% end_marg %>
+
+People who are bothered by these issues often acknowledge the external \emph{unobservability}
+of matter passing through the horizon, and then want to pass from this to questions like, 
+``Does that mean the black hole never really forms?''
+This presupposes that our distant observer has a uniquely defined notion of simultaneity that applies to a
+region of space stretching from her own position to the interior of the black hole, so that
+she can say what's going on inside the black hole ``now.'' But the notion of simultaneity in general relativity is
+even more limited than its counterpart in special relativity.
+Not only is simultaneity in general relativity observer-dependent, as in special relativity,
+but it is also local rather than global.
+
+
+In figure \figref{penrose-black-hole-2}, E is an event on the world-line of an observer. The
+spacelike surface $\zu{S}_1$ is one possible ``now'' for this observer. According to
+this surface, no particle has ever fallen in and reached the
+horizon; every such particle has a world-line that intersects $\zu{S}_1$,
+and therefore it's still on its way in.
+
+$\zu{S}_2$ is another possible ``now'' for the same
+observer at the same time. According to this definition of ``now,''
+all the particles have passed the event horizon, but none have hit the singularity yet.
+Finally, $\zu{S}_3$ is a ``now'' according to which all the particles have hit the singularity.
+
+If this was special relativity, then we could decide which surface was the
+correct notion of simultaneity for the observer, based on the
+observer's state of motion. But in general relativity, this only works locally (which
+is why I made all three surfaces coincide near E). There is no
+well-defined way of deciding which is the correct way
+of globally extending this notion of simultaneity.
+
+Although it may seem strange that we can't say whether the
+singularity has ``already'' formed according to a distant observer,
+this is really just an inevitable result of the fact that the
+singularity is spacelike. The same thing happens in the case of a
+Schwarzschild spacetime, which we think of as a description of an
+eternal black hole, i.e., one that has always existed and always
+will. On the similar Penrose diagram for an eternal black hole, we
+can still draw a spacelike surface like $\zu{S}_1$ or $\zu{S}_2$, representing a
+definition of ``now'' such that the singularity doesn't exist yet.
+<% end_sec('penrose-black-hole') %>
+
+<% begin_sec("Penrose diagrams in general",nil,'general-penrose') %>
+Ideally we would like to generalize the procedure for drawing Penrose diagrams so that we would be
+able to uniquely determine one for any spacetime. This turns out to be not so clear-cut.
+The procedure would go something like this:
+
+\begin{enumerate}
+    \item Make an $n$-dimensional section or projection, where usually, but not always, $n=2$.
+    \item Do a transformation to reduce the resulting manifold to a flat one of finite size.
+    \item Adjoin idealized surfaces and points at infinity.
+\end{enumerate}
+
+At step 1, we want to take advantage of any symmetries, such as
+rotational symmetry, so that the final result will be informative, be
+representative of the whole spacetime, and accurately depict causal
+relationships in the original spacetime. If the original spacetime has a low
+degree of symmetry (e.g., a spacetime containing three black holes arranged in a triangle),
+then this might require $n>2$. At this step we also need to
+make sure that lightlike geodesics in the original space correspond
+properly to lightlike geodesics in the submanifold. 
+
+For step 2, we have already given a geometrical characterization of the type of transformation we have
+in mind, which is called a \emph{conformal transformation}.\index{conformal transformation}
+It turns out to be possible to encapsulate this idea in a simple analytic way.
+Given a spacetime with a metric $g$, we define a fictitious metric $\tilde{g}=\Omega^2 G$, where
+$\Omega$ is a nonzero real number that varies from point to point. The idea here is that $g$ and
+$\tilde{g}$ agree on where the light cone is, but they disagree on the measurement of distances and
+times. The same manifold equipped with
+the fictitious metric $\tilde{g}$ is the one being drawn on the page when we make a Penrose diagram.
+We let $\Omega\rightarrow0$ as we approach the idealized boundary regions like $i^0$ and $\mathscr{I}^+$,
+and this is what causes the Penrose diagram to take up finite space on the page.
+
+It is not possible in general to do what is required in step 2 by making a conformal transformation
+to change a manifold into a flat one. A manifold that can be flattened in this way is called conformally
+flat. All two-dimensional manifolds are conformally flat, so in the $n=2$ case this is guaranteed.
+For $n>3$ we will usually not have conformal flatness if there are gravitational waves or tidal
+forces present.\index{conformal flatness}
+
+The most problematic part, surprisingly, is step 3. This topic goes under the general
+heading of ``boundary constructions.''\index{boundary constructions}\label{boundary-constructions}
+Reviews are available on this topic.\footnote{Ashley, ``Singularity theorems and the abstract boundary construction,''
+\url{https://digitalcollections.anu.edu.au/handle/1885/46055}.
+Garcia-Parrado and Senovilla, ``Causal structures and causal boundaries,''
+\url{http://arxiv.org/abs/gr-qc/0501069}.}
+There are a number of more or less specific techniques for constructing a boundary, with an alphabet
+soup of names including the g-boundary, c-boundary, b-boundary, and a-boundary.
+As someone who is not a specialist in this subfield, the impression I get is that this is an area
+of research that has turned out badly and has never produced any useful results, but work continues,
+and it is possible that at some point the smoke will clear. As a simple example of what one would like
+to get, but doesn't get, from these studies, it would seem natural to ask how many dimensions there are
+in a black hole singularity. (See p.~\pageref{singularity-dim-elementary} for a discussion of why this
+is a nontrivial question.) Different answers come back from the different methods. For example,
+the b-boundary approach says that both black-hole and cosmological singularities are zero-dimensional
+points, while in the c-boundary method (which was designed to harmonize with Penrose diagrams) they
+are three-surfaces (as one would imagine from the Penrose diagrams).
+<% end_sec('general-penrose') %>
+<% begin_sec("Global hyperbolicity",nil,'global-hyperbolicity') %>\index{global hyperbolicity}
+Causality refers to our vaguely defined feeling that the world should have an orderly progression of cause and
+effect. Making this notion more precise is surprisingly difficult. Penrose diagrams, and their associated
+concepts, are essentially
+representations of the causal structure of spacetime, and these turn out to be helpful in putting together one of
+the more satisfying attempts to define causality. This definition is called global hyperbolicity.
+The obscure terminology is related to the classification of partial differential equations.
+
+Some definitions are required as a preliminary. Consider a set S of events in spacetime.
+S is \emph{bounded} if it does not include any of the idealized points on the Penrose diagram that we have added at 
+infinity.\footnote{More rigorously,
+this is equivalent to saying that for any geodesic in S, there is a bound on the affine parameter.}
+S is \emph{closed} if it contains its own boundary.\footnote{To make this more precise,
+we proceed as described in section \ref{subsec:tangent-space},
+p.~\pageref{subsec:tangent-space} by enlarging the set of points in our spacetime manifold M to include points at
+infinitesimal distances from one of the original points. Then S is closed if, for any point in the enlarged
+version of S, there is a point lying at an infinitesimal distance from it in the original version of S.}
+S is \emph{compact} if it is closed and bounded.
+
+\begin{eg}{Compact and noncompact light cones}\label{eg:compact-and-noncompact}
+Figure \figref{compact-and-noncompact} shows a spacetime containing a black hole that forms by gravitational
+collapse. Point P is inside the event horizon, Q outside. Consider the following four point-sets:
+
+$I^+(\zu{P})$, called the \emph{chronological future}\index{chronological future} of P, is the interior of P's future-directed light cone.
+
+$J^+(\zu{P})$ is like $I^+(\zu{P})$, but also includes events that are on the boundary of the light cone, i.e., events
+that cannot be connected to P by a timelike curve but that can be connected to it by a lightlike curve.
+We call this the \emph{causal future}\index{causal future} of P, since it is the set of events that could be caused by P.
+
+$I^+(\zu{Q})$ and $J^+(\zu{Q})$ are the analogous sets built on Q.
+
+Of these four sets, only $J^+(\zu{P})$ is compact. $I^+(\zu{P})$ is noncompact because it is not closed.
+$I^+(\zu{Q})$ and $J^+(\zu{Q})$ are noncompact because they are not bounded; they include idealized
+points at infinity that lie in $i^+$ and $\mathscr{I}^+$.
+\end{eg}
+
+<% marg(100) %>
+<%
+  fig(
+    'compact-and-noncompact',
+    %q{Example \ref{eg:compact-and-noncompact}.}
+  )
+%>
+<% end_marg %>
+
+In addition to the notation introduced in example \ref{eg:compact-and-noncompact}, we will need
+the similar notations $I^-$ and $J^-$ for the corresponding past light-cones.
+
+Definition: A spacetime is globally hyperbolic if: (1) there are no closed, timelike curves (CTCs),\footnote{For
+precision, the condition needs to be made a little stronger. We want no closed, non-spacelike curves, and
+we also want it to be impossible for curves to exist that are arbitrarily close to being such curves, in the
+sense that for any event, there exists a neighborhood around it that can never be revisited.} and
+(2) given any two events P and Q, the intersection of $J^+(\zu{P})$ and $J^-(\zu{Q})$ is compact.
+(Condition 2 is required only when P and Q are points in the manifold, not boundary points.)
+
+In a globally hyperbolic spacetime, initial-value problems always have unique solutions. That is, we can
+pick a spacelike surface and give the value of a wave on that surface, and the wave equation will then
+have a unique solution. Such a surface is called a Cauchy surface.\index{Cauchy surface}
+
+We can readily verify by inspection of the Penrose digrams that the spacetimes described earlier in this
+section are globally hyperbolic.
+Condition 2 implies that the intersection doesn't contain any singularities or points at infinity.
+Although black hole spacetimes do contain singularities, the spacelike nature of these singularities implies
+that they can never lie in the intersection of light cones as referred to in the definition.
+Therefore such spacetimes are globally hyperbolic.
+
+<% marg(300) %>
+<%
+  fig(
+    'not-globally-hyperbolic',
+    %q{Example \ref{eg:compact-and-noncompact}.}
+  )
+%>
+<% end_marg %>
+
+\begin{eg}{Global hyperbolicity}
+Figure \subfigref{not-globally-hyperbolic}{1} shows a piece cut out of Minkowski space. The dashed outline
+is meant to indicate that the
+piece doesn't include its boundary. This spacetime is not globally hyperbolic. For certain choices
+of events P and Q, the intersection $J^+(\zu{P})\cap J^-(\zu{Q})$ could extend out to the cut at the
+edge. Since the spacetime doesn't include its boundary, this intersection would not be compact.
+It's easy to see why causality fails in this spacetime. If we pick a spacelike surface near the bottom
+of the diagram, it would only cut through a small part of the bottom of the spacetime. At later times,
+the spacetime grows at a rate that is greater than $c$. Therefore such a surface cannot be used as
+a Cauchy surface; given the initial conditions on this surface, we cannot predict what will happen in
+the parts of the universe that are outside its causal future.
+
+In \subfigref{not-globally-hyperbolic}{2} we have the same example, but now the boundary is included.
+This set is not a manifold, which excludes it from consideration as a spacetime in general relativity.
+
+Figure \subfigref{not-globally-hyperbolic}{3} is a picture of Minkowski space with a timelike singularity
+in it (dashed line). Singularities are not point-sets in the manifold, so topologically,
+this is like Minkowski space with a single timelike curve surgically removed. Global hyperbolicity fails
+because the intersection $J^+(\zu{P})\cap J^-(\zu{Q})$ could surround the singularity, and would
+not be compact because it would not include its boundary at the singularity.
+This violation of global hyperbolicity indicates a failure of causality in such a spacetime
+(see p.~\pageref{slime-and-socks}).
+
+By cutting off the lower half of the diamond representing Minkowski spacetime, we obtain
+figure \subfigref{not-globally-hyperbolic}{4}. The dashed line indicates that the boundary is not included,
+and therefore this is a manifold. It is also globally hyperbolic. This example suggests that global
+hyperbolicity does not necessarily capture everything we might ever want to describe in a definition of
+causality. If a paleontologist living in this spacetime finds a dinosaur fossil embedded in a rock,
+she will naturally infer that a dinosaur lived at some point in the past, causing the fossil to exist.
+But perhaps this is not the case --- the hypothetical dinosaur might be one that would have existed before
+the boundary. This creationism-flavored violation of causality is of a different flavor than the 
+situation we would have had if the bottom edge of the diagram had been a big bang singularity; in that
+case, we would have had a knowable \emph{reason} why chains of cause and effect could not be extended back into
+the past beyond a certain time.
+\end{eg}
+
+
+
+<% end_sec('global-hyperbolicity') %>
+
+
+<% end_sec('penrose-diagrams') %> % Penrose diagrams
+
+<% begin_sec("Static and stationary spacetimes") %>\label{sec:static-and-stationary}
+<% begin_sec("Stationary spacetimes") %>
+When we set out to describe a generic spacetime, the Alice in Wonderland quality of the experience is partly
+because coordinate invariance allows our time and distance scales to be arbitrarily rescaled, but also
+partly because the landscape can change from one moment to the next. The situation is drastically
+simplified when the spacetime has a timelike Killing vector. Such a spacetime is said to be stationary.\index{stationary}
+Two examples are flat spacetime and the spacetime surrounding the rotating earth (in which
+there is a frame-dragging effect). Non-examples include the solar system, cosmological models, gravitational
+waves, and a cloud of matter undergoing gravitational collapse.
+
+Can Alice determine, by traveling around her spacetime and carrying out observations, whether it is stationary?
+If it's not, then she might be able to prove it. For example, suppose she visits a certain region
+and finds that the Kretchmann invariant\index{Kretchmann invariant} $R^{abcd}R_{abcd}$ varies with time in her frame
+of reference. Maybe this is because an asteroid is coming her way, in which case she could
+readjust her velocity vector to match that of the asteroid. Even if she can't see the asteroid, she can
+still try to find a velocity that makes her local geometry stop changing in this particular
+way. If the spacetime is truly stationary, then she can always ``tune in'' to the right velocity vector
+in this way by searching systematically. If this procedure ever fails, then she has proved that her spacetime
+is not stationary.
+
+Self-check: Why is the timelike nature of the Killing vector important in this story?
+
+Proving that a spacetime \emph{is} stationary is harder. This is partly just because spacetime is infinite, so it will
+take an infinite amount of time to check everywhere. We aren't inclined to worry too much about this limitation on our geometrical knowledge,
+which is of a type that has been familiar since thousands of years ago, when it upset the ancient Greeks
+that the parallel postulate could only be checked by following lines out to an infinite distance.
+But there is a new type of limitation as well.
+The Schwarzschild spacetime is not stationary according to our definition. In the coordinates used in
+section \ref{sec:schwarzschild}, $\partial_t$ is a Killing vector, but is only timelike for $r>2m$; for
+$r<2m$ it is spacelike. Although the solution describes a black hole that
+is going to sit around forever without changing, no observer can ever verify that fact, because once she strays
+inside the horizon she must follow a timelike world-line, which will end her program of observation within some
+finite time.
+<% end_sec %> % Static spacetime
+
+<% begin_sec("Isolated systems") %>
+<% begin_sec("Asymptotic flatness",nil,'asymptotic-flatness') %>
+This unfortunate feature of our definition of stationarity --- its empirical unverifiability --- is something that
+in general we just have to live with. But there is an alternative in the special case of an isolated system,
+such as our galaxy or a black hole. It may be a good approximation to ignore distant matter, modeling such a system
+with a spacetime that is asymptotically flat.\index{asymptotic flatness}
+The notion of asymptotic flatness was introduced informally on p.~\pageref{asymptotic-flatness-idea}.
+Formulating the definition of this term rigorously and in a coordinate-invariant way involves a large amount of technical machinery,
+since we are not guaranteed to be presented in advance with a special, physically significant set of coordinates that would
+lead directly to a quantitative way of defining words like ``nearby.'' 
+The essential idea is that a spacetime is asymptotically flat if it is possible to perform a conformal transformation in such a
+way that the result has idealized regions at infinity $i^0$, $\mathscr{I}^+$, and $\mathscr{I}^-$ (but not $i^+$ and $i^-$)
+that look like those of Minkowski space.
+The reader who wants to see the full machinery presented can find presentations in various places, such as
+Hawking and Ellis, ch.~11 of Wald, or the online review article ``Conformal Infinity'' at \url{livingreviews.org}.
+<% end_sec('asymptotic-flatness') %> % Asymptotic flatness
+
+<% begin_sec("Asymptotically stationary spacetimes") %>
+In the case of an asymptotically flat spacetime, we say that it is also asymoptotically stationary\index{stationary!asymptotically}
+if it has a Killing vector that becomes timelike far away. Some authors (e.g., Ludvigsen) define ``stationary'' to mean what I'm calling ``asymoptotically stationary,''
+others (Hawking and Ellis) define it the same way I do, and still others (Carroll) are not self-consistent.
+The Schwarzschild spacetime is asymptotically stationary, but not stationary.
+<% end_sec %> % Asymptotically stationary spacetimes
+<% end_sec %> % Isolated systems
+
+<% begin_sec("A stationary field with no other symmetries") %>
+Consider the most general stationary case, in which the only Killing vector is the timelike one.
+The only ambiguity in the choice of this vector is a rescaling; its direction is fixed.
+At any given point in space, we therefore have a notion of being at rest, which is to have a
+velocity vector parallel to the Killing vector. An observer at rest detects no time-dependence in
+quantities such as tidal forces.
+
+Points in space thus have a permanent identity. The gravitational field,
+which the equivalence principle tells us is normally an elusive, frame-dependent concept, now becomes
+more concrete: it is the proper acceleration required in order to stay in one place. We can therefore
+use phrases like ``a stationary field,'' without the usual caveats about the coordinate-dependent meaning of ``field.''
+
+Space can be
+sprinkled with identical clocks, all at rest. Furthermore, we can compare the rates of these clocks,
+and even compensate for mismatched rates, by the following procedure. Since the spacetime is stationary,
+experiments are reproducible. If we send a photon or a material particle from a point A in space to
+a point B, then identical particles emitted at later times will follow identical trajectories. The
+time lag between the arrival of two such particls tells an observer at B the amount of time at B
+that corresponds to a certain interval at A. If we wish, we can adjust all the clocks so that their
+rates are matched. An example of such rate-matching is the GPS satellite system, in which
+the satellites' clocks are tuned to 10.22999999543 MHz, matching the ground-based clocks at 10.23 MHz.
+(Strictly speaking, this example is out of place in this subsection, since the earth's field has
+an additional azimuthal symmetry.)
+
+It is tempting to conclude that this type of spacetime comes equipped with a naturally preferred time
+coordinate that is unique up to a global affine transformation $t\rightarrow at+b$. But to construct such a time
+coordinate, we would have to match not just the rates of the clocks, but also their phases.
+The best method relativity allows for doing this is 
+Einstein synchronization (p.~\pageref{einstein-synch}),\index{Einstein synchronization}\index{synchronization!Einstein convention}
+which involves trading a photon back and forth between clocks A and B and adjusting the clocks
+so that they agree that each clock gets the photon at the mid-point in time between its arrivals
+at the other clock. The trouble is that for a general stationary spacetime, this procedure is not
+transitive: synchronization of A with B, and of B with C, does not guarantee agreement between A with C.
+This is because the time it takes a photon to travel clockwise around triangle ABCA may be different
+from the time it takes for the counterclockwise itinerary ACBA. In other words, we may have a Sagnac effect,\index{Sagnac effect}
+which is generally interpreted as a sign of rotation. Such an effect will occur, for example,
+in the field of the rotating earth, and it cannot be eliminated by choosing a frame that rotates
+along with the earth, because the surrounding space experiences a frame-dragging effect, which
+falls off gradually with distance.
+
+Although a stationary spacetime does not have a uniquely preferred time, it does prefer some time
+coordinates over others. In a stationary spacetime, it is always possible to find a ``nice'' $t$
+such that the metric can be expressed without any $t$-dependence in its components.
+<% end_sec %> % A stationary field with no other symmetries
+
+<% begin_sec("A stationary field with additional symmetries") %>
+Most of the results given above for a stationary field with no other symmetries also hold in the
+special case where additional symmetries are present. The main difference is that we can make
+linear combinations of a particular timelike Killing vector with the other Killing vectors, so
+the timelike Killing vector is not unique. This means that there is no preferred notion of
+being at rest. For example, in a flat spacetime we cannot define an observer to be at rest
+if she observes no change in the local observables over time, because that is true for
+any inertial observer. Since there is no preferred rest frame, we can't define the gravitational
+field in terms of that frame, and there is no longer any preferred definition of the gravitational
+field.
+<% end_sec %> % A stationary field with additional symmetries
+
+<% begin_sec("Static spacetimes") %>\index{static spacetime}
+
+
+In addition to synchronizing all clocks to the same frequency, we
+might also like to be able to match all their phases using Einstein
+synchronization, which requires transitivity.  Transitivity is
+frame-dependent. For example, flat spacetime allows transitivity if we
+use the usual coordinates. However, if we change into a rotating frame
+of reference, transitivity fails (see p.~\pageref{sec:carousel}).  If
+coordinates exist in which a particular spacetime has transitivity,
+then that spacetime is said to be static.\index{static spacetime} In
+these coordinates, the metric is diagonalized, and since there are no
+space-time cross-terms like $\der x\der t$ in the metric, such a
+spacetime is invariant under time reversal. Roughly speaking, a static
+spacetime is one in which there is no rotation.
+% https://www.physicsforums.com/threads/when-can-a-metric-be-put-in-diagonal-form.798380/
+<% end_sec %> % Static spacetimes
+
+<% begin_sec("Birkhoff's theorem",nil,'birkhoff') %>
+Birkhoff's theorem,\index{Birkhoff's theorem}\label{birkhoff} proved below, states that in the case of spherical symmetry, 
+the vacuum field equations have a solution, the Schwarzschild spacetime, which is unique up to a choice of coordinates
+and the value of $m$.
+Let's enumerate the assumptions that went into our derivation of the
+Schwarzschild metric on p.~\pageref{sec:complete-sch}. These were: (1) the vacuum field equations, (2) spherical symmetry, (3) asymptotic staticity,
+(4) a certain choice of coordinates, and (5) $\Lambda=0$.
+Birkhoff's theorem says that the assumption of staticity was not necessary.
+That is, even if the mass distribution contracts and expands over time, the exterior solution is still the Schwarzschild solution.
+Birkhoff's theorem holds because gravitational waves are transverse, not longitudinal (see p.~\pageref{grav-waves-transverse}),
+so the mass distribution's radial throbbing cannot generate a gravitational wave.
+
+Proof of Birkhoff's theorem: Spherical symmetry
+guarantees that we can introduce coordinates $r$ and $t$ such that the surfaces of constant $r$ and $t$ have the structure of
+a sphere with radius $r$. On one such surface we can introduce colatitude and longitude coordinates $\theta$ and $\phi$.
+The $(\theta,\phi)$ coordinates can be extended in a natural way to other values of $r$ by choosing the radial lines to lie
+in the direction of the covariant derivative vector\footnote{It may seem backwards to start talking about the covariant
+derivative of a particular coordinate before a complete coordinate system has even been introduced. But (excluding the trivial case of a flat spacetime),
+$r$ is not just an arbitrary coordinate, it is something that an observer at a certain point in spacetime can determine by
+mapping out a surface of geometrically identical points, and then determining that surface's radius of curvature.
+Another worry is that it is possible for $\nabla_a r$ to misbehave
+on certain surfaces, such as the event horizon of the Schwarzschild spacetime, but we can simply require that radial lines
+remain continuous as they pass through these surfaces.} $\nabla_a r$, and this ensures that the metric will not have any nonvanishing terms
+in $\der r\der\theta$ or $\der r\der\phi$, which could only arise if our choice had broken the symmetry between
+positive and negative values of $\der\theta$ and $\der\phi$. Just as we were free to choose any way of threading lines of
+constant $(\theta,\phi,t)$ between spheres of different radii, we can also choose how to thread lines of constant $(\theta,\phi,r)$
+between different times, and this can be done so as to keep the metric free of any time-space cross-terms such as $\der\theta\der t$.
+The metric can therefore be written in the form\footnote{On the same surfaces referred to in the preceding footnote,
+the functions $h$ and $k$ may to go to 0 or $\infty$. These turn out to be nothing more serious than coordinate singularities.}
+\begin{equation*}
+  \der s^2 = h(t,r)\der t^2 - k(t,r)\der r^2 - r^2(\der\theta^2+\sin^2\theta \der\phi^2)\eqquad.
+\end{equation*}
+This has to be a solution of the vacuum field equations, $R_{ab}=0$, and in particular a quick calculation
+with Maxima shows that $R_{rt}=-\partial_t k/k^2r$, so $k$ must be independent of time.
+With this restriction, we find $R_{rr}=-\partial_rh/hkr-1/r^2-1/kr^2=0$, and since $k$ is time-independent,
+$\partial_rh/h$ is also time-independent. This means that for a particular time $t_\zu{o}$, the function $f(r)=h(t_\zu{o},r)$
+has some universal shape set by a differential equation, with the only possible ambiguity being an over-all scaling that depends on  $t_\zu{o}$.
+But since $h$ is the time-time component of the metric, this scaling corresponds physically to a situation in which every clock, all over the universe,
+speeds up and slows down in unison. General relativity is coordinate-independent, so this has no
+observable effects, and we can absorb it into a redefinition of $t$ that will cause $h$ to be time-independent. Thus the metric can be expressed
+in the time-independent diagonal form
+\begin{equation*}
+  \der s^2 = h(r)\der t^2 - k(r)\der r^2 - r^2(\der\theta^2+\sin^2\theta \der\phi^2)\eqquad.
+\end{equation*}
+We have already solved the field equations for a metric of this
+form and found as a solution the Schwarzschild spacetime.\footnote{The Schwarzschild \emph{spacetime} is the uniquely
+defined geometry found by removing the coordinate singularities from this form of the Schwarzschild \emph{metric}.} 
+Since the metric's components are all independent of $t$, $\partial_t$ is a Killing vector, and it
+is timelike for large $r$, so the Schwarzschild spacetime is asymptotically static.
+
+<% end_sec('birkhoff') %> % Birkhoff's theorem
+
+<% begin_sec("No-hair theorems",nil,'no-hair') %>
+ Birkhoff's theorem is similar to a set of theorems called
+no-hair theorems describing black holes.\index{no-hair theorems}\index{black hole!no-hair theorem}
+The most general no-hair theorem states that a black hole is completely characterized by its mass, charge, and
+angular momentum. Other than these three numbers, nobody on the outside can recover any information that was possessed by the matter and
+energy that were sucked into the black hole.
+
+It has been proposed\footnote{Johannsen and Psaltis, http://arxiv.org/abs/1008.3902v1}
+that the no-hair theorem for nonzero angular momentum and zero charge could be tested empirically by
+observations of Sagittarius A*.\index{Sagittarius A*} If the observations are consistent with the no-hair theorem, it would
+be taken as supporting the validity of general relativity and the interpretation of this object as a supermassive black hole.
+If not, then there are various possibilities, including a failure of general relativity to be the correct theory of strong
+gravitational fields, or a failure of one of the theorem's other assumptions, such as the nonexistence of closed timelike curves
+in the surrounding universe.
+
+The no-hair theorems say that relativity only has a small repertoire of types of black-holes,
+defined as regions of space that are causally disconnected from the universe, in the sense that
+future light-cones of points in the region do not extend to 
+infinity.\footnote{For a more formal statement of
+this, see Hawking and Ellis, ``The Large Scale Structure of 
+Space-Time,'' p.~315. Essentially, the region must be a connected
+region on a spacelike three-surface, and there must be no lightlike world-lines that connect points
+in that region
+to null infinity. Null infinity\index{null infinity}\label{no-hair-null-infinity}
+was introduced briefly on p.~\pageref{null-infinity-intro} 
+is defined formally using conformal techniques, but basically
+refers to points that are infinitely far away in both space and time, and have the 
+two infinities \emph{equal} in a certain
+sense, so that a free light ray could end up there. The definition is based on the
+assumption that the surrounding spacetime
+is asymptotically flat, since otherwise null infinity can't be defined. It is not
+actually necessary to assume a singularity
+as part of the definition; the no-hair theorems guarantee that one exists.}
+%%% -- end of footnote
+That is, a black hole is defined as\index{black hole!definition}
+a region hidden behind an event horizon, and since the definition of an event horizon is dependent on
+the observer, we specify an observer infinitely far away. 
+Birkhoff's theorem has a somewhat different structure than those of the no-hair theorems, since
+it assumes a symmetry and proves the existence of an event horizon (if the vacuum region is extended
+to small enough radii), whereas the no-hair theorems assume an event horizon and prove the form of
+the metric, including its symmetries.
+
+The no-hair theorems cannot classify naked singularities,
+i.e., those not hidden behind horizons. The role of naked singularities in relativity is the subject
+of the cosmic censorship hypothesis, which is an open problem. The theorems do not rule out the
+Big Bang singularity, because we cannot define the notion of an observer infinitely far from the Big Bang.
+We can also see that Birkhoff's theorem does not prohibit the Big Bang, because
+cosmological models are not vacuum solutions with $\Lambda=0$. Black string
+solutions are not ruled out by Birkhoff's theorem because they would lack spherical symmetry,
+so we need the arguments given on 
+p.~\pageref{sec:schwarzschild-d-dimensions} to show that they don't exist.\index{black string}
+
+We saw on pp.~\pageref{singularity-dim-elementary} and \pageref{boundary-constructions} that
+there is no clearly defined way to treat a singularity as a geometrical object, and that this
+ambiguity extends even to such seemingly straightforward questions as how many dimensions it has.
+Geometrically, as Gertrude Stein said about Oakland, there's ``no there there.''\label{no-there-there}
+We could also ask whether a black hole singularity has any \emph{physical properties}.
+If so, then the no-hair theorems would limit the list of such properties to at most three.
+But we cannot ascribe these properties to the singularity itself.
+Rather, they are properties of some large region of the spacetime, measurable by an observer at
+asymptotic infinity. Such an observer cannot say whether a black hole's mass is a property of
+the singularity; she cannot even say whether the singularity exists ``now.'' In this sense
+a black hole singularity is not an ``it.'' Asking about ``its'' properties is like asking what
+time it is when the tip of the minute hand is at the center
+of the clock. The dial only exists around the circumference of the circle, not at its center.
+<% end_sec('no-hair') %>
+
+
+<% begin_sec("The gravitational potential") %>
+When Pound and Rebka made the first observation of gravitational redshifts, these shifts were
+interpreted as evidence of gravitational time dilation, i.e., a mismatch in the rates of
+clocks. We are accustomed to connecting these two ideas by using the expression $e^{-\Delta\Phi}$ for
+the ratio of the rates of two clocks (example \ref{eg:gps}, p.~\pageref{eg:gps}), where $\Phi$ is a function of the spatial coordinates,
+and this is in fact the most general possible definition of
+a gravitational potential $\Phi$ in relativity. Since a stationary field allows us to compare
+rates of clocks, it seems that we should be able to define a gravitational potential for any
+stationary field. There is a problem, however, because when we talk about a potential, we normally
+have in mind something that has encoded within it all there is to know about the field. We would
+therefore expect to be able to find the metric from the potential. But the
+example of the rotating earth shows that this need not be the case for a general stationary field.
+In that example, there are effects like frame-dragging that clearly cannot be deduced from $\Phi$;
+for by symmetry, $\Phi$ is independent of azimuthal angle, and therefore it cannot distinguish
+between the direction of rotation and the contrary direction. In a static spacetime, these
+rotational effects don't exist; a static vacuum spacetime can be described completely in terms
+of a single scalar potential plus information about the spatial curvature.
+
+There are two main reasons why relativity does not offer a gravitational
+potential with the same general utility as its Newtonian counterpart.\index{potential!relativistic vs. Newtonian}
+
+The Einstein field equations are nonlinear. Therefore one cannot, in general, find the field
+created by a given set of sources by adding up the potentials. At best this is a possible
+weak-field approximation. In particular, although Birkhoff's theorem\index{Birkhoff's theorem}
+is in some ways analogous to the Newtonian shell theorem, it cannot be used to find the metric
+of an arbitrary spherically symmetric mass distribution by breaking it up into spherical shells.
+
+It is also not meaningful to talk about any kind of gravitational potential for spacetimes that aren't static or stationary.
+For example, consider a cosmological model describing our expanding universe. Such models are
+usually constructed according to the Copernican principle that no position in the universe occupies
+a privileged place. In other words, they are homogeneous in the sense that they have Killing vectors
+describing arbitrary translations and rotations. Because of this high degree of symmetry, a gravitational
+potential for such a model would have to be independent of position, and then it clearly could not
+encode any information about the spatial part of the metric. Even if we were willing to make the
+potential a function of time, $\Phi(t)$, the results would still be nonsense. The gravitational
+potential is defined in terms of rate-matching of clocks, so a potential that was purely a function
+of time would describe a situation in which all clocks, everywhere in the universe, were changing
+their rates in a uniform way. But this is clearly just equivalent to a redefinition of the time
+coordinate, which has no observable consequences because general relativity is coordinate-invariant.
+A corollary is that in a cosmological spacetime, it is not possible to give a natural prescription for deciding whether a
+particular redshift is gravitational (measured by $\Phi$) or kinematic, or some combination of the two\label{potential-cosm}
+(see also p.~\pageref{split-kin-grav}).\index{red-shift!cosmological!kinematic versus gravitational}
+<% end_sec %> % The gravitational potential
+
+<% end_sec %> % Static and stationary spacetimes
+
+<% begin_sec("The uniform gravitational field revisited") %>\label{sec:uniform-field-kasner}\index{uniform gravitational field}\index{gravitational field!uniform}
+This section gives a somewhat exotic example.
+It is not necessary to read it in order to understand the later material.
+
+In problem \ref{hw:uniform-field} on page \pageref{hw:uniform-field}, we made a wish list of desired properties
+for a uniform gravitational field, and found that they could not all be satisfied at once. That is, there is no
+global solution to the Einstein field equations that uniquely and satisfactorily embodies all of our Newtonian
+ideas about a uniform field. We now revisit this question in the light of our new knowledge.
+
+The 1+1-dimensional metric
+\begin{equation*}
+  \der s^2 = e^{2gz}\der t^2-\der z^2
+\end{equation*}
+is the one that uniquely satisfies our expectations based on the equivalence principle (example \ref{eg:gps}, p.~\pageref{eg:gps}), and it is a vacuum solution.
+We might logically try to generalize this to 3+1 dimensions as follows:
+\begin{equation*}
+  \der s^2 = e^{2gz}\der t^2-\der x^2 - \der y^2 - \der z^2\eqquad.
+\end{equation*}
+But a funny thing happens now --- simply by slapping on the two new Cartesian axes $x$ and $y$, it turns out
+that we have made our vacuum solution into a non-vacuum solution, and not only that, but the
+resulting stress-energy tensor is unphysical (ch.~\ref{ch:sources}, problem \ref{hw:uniform-field-sources},
+p.~\pageref{hw:uniform-field-sources}).
+
+One way to proceed would be to relax our insistence on making the spacetime one that exactly
+embodies the equivalence principle's requirements for a uniform field.\footnote{Thanks to physicsforums.com user
+Mentz114 for suggesting this approach and demonstrating the following calculation.%http://physicsforums.com/showthread.php?t=377254
+} This can be done by
+taking $g_{tt}=e^{2\Phi}$, where $\Phi$ is not necessarily equal to $2gz$. By requiring that the metric be a 3+1 vacuum
+solution, we arrive at a differential equation whose solution is $\Phi=\ln(z+k_1)+k_2$, which recovers
+the flat-space metric that we found in example \ref{eg:const-accel-metric} on page \pageref{eg:const-accel-metric}
+by applying a change of coordinates to the Lorentz metric.
+
+What if we want to carry out the generalization from 1+1 to 3+1 without violating the equivalence principle?
+For physical motivation in how to get past this obstacle, consider the following argument made by
+Born in 1920.\footnote{Max Born, \emph{Einstein's Theory of Relativity}, 1920. In the 1962 Dover edition, the relevant passage
+is on p.~320}
+Take a frame of reference tied to a rotating disk, as in the example from which Einstein originally took much of the
+motivation for creating a geometrical theory of gravity (subsection \ref{sec:carousel}, p.~\pageref{sec:carousel}).\index{rotating frame of reference}
+Clocks near the edge of the disk run slowly, and by the equivalence principle, an observer on the disk
+interprets this as a gravitational time dilation. But this is not the only relativistic effect seen by
+such an observer. Her rulers are also Lorentz contracted as seen by a non-rotating observer, and
+she interprets this as evidence of a non-Euclidean spatial geometry. There are some physical differences
+between the rotating disk and our default conception of a uniform field, specifically in the question
+of whether the metric should be static (i.e., lacking in cross-terms between the space and time variables).
+But even so, these considerations make it natural to hypothesize that the correct 3+1-dimensional
+metric should have transverse spatial coefficients that decrease with height.
+
+With this motivation, let's consider a metric of the form
+\begin{equation*}
+  \der s^2 = e^{2z}\der t^2-e^{-2jz}\der x^2 - e^{-2kz}\der y^2 - \der z^2\eqquad,
+\end{equation*}
+where $j$ and $k$ are constants, and I've taken $g=1$ for convenience.\footnote{A metric of this general form is referred to as a Kasner
+metric. One usually sees it written with a logarithmic change of variables, so that $z$ appears in the base rather than
+in the exponent.}\index{Kasner metric} The following Maxima code
+calculates the scalar curvature and the Einstein tensor:
+\begin{listing}{1}
+load(ctensor);
+ct_coords:[t,x,y,z];
+lg:matrix([exp(2*z),0,0,0],
+          [0,-exp(-2*j*z),0,0],
+          [0,0,-exp(-2*k*z),0],
+          [0,0,0,-1]
+);
+cmetric();   
+scurvature();
+leinstein(true);
+\end{listing}
+% kasner.mac
+The output from line 9 shows that the scalar curvature is constant, which is a necessary condition for any spacetime that we want to think of
+as representing a uniform field. Inspecting the Einstein tensor output by line 10, we find that
+in order to get $G_{xx}$ and $G_{yy}$ to vanish, we need $j$ and $k$ to be $(1 \pm \sqrt{3} i)/2$.
+By trial and error, we find that assigning the complex-conjugate values to $j$ and $k$ makes $G_{tt}$ and $G_{zz}$ vanish as well,
+so that we have a vacuum solution. This solution is, unfortunately, complex, so it is not of any obvious value as a physically
+meaningful result. Since the field equations are nonlinear, we can't use the usual trick of forming real-valued superpositions
+of the complex solutions. We could try simply taking the real part of the metric. This gives
+$g_{xx}=e^{-z}\cos\sqrt{3}z$ and $g_{yy}=e^{-z}\sin\sqrt{3}z$, and is unsatisfactory because the metric becomes
+degenerate (has a zero determinant) at $z=n \pi/2\sqrt{3}$, where $n$ is an integer.
+
+It turns out, however, that there is a very similar solution, found by Petrov in
+1962,\footnote{Petrov, in \emph{Recent Developments in General Relativity}, 1962, Pergamon, p. 383. For a presentation that
+is freely accessible online, see Gibbons and Gielen,
+``The Petrov and Kaigorodov-Ozsv\'{a}th Solutions: Spacetime as a Group Manifold,'' \url{arxiv.org/abs/0802.4082}.} that is real-valued.
+The Petrov metric,\index{Petrov metric} which describes a spacetime with cylindrical symmetry, is:
+\begin{equation*}\label{eq:petrov-metric}
+  \der s^2 = -\der r^2 - e^{-2r}\der z^2+e^r[2\sin\sqrt{3}r \der \phi \der t-\cos\sqrt{3}r(\der \phi^2-\der t^2)]
+\end{equation*}
+Note that it has many features in common with the complex oscillatory solution we found above. There are transverse
+length contractions that decay and oscillate in exactly the same way.
+The presence of the $ \der \phi \der t$ term tells us that this is a non-static,
+rotating solution --- exactly like the one that Einstein and Born had in mind in their prototypical example!
+We typically obtain this type of effect due to frame dragging\index{Lense-Thirring effect}\index{frame dragging}
+by some rotating massive body (see p.~\pageref{sec:frame-dragging}), and
+the Petrov solution can indeed be
+interpreted as the spacetime that exists in the vacuum on the exterior of an infinite, rigidly rotating cylinder of ``dust''
+(see p.~\pageref{eg:dust-and-radiation-cosm}).
+
+The complicated Petrov metric might seem like the furthest possible thing from a uniform gravitational field,
+but in fact it is about the closest thing general relativity provides to such a field.
+We first note that the metric has Killing vectors $\partial_z$, $\partial_\phi$, and $\partial_r$,
+so it has at least three out of the four translation symmetries we expect from a uniform field.
+By analogy with electromagnetism, we would expect this symmetry to be absent in the radial direction, since
+by Gauss's law the electric field of a line of charge falls off like $1/r$.
+But surprisingly, the Petrov metric is also uniform radially. It is possible to give the fourth
+killing vector explicitly (it is $\partial_r + z\partial_z + (1/2)(\sqrt{3}t-\phi)\partial_\phi - (1/2)(\sqrt{3}\phi+t)\partial_t$),
+but it is perhaps more transparent to check that it
+represents a field of constant strength (problem \ref{hw:petrov-strength}, p.~\pageref{hw:petrov-strength}).
+
+For insight into this surprising result, recall that in
+our attempt at constructing the Cartesian version of this metric, we ran into the problem that the metric became
+degenerate at $z=n \pi/2\sqrt{3}$. The presence of the $\der \phi \der t$ term prevents this from happening in Petrov's
+cylindrical version; two of the metric's diagonal components can vanish at certain values of $r$, but the presence of the off-diagonal component
+prevents the determinant from going to zero. (The determinant is in fact equal to $-1$ everywhere.)
+What is happening physically is that although the labeling of the $\phi$ and $t$ coordinates suggests a time and an azimuthal
+angle, these two coordinates are in fact treated completely symmetrically. At values of $r$ where the cosine factor
+equals 1, the metric is diagonal, and has signature $(t,\phi,r,z)=(+,-,-,-)$, but when the cosine equals $-1$,
+this becomes $(-,+,-,-)$, so that $\phi$ is now the timelike coordinate. This perfect symmetry between $\phi$ and $t$
+is an extreme example of frame-dragging, and is produced because of the specially chosen rate of rotation of the dust
+cylinder, such that the velocity of the dust at the outer surface is exactly $c$ (or approaches it).
+
+Classically, we would expect that a test particle released close enough to the cylinder would be pulled in
+by the gravitational attraction and destroyed on impact, while a particle released farther away would fly
+off due to the centrifugal force, escaping and eventually approaching a constant velocity. Neither of these would be anything like the experience of
+a test particle released in a uniform field. But consider a particle released at rest in the rotating frame
+at a radius $r_1$ for which $\cos\sqrt{3}r_1=1$, so that $t$ is the timelike coordinate. The particle accelerates (let's say outward),
+but at some point it arrives at an $r_2$ where the cosine equals zero, and the $\phi-t$ part of the metric is purely
+of the form $\der\phi\der t$. At this location, we can define local coordinates $u=\phi-t$ and $v=\phi+t$,
+so that the metric depends only on $\der u^2-\der v^2$. One of the coordinates, say $u$, is now the timelike one.
+Since our particle is material,
+its world-line must be timelike, so it is swept along in the $-\phi$ direction.
+Gibbons and Gielen show that the particle will now come back inward, and continue forever by oscillating
+back and forth between two radii at which the cosine vanishes.
+
+<% begin_sec("Closed timelike curves") %>\label{sec:ctc}\index{closed timelike curves}
+This oscillation still doesn't sound like the motion of a particle in a uniform field, but another strange thing happens,
+as we can see by taking another look at the values of $r$ at which the cosine vanishes.
+At such a value of $r$, construct a curve of the form $(t=\text{constant},r=\text{constant},\phi,z=\text{constant})$.
+This is a closed curve, and its proper length is zero, i.e., it is lightlike. This violates causality.
+A photon could travel around this path and arrive at its starting point at the same time when it was emitted.
+Something similarly weird hapens to the test particle described above: whereas it seems to fall sometimes up and sometimes down, in fact it
+is always falling down --- but sometimes it achieves this by falling up while moving backward in time!
+
+Although the Petov metric violates causality,
+Gibbons and Gielen have shown that it satisfies the chronology protection conjecture:\index{chronology protection conjecture}
+``In the context of causality violation we have shown that one cannot create CTCs [closed timelike curves] by spinning up a cylinder beyond
+its critical angular velocity by shooting in particles on timelike or null curves.''
+
+We have an exact vacuum solution to the Einstein field equations that violates causality. This raises troublesome questions
+about the logical self-consistency of general relativity. 
+A very readable and entertaining overview of these issues is given in the final chapter of Kip Thorne's \emph{Black Holes and Time Warps:
+Einstein's Outrageous Legacy}. In a toy model constructed by Thorne's students, involving a billiard ball and a wormhole, it turned out that there always
+seemed to be self-consistent solutions to the ball's equations of motion, but they were not unique, and they often involved
+disquieting possibilities in which the ball went back in time and collided with its earlier self. Among other things, this seems to lead to
+a violation of conservation of mass-energy, since no mass was put into the system to create extra copies of the ball. This would then
+be an example of the fact that, as discussed in section \ref{sec:no-conservation-laws}, general
+relativity does not admit global conservation laws. However, there is also an argument that the mouths of the wormhole
+change in mass in such a way as to preserve conservation of energy.\footnote{\url{http://golem.ph.utexas.edu/string/archives/000550.html}}
+<% end_sec %> % closed timelike curves
+
+
+<% end_sec %> % uniform field
+
+
+
+<% begin_hw_sec %>
+
+<% begin_hw('screw') %>
+Example \ref{eg:cylinder-killing} on page \pageref{eg:cylinder-killing} gave the Killing vectors
+$\partial_z$ and $\partial_\phi$ of a cylinder. If we express these instead as two linearly independent Killing
+vectors that are linear combinations of these two, what is the geometrical interpretation?
+<% end_hw %>
+
+<% begin_hw('alice-stationary') %>
+Section \ref{sec:static-and-stationary} told the story of Alice trying to find evidence that her spacetime is
+not stationary, and also listed the following examples of spacetimes that were not stationary: (a)
+the solar system, (b) cosmological models, (c) gravitational
+waves propagating at the speed of light, and (d) a cloud of matter undergoing gravitational collapse. For each of these,
+show that it is possible for Alice to accomplish her mission.
+<% end_hw %>
+
+<% begin_hw('constant-curvature-invariants') %>
+If a spacetime has a certain symmetry, then we expect that symmetry to be detectable in the behavior
+of curvature scalars such as the scalar curvature $R=R\indices{^a_a}$ and the Kretchmann invariant $k=R^{abcd}R_{abcd}$.\index{Kretchmann invariant}\\
+(a) Show that the metric
+\begin{equation*}
+  \der s^2 = e^{2gz}\der t^2-\der x^2 - \der y^2 - \der z^2
+\end{equation*}
+from page \pageref{sec:uniform-field-kasner} has constant values of $R=1/2$ and $k=1/4$. Note that Maxima's ctensor package has
+built-in functions for these; you have to call the \verb@lriemann@ and \verb@uriemann@ before calling them.\hwendpart
+(b) Similarly, show that the Petrov metric
+\begin{equation*}
+  \der s^2 = -\der r^2 - e^{-2r}\der z^2+e^r[2\sin\sqrt{3}r \der \phi \der t-\cos\sqrt{3}r(\der \phi^2-\der t^2)]
+\end{equation*}
+(p.~\pageref{eq:petrov-metric}) has $R=0$ and $k=0$.\hwendpart
+\hwremark{Surprisingly, one can have a spacetime on which every possible curvature invariant vanishes identically,
+and yet which is not flat. See Coley, Hervik, and Pelavas, ``Spacetimes characterized by their scalar curvature invariants,''
+\url{arxiv.org/abs/0901.0791v2}.}
+<% end_hw %>
+% constant-curvature-invariants.mac
+
+<% begin_hw('petrov-strength') %>\index{Petrov metric}
+Section \ref{sec:uniform-field-kasner} on page \pageref{sec:uniform-field-kasner} presented the Petrov metric.
+The purpose of this problem is to verify that the gravitational field it represents does not fall off with distance.
+For simplicity, let's restrict our attention to a particle released at an $r$ such that $\cos\sqrt{3}r=1$, so that
+$t$ is the timelike coordinate. Let the particle be released at rest in the sense that initially it has
+$\dot{z}=\dot{r}=\dot{\phi}=0$, where dots represent differentiation with respect to the particle's
+proper time. Show that the magnitude of the proper acceleration is independent of $r$.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('rotation-with-no-center') %>
+The idea that a frame is ``rotating'' in general relativity can be formalized by saying
+that the frame is stationary but not static. Suppose someone says that any rotation must have a center.
+Give a counterexample.
+\hwsoln
+<% end_hw %>
+
+<% end_hw_sec %>
+
+<% end_chapter %>

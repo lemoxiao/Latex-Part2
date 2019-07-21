@@ -1,0 +1,1782 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+%======
+% TEXT
+%======
+
+% Builds \labelX, \refX, \RefX, \refXRange, \RefXRange, \refPageOfX, and
+% \RefPageOfX commands:
+%    #1: The identifier (X) in singular
+%    #2: Plural identifier term
+%    #3: Short term to appear in reference (without ending dot)
+\makeatletter
+\newcounter{refListLength}
+\NewDocumentCommand{\buildLabelRefCommands}{mom}{%
+  \expandafter\newcommand\csname label#1\endcsname[1]{\label{#1:##1}}%
+  \expandafter\NewDocumentCommand\csname @ref#1\endcsname{smm}{%
+    \IfBooleanF{##1}{##3}%
+    \ref{#1:##2}%
+  }%
+  \expandafter\NewDocumentCommand\csname ref#1\endcsname{sm}{%
+    \def\refcmd{\csname @ref#1\endcsname}%
+    \def\prefix{#3.\thinspace}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname Ref#1\endcsname{sm}{%
+    \def\refcmd{\csname @ref#1\endcsname}%
+    \def\prefix{#1~}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname @ref#1List\endcsname{smm}{%
+    \setcounter{refListLength}{0}%
+    \foreach \r in {##2} {\stepcounter{refListLength}}%
+    \edef\numRefs{\arabic{refListLength}}%
+    \IfBooleanF{##1}{##3}%
+    \foreach \r [count=\ri] in {##2} {%
+      \ifnum \ri=\numRefs
+        \ifnum \numRefs>1
+          and~%
+        \fi%
+      \fi%
+      \ref{#1:\r}%
+      \ifnum \ri<\numRefs
+        \ifnum \numRefs>2
+          ,%
+        \fi
+        \ %
+      \fi%
+    }%
+  }%
+  \expandafter\NewDocumentCommand\csname ref#1List\endcsname{sm}{%
+    \def\refcmd{\csname @ref#1List\endcsname}%
+    \def\prefix{#3s.\thinspace}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname Ref#1List\endcsname{sm}{%
+    \def\refcmd{\csname @ref#1List\endcsname}%
+    \def\prefix{\IfValueTF{#2}{#2}{#1s}~}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname @ref#1Range\endcsname{smmm}{%
+    \IfBooleanF{##1}{##4}%
+    \mbox{\ref{#1:##2}--\ref{#1:##3}}%
+  }%
+  \expandafter\NewDocumentCommand\csname ref#1Range\endcsname{smm}{%
+    \def\refcmd{\csname @ref#1Range\endcsname}%
+    \def\prefix{#3s.\thinspace}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{##3}{\prefix}}%
+                     {\refcmd{##2}{##3}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname Ref#1Range\endcsname{smm}{%
+    \def\refcmd{\csname @ref#1Range\endcsname}%
+    \def\prefix{\IfValueTF{#2}{#2}{#1s}~}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{##3}{\prefix}}%
+                     {\refcmd{##2}{##3}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname @refPageOf#1\endcsname{smm}{%
+    \IfBooleanF{##1}{##3}%
+    \pageref{#1:##2}%
+  }%
+  \expandafter\NewDocumentCommand\csname refPageOf#1\endcsname{sm}{%
+    \def\refcmd{\csname @refPageOf#1\endcsname}%
+    \def\prefix{p.\thinspace}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname RefPageOf#1\endcsname{sm}{%
+    \def\refcmd{\csname @refPageOf#1\endcsname}%
+    \def\prefix{Page~}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname @refPagesOf#1List\endcsname{smm}{%
+    \setcounter{refListLength}{0}%
+    \foreach \r in {##2} {\stepcounter{refListLength}}%
+    \edef\numRefs{\arabic{refListLength}}%
+    \IfBooleanF{##1}{##3}%
+    \foreach \r [count=\ri] in {##2} {%
+      \ifnum \ri=\numRefs
+        \ifnum \numRefs>1
+          and~%
+        \fi%
+      \fi%
+      \pageref{#1:\r}%
+      \ifnum \ri<\numRefs
+        \ifnum \numRefs>2
+          ,%
+        \fi
+        \ %
+      \fi%
+    }%
+  }%
+  \expandafter\NewDocumentCommand\csname refPagesOf#1List\endcsname{sm}{%
+    \def\refcmd{\csname @refPagesOf#1List\endcsname}%
+    \def\prefix{pp.\thinspace}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname RefPagesOf#1List\endcsname{sm}{%
+    \def\refcmd{\csname @refPagesOf#1List\endcsname}%
+    \def\prefix{Pages~}%
+    \IfBooleanTF{##1}{\refcmd*{##2}{\prefix}}%
+                     {\refcmd{##2}{\prefix}}%
+  }%
+  \expandafter\NewDocumentCommand\csname nameref#1\endcsname{sm}{%
+    \def\refcmd{\csname ref#1\endcsname}%
+    \IfBooleanF{##1}{\refcmd*{##2}.\thinspace}%
+    \nameref{#1:##2}%
+  }%
+}
+\makeatother
+
+% Build labeling and reference commands
+\buildLabelRefCommands{Algorithm}{Alg}
+\buildLabelRefCommands{Appendix}[Appendices]{Ap}
+\buildLabelRefCommands{Chapter}{Chap}
+\buildLabelRefCommands{Definition}{Def}
+\buildLabelRefCommands{Equation}{Eq}
+\buildLabelRefCommands{Figure}{Fig}
+\buildLabelRefCommands{Section}{Sect}
+\buildLabelRefCommands{Table}{Tab}
+
+% Macro for labeling and references pages
+\newcommand{\labelPage}[1]{\label{page:#1}}
+\newcommand{\refPage}[1]{p.\thinspace\pageref{page:#1}}
+
+% Other text commands
+\NewDocumentCommand{\eg}{s}{%
+  e.g%
+  \IfBooleanF{#1}{.\ }%
+}
+\NewDocumentCommand{\etal}{s}{%
+  et al%
+  \IfBooleanF{#1}{.\ }%
+}
+\NewDocumentCommand{\etc}{s}{%
+  etc%
+  \IfBooleanF{#1}{.\ }%
+}
+\NewDocumentCommand{\st}{s}{%
+  s.t%
+  \IfBooleanF{#1}{.\ }%
+}
+\NewDocumentCommand{\versus}{s}{%
+  vs%
+  \IfBooleanF{#1}{.\ }%
+}
+\NewDocumentCommand{\wrt}{s}{%
+  w.r.t%
+  \IfBooleanF{#1}{.\ }%
+}
+\newcommand{\todo}[1]{%
+  \textcolor{black!25!red}{\textsc{todo}:~#1}%
+}
+\newcommand{\toolFont}[1]{\textsc{#1}}
+
+% Enable bold version of the monotype font
+% See http://www.macfreek.nl/memory/LaTeX_Bold_Typewriter_Font
+\DeclareFontShape{OT1}{cmtt}{bx}{n}%
+  {<5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
+
+% For highlighting text
+% See https://tex.stackexchange.com/a/74469/2634
+\newcommand{\hlDiffColor}{black!25}
+\newcommand{\hlStrut}{%
+  \vrule width 0pt height .9\ht\strutbox depth .9\dp\strutbox\relax%
+}
+\NewDocumentCommand{\hlDiff}{mo}{%
+  \IfValueT{#2}{\hspace{#2}}%
+  \begingroup%
+  \setlength{\fboxsep}{0pt}%
+  \ifmmode%
+    \colorbox{\hlDiffColor}{\hlStrut$#1$\/}%
+  \else%
+    \colorbox{\hlDiffColor}{\hlStrut#1\/}%
+  \fi%
+  \endgroup%
+  \IfValueT{#2}{\hspace{#2}}%
+}
+
+\NewDocumentEnvironment{statement}{}{%
+  \begin{list}{}{}
+    \item\itshape%
+}{%
+  \end{list}%
+}
+
+
+%=======
+% LISTS
+%=======
+
+\setlist{noitemsep}
+
+\setlist[itemize]{%
+  label=\raisebox{1pt}{\rule{4pt}{4pt}},
+}
+
+\newlist{inlinelist}{enumerate*}{1}
+\setlist[inlinelist]{%
+  label={},
+  itemjoin={},
+}
+
+\newlist{contributions}{enumerate}{2}
+\setlist[contributions,1]{%
+  label=C\arabic*,
+  labelsep=8pt,
+}
+\setlist[contributions,2]{%
+  label=\alph*.,
+  ref=\alph*,
+  topsep=0pt,
+}
+
+\NewDocumentCommand{\labelContribution}{m}{%
+  \label{cont:#1}%
+}
+\NewDocumentCommand{\refContribution}{m}{%
+  \ref{cont:#1}%
+}
+
+\newlist{publications}{enumerate}{1}
+\setlist[publications]{%
+  label=P\arabic*,
+  labelsep=8pt,
+  itemsep=.5\baselineskip,
+}
+
+\NewDocumentCommand{\labelPublication}{m}{%
+  \label{pub:#1}%
+}
+\NewDocumentCommand{\refPublication}{m}{%
+  \ref{pub:#1}%
+}
+
+\newlist{requirements}{enumerate}{1}
+\setlist[requirements]{%
+  label=R\arabic*,
+  labelsep=8pt,
+  itemsep=.5\baselineskip,
+}
+
+\NewDocumentCommand{\labelRequirement}{m}{%
+  \label{req:#1}%
+}
+\NewDocumentCommand{\refRequirement}{m}{%
+  \ref{req:#1}%
+}
+
+\newlist{modelList}{enumerate*}{1}
+\setlist[modelList]{%
+  label={(\textsc{\roman*})},
+  ref=\textsc{\roman*},
+  itemjoin={;\ },
+  itemjoin*={; and\ },
+}
+
+\NewDocumentCommand{\labelModel}{m}{%
+  \label{model:#1}%
+}
+\NewDocumentCommand{\refModel}{m}{%
+  \ref{model:#1}%
+}
+
+\newlist{patternList}{enumerate*}{1}
+\setlist[patternList]{%
+  label={(\textsc{\roman*})},
+  ref=\textsc{\roman*},
+  itemjoin={;\ },
+  itemjoin*={; and\ },
+}
+
+\NewDocumentCommand{\labelPattern}{m}{%
+  \label{pattern:#1}%
+}
+\NewDocumentCommand{\refPattern}{m}{%
+  \ref{pattern:#1}%
+}
+
+\setlist[description]{%
+  font=\sffamily,
+}
+
+
+%==============
+% PUBLICATIONS
+%==============
+
+\NewDocumentEnvironment{authorsContribution}{}{%
+
+  \vspace{.5\baselineskip}
+  {\sffamily\bfseries Contribution}\quad%
+}{%
+}
+
+
+%=========
+% FIGURES
+%=========
+
+\newlength{\betweensubfigures}
+\setlength{\betweensubfigures}{\baselineskip}
+
+% Declares a paragraph where a figure will be inlined with the text. Commands
+% for the figure itself must be as they would appear within a 'figure'
+% environment (however, do not explicitly declare such an environment as it will
+% taken care of by the macro.
+%
+% Attributes for controlling the position of the figure are 'l' (always on the
+% left), 'r' (always on the right), and 'p' (right if the page is odd and left
+% if the page is even).
+%
+% It might happen that the paragraph is split over two pages. In such cases it
+% is necessary to manually break the paragraph into two but allowing the last
+% line of the first paragraph to fill the entire width of the page. This is done
+% by appending
+%
+%      {\parfillskip=0pt\relax\par}
+%
+% to the first paragraph.
+%
+% Arguments:
+%    #1: Width of figure.
+%    #2: Positioning attribute: l, r, or p. Optional (default is p).
+%    #3: Number-of-lines offset from the top of the paragraph. Optional (default
+%        is 0).
+\newbool{isInsideInParFigure}
+\newtoggle{positionLeft}
+\newlength{\leftParOffset}
+\newlength{\rightParOffset}
+\newsavebox{\inParFigureBox}
+\newlength{\inParFigureHeight}
+\newcounter{totalArgs}
+\NewDocumentEnvironment{inParFigure}{mO{p}O{0}}{%
+  \inParFigureX{#1}{#2}{#3}%
+}{%
+  \endinParFigureX%
+}
+\NewEnviron{inParFigureX}[3]{%
+  % Check position attribute
+  \ifthenelse{\equal{#2}{l}}{%
+    \global\toggletrue{positionLeft}%
+  }{}%
+  \ifthenelse{\equal{#2}{r}}{%
+    \global\togglefalse{positionLeft}%
+  }{}%
+  \ifthenelse{\equal{#2}{p}}{%
+    \checkoddpage
+    \ifthenelse{\boolean{oddpage}}{%
+      \global\togglefalse{positionLeft}
+    }{%
+      \global\toggletrue{positionLeft}
+    }%
+  }{}%
+  \ifthenelse{\equal{#2}{l} \OR \equal{#2}{r} \OR \equal{#2}{p}}{}{%
+    \PackageError{}{Position argument must be either 'l', 'r', or 'p'!}%
+  }%
+
+  % Make minipage to contain figure
+  \savebox{\inParFigureBox}{%
+    \begin{minipage}{#1}%
+      \booltrue{isInsideInParFigure}%
+      \iftoggle{positionLeft}{}{%
+        \mbox{}\hfill%
+      }%
+      \parbox{\widthof{\BODY}}{\BODY}%
+      \boolfalse{isInsideInParFigure}%
+    \end{minipage}%
+  }%
+  \setlength{\inParFigureHeight}{\ht\inParFigureBox+\dp\inParFigureBox}%
+
+  % Put figure as a zero-width entity with depth such that it will be placed at
+  % desired position within paragraph
+  \setlength{\parindent}{0pt}%
+  \iftoggle{positionLeft}{}{%
+    \hfill%
+  }%
+  \adjustbox{%
+    raise={-\height+\inParFigureHeightTweak\baselineskip-#3\baselineskip}%
+          {0pt}%
+          {0pt}%
+  }{%
+    \usebox{\inParFigureBox}%
+  }%
+  \vspace{-\baselineskip}% Undo line skip
+  \par%
+
+  % Calculate height of minipage in number of text lines
+  \pgfmathtruncatemacro{\numLinesPGF}{ceil(\inParFigureHeight/\baselineskip)}%
+  \global\edef\numLines{\numLinesPGF}%
+
+  % Make paragraph shape to allow figure to be inlined
+  \gdef\makeParShape{%
+    \iftoggle{positionLeft}{%
+      \setlength{\leftParOffset}{#1+\inParFigureTextPadding}%
+      \setlength{\rightParOffset}{\textwidth-\leftParOffset}%
+    }{%
+      \setlength{\leftParOffset}{0pt}%
+      \setlength{\rightParOffset}{\textwidth-#1-\inParFigureTextPadding}%
+    }%
+    \setcounter{totalArgs}{#3+\numLines+1}%
+    \parshape = \value{totalArgs}%
+      \MyRepeat{#3}{0pt \textwidth}%
+      \MyRepeat{\numLines}{\leftParOffset \rightParOffset}%
+      0pt \textwidth%
+  }%
+}
+\AfterEndEnvironment{inParFigure}{%
+  \makeParShape%
+}
+\NewDocumentCommand{\inParFigureTextPadding}{}{1.5em}
+\NewDocumentCommand{\inParFigureHeightTweak}{}{0.55}
+
+% Command for repeating something n times.
+\makeatletter
+\newcommand{\MyRepeat}[1]{%
+  \expandafter\@MyRepeat\expandafter{\the\numexpr #1\relax}%
+}
+\def\@MyRepeat#1{%
+  \ifnum#1>0
+    \expandafter\@@MyRepeat\expandafter{%
+      \the\numexpr #1-1\expandafter\relax\expandafter%
+    }%
+  \else%
+    \expandafter\@gobble%
+  \fi%
+}
+\def\@@MyRepeat#1#2{%
+  \@MyRepeat{#1}{#2}#2%
+}
+\makeatother
+
+
+%========
+% TABLES
+%========
+
+\newcommand{\tabhead}{\sffamily\bfseries}
+\newcommand{\mathtabhead}[1]{\bm{#1}}
+
+
+%======
+% MATH
+%======
+
+% Define 'definition' environment
+\newtheoremstyle{def}%
+                {\topsep}%
+                {\topsep}%
+                {}%
+                {}%
+                {\sffamily\relsize{-0.8}\bfseries}%
+                {}%
+                {1em}%
+                {%
+                  \thmname{#1}%
+                  \thmnumber{ #2}%
+                  \thmnote{ -- %
+                    \setboolean{consFontForceTextRM}{false}%
+                    #3%
+                    \setboolean{consFontForceTextRM}{true}%
+                  }%
+                }
+\theoremstyle{def}
+\newtheorem{definition}{Definition}[chapter]
+
+% Reduce vertical spacing of displaymath inside a 'definition' environment
+\AtBeginEnvironment{definition}{%
+  \setlength{\abovedisplayskip}{5pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{5pt plus 2pt minus 2pt}%
+}
+
+% General commands
+\newcommand{\mathsc}[1]{\textrm{\textsc{#1}}}
+\newcommand{\overbar}[1]{
+  \mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu
+}
+\NewDocumentCommand{\mPowerset}{m}{
+  2^{#1}
+}
+\newcommand{\mTransp}{\mathsf{T}}
+\newcommand{\mNatNumSet}{\mathbb{N}}
+\newcommand{\mPhi}{\varphi}
+\newcommand{\mSigma}{\Sigma}
+\NewDocumentCommand{\mSequence}{sm}{
+  \IfBooleanT{#1}{\left}\langle
+    #2
+  \IfBooleanT{#1}{\right}\rangle
+}
+\NewDocumentCommand{\mSet}{sm}{
+  \IfBooleanT{#1}{\left}\{
+    #2
+  \IfBooleanT{#1}{\right}\}
+}
+\def\mSetSep{\mid}%
+\NewDocumentCommand{\mSetBuilder}{smm}{
+  \IfBooleanTF{#1}{
+    \left\{
+    \begin{array}{@{}c|c@{}}
+      #2 & #3
+    \end{array}
+    \right\}
+  }{
+    \mSet{#2 \mSetSep #3}
+  }
+}
+\NewDocumentCommand{\mCard}{sm}{
+  \IfBooleanT{#1}{\left}|
+    #2
+  \IfBooleanT{#1}{\right}|
+}
+\newcommand{\mEmptySet}{\varnothing}
+\newcommand{\mFunFont}[1]{\mathit{#1}}
+\NewDocumentCommand{\mEdge}{mm}{
+  #1 \rightarrow #2
+}
+\NewDocumentCommand{\mPair}{smm}{
+  \IfBooleanT{#1}{\left}(
+    #2, #3
+  \IfBooleanT{#1}{\right})
+}
+\NewDocumentCommand{\mTuple}{sm}{
+  \IfBooleanT{#1}{\left}\langle
+    #2
+  \IfBooleanT{#1}{\right}\rangle
+}
+\newcommand{\mAnd}{\wedge}
+\newcommand{\mBigAnd}{\bigwedge}
+\newcommand{\mOr}{\vee}
+\newcommand{\mImp}{\Rightarrow}
+\newcommand{\mEq}{\Leftrightarrow}
+\newcommand{\mNot}{\neg}
+\newcommand{\mFunDecl}[3]{
+  #1 : #2 \rightarrow #3
+}
+\newcommand{\mMatrix}[1]{\mathit{#1}}
+\newcommand{\mVector}[1]{\vec{#1}}
+\newcommand{\mBigO}{O}
+\DeclareMathOperator{\mInEdgeNr}{\mFunFont{in}}
+\DeclareMathOperator{\mOutEdgeNr}{\mFunFont{out}}
+\DeclareMathOperator{\mMax}{\mFunFont{max}}
+\DeclareMathOperator{\mMin}{\mFunFont{min}}
+\DeclareMathOperator{\mPred}{\mFunFont{pred}}
+\DeclareMathOperator{\mRank}{\mFunFont{rank}}
+\DeclareMathOperator{\mSucc}{\mFunFont{succ}}
+\DeclareMathOperator{\mSource}{\mFunFont{source}}
+\DeclareMathOperator{\mTarget}{\mFunFont{target}}
+\DeclareMathOperator{\mType}{\mFunFont{type}}
+
+\newcommand{\mNodeMatchRel}{\backsimeq}
+\newcommand{\mVFTwoAttrCmp}{\mNodeMatchRel}
+
+\newcommand{\mAnchor}{\bullet}
+\newlength{\boxSize}
+\setlength{\boxSize}{1.08ex}
+\newlength{\boxLineWidth}
+\setlength{\boxLineWidth}{.13ex}
+\newlength{\hexagonEdgeLength}
+\pgfmathsetlengthmacro{\hexagonEdgeLength}{\boxSize/(2*sin(60))}
+\newcommand{\mBox}{%
+  \tikz%
+  \draw [line width=\boxLineWidth]%
+        (0,0) -- (0, \boxSize) -- (\boxSize, \boxSize) -- (\boxSize, 0) --
+        cycle;%
+  \mkern 1mu%
+}
+\newcommand{\mStop}{%
+  \tikz%
+  \draw [line width=\boxLineWidth]%
+        (0,0) --
+        ++(120:\hexagonEdgeLength) --
+        ++(60:\hexagonEdgeLength) --
+        ++(0:\hexagonEdgeLength) --
+        ++(-60:\hexagonEdgeLength) --
+        ++(-120:\hexagonEdgeLength) --
+        cycle;
+}
+% Constraint model-related commands
+\renewcommand{\emptyset}{\varnothing}
+\newcommand{\mStronger}{\leq}
+\newboolean{consFontForceTextRM}
+\setboolean{consFontForceTextRM}{true}
+\NewDocumentCommand{\mConstraintFont}{sm}{%
+  \IfBooleanTF{#1}{%
+    \StrLeft{#2}{1}[\tempa]%
+    \StrGobbleLeft{#2}{1}[\tempb]%
+    \ifthenelse{\boolean{consFontForceTextRM}}{%
+      \mathsc{\MakeUppercase{\tempa}\MakeLowercase{\tempb}}%
+    }{%
+      \textsc{\MakeUppercase{\tempa}\MakeLowercase{\tempb}}%
+    }%
+  }{%
+    \ifthenelse{\boolean{consFontForceTextRM}}{%
+      \mathsc{\MakeLowercase{#2}}%
+    }{%
+      \textsc{\MakeLowercase{#2}}%
+    }%
+  }%
+}
+\newcommand{\mBrPattern}{g_{\mathrm{br}}}
+\newcommand{\mConst}{\rule{3pt}{3pt}}
+\newcommand{\mCopy}{\circ}
+\newcommand{\mKill}{\times}
+\newcommand{\mNull}{\bot}
+\newcommand{\mNullCopy}{\rlap{$\mCopy$} \mkern-.125mu \mNull}
+\newcommand{\mState}{\square}
+\newcommand{\mUFGraph}{G}
+\newcommand{\mPatternSet}{S}
+\newcommand{\mExtPatternSet}{\mPatternSet_\mathrm{ext}}
+\newcommand{\mArgSet}{A}
+\NewDocumentCommand{\mOpSet}{o}{
+  \IfValueTF{#1}{O_{#1}}{O}
+}
+\NewDocumentCommand{\mOpCompSet}{m}{
+  \mOpSet_{\overbar{#1}}
+}
+\NewDocumentCommand{\mOperandSet}{o}{
+  \IfValueTF{#1}{P_{#1}}{P}
+}
+\NewDocumentCommand{\mOperandCompSet}{m}{
+  \mOperandSet_{\overbar{#1}}
+}
+\newcommand{\mPhiOperandSet}{\mOperandSet[\mPhi]}
+\newcommand{\mPhiOperandCompSet}{\mOperandCompSet{\mPhi}}
+\newcommand{\mForbiddenCombSet}{F}
+\newcommand{\mCostMatrix}{\mMatrix{C}}
+\newcommand{\mDomMatrix}{\mMatrix{R}}
+\NewDocumentCommand{\mDataSet}{o}{
+  \IfValueTF{#1}{D_{#1}}{D}
+}
+\NewDocumentCommand{\mDataCompSet}{m}{
+  \mDataSet_{\overbar{#1}}
+}
+\newcommand{\mConstDataSet}{\mDataSet[\mConst]}
+\newcommand{\mConstDataCompSet}{\mDataCompSet{\mConst}}
+\newcommand{\mStateDataSet}{\mDataSet[\mState]}
+\newcommand{\mStateDataCompSet}{\mDataCompSet{\mState}}
+\newcommand{\mBlockSet}{B}
+\newcommand{\mFunctionDefEdgeSet}{E}
+\newcommand{\mFunctionEntryBlock}{b_{\mathsc{f}}}
+\newcommand{\mMatchDefEdgeSet}{E_{M}}
+\NewDocumentCommand{\mMatchSet}{o}{
+  \IfValueTF{#1}{M_{#1}}{M}
+}
+\NewDocumentCommand{\mMatchCompSet}{m}{
+  \mMatchSet_{\overbar{#1}}
+}
+\newcommand{\mCopyMatchSet}{\mMatchSet[\mCopy]}
+\newcommand{\mCopyMatchCompSet}{\mMatchCompSet{\mCopy}}
+\newcommand{\mKillMatchSet}{\mMatchSet[\mKill]}
+\newcommand{\mKillMatchCompSet}{\mMatchCompSet{\mKill}}
+\newcommand{\mNullMatchSet}{\mMatchSet[\!\mNull]}
+\newcommand{\mNullCopyMatchSet}{\mMatchSet[\mNullCopy]}
+\newcommand{\mPhiMatchSet}{\mMatchSet[\mPhi]}
+\newcommand{\mPhiMatchCompSet}{\mMatchCompSet{\mPhi}}
+\newcommand{\mLocationSet}{L}
+\newcommand{\mFallThroughSet}{J}
+\NewDocumentCommand{\mInterchDataSet}{o}{
+  \IfValueTF{#1}{I_{#1}}{I}
+}
+\newcommand{\mIntLocation}{l_{\mathsc{int}}}
+\newcommand{\mKilledLocation}{l_{\mathsc{killed}}}
+\NewDocumentCommand{\mVar}{mo}{
+  \mathbf{#1}{\IfValueTF{#2}{[#2]}{}}
+}
+\newcommand{\mBRVLine}{\vrule width 0.4pt height 1.6ex depth 2pt}
+\NewDocumentCommand{\mBoolRepVar}{m}{%
+  [ \mathllap{\mBRVLine\hspace*{.85pt}} #1 \mathrlap{\hspace*{.85pt}\mBRVLine} ]
+}
+\newcommand{\mResourceSet}{R}
+\newcommand{\mHeuristicCost}{C_{\mathsc{heur}}}
+\newcommand{\mRelaxedCost}{C_{\mathsc{rlx}}}
+\DeclareMathOperator{\mArgLoc}{\mFunFont{argLoc}}
+\DeclareMathOperator{\mBranches}{\mFunFont{branches}}
+\DeclareMathOperator{\mBlockOf}{\mFunFont{blockOf}}
+\DeclareMathOperator{\mCapOf}{\mFunFont{cap}}
+\DeclareMathOperator{\mCapUseLocsOf}{\mFunFont{capUseLocsOf}}
+\DeclareMathOperator{\mCapDefLocsOf}{\mFunFont{capDefLocsOf}}
+\DeclareMathOperator{\mCupUseLocsOf}{\mFunFont{cupUseLocsOf}}
+\DeclareMathOperator{\mCupDefLocsOf}{\mFunFont{cupDefLocsOf}}
+\DeclareMathOperator{\mChild}{\mFunFont{child}}
+\DeclareMathOperator{\mConsumes}{\mFunFont{consumes}}
+\DeclareMathOperator{\mCost}{\mFunFont{cost}}
+\DeclareMathOperator{\mCovers}{\mFunFont{covers}}
+\DeclareMathOperator{\mDataOf}{\mFunFont{dataOf}}
+\DeclareMathOperator{\mDefines}{\mFunFont{defines}}
+\DeclareMathOperator{\mDisableIncompUsers}{\mFunFont{disableUses}}
+\DeclareMathOperator{\mDom}{\mFunFont{dom}}
+\DeclareMathOperator{\mDomain}{\mFunFont{D}}
+\DeclareMathOperator{\mEmits}{\mFunFont{emits}}
+\DeclareMathOperator{\mEmptyBlock}{\mFunFont{isEmpty}}
+\DeclareMathOperator{\mEntry}{\mFunFont{entry}}
+\DeclareMathOperator{\mExtValues}{\mFunFont{extValues}}
+\DeclareMathOperator{\mIsExt}{\mFunFont{isExt}}
+\DeclareMathOperator{\mFreq}{\mFunFont{freq}}
+\DeclareMathOperator{\mLat}{\mFunFont{lat}}
+\DeclareMathOperator{\mMatched}{\mFunFont{matched}}
+\DeclareMathOperator{\mMTrees}{\mFunFont{mtrees}}
+\DeclareMathOperator{\mNumChildren}{\mFunFont{numch}}
+\DeclareMathOperator{\mOpCost}{\mFunFont{cost}}
+\DeclareMathOperator{\mResourceUse}{\mFunFont{req}}
+\DeclareMathOperator{\mSpans}{\mFunFont{spans}}
+\DeclareMathOperator{\mStates}{\mFunFont{states}}
+\DeclareMathOperator{\mStores}{\mFunFont{stores}}
+\DeclareMathOperator{\mUses}{\mFunFont{uses}}
+\DeclareMathOperator{\mUsersOf}{\mFunFont{usersOf}}
+\DeclareMathOperator{\mWeight}{\mFunFont{weight}}
+\DeclareMathOperator{\mWidthOf}{\mFunFont{widthOf}}
+
+\NewDocumentCommand{\mkGlobalConCommands}{om}{%
+  \IfValueTF{#1}{%
+    \expandafter\DeclareMathOperator\csname m#1\endcsname{\mConstraintFont{#2}}
+    \expandafter\DeclareMathOperator\csname M#1\endcsname{\mConstraintFont*{#2}}
+  }{%
+    \expandafter\DeclareMathOperator\csname m#2\endcsname{\mConstraintFont{#2}}
+    \expandafter\DeclareMathOperator\csname M#2\endcsname{\mConstraintFont*{#2}}
+  }
+}
+
+\mkGlobalConCommands{AllDifferent}
+\mkGlobalConCommands{Circuit}
+\mkGlobalConCommands{Cumulative}
+\mkGlobalConCommands{GCC}
+\mkGlobalConCommands{Increasing}
+\mkGlobalConCommands{NoOverlap}
+\mkGlobalConCommands{Table}
+\mkGlobalConCommands[ValuePrecChain]{VPC}
+
+% For typesetting matrices
+\newsavebox{\matrixBox}
+\NewDocumentEnvironment{aMatrix}{m}{
+  \left[
+    \begin{array}{@{\,}#1@{\,}}
+}{
+    \end{array}
+  \right]
+}
+
+% Typesets a tree that appears in the sigma set.
+\NewDocumentCommand{\mSigmaTree}{mm}{%
+  #1(#2)%
+}
+
+\newcommand{\mSubsumes}{\geq}
+\newcommand{\mStrictSubsumes}{>}
+\newcommand{\mImmSubsumes}{>_i}
+\newcommand{\mMatchSetBase}[1]{#1_0}
+\NewDocumentCommand{\mReduceCost}{mm}{
+  \mFunFont{reducecost}(
+    #1 \xrightarrow{\raisebox{-2pt}[-6pt]{\scriptsize$*$}} #2
+  )
+}
+
+% Get \udtimes symbol from 'mathdesign' package
+\DeclareFontEncoding{MDA}{}{}
+\DeclareFontSubstitution{MDA}{cmr}{m}{n}
+\DeclareSymbolFont{mathdesignA}{MDA}{mdugm}{m}{n}
+\DeclareMathSymbol{\udtimes}{\mathbin}{mathdesignA}{"5D}
+
+
+%============
+% REFERENCES
+%============
+
+\addbibresource{references.bib}
+
+% Command alias.
+\NewDocumentCommand{\printreferences}{}{%
+  \printbibliography%
+}
+
+% Bibliography options:
+%    - Write first and middle names as initials in the bibliography
+%    - Sort references by label (when citing)
+%    - Set 2 names as max before invoking "et al." when citing
+%    - Print all names in bibliography
+\ExecuteBibliographyOptions{%
+  giveninits=true,
+  sortcites=true,
+  maxcitenames=2,
+  maxbibnames=100,
+  hyperref=true,
+  urldate=iso8601,
+}
+
+% Include prefixes in citations.
+% https://tex.stackexchange.com/a/23397/2634
+\ExecuteBibliographyOptions{%
+  useprefix=false,
+}
+\makeatletter
+\AtBeginDocument{%
+  \toggletrue{blx@useprefix}% Use prefixes in running text
+  \renewcommand*{\mkbibnameprefix}[1]{\MakeCapital{#1}}}% Capitalize prefixes in
+                                                        % running text
+\AtBeginBibliography{%
+  \renewcommand*{\mkbibnameprefix}[1]{#1}}% Uncapitalize prefixes in
+                                          % bibliography
+\makeatother
+
+% Customize appearance of chapter heading
+\newcommand{\refname}{References}
+\defbibheading{bibliography}[\refname]{%
+  \chapter*{#1}%
+  \addcontentsline{toc}{chapter}{\refname}%
+  \markboth{#1}{#1}%
+}
+
+% Customize URL field
+\DeclareFieldFormat{url}{\textsc{url}:~\relsize{-.5}\url{#1}}
+
+% Use "Doctoral thesis" instead of "PhD thesis"
+\DefineBibliographyStrings{english}{%
+  phdthesis={doctoral thesis},
+  urlseen={accessed},
+}
+
+% Prevent pagebreaks within entries
+% http://tex.stackexchange.com/a/43275/2634
+\patchcmd{\bibsetup}{\interlinepenalty=5000}{\interlinepenalty=10000}{}{}
+
+% Modify \fullcite to include all authors.
+\let\oldfullcite\fullcite
+\renewcommand{\fullcite}[1]{%
+  \AtNextCite{\AtEachCitekey{\defcounter{maxnames}{100}}}%
+  \oldfullcite{#1}%
+}
+
+
+%============
+% GLOSSARIES
+%============
+
+% Add "glossary" to table of content
+\glstoctrue
+
+% Disable hyperlinks from terms to index
+\glsdisablehyper
+
+% Add new fields to glossary entries
+\glsaddkey{indextext}%
+          {}%
+          {\glsentryindextext}%
+          {\Glsentryindextext}%
+          {\glsindextext}%
+          {\Glsindextext}%
+          {\GLSindextext}
+\glsaddkey{isacronym}%
+          {false}%
+          {\glsentryisacronym}%
+          {\Glsentryisacronym}%
+          {\glsisacronym}%
+          {\Glsisacronym}%
+          {\GLSisacronym}
+\glsaddkey{acronymlabel}%
+          {}%
+          {\glsentryacronymlabel}%
+          {\Glsentryacronymlabel}%
+          {\glsacronymlabel}%
+          {\Glsacronymlabel}%
+          {\GLSacronymlabel}
+\glsaddkey{acronymdesc}%
+          {}%
+          {\glsentryacronymdesc}%
+          {\Glsentryacronymdesc}%
+          {\glsacronymdesc}%
+          {\Glsacronymdesc}%
+          {\GLSacronymdesc}
+
+\newcommand{\glsIsAcronym}[3]{%
+  \glsletentryfield{\tmpa}{#1}{isacronym}%
+  \expandafter\ifstrequal\expandafter{\tmpa}{true}{%
+    #2%
+  }{%
+    #3%
+  }%
+}
+
+% Customize index style
+\newcommand{\indexPageFont}{%
+  \scshape%
+}
+\newcommand{\undoIndexPageFont}{%
+  \normalfont%
+}
+
+\renewcommand{\glossaryentrynumbers}[1]{%
+  {\indexPageFont#1}%
+}
+\newglossarystyle{myindex}{%
+  \setglossarystyle{mcolindex}
+  \setlength{\columnsep}{8mm}
+  \renewcommand*{\glstreenamefmt}[1]{{\sffamily\bfseries##1}}
+  \renewcommand*{\glossentry}[2]{%
+     \item\glsentryitem{##1}%
+       \glstreenamefmt{%
+         \glstarget{##1}{%
+           \glsletentryfield{\tmpa}{##1}{indextext}%
+           \expandafter\ifblank\expandafter{\tmpa}{%
+             \glsentryfirst{##1}%
+           }{%
+             \glsentryindextext{##1}%
+           }%
+         }%
+       }%
+       \space\hfill\space##2%
+  }
+  \renewcommand{\subglossentry}[3]{%
+    \ifcase##1\relax
+      % level 0
+      \item
+    \or
+      % level 1
+      \subitem
+      \glssubentryitem{##2}%
+    \else
+      % all other levels
+      \subsubitem
+    \fi
+    \glstreenamefmt{\glstarget{##2}{\glossentryname{##2}}}%
+    \space\hfill\space##3%
+  }%
+}
+
+\renewcommand{\printindex}[1][]{%
+  \setglossarystyle{myindex}
+  \printglossary[title={Index}, #1]
+}
+
+\newglossarystyle{myloa}{%
+  \setglossarystyle{list}
+  \setlist[description]{%
+    font=\sffamily,
+    labelwidth=4em,
+  }
+  \renewcommand*{\glossentry}[2]{%
+    \glsIsAcronym{##1}{%
+      \item[\glsentryacronymlabel{##1}] \glsentryacronymdesc{##1}
+    }{}
+  }%
+  \renewcommand*{\subglossentry}[3]{%
+   \glsIsAcronym{##2}{%
+      \item[\glsentryacronymlabel{##2}] \glsentryacronymdesc{##2}
+    }{}
+   }%
+  \renewcommand*{\glsgroupskip}{}%
+}
+
+\newcommand{\listofacronyms}[1][]{%
+  \setglossarystyle{myloa}
+  \printglossary[title={List of Acronyms}, #1]
+}
+
+% Commands for introducing terms and acronyms
+\NewDocumentCommand{\newTerm}{omO{}}{%
+  \IfValueTF{#1}{%
+    \newglossaryentry{#1}{isacronym={false}, name={#2}, description={#2}, #3}%
+  }{%
+    \newglossaryentry{#2}{isacronym={false}, name={#2}, description={#2}, #3}%
+  }%
+}
+\NewDocumentCommand{\newAcronym}{ommO{}}{%
+  \IfValueTF{#1}{%
+    \newTerm[#1]%
+            {#2}%
+            [%
+              isacronym={true},
+              acronymlabel={#2},
+              acronymdesc={#3},
+              indextext={#2},
+              description={#3},
+              first={#3 (#2)},
+              firstplural={#3s (#2s)},
+              #4%
+            ]%
+  }{%
+    \newTerm{#2}%
+            [%
+              isacronym={true},
+              acronymlabel={#2},
+              acronymdesc={#3},
+              indextext={#2},
+              description={#3},
+              first={#3~(#2)},
+              firstplural={#3s~(#2s)},
+              #4%
+            ]%
+  }%
+}
+\NewDocumentCommand{\newToolTerm}{omO{}}{%
+  \IfValueTF{#1}{%
+    \newTerm[#1]{\toolFont{#2}}[sort={#2}, #3]%
+  }{%
+    \newTerm[#2]{\toolFont{#2}}[sort={#2}, #3]%
+  }%
+}
+
+% Commands for referring to a short version of a term or acronym
+\let\glsshort\glsuseri
+\let\Glsshort\Glsuseri
+\let\glsplshort\glsuserii
+\let\Glsplshort\Glsuserii
+\let\glshyphened\glsuseriii
+\let\Glshyphened\Glsuseriii
+\let\glslong\glsuseriv
+\let\Glslong\Glsuseriv
+\let\glspllong\glsuserv
+\let\Glspllong\Glsuserv
+
+% Adds a modifier to all \gls-like commands for emphasizing the term or acronym
+\newcommand{\glsEmph}[1]{\emph{#1}}
+\GlsXtrSetAltModifier{!}{format=hyperit}
+\makeatletter
+\renewcommand*{\glslinkpostsetkeys}{%
+  \ifdefstring\@glsnumberformat{hyperit}%
+                               {\let\glstextformat\glsEmph}%
+                               {\let\glstextformat\@firstofone}%
+}
+\makeatother
+
+% Rename certain items
+\renewcommand{\seename}{see also}
+
+% Force 'see also' to appear on a new line in the index
+\renewcommand\glsseeformat[3][\seename]{%
+  \\*\undoIndexPageFont\raggedleft\emph{#1} \glsseelist{#2}%
+}
+
+
+%===================
+% TABLE OF CONTENTS
+%===================
+
+% Change ToC title
+\renewcommand{\contentsname}{Table of Contents}
+
+% Increase width for chapter numbers
+\addtolength{\cftchapternumwidth}{4pt}
+\addtolength{\cftsectionindent}{4pt}
+\addtolength{\cftsectionnumwidth}{3pt}
+
+% Right-align chapter numbers
+\renewcommand{\cftchapterpresnum}{\hfill}
+\renewcommand{\cftchapteraftersnum}{\hspace*{8pt}}
+
+% Reduce space between leading dots
+\renewcommand{\cftsectiondotsep}{4}
+
+% Edit font of page numbers
+\renewcommand{\cftchapterformatpnum}[1]{%
+  \textsc{\textbf{#1}}%
+}
+\renewcommand{\cftsectionformatpnum}[1]{%
+  \textsc{#1}%
+}
+
+% Increase width for page numbers (to prevent titles to run into them)
+\setpnumwidth{2.55em}
+
+% Set titles in ragged right mode (rmarg should be greater than numwidth)
+\setrmarg{3.55em plus 1fil}
+
+% Force same indentation for entries in List of Algorithms as other List of Fig.
+% https://tex.stackexchange.com/a/381303/2634
+\makeatletter
+\renewcommand*\l@algocf{\l@figure}
+\makeatother
+
+
+%======================================
+% TITLE, CHAPTER, AND SECTION HEADINGS
+%======================================
+
+\makeatletter
+\apptocmd{\@titleFont}{\sffamily}{}{}
+\apptocmd{\@frontMatterChapFont}{\sffamily}{}{}
+\makeatother
+
+\maxsecnumdepth{subsubsection}
+
+\setlength{\midchapskip}{50pt}
+\renewcommand*{\chapterheadstart}{%
+  % Remove all space above chapter heading
+}
+\renewcommand*{\chapnamefont}{%
+  \sffamily\large\scshape%
+}
+\renewcommand*{\chapnumfont}{%
+  \normalfont\fontsize{80}{64}\selectfont%
+}
+\renewcommand*{\printchaptername}{%
+  % Do not print 'Chapter' or 'Appendix'
+}
+\makeatletter
+\renewcommand*{\printchapternum}{%
+  \flushright%
+  \begin{tabular}{@{}c@{}}
+    \chapnamefont\MakeLowercase{\@chapapp}\\[.5ex]
+    \chapnumfont\thechapter%
+  \end{tabular}%
+}
+\renewcommand*{\printchaptertitle}[1]{%
+  \flushleft\chaptitlefont#1%
+}
+\renewcommand*{\chaptitlefont}{%
+  \sffamily\Huge\bfseries%
+}
+\setsecheadstyle{\sffamily\Large\bfseries}
+\setsubsecheadstyle{\sffamily\large\bfseries}
+\setsubsubsecheadstyle{\sffamily\bfseries}
+\setparaheadstyle{\sffamily\bfseries}
+
+% Customize typesetting of page headers and footers
+\newcommand{\hfMarkText}[1]{%
+  \footnotesize\textosf{\textsc{\MakeLowercase{#1}}}%
+}
+\nouppercaseheads
+\makeevenhead{headings}%
+             {\hfMarkText{\thepage}}%
+             {}%
+             {\hfMarkText{\leftmark}}
+\makeoddhead{headings}%
+            {\hfMarkText{\rightmark}}%
+            {}%
+            {\hfMarkText{\thepage}}
+\makeoddfoot{plain}%
+            {}%
+            {\hfMarkText{\thepage}}%
+            {}
+\makeatletter
+\renewcommand{\@hfMarkText}[1]{\hfMarkText{#1}}
+\makeatother
+
+% Remove chapter section numbers from header marks
+\addtopsmarks{headings}{}{
+  \createmark{chapter}{left}{shownumber}{}{ \ }
+}
+\addtopsmarks{headings}{}{
+  \createmark{section}{right}{shownumber}{}{ \ }
+}
+
+% Activate changes
+\pagestyle{headings}
+
+
+%==================
+% FOR WRITING CODE
+%==================
+
+\NewDocumentCommand{\codeFont}{s}{%
+  \ttfamily%
+  \IfBooleanT{#1}{\relsize{-.5}}%
+}
+\NewDocumentCommand{\cCode}{sm}{%
+  \mbox{%
+    \IfBooleanTF{#1}{\codeFont*}{\codeFont}%
+    #2%
+  }%
+}
+\NewDocumentCommand{\cVar}{smo}{%
+  \IfBooleanTF{#1}{%
+    \cCode*{#2\IfValueTF{#3}{$_{\text{#3}}$}{}}%
+  }{%
+    \cCode{#2\IfValueTF{#3}{$_{\text{#3}}$}{}}%
+  }%
+}
+\let\irFont\codeFont
+\NewDocumentCommand{\irCode}{sm}{%
+  \mbox{%
+    \IfBooleanTF{#1}{\irFont*}{\irFont}%
+    #2%
+  }%
+}
+\NewDocumentCommand{\irVar}{smo}{%
+  \IfBooleanTF{#1}{%
+    \irCode*{#2\IfValueTF{#3}{$_{\text{#3}}$}{}}%
+  }{%
+    \irCode{#2\IfValueTF{#3}{$_{\text{#3}}$}{}}%
+  }%
+}
+\NewDocumentCommand{\irTemp}{sm}{%
+  \IfBooleanTF{#1}{%
+    \irCode*{t$_{\text{#2}}$}%
+  }{%
+    \irCode{t$_{\text{#2}}$}%
+  }%
+}
+\NewDocumentCommand{\irAssign}{smm}{%
+  \mbox{#2 $\leftarrow$ #3}%
+}
+\newcommand{\irAddText}{$+$}
+\NewDocumentCommand{\irAdd}{smm}{%
+  \mbox{#2 \irAddText{} #3}%
+}
+\NewDocumentCommand{\irBlock}{sm}{%
+  \IfBooleanTF{#1}{\irCode*{#2}}{\irCode{#2}}%
+}
+\newcommand{\irBrText}{br}
+\NewDocumentCommand{\irBr}{sm}{%
+  \mbox{%
+    \IfBooleanTF{#1}{%
+      \irCode*{\bfseries\irBrText}%
+    }{%
+      \irCode{\bfseries\irBrText}%
+    }
+    \IfBooleanTF{#1}{\irBlock*{#2}}{\irBlock{#2}}%
+  }%
+}
+\newcommand{\irCallText}{call}
+\NewDocumentCommand{\irCall}{sm}{%
+  \mbox{%
+    \IfBooleanTF{#1}{%
+      \irCode*{\bfseries\irCallText}%
+    }{%
+      \irCode{\bfseries\irCallText}%
+    }
+    \IfBooleanTF{#1}{\irCode*{#2}}{\irCode{#2}}%
+  }%
+}
+\newcommand{\irCondBrText}{c.br}
+\NewDocumentCommand{\irCondBr}{smmm}{%
+  \mbox{%
+    \IfBooleanTF{#1}{%
+      \irCode*{\bfseries\irCondBrText}%
+    }{%
+      \irCode{\bfseries\irCondBrText}%
+    }
+    \IfBooleanTF{#1}{%
+      \irCode*{#2, }\irBlock*{#3}\irCode*{, }\irBlock*{#4}%
+    }{%
+      \irCode{#2, }\irBlock{#3}\irCode{, }\irBlock{#4}%
+    }%
+  }%
+}
+\newcommand{\irCpText}{cp}
+\newcommand{\irEQText}{$=$}
+\NewDocumentCommand{\irEQ}{smm}{\mbox{#2 \irEQText{} #3}}
+\newcommand{\irNEText}{$\neq$}
+\NewDocumentCommand{\irNE}{smm}{\mbox{#2 \irNEText{} #3}}
+\newcommand{\irGEText}{$\geq$}
+\NewDocumentCommand{\irGE}{smm}{\mbox{#2 \irGEText{} #3}}
+\newcommand{\irGTText}{$>$}
+\NewDocumentCommand{\irGT}{smm}{\mbox{#2 \irGTText{} #3}}
+\newcommand{\irLEText}{$\leq$}
+\NewDocumentCommand{\irLE}{smm}{\mbox{#2 \irLEText{} #3}}
+\newcommand{\irLTText}{$<$}
+\NewDocumentCommand{\irLT}{smm}{\mbox{#2 \irLTText{} #3}}
+\newcommand{\irLSHText}{$\ll$}
+\NewDocumentCommand{\irLSH}{smm}{\mbox{#2 \irLSHText{} #3}}
+\newcommand{\irMulText}{$\times$}
+\NewDocumentCommand{\irMul}{smm}{\mbox{#2 \irMulText{} #3}}
+\newcommand{\irLoadText}{load}
+\NewDocumentCommand{\irLoad}{sm}{%
+  \IfBooleanTF{#1}{%
+    \irCode*{\bfseries\irLoadText}%
+  }{%
+    \irCode{\bfseries\irLoadText}%
+  }
+  #2%
+}
+\newcommand{\irPhiText}{$\mPhi$}
+\NewDocumentCommand{\irPhi}{sm}{\mbox{\irPhiText(#2)}}
+\newcommand{\irRetText}{ret}
+\NewDocumentCommand{\irRet}{sm}{%
+  \IfBooleanTF{#1}{%
+    \irCode*{\bfseries\irRetText}%
+  }{%
+    \irCode{\bfseries\irRetText}%
+  }
+  #2%
+}
+\newcommand{\irStoreText}{store}
+\NewDocumentCommand{\irStore}{smm}{%
+  \IfBooleanTF{#1}{%
+    \irCode*{\bfseries\irStoreText}%
+  }{%
+    \irCode{\bfseries\irStoreText}%
+  }
+  #2, #3%
+}
+\newcommand{\irSubText}{$-$}
+\NewDocumentCommand{\irSub}{smm}{\mbox{#2 \irSubText{} #3}}
+\newcommand{\irZextText}{zxt}
+\NewDocumentCommand{\irZext}{sm}{%
+  \IfBooleanTF{#1}{%
+    \irCode*{\bfseries\irZextText}%
+  }{%
+    \irCode{\bfseries\irZextText}%
+  }
+  #2%
+}
+
+% Commands to be used inside TikZ nodes
+\NewDocumentCommand{\noWidth}{mO{0pt}}{%
+  \raisebox{#2}[\height][0pt]{#1}%
+}
+\newcommand{\nAdd}{\irCode{\noWidth{\irAddText}}}
+\newcommand{\nBlock}[1]{\irCode{#1}}
+\newcommand{\nBr}{\irCode{\irBrText}}
+\newcommand{\nCall}[1]{\irCode{\noWidth{#1}}}
+\NewDocumentCommand{\nCondBr}{s}{%
+  \IfBooleanTF{#1}{%
+    \irCode{\irCondBrText}%
+  }{%
+    \irCode{c{\kern-1pt}.{\kern-1.2pt}b{\kern-.3pt}r}%
+  }%
+}
+\NewDocumentCommand{\nRet}{s}{%
+  \IfBooleanTF{#1}{%
+    \irCode{\irRetText}%
+  }{%
+    \irCode{r{\kern-.3pt}e{\kern-.6pt}t}%
+  }%
+}
+\newcommand{\nCopy}{\irCode{\noWidth{\irCpText}}}
+\newcommand{\nEQ}{\irCode{\noWidth{\irEQText}}}
+\newcommand{\nGT}{\irCode{\noWidth{\irGTText}}}
+\newcommand{\nLT}{\irCode{\noWidth{\irLTText}}}
+\newcommand{\nGE}{\irCode{\noWidth{\irGEText}}}
+\newcommand{\nLE}{\irCode{\noWidth{\irLEText}}}
+\newcommand{\nLSH}{\irCode{\noWidth{\irLSHText}}}
+\newcommand{\nLoad}{\irCode{\noWidth{ld}}}
+\newcommand{\nMul}{\irCode{\noWidth{\irMulText}}}
+\newcommand{\nPhi}{\irCode{\noWidth{\irPhiText}[.5pt]}}
+\NewDocumentCommand{\nStore}{s}{%
+  \IfBooleanTF{#1}{%
+    \irCode{st}%
+  }{%
+    \irCode{s{\kern-.2pt}t}%
+  }%
+}
+\newcommand{\nSub}{\irCode{\noWidth{\irSubText}[-1pt]}}
+\newcommand{\nZext}{\irCode{\noWidth{\irZextText}}}
+\newcommand{\nTemp}[1]{%
+  \irTemp{#1}\hspace*{-1pt}%
+}
+\NewDocumentCommand{\nVar}{mo}{%
+  \irVar{#1\IfValueTF{#2}{$_{\text{#2}}$}{}}%
+  \IfValueTF{#2}{\hspace*{-1pt}}{}%
+}
+
+% Commands used for assembly instructions
+\let\instrFont\irFont
+\let\instrCode\irCode
+\let\instrBlock\irBlock
+\let\instrEQ\irEQ
+\let\instrNE\irNE
+\let\instrGE\irGE
+\let\instrLE\irLE
+\let\instrTemp\irTemp
+\let\instrVar\irVar
+
+% Commands for grammars
+\newcommand{\mNTFont}[1]{%
+  % This command must not be declared using \NewDocumentCommand because it
+  % will appear inside a \bm{...}, which cannot handle \NewDocumentCommand-
+  % declared macros.
+  \mathit{#1}%
+}
+\NewDocumentCommand{\mNT}{mO{}}{%
+  \mNTFont{#1}_{#2}%
+}
+\NewDocumentCommand{\mAttr}{m}{%
+  \mNTFont{#1}%
+}
+\NewDocumentCommand{\mPredicate}{m}{%
+  \mNTFont{#1}%
+}
+\NewDocumentCommand{\mAction}{m}{%
+  \mNTFont{#1}%
+}
+
+
+%========================
+% FOR WRITING ALGORITHMS
+%========================
+
+% Set height of rules
+\setlength{\algoheightrule}{\heavyrulewidth}%
+
+% Commands used for algorithms
+\newcommand{\Or}{\textbf{or}\ }
+\newcommand{\Assign}{$\leftarrow$\ }
+
+\DontPrintSemicolon
+\SetNlSty{tiny}{}{}
+\SetAlFnt{\figureFont\figureFontSize}
+\SetAlCapSkip{\abovecaptionskip}
+\SetAlCapSty{}
+
+% Customize algorithm typesetting
+\newcommand{\algStyle}[1]{\textsf{#1}}
+\newcommand{\kwStyle}[1]{\algStyle{\textbf{#1}}}
+\newcommand{\commentStyle}[1]{\emph{#1}}
+\SetKwSty{kwStyle}
+\SetArgSty{algStyle}
+\SetFuncArgSty{algStyle}
+\patchcmd{\SetProgSty}{ArgSty}{ProgSty}{}{}% There is a bug in \SetProgSty
+\SetProgSty{algStyle}
+\SetCommentSty{commentStyle}
+\SetKwComment{cmt}{\righttriangle\:}{}
+\SetKw{Return}{return}
+\SetNlSty{figureFont}{}{}
+
+\SetKw{And}{and}
+\SetKw{Not}{not}
+\SetKw{Or}{or}
+
+% Command for removing algorithm line number for a single line
+\let\oldnl\nl
+\newcommand{\nonl}{\renewcommand{\nl}{\let\nl\oldnl}}
+
+% Hook for checking whether the 'vlined' option is used
+\newbool{VlinedOptionUsed}
+\boolfalse{VlinedOptionUsed}
+\apptocmd{\SetAlgoVlined}{\booltrue{VlinedOptionUsed}}{}{}
+
+% Command for declaring a function in an algorithm
+\newbool{InsideDeclFunction}
+\boolfalse{InsideDeclFunction}
+\makeatletter
+\newcommand{\DeclFunction}[3]{%
+  \ifbool{InsideDeclFunction}{}{\nonl}%
+  \KwSty{function} #1\,(#2):%
+  \begingroup%
+    \booltrue{InsideDeclFunction}%
+    \algocf@block{#3}{}{}
+  \endgroup%
+  \ifbool{VlinedOptionUsed}{}{%
+    \ifbool{InsideDeclFunction}{}{\nonl}%
+    \KwSty{end}\;%
+  }%
+}
+\makeatother
+
+% Command for calling a function in an algorithm
+\newcommand{\Call}[2]{%
+  #1\,(#2)%
+}
+
+% Redefined \listofalgorithms for consistent appearance
+\makeListOfCommand{\listofalgorithms}{\listalgorithmcfname}{loa}{chapter}
+
+
+%==========
+% LISTINGS
+%==========
+
+\lstset{%
+  basicstyle=\codeFont\footnotesize,
+  frame=lines,
+  framerule=\heavyrulewidth,
+  framexleftmargin=.5em,
+  framexrightmargin=.5em,
+  aboveskip=0pt,
+  belowskip=0pt,
+}
+
+\lstdefinelanguage{minizinc}{%
+  morekeywords={
+    array,
+    array1d,
+    array2d,
+    bool2int,
+    card,
+    circuit,
+    constraint,
+    domain,
+    diff,
+    div,
+    endif,
+    else,
+    exists,
+    false,
+    fix,
+    forall,
+    if,
+    in,
+    include,
+    increasing,
+    index\_set\_1of2,
+    int,
+    int\_search,
+    intersect,
+    let,
+    max,
+    min,
+    minimize,
+    mod,
+    not,
+    of,
+    output,
+    seq\_search,
+    set,
+    show,
+    solve,
+    subset,
+    sum,
+    table,
+    test,
+    then,
+    true,
+    union,
+    value\_precede\_chain,
+    var,
+    where,
+  },
+  sensitive=true,
+  morecomment=[l]{\%},
+  morestring=[b]",
+  numbers=left,
+  numberstyle=\tiny\ttfamily,
+}
+
+% Creates a minipage of certain width where the frame from the listings will
+% not overflow.
+\newenvironment{lstpage}[1]{%
+  \begin{minipage}{#1}%
+    \centering%
+    \begin{minipage}{#1-1em}%
+}{%
+    \end{minipage}%
+  \end{minipage}%
+}
+
+
+%=========
+% CAPTION
+%=========
+
+% Add period at end of every caption and subcaption
+\captionsetup{textformat=period}
+
+% algorithm2e does not obey the caption settings above and requires a patch
+\makeatletter
+\patchcmd{\algocf@captiontext}{\endgraf}{\unskip.\endgraf}{}{}
+\makeatother
+
+% Fix captions of algorithms so that they use the entire text width
+\makeatletter
+\pretocmd{\algocf@makecaption}{%
+  \addtolength{\hsize}{1.5\algomargin}%
+  \setlength{\algomargin}{0pt}%
+}{}{}
+\makeatother
+
+
+%==================
+% EXPERIMENT PLOTS
+%==================
+
+\newcommand{\expDir}{experiments/20180111-113629}
+
+\NewDocumentCommand{\includeSolvTechStats}{O{disable}m}{%
+  \input{\expDir/solv-tech-#1-#2-pre+solving-time-speedup.stats}%
+}
+
+\newcommand{\functionNameFont}{\LARGE}
+\newcommand{\functionName}[1]{{\functionNameFont\path{#1}}}
+\newcommand{\plotPercentageFont}{\huge}
+\newcommand{\plotPercentage}[1]{{\plotPercentageFont\SI{#1}{\percent}}}
+\newcommand{\normValue}[1]{%
+  \pgfmathparse{and(-1 < #1, #1 < 1) ? 1 : 0}%
+  \ifnum \pgfmathresult=1
+    % Decimal rounding
+    \pgfmathprintnumber[fixed, precision=3]{#1}%
+  \else
+    % Significant figure rounding
+    \pgfmathprintnumberto[fixed, precision=3, verbatim]{#1}{\tempa}%
+    \num[round-mode=figures, round-precision=3]{\tempa}%
+  \fi%
+}
+\newcommand{\plotNormTicsFont}{\huge}
+\newcommand{\plotSpeedupTics}[1]{%
+  {\plotNormTicsFont$\normValue{#1}\mSpeedupSuffix$}%
+}
+\newcommand{\plotZCNormTics}[1]{%
+  {\plotNormTicsFont$\normValue{#1}\mZCNormSuffix$}%
+}
+\newcommand{\plotSecondsFont}{\Large}
+\newcommand{\plotSeconds}[1]{{\plotSecondsFont\SI{#1}{\s}}}
+\newcommand{\barNormValueFont}{}
+\newcommand{\barSymbolFont}{\LARGE}
+\newcommand{\plotBarNormValue}[1]{%
+  {\barNormValueFont\normValue{#1}}%
+}
+\newcommand{\barNormValueNotOptimal}{$*$}
+\newcommand{\plotBarNormValueNotOptimal}{%
+  {\barSymbolFont\barNormValueNotOptimal}%
+}
+\newcommand{\barNormValueNoBaselineSolution}{$**$}
+\newcommand{\plotBarNormValueNoBaselineSolution}{%
+  {\barSymbolFont\barNormValueNoBaselineSolution}%
+}
+\newcommand{\barNormValueNoSolution}{$***$}
+\newcommand{\plotBarNormValueNoSolution}{%
+  {\barSymbolFont\barNormValueNoSolution}%
+}
+\newcommand{\plotSubOptSymbol}{%
+  \Huge\bfseries%
+  \hspace*{4.6pt}%
+  \raisebox{9pt}{$\colon$}%
+}
+
+\newcommand{\trimBarchartPlot}[1]{\trimbox{6pt 12pt 8pt 7pt}{#1}}
+\newcommand{\trimLinechartPlot}[1]{\trimbox{7pt 9pt 9pt 7pt}{#1}}
+
+
+%=========
+% SIUNITX
+%=========
+
+\sisetup{
+  round-mode = places,
+  round-precision = 2,
+}
+
+
+%======
+% MISC
+%======
+
+\usepgflibrary{fpu}
+
+\NewDocumentCommand{\minOf}{m}{%
+  \pgfkeys{/pgf/fpu}% Enable large values
+  \pgfkeys{/pgf/fpu/output format=fixed}%
+  \pgfmathparse{min(#1)}%
+  \pgfkeys{/pgf/fpu=false}% Restore
+}
+
+\NewDocumentCommand{\maxOf}{m}{%
+  \pgfkeys{/pgf/fpu}% Enable large values
+  \pgfkeys{/pgf/fpu/output format=fixed}%
+  \pgfmathparse{max(#1)}%
+  \pgfkeys{/pgf/fpu=false}% Restore
+}
+
+\NewDocumentCommand{\numMinOf}{O{}m}{%
+  \minOf{#2}%
+  \num[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\numMaxOf}{O{}m}{%
+  \maxOf{#2}%
+  \num[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\SIMinOf}{O{}mm}{%
+  \minOf{#2}%
+  \SI[#1]{\pgfmathresult}{#3}%
+}
+
+\NewDocumentCommand{\SIMaxOf}{O{}mm}{%
+  \maxOf{#2}%
+  \SI[#1]{\pgfmathresult}{#3}%
+}
+
+\NewDocumentCommand{\printSolvingTime}{O{}m}{%
+  \SI[round-mode=figures, round-precision=3, #1]{#2}{\s}%
+}
+
+\NewDocumentCommand{\printMinSolvingTime}{O{}m}{%
+  \minOf{#2}%
+  \printSolvingTime[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printMaxSolvingTime}{O{}m}{%
+  \maxOf{#2}%
+  \printSolvingTime[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printCycles}{O{}m}{%
+  \num[round-precision=0, #1]{#2}~cycles%
+}
+
+\NewDocumentCommand{\printMinCycles}{O{}m}{%
+  \minOf{#2}%
+  \printCycles[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printMaxCycles}{O{}m}{%
+  \maxOf{#2}%
+  \printCycles[#1]{\pgfmathresult}%
+}
+
+\newcommand{\mSpeedupSuffix}{\times}
+\newcommand{\mZCNormSuffix}{%
+  \udtimes%
+}
+
+\NewDocumentCommand{\printSpeedup}{sO{}m}{%
+  \pgfmathparse{#3 < 10 ? 1 : 0}%
+  \ifnum \pgfmathresult=1
+    % Decimal rounding
+    \num[round-mode=places, round-precision=2, #2]{#3}%
+  \else
+    % Significant figure rounding
+    \num[round-mode=figures, round-precision=3, #2]{#3}%
+  \fi%
+  \IfBooleanTF{#1}{}{$\mSpeedupSuffix$}%
+}
+
+\NewDocumentCommand{\printMaxSpeedup}{O{}m}{%
+  \maxOf{#2}%
+  \printSpeedup[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printMinSpeedup}{O{}m}{%
+  \minOf{#2}%
+  \printSpeedup[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printZCNorm}{sO{}m}{%
+  \num[round-mode=figures, round-precision=3, #2]{#3}%
+  \IfBooleanTF{#1}{}{$\mZCNormSuffix$}%
+}
+
+\NewDocumentCommand{\printMaxZCNorm}{O{}m}{%
+  \maxOf{#2}%
+  \printZCNorm[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printMinZCNorm}{O{}m}{%
+  \minOf{#2}%
+  \printZCNorm[#1]{\pgfmathresult}%
+}
+
+\NewDocumentCommand{\printGMI}{sO{}m}{%
+  \IfBooleanTF{#1}{%
+    \printSpeedup*[#2]{#3}%
+  }{%
+    \printSpeedup[#2]{#3}%
+  }%
+}
+
+\NewDocumentCommand{\printGMICI}{O{}mO{}m}{%
+  \mbox{$[\printGMI*[#1]{#2}, \printGMI*[#3]{#4}]\mSpeedupSuffix$}%
+}
+
+\newcommand{\supportNo}{$\cdot$}
+\newcommand{\supportYes}{%
+  \begin{tikzpicture}
+    \draw [line width=1.5pt] (0,0) -- ++(-45:4pt) -- ++(45:7.5pt);
+  \end{tikzpicture}%
+}
+\newcommand{\righttriangle}{%
+  \begin{tikzpicture}
+    \draw [line width=.65pt] (0,0) -- ++(-90:4pt) -- ++(30:4pt) -- cycle;
+  \end{tikzpicture}%
+}
+
+% Length to be used for storing temporary values
+\newlength{\tmpLength}

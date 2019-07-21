@@ -1,0 +1,48 @@
+\ProvidesFile{letterStyleAlinz.lco}[2015/10/01 letter style (Andreas Linz)]
+
+\LoadLetterOption{DIN}
+\KOMAoptions{paper=a4,%
+%             symbolicnames,% phone, email symbol etc.
+             parskip=half,%
+             enlargefirstpage=false,%
+             locfield=wide,%
+             fromalign=left,% location, locationleft, center, left, right, location, ...
+             fromrule=aftername% afteraddress
+}
+
+\addtokomafont{fromname}{\bfseries\scshape\large}
+\addtokomafont{fromrule}{\color{blue}}
+\setkomavar{location}{\footnotesize
+    \begin{tabular}[t]{@{}r l}%
+		\ifkomavarempty{fromphone}{}{%
+        	\usekomavar*{fromphone}         & \usekomavar{fromphone}\\
+		}
+		\ifkomavarempty{frommobilephone}{}{%
+	        \usekomavar*{frommobilephone}   & \usekomavar{frommobilephone}\\
+		}
+                                        & \\
+		\ifkomavarempty{fromurl}{}{%
+	        \usekomavar*{fromurl}           & \usekomavar{fromurl}\\
+		}
+		\ifkomavarempty{fromemail}{}{%
+	        \usekomavar*{fromemail}         & \usekomavar{fromemail}
+		}
+    \end{tabular}
+}
+
+\setkomavar{backaddressseparator}{\enspace\textperiodcentered\enspace}
+\setkomavar{enclseparator}{:}
+\setkomavar{signature}{\vspace{\baselineskip}\\\usekomavar{fromname}}
+
+\setkomafont{addressee}{\sffamily}
+\addtokomafont{lettersubject}{\color{blue}}
+
+% examples: ftp://ftp.rrzn.uni-hannover.de/pub/mirror/tex-archive/macros/latex/contrib/koma-script/doc/scrguide.pdf page 204
+\setkomavar{firstfoot}{%
+}
+
+\pagestyle{headings}
+
+\renewcommand\pagemark{%
+    \usekomafont{pagenumber}\thepage{}~/~\pageref{LastPage}%
+}

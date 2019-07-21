@@ -1,0 +1,142 @@
+% ********************************************************************
+% classicthesis-ldpkg.sty (formerly known as loadpackages.sty)
+%
+% Copyright (C) 2011 Andr\'e Miede http://www.miede.de
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{classicthesis-ldpkg}[2011/01/24 v2.9 Package Loader for Classic Thesis Style]
+ 
+\@ifpackageloaded{classicthesis}%
+    {\PackageWarningNoLine{classicthesis-ldpkg}{Package "classicthesis" should be loaded AFTER "classicthesis-ldpkg".}}%
+    {\relax}%    
+ 
+% ********************************************************************
+% Options
+% ******************************************************************** 
+\RequirePackage{ifthen}
+    \newboolean{cld@backref} % enable backrefs in the bibliography
+\DeclareOption{backref}{\setboolean{cld@backref}{true}}
+\ProcessOptions\relax
+
+% ******************************************************************** 
+% Packages
+% ******************************************************************** 
+\RequirePackage[T1]{fontenc}                
+\RequirePackage{textcomp}
+%\RequirePackage[dvipsnames]{xcolor} 
+\RequirePackage{xspace} % to get the spacing after macros right
+\RequirePackage{tabularx} % better tables
+\RequirePackage{mparhack} % get marginpar right
+\RequirePackage{fixltx2e} % fixes some LaTeX stuff
+%\RequirePackage{ellipsis} % ... ;-)                  
+\RequirePackage{relsize} % scale font up or down  
+\RequirePackage[printonlyused,smaller]{acronym} % nice macros for handling all acronyms in the thesis
+%\renewcommand*{\acsfont}[1]{\textssc{#1}}
+\newcommand{\bflabel}[1]{{#1}\hfill} % fix the list of acronyms
+%\RequirePackage{natbib}
+
+% ********************************************************************
+% Commands
+% ********************************************************************                
+\newcounter{dummy} % necessary for correct hyperlinks (to index, bib, etc.)
+\newcommand{\longpage}{\enlargethispage{3\baselineskip}}
+\newcommand{\medpage}{\enlargethispage{2\baselineskip}}
+\newcommand{\shortpage}{\enlargethispage{\baselineskip}}
+\newcommand{\concskip}{\medskip}
+\newcommand{\myPrimRef}[1]{\textit{#1}} % how primary index entries will be marked 
+% ******************************************************************** 
+\newcommand{\ie}{i.\,e.}
+\newcommand{\Ie}{I.\,e.}
+\newcommand{\eg}{e.\,g.}
+\newcommand{\Eg}{E.\,g.}
+\newcommand{\etAl}{et al.\xspace}
+\newcommand{\twod}{2\textsc{d}\xspace}
+\newcommand{\threed}{3\textsc{d}\xspace}
+% ******************************************************************** 
+\newcommand{\system}[1]{\emph{#1}}
+\newcommand{\person}[1]{#1}
+\newcommand{\term}[1]{\emph{#1}}
+\newcommand{\cauthor}[1]{\relax}
+\@ifpackageloaded{natbib}%
+    {\renewcommand{\cauthor}[1]{\person{\citeauthor{#1}}}%
+    }{\PackageWarningNoLine{classicthesis-ldpk}{Package "natbib" not loaded, %
+        command "cauthor" will not work.}}
+\newcommand{\tableheadline}[1]{\multicolumn{1}{c}{\spacedlowsmallcaps{#1}}}
+% ******************************************************************** 
+\newcommand{\RA}{\ensuremath{\Rightarrow}}
+\newcommand{\ra}{\ensuremath{\rightarrow}}
+\newcommand{\lra}{\ensuremath{\leftrightarrow}}
+\newcommand{\On}{\ensuremath{O(n)}\xspace}
+\newcommand{\Ologn}{\ensuremath{O(\log n)}\xspace}
+\newcommand{\Oone}{\ensuremath{O(1)}\xspace}
+
+% ********************************************************************
+% take care of the caption fonts and sizes (tables and figures)
+\RequirePackage{caption}
+    		
+% ********************************************************************
+% enable subfigures in figures
+\RequirePackage{subfig}     
+
+% ********************************************************************
+% Using PDFLaTeX:
+% ********************************************************************
+\RequirePackage[pdftex,hyperfootnotes=false,pdfpagelabels]{hyperref}  % backref linktocpage pagebackref
+\pdfcompresslevel=9
+\pdfadjustspacing=1 
+\RequirePackage[pdftex]{graphicx} % PDFTeX driver for graphicx
+%\DeclareGraphicsRule{*}{mps}{*}{} % enables use of MetaPost graphics with pdflatex 
+
+%******lung*************************************************
+% for German texts to get \autoref macros right
+%\renewcommand{\figureautorefname}{Figure} 
+%\newcommand*{\subfigureautorefname}{Figure}
+%\renewcommand{\tableautorefname}{Table}
+%\renewcommand{\partautorefname}{Part}
+%\renewcommand{\chapterautorefname}{Chapter}
+%\renewcommand{\sectionautorefname}{Section}
+%\renewcommand{\subsectionautorefname}{Section}
+%\renewcommand{\subsubsectionautorefname}{Section}
+%%\renewcommand{\paragraphautorefname}{Absatz}
+%%\renewcommand{\subparagraphautorefname}{Unterabsatz}
+%%\renewcommand{\footnoteautorefname}{Fu\"snote}
+%%\renewcommand{\FancyVerbLineautorefname}{Zeile}
+%%\renewcommand{\theoremautorefname}{Theorem}
+%%\renewcommand{\appendixautorefname}{Anhang}
+%%\renewcommand{\equationautorefname}{Gleichung}        
+%%\renewcommand{\itemautorefname}{Punkt}             
+
+% ********************************************************************
+% get the links to the figures and tables right
+%\RequirePackage[all]{hypcap} % to be loaded after hyperref package
+
+% ********************************************************************
+% setup the style of the backrefs from the bibliography
+\newcommand{\backrefnotcitedstring}{\relax}%(Not cited.)
+\newcommand{\backrefcitedsinglestring}[1]{(Cited on page~#1.)}
+\newcommand{\backrefcitedmultistring}[1]{(Cited on pages~#1.)}
+
+\ifthenelse{\boolean{cld@backref}}%
+{%
+		\RequirePackage[hyperpageref]{backref} % to be loaded after hyperref package 
+		   \renewcommand{\backreftwosep}{ and~} % seperate 2 pages
+		   \renewcommand{\backreflastsep}{, and~} % seperate last of longer list
+		   \renewcommand*{\backref}[1]{}  % Disable standard
+		   \renewcommand*{\backrefalt}[4]{% Detailed backref
+		      \ifcase #1 %
+		         \backrefnotcitedstring%
+		      \or%
+		         \backrefcitedsinglestring{#2}%
+		      \else%
+		         \backrefcitedmultistring{#2}%
+		      \fi}%
+}{\relax}
+   
+%   \hspace*{\fill}{\scriptsize\itshape\mbox{%
+%   \ifnum#1=1 %
+%     (Cited on page~%
+%   \else
+%     (Cited on pages~%
+%   \fi
+%   #2)}
+%}       

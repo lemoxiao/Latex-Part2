@@ -1,0 +1,190 @@
+\documentclass[10pt, oneside, reqno]{amsbook}
+\setcounter{tocdepth}{1}
+\usepackage{a4wide}
+
+\usepackage{amsmath,amsfonts}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc} \usepackage{times}
+\def\uv#1{``#1''}
+\usepackage{multido}
+
+
+\usepackage[metapost]{mfpic}
+\clipmfpic
+
+
+\usepackage{epsf}
+\usepackage{psfrag}
+\usepackage{amsthm}
+
+\makeatletter
+\def\th@definition{\normalfont \thm@headfont{\bfseries}}
+\def\th@plain{\thm@headfont{\bfseries} \itshape }
+\makeatother
+
+\theoremstyle{plain}
+
+% \newtheorem{veta}{%\hbox to 0pt{\hss\HandRight \quad}
+% Vìta}[section]
+\usepackage{shadethm}
+\newshadetheorem{veta}{%\hbox to 0pt{\hss\HandRight \quad}
+Vìta}[section]
+
+\theoremstyle{definition}
+\newtheorem{definice}{Definice}[section]
+\newtheorem{ddefinice}{Definice}[section]
+\newtheorem{poznamka}{Poznámka}[section]
+\newtheorem{priklad}{%\hbox to  0pt{\hss\HandPencilLeft\quad}
+Pøíklad}[section]
+\def\theenumi{(\roman{enumi})} \def\labelenumi{\theenumi}
+
+
+\makeatletter
+\@addtoreset{equation}{section}
+\def\zacatek{\@ifnextchar[{\speczacatek}{\normalzacatek}}
+\def\normalzacatek{\textbf{.} }
+\def\speczacatek[#1]{ (#1)\textbf{.} }
+\makeatother
+\def\theequation{\thesection.\arabic{equation}}
+\def\koment(#1){\hfill\penalty
+  0\null\nobreak\hfill\nobreak\hbox{\textit{#1}}} \def\hop{\kern 2mm}
+\def\oramujbox#1{\hbox{\vrule \vbox{\hrule\hop\hbox{\hop
+        \vbox{\parindent 0pt \advance \hsize by -4mm #1}\hop
+      }\hop\hrule}\vrule}}
+
+\renewenvironment{definice}{\refstepcounter{definice}
+\setbox0=\vbox
+\bgroup\noindent\advance\hsize by -2\fboxsep\relax
+\linewidth=\hsize\textbf{Definice}\zacatek
+}{\egroup\par\smallbreak\noindent\fbox{\box0}\smallskip}
+
+
+\input fig2
+\parindent 0pt
+
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\tg}{tg}
+\DeclareMathOperator{\arctg}{arctg}
+\DeclareMathOperator{\arccotg}{arccotg}
+\let\epsilon\varepsilon
+\let\eps\epsilon
+\let\phi\varphi
+\def\dx{\,\mathrm{d}x}
+\def\dy{\,\mathrm{d}y}
+\def\dt{\,\mathrm{d}t}
+\def\dr{\,\mathrm{d}r}
+\def\du{\,\mathrm{d}u}
+\def\dv{\,\mathrm{d}v}
+\def\dphi{\,\mathrm{d}\phi}
+
+\def\implies{\Rightarrow}
+
+
+
+%\pagestyle{plain}
+\pagestyle{headings}
+
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\Q{\mathbb{Q}}
+\def\Z{\mathbb{Z}}
+\def\N{\mathbb{N}}
+
+\DeclareMathOperator{\adj}{adj}
+\DeclareMathOperator{\tr}{Tr}
+
+\input mat-mak
+\def\posledniradek{\konec}
+\def\cdotsp{...}
+\def\vertp{:}
+\def\diagp{:.}
+
+\everymath{\displaystyle}
+\interdisplaylinepenalty 50
+
+\raggedbottom
+\def\appendixname{PØÍLOHA}
+
+%%%%%%%%%%%% Pro oboustranny tisk
+ %\addtolength{\oddsidemargin}{12mm}
+ %\addtolength{\evensidemargin}{-12mm}
+\let\overbar\overline
+
+\makeatletter
+\def\@maketitle{%
+  \cleardoublepage \thispagestyle{empty}%
+  \begingroup \topskip\z@skip
+  \null\vfil
+  \begingroup
+  \LARGE\bfseries \centering
+  \openup\medskipamount
+  \@title\par\vspace{24pt}%
+  \def\and{\par\medskip}\centering
+  \mdseries\authors\par\bigskip
+  \endgroup
+  \vfil
+  \begin{center}\epsfbox{logocb.eps}  \end{center}
+  \ifx\@empty\addresses \else \@setaddresses \fi
+  \vfil
+  \ifx\@empty\@dedicatory
+  \else \begingroup
+    \centering{\footnotesize\itshape\@dedicatory\@@par}%
+    \endgroup
+  \fi
+%   \vfill
+\vfil
+%   \newpage\thispagestyle{empty}
+  \begin{center}
+    \ifx\@empty\@subjclass\else\@setsubjclass\fi
+    \ifx\@empty\@keywords\else\@setkeywords\fi
+    \ifx\@empty\@translators\else\vfil\@settranslators\fi
+    \ifx\@empty\thankses\else\vfil\@setthanks\fi
+  \end{center}
+  \vfil
+  \@setabstract
+  \endgroup
+  \newpage}
+
+\makeatother
+
+
+
+\begin{document}
+
+
+  \author{Robert Maøík
+  {\texttt{marik@mendelu.cz}}\\
+  \texttt{{user.mendelu.cz/marik}}}
+
+   \title{\textsc{In¾enýrská matematika}}
+ \maketitle
+
+\leavevmode
+\tableofcontents
+
+\chapter{Diferenciální poèet funkcí dvou promìnných}
+\input{dveprom}
+
+\chapter{Diferenciální rovnice}
+\input{drce}
+
+\chapter{Autonomní systémy}
+\input{autsyst}
+
+\opengraphsfile{obrint}
+\mfpicunit=1cm
+\chapter{Dvojný integrál}
+\input{dvojint}
+\closegraphsfile
+
+\opengraphsfile{obrdr}
+\tlabelsep{3pt}
+\mfpicunit=1pt
+\chapter{Numerické øe¹ení diferencálních rovnic}
+\input{numerika}
+\closegraphsfile
+
+\end{document}
+
+
+

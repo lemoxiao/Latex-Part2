@@ -1,0 +1,207 @@
+
+\section{几个原理}
+\label{sec:some-principle}
+
+\subsection{容斥原理}
+\label{subsec:inclusion-exclusion-principle}
+
+\begin{principle}[容斥原理]
+  用$|A|$表示集合$A$的元素个数，则多个集合的并集的元素个数是:
+  \begin{eqnarray}
+    \label{eq:inclusion-exclusion-principle}
+    \left| \bigcup_{i=1}^nA_i \right| & = & \sum_{i=1}^n|A_i|-\sum_{1\leqslant i <j \leqslant n} \left| A_i \cap A_j \right| +\sum_{1 \leqslant i <j <k \leqslant n} \left| A_i\cap A_j \cap A_k \right| \nonumber \\
+ & & -\cdots+(-1)^{n+1} \left| \bigcap_{i=1}^n A_i \right|
+  \end{eqnarray}
+\end{principle}
+容斥原理的含义借助韦恩图是显而易见的，其证明用数学归纳法即可，这里从略。
+
+\begin{figure}[htbp]
+  \centering
+\includegraphics{content/prepare/pic/inclusion-exclusion-principle.pdf}
+\caption{容斥原理示意图}
+\label{fig:inclusion-exclusion-principle}
+\end{figure}
+
+
+\begin{example}[伯努利(Bernoulli)信封问题]
+  \label{example:bernoulli-envelope-solved-by-inc-exclu-principle}
+  作为容斥原理的一个直接应用，这里讨论一下伯努利信封问题: 有相同数目的信封和信件若干，将这些信件装进这些信封，使得没有任何一封信件与信封搭配正确，问题是有多少种装法。
+
+  记信件数目是$n$，并把信件和信封依次编号为$1,2,\ldots,n$，信件与所属的信封编号相同。那么要计算所有信件都搭配错误的组装数，可以考虑其反面即至少有一封信件搭配正确的组装数目，再从总数$n!$中减去它即可，根据容斥原理，构造出集合$A_i$表示第$i$封信件搭配正确的组装方案，则$|A_i|=(n-1)!$，那么至少有一封信件搭配正确的方案集合就是这些$A_i$的并集，其数目是
+  \begin{eqnarray*}
+ &  &    \sum_{i=1}^n|A_i|-\sum_{1\leqslant i <j \leqslant n}|A_i \cap A_j|+\sum_{1 \leqslant i <j <k \leqslant n}|A_i\cap A_j \cap A_k| \\
+  &    & -\cdots+(-1)^{n+1}|\cap_{i=1}^nA_i| \\
+   &   = & n (n-1)! - C_n^2(n-2)! + C_n^3(n-3)! - \cdots + (-1)^{n+1}C_n^n0! \\
+    &  = & n!\sum_{i=1}^n(-1)^{i+1}\frac{1}{i!}
+  \end{eqnarray*}
+  所以从总数$n!$中减去它就得到最后的结果，在$0!=1$的约定下，这结果可以写为:
+  \begin{equation}
+    \label{eq:bernoulli-envelope-problem-solution}
+    \sum_{i=0}^n(-1)^i \frac{1}{i!}
+  \end{equation}
+
+  于是问题得以解决，以后还将介绍利用数列递推方法来解决此问题(见\autoref{example:bernoulli-envelope-solved-by-recursive-method})。
+\end{example}
+
+\subsection{数学归纳法}
+\label{subsec:mathematical-induction}
+
+\begin{principle}[第一数学归纳法]
+  设$A$是一个元素都是整数的集合，如果:
+  \begin{enumerate}
+  \item $1 \in A$.
+  \item 如果 $n \in A$，则必有 $ n+1 \in A$.
+  \end{enumerate}
+  那么对于任何正整数$n$，都有$n \in A$.
+\end{principle}
+
+这个原理是显而易见的，它可以用来证明与整数有关的命题$P(n)$，把$A$视为使得命题成立的那些整数的集合，那么如果命题对$n=1$成立，即$P(1)$为真，又如果由$P(n)$成立能推得$P(n+1)$也成立，则命题对于一切正整数就都成立。
+
+\begin{example}[斐波那契数列(Fibonacci sequence)]
+  数列是按照顺序排列成的一列数，按照顺序可以记为$x_1,x_2,\ldots,x_n,\ldots$，一个著名的例子是斐波那契数列$\{F_n\}$，它的前两项是$F_1=1,F_2=1$，以后的每一项都是它前两项之和，即
+  \[ F_{n+1}=F_n+F_{n-1} \]
+  这称为斐波那契数列的\emph{递推公式}，利用数学归纳法可以证明它具有如下的\emph{通项公式}:
+  \[ F_n = \frac{1}{\sqrt{5}} \left( \left( \frac{1+\sqrt{5}}{2} \right)^n - \left( \frac{1-\sqrt{5}}{2} \right)^n \right) \]
+  容易看出，斐波那契数列的每一项都是整数，然而这个通项公式中却出现了无理数，这是一个有趣的现象，以后在讲到数列时，还会看到，有些每一项都是整数的数列，其通项公式却不得不借助复数来表达。
+\end{example}
+
+\begin{example}[伯努利不等式(Bernoulli inequality)]
+  伯努利不等式是几个形状类似的不等式的统称，其中一个是这样的，任意给定$n$个实数$x_i(i=1,2,\ldots,n)$，它们都满足$x_i>-1$并且都具有相同的符号（可以为零），则有不等式
+  \[ (1+x_1)(1+x_2)\cdots(1+x_n) \geqslant 1+x_1+x_2+\cdots+x_n \]
+  成立，这可以用数学归纳法加以证明，一个特别的情况是，如果实数$x>-1$，则对任意正整数$n$，有
+  \[ (1+x)^n \geqslant 1+nx \]
+\end{example}
+
+除了常用的第一数学归纳法以外，我们还有以下的:
+\begin{principle}[第二数学归纳法]
+如果与正整数有关的命题$P(n)$满足:
+  \begin{enumerate}
+  \item $P(1)$成立;
+  \item 由$P(1),P(2),\dots,P(k)$成立能够推证出$P(k+1)$成立;
+  \end{enumerate}
+那么该命题对于一切正整数成立.
+\end{principle}
+有些命题在递推过程中，依赖的是前面的所有结论而非仅仅依赖前一个结论，此时第二数学归纳法就非常适用，例如下面这个例子:
+
+\begin{example}
+  \label{example:a-power-n-b-power-n-factoring}
+  由平方差公式和立方差
+  \begin{eqnarray*}
+    a^2-b^2 & = & (a-b)(a+b) \\
+    a^3-b^3 & = & (a-b)(a^2+ab+b^2)
+  \end{eqnarray*}
+  出发，可以利用数学归纳法得出一般的$n$次方差公式
+  \[ a^n - b^n = (a-b)(a^{n-1}+a^{n-2}b+\cdots+ab^{n-2}+b^{n-1}) \]
+  或者利用求和符号写成
+  \[ a^n-b^n = (a-b)\sum_{i=0}^{n-1}a^{n-1-i}b^i \]
+  \begin{proof}[证明]
+    先用数学归纳法证明公式的特殊情况，即$a=1,b=t$的情况
+    \[ 1-t^n = (1-t)\sum_{i=0}^{n-1}t^i \]
+    当$n=2$时，即$1-t^2=(1-t)(1+t)$，公式是成立的，假定上式对于小于等于$n$的正整数都成立，那么对于正整数$n+1$的情形，就有
+    \begin{eqnarray*}
+      1-t^{n+1} & = & (1+t)(1-t^n)-t(1-t^{n-1}) \\
+                & = & (1-t)(1+t)\sum_{i=0}^{n-1}t^i - t(1-t)\sum_{i=0}^{n-2}t^i \\
+                & = & (1-t) \left( \sum_{i=0}^{n-1}t^i + t\sum_{i=0}^{n-1}t^i -t\sum_{i=0}^{n-2}t^i \right) \\
+                & = & (1-t) \left( \sum_{i=0}^{n-1}t^i + \sum_{i=0}^{n-1}t^{i+1} -\sum_{i=0}^{n-2}t^{i+1} \right) \\
+                & = & (1-t) \left( \sum_{i=0}^{n-1}t^i + \sum_{i=1}^{n}t^{i} -\sum_{i=1}^{n-1}t^{i} \right) \\
+      & = & (1-t)\sum_{i=0}^nt^n
+    \end{eqnarray*}
+    于是上式对于正整数$n+1$也成立，在上式中取$t=\dfrac{a}{b}$，即可得出要证的等式。
+  \end{proof}
+
+  从证明过程中所可以看出，奠基不是从1开始的，而是从2开始的，而且为了证明$P(n+1)$成立，利用了假设$P(n)$和$P(n-1)$成立。
+\end{example}
+
+\begin{principle}[倒推归纳法]
+如果与正整数有关的命题$P(n)$满足:
+  \begin{enumerate}
+  \item 有无穷多个正整数$n$使命题成立;
+  \item 由$P(k)$成立能够推证$P(k-1)$成立;
+  \end{enumerate}
+那么该命题对于一切正整数成立。
+\end{principle}
+倒推归纳法的原理也是显而易见的，对于任何一个给定的正整数$n$，由于不超过$n$的正整数只有有限个，所以必然存在一个大于$n$的正整数$N$，使得命题$P(N)$成立，再倒推回来，知$P(n)$成立。
+
+\begin{example}[均值不等式]
+作为一个例子，我们用倒推归纳法来证明均值不等式，这比用通常的第一数学归纳法来得更加容易:
+
+  均值不等式的内容是： 对任意$n(n\geqslant2)$个正实数$a_i$，有下面不等式成立:
+\[ \frac{1}{n}\sum_{i=1}^na_i \geqslant \left( \prod_{i=1}^na_i \right)^{\frac{1}{n}} \]
+
+\begin{proof}[证明]\footnote{这个倒推归纳法的证明来自于参考文献\cite{the-secret-of-inequality}.}
+  对$n=2$的情形，有$\frac{1}{2}(a_1+a_2)-\sqrt{a_1a_2}=\frac{1}{2}(\sqrt{a_1}-\sqrt{a_2})^2\geqslant 0$知不等式成立。
+
+ 反复使用$n=2$的结论，我们就可以得到当$n$是2的幂的时候不等式是成立的，然而2的幂是无穷多的，所以只要证明，不等式如果对$n+1$个正实数成立就必然对$n$个正实数也成立就可以了。
+
+对于任意$n$个正实数，我们再添加一个正实数$a_{n+1}=\frac{1}{n}\sum_{i=1}^na_i$构成$n+1$个正实数，由假设，不等式对$n+1$个正实数是成立的，所以有
+\[
+\frac{1}{n+1}\sum_{i=1}^{n+1}a_i \geqslant \left( \prod_{i=1}^{n+1}a_i \right)^{\frac{1}{n+1}}
+\]
+而由于$a_{n+1}$正好等于其它$n$个实数的平均数，所以
+\[ \frac{1}{n+1}\sum_{i=1}^{n+1}a_i = \frac{1}{n}\sum_{i=1}^{n}a_i \]
+因此前一式即为:
+\[
+\frac{1}{n}\sum_{i=1}^{n}a_i \geqslant \left( \prod_{i=1}^{n}a_i \right)^{\frac{1}{n+1}} \cdot \left( \frac{1}{n}\sum_{i=1}^na_i \right)^{\frac{1}{n+1}}
+\]
+化简即得
+\[
+\frac{1}{n}\sum_{i=1}^na_i \geqslant \left( \prod_{i=1}^na_i \right)^{\frac{1}{n}} 
+\]
+即得证。
+\end{proof}
+\end{example}
+
+\begin{principle}[跳跃数学归纳法]
+  如果与正整数有关的命题$P(n)$满足:
+  \begin{enumerate}
+  \item $P(1)$,$P(2)$,$\ldots$,$P(m)$成立;
+  \item 由$P(k)$成立能够推证$P(k+m)$成立;
+  \end{enumerate}
+那么该命题对于一切正整数成立。
+\end{principle}
+
+数学归纳法还有其他形式，比如解决对偶性问题（如正余弦）的螺旋归纳法，解决同时与两个正整数相关的命题的二重归纳法等，但它们的道理都是类似的。
+
+下面举几个应用数学归纳法的例子。
+
+\begin{example}
+  对于任意两个正整数$m<n$，证明 $\frac{n!}{m!(n-m)!}$是整数。
+
+\begin{proof}[证明]
+  这就是要证明组合数$C_n^m$是整数，从组合数的实际意义来看它应该是整数，但我们感兴趣的是数学证明，这个结论在初等数论中应用整数的素数分解定理可以很容易的证明它，这里我们使用数学归纳法来证明。
+
+  因为
+  \[ C_n^m = \frac{n!}{m!(n-m)!} = \frac{n(n-1)\cdots(n-m+1)}{m!} \]
+  分子是连续$m$个正整数的乘积，所以我们只要证明辅助结论：任意$m$个连续正整数的乘积能被$m!$整除。
+
+  实际上$m!$自身也是$m$个连续正整数的乘积，而且是最小的乘积，我们对连续正整数的个数$m$施行数学归纳法。
+
+  显然$m=1$时结论是成立的，今假定任意$m$个连续正整数能被$m!$整除，来看连续$m+1$个正整数的情况。
+
+  连续$m+1$个正整数可以写成$r(r+1)\cdots (r+m)$，显然$r$从1开始逐个取遍所有正整数，这个连乘积就能取遍所有$m+1$个连续正整数的乘积，所以我们这里再嵌套一个对$r$的数学归纳法。
+
+  当$r=1$时这连乘积即为$(m+1)!$显然能被$(m+1)!$整除，假定连乘积$r(r+1)\cdots (r+m)$能被$(m+1)!$所整除，那么我们来看当$r$增加1时的连续乘积$(r+1)(r+2)\cdots (r+m+1)$，由
+  \[ (r+1)(r+2) \cdots (r+m+1) - r(r+1) \cdots (r+m) = (m+1) \cdot (r+1)(r+2) \cdots (r+m) \]
+  由对$m$的归纳假设, $(r+1)(r+2) \cdots (r+m)$是$m!$的倍数，所以这个差便是$(m+1)!$的倍数，再由对$r$的归纳假设，左边的减数也是$(m+1)!$的倍数，所以左边的被减数也能被$(m+1)!$所整除，按照对$r$的归纳法，这就证得了任意$m+1$个连续正整数的乘积都能被$(m+1)!$所整除，再按对$m$的数学归纳法，就证得了我们最终的结论。
+\end{proof}
+\end{example}
+
+\begin{example}
+  求证多项式系数$\frac{n!}{n_1!n_2!\cdots n_m!}$是整数，其中$n=n_1+n_2+\cdots+n_m(n_i\geqslant 0, i=1,2,\ldots,n)$。
+
+\begin{proof}[证明]
+  由上一个例子中所证得的，二项式系数是整数，而多项式系数
+  \[ \frac{n!}{n_1!n_2!\cdots n_m!} = \frac{n!}{n_1!(n-n_1)!} \cdot \frac{(n-n_1)!}{n_2!(n-n_1-n_2)!} \cdots \frac{(n-n_1-n_2-\cdots-n_{m-1})!}{n_m!0!} \]
+  于是这多项式系数就转化成了若干个二项式系数的乘积，所以它亦是整数。
+\end{proof}
+\end{example}
+
+\subsection{抽屉原理}
+\label{sec:drawer-principle}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../elementary-math-note"
+%%% End:

@@ -1,0 +1,1343 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{Constraint Programming}
+\labelChapter{constraint-programming}
+
+\glsreset{CP}
+\glsreset{IP}
+
+This chapter describes \gls{CP}, which is a method for solving combinatorial
+problems.
+%
+Like similar methods such as \gls!{IP} and \gls!{SAT}, in \gls{CP} we first
+\emph{model} the problem and then we \emph{solve} the model.
+%
+The modeling and solving aspects are described in \refSectionList{cp-modeling,
+  cp-solving}, respectively.
+%
+Comprehensive overviews of \gls{CP}, \gls{IP}, and \gls{SAT} are given in
+\cite{RossiEtAl:2006}, \cite{Wolsey:1998}, and \cite{BiereEtAl:2009},
+respectively.
+%
+In \refSection{cp-lazy-clause-generation} we briefly describe \glsdesc{LCG},
+which is a solving technique that \gls{Chuffed} -- the \gls{constraint solver}
+used in the experiments -- is based.
+
+In terms of modeling, \gls{CP} offers a higher level of abstraction compared to
+other methods.
+%
+For example, \gls{CP} provides dedicated \glspl{constraint} for capturing many
+recurring problem structures that must be decomposed and reformulated in
+\gls{IP} or \gls{SAT}.
+%
+This makes \gls{CP} particularly suited for modeling the problems introduced in
+\refChapter{introduction}.
+
+
+\section{Modeling}
+\labelSection{cp-modeling}
+
+To solve a problem using \gls{CP}, it must first be formulated as a
+\gls{constraint model}.
+%
+Modeling strategies are discussed in detail by \textcite{Smith:2006}.
+
+A \gls!{constraint model} (or just \glsshort!{constraint model}) consists of two
+components:%
+%
+\begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+  \item a set of \glspl{variable}
+  \item a set of \glspl{constraint}
+\end{inlinelist}.
+%
+\Glspl!{variable} represent problem decisions and take their values from a
+finite \gls{domain}.
+%
+The \gls!{domain} of a variable~$\mVar{x}$, denoted $\mDomain(\mVar{x})$, is
+typically is a set of integers, but it can also consist of real numbers and
+complex structures such as string, sets, and \glspl{graph}~\cite{Gervet:2006}.
+%
+A \gls{variable}~$\mVar{x}$ is \gls!{assigned.v} if
+\mbox{$|\!\mDomain(\mVar{x})| = 1$}, and we abbreviate a \gls{variable}
+assignment \mbox{$\mVar{x} \in \mSet{v}$} to \mbox{$\mVar{x} = v$}.
+
+\Glspl!{constraint} express relations between \glspl{variable} and forbid
+assignments that are illegal in the problem.
+%
+Given a set of \glspl{variable} \mbox{$\mVar{x}_1, \ldots, \mVar{x}_k$} and a
+\gls{constraint}~$C$, an assignment to \mbox{$\mVar{x}_1, \ldots, \mVar{x}_k$}
+is a \gls!{solution}[ to $C$] if \mbox{$C(\mVar{x}_1, \ldots, \mVar{x}_k)$}
+holds.
+%
+An assignment to all \glspl{variable} fulfilling all \glspl{constraint} in a
+\glsshort{constraint model}~$M$ is a \gls!{solution}[ to $M$].
+%
+An example of a \gls{constraint model} and its \glspl{solution} is shown in
+\refTable{cp-model-example}.
+
+\begin{table}
+  \centering%
+  \figureFont\figureFontSize%
+  \mbox{}%
+  \hfill\hfill%
+  \subcaptionbox{Constraint model\labelTable{cp-model-example-instance}}%
+                {%
+                  \begin{tabular}{lc}
+                    \toprule
+                      \multicolumn{1}{c}{\tabhead variables}
+                        & \tabhead constraints\\
+                    \midrule
+                      $\mVar{x} \in \mSet{1, 2}$ & $\mVar{x} \neq \mVar{y}$\\
+                      $\mVar{y} \in \mSet{1, 2}$ & $\mVar{x} \neq \mVar{z}$\\
+                      $\mVar{z} \in \mSet{1, 2, 3, 4}$
+                        & $\mVar{y} \neq \mVar{z}$\\
+                    \bottomrule
+                  \end{tabular}%
+                }%
+  \hfill%
+  \subcaptionbox{Solutions\labelTable{cp-model-example-solutions}}%
+                [21mm]%
+                {%
+                  \newcolumntype{C}{>{$}c<{$}}%
+                  $\begin{tabular}{C@{\quad}C@{\quad}C}
+                     \toprule
+                       \mVar{x} & \mVar{y} & \mVar{z} \\
+                     \midrule
+                       1 & 2 & 3 \\
+                       2 & 1 & 3 \\
+                       1 & 2 & 4 \\
+                       2 & 1 & 4 \\
+                     \bottomrule
+                   \end{tabular}$%
+                }%
+  \hfill\hfill%
+  \mbox{}
+
+  \caption[Example of a constraint model]%
+          {%
+            Example of a constraint model, corresponding to a problem where
+            three variables must be assigned values which are different from one
+            another%
+          }
+  \labelTable{cp-model-example}
+\end{table}
+
+The use of \glspl{variable} and \glspl{constraint} results in \glspl{constraint
+  model} that are \gls!{compositional.cm}, meaning they can easily be
+extended to capture additional problems to be solved in unison.
+
+
+\subsection{Global Constraints}
+
+If a \gls!{binary.c}[ \gls{constraint}] is a \gls{constraint} involving two
+\glspl{variable}, then a \gls!{global.c}[ \gls{constraint}] is a
+\gls{constraint} over an arbitrary number of
+\glspl{variable}~\cite{VanHoeveKatriel:2006}.
+%
+\Gls{global.c} \glspl{constraint} capture recurring problem structures and
+improve solving compared to relations modeled using multiple \gls{binary.c}
+\glspl{constraint}.
+
+
+\paragraph{The All-Different Constraint}
+
+Arguably, the most well-known \gls{global.c} \gls{constraint} is the
+\gls!{all-different constraint}~\cite{Lauriere:1978} (see~\cite{VanHoeve:2001}
+for a survey), which enforces all \glspl{variable} in a given set to take
+distinct values.
+%
+We refer to this \gls{constraint} as $\mAllDifferent$, which is defined as
+follows.
+
+\begin{definition}[$\mAllDifferent$]
+  Let \mbox{$\mVar{x}_1, \ldots, \mVar{x}_k$} be a list of \glspl{variable}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mAllDifferent(\mVar{x}_1, \ldots, \mVar{x}_k)
+    \equiv
+    \mBigAnd_{\mathclap{1 \,\leq\, i \,<\, j \,\leq\, k}}
+    \mVar{x}_i \neq \mVar{x}_j.
+  \end{displaymath}
+  \labelDefinition{all-different}
+\end{definition}
+
+Hence the \glspl{constraint} in \refTable{cp-model-example} can be replaced by
+$\mAllDifferent(\mVar{x}, \mVar{y}, \mVar{z})$.
+
+
+\paragraph{The Global Cardinality Constraint}
+
+In \refChapter{existing-isel-techniques-and-reps} we saw another \gls{global.c}
+\gls{constraint} -- the \gls!{global cardinality
+  constraint}~\cite{OplobeduEtAl:1989} -- and how it can be used to model the
+\gls{pattern selection} problem (see \refEquation{pattern-selection-using-gcc}
+on \refPageOfEquation{pattern-selection-using-gcc}).
+%
+This \gls{constraint} is a generalization of the \gls{all-different constraint},
+and for completeness we give here the its formal definition.
+
+\begin{definition}[$\mGCC$]
+  Let \mbox{$v_1, \ldots, v_k$} be a list of values, and let \mbox{$\mVar{x}_1,
+    \ldots, \mVar{x}_n$} and \mbox{$\mVar{c}_1, \ldots, \mVar{c}_k$} be lists of
+  \glspl{variable}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mGCC(
+      \mTuple{v_1, \mVar{c}_1} \hspace{-1pt},
+      \ldots,
+      \mTuple{v_k, \mVar{c}_k}  \hspace{-1pt},
+      \mVar{x}_1, \ldots, \mVar{x}_n
+    )
+    \equiv
+    \mBigAnd_{\mathclap{1 \,\leq\, i \,\leq\, k}}
+    \big|
+      \mSetBuilder{\mVar{x}_j}{\forall 1 \leq j \leq n : \mVar{x}_j = v_i}
+    \big| = \mVar{c}_i.
+  \end{displaymath}
+  \labelDefinition{gcc}
+\end{definition}
+
+For example, \mbox{$\mGCC(\mTuple{5, \mVar{c}_1 = 0} \hspace{-1pt}, \mTuple{3,
+    \mVar{c}_2 = 1} \hspace{-1pt}, \mVar{x}_1 = 2, \mVar{x}_2 = 3)$} holds
+because no $\mVar{x}$~\gls{variable} is assigned value~\num{5} and exactly one
+$\mVar{x}$~\gls{variable} is assigned value~\num{3}.
+%
+Similarly, \mbox{$\mGCC(\mTuple{3, \mVar{c}_1 \in \mSet{0, 2}} \hspace{-1pt},
+  \mVar{x}_1 = 2, \mVar{x}_2 = 3)$} does not holds because either none or both
+$\mVar{x}$~\glspl{variable} must be assigned value~\num{3}.
+
+
+\paragraph{The Circuit Constraint}
+
+Another relevant example is the \gls!{circuit constraint}~\cite{Lauriere:1978},
+which enforces that the \glspl{variable} representing adjacency forms a
+\gls{Hamiltonian.c} \gls{cycle}.
+%
+We refer to this \gls{constraint} as $\mCircuit$, which is defined as follows.
+
+\begin{definition}[$\mCircuit$]
+  Let \mbox{$\mVar{x}_1, \ldots, \mVar{x}_k$} be a list of \glspl{variable}, and
+  let \mbox{$P = d_1, \ldots, d_k$} be a permutation of \gls{domain} values such
+  that \mbox{$d_i \in \mDomain(\mVar{x}_i)$} for all \mbox{$i = 1, \ldots,
+    k$\hspace{-.8pt}.}
+  %
+  Given $P$, form a \gls{graph}~\mbox{$G = \mPair{N}{E}$} such that there is
+  exactly one \gls{node} \mbox{$n_i \in N$} and exactly one \gls{edge}
+  \mbox{$\mEdge{n_i}{n_{d_i}}$} for all \mbox{$i = 1, \ldots, k$\hspace{-.8pt}.}
+  %
+  $P$ is considered \emph{cyclic} if and only if $G$ contains a
+  \gls{Hamiltonian.c} \gls{cycle}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mCircuit(\mVar{x}_1, \ldots, \mVar{x}_k)
+    \equiv
+    \text{$\mVar{x}_1, \ldots, \mVar{x}_k$ is cyclic}.
+  \end{displaymath}
+  \labelDefinition{circuit}
+\end{definition}
+
+For example, \mbox{$\mCircuit(\mVar{x}_1 \in \mSet{2}, \mVar{x}_2 \in \mSet{4},
+  \mVar{x}_3 \in \mSet{1}, \mVar{x}_4 \in \mSet{3})$} holds because the
+assignment forms the following \gls{cycle}:
+%
+\begin{center}
+  \figureFont\figureFontSize%
+  \begin{tikzpicture}[%
+      every node/.style={
+        node distance=4mm,
+      }
+    ]
+
+    \node (x1) {$\mVar{x}_1$};
+    \node [right=of x1] (x2) {$\mVar{x}_2$};
+    \node [below=of x1] (x3) {$\mVar{x}_3$};
+    \node [right=of x3] (x4) {$\mVar{x}_4$};
+
+    \begin{scope}[->, line width=\normalLineWidth]
+      \draw (x1) -- (x2);
+      \draw (x2) -- (x4);
+      \draw (x4) -- (x3);
+      \draw (x3) -- (x1);
+    \end{scope}
+  \end{tikzpicture}%
+\end{center}
+%
+However, \mbox{$\mCircuit(\mVar{x}_1 \in \mSet{2}, \mVar{x}_2 \in \mSet{1},
+  \mVar{x}_3 \in \mSet{4}, \mVar{x}_4 \in \mSet{3})$} does not hold because the
+assignment forms two non-\gls{Hamiltonian.c} \glspl{cycle}:
+%
+\begin{center}
+  \figureFont\figureFontSize%
+  \begin{tikzpicture}[%
+      every node/.style={
+        node distance=4mm,
+      }
+    ]
+
+    \node (x1) {$\mVar{x}_1$};
+    \node [right=of x1] (x2) {$\mVar{x}_2$};
+    \node [below=of x1] (x3) {$\mVar{x}_3$};
+    \node [right=of x3] (x4) {$\mVar{x}_4$};
+
+    \begin{scope}[->, line width=\normalLineWidth, bend left]
+      \draw (x1) to (x2);
+      \draw (x2) to (x1);
+      \draw (x3) to (x4);
+      \draw (x4) to (x3);
+    \end{scope}
+  \end{tikzpicture}%
+\end{center}
+
+$\MCircuit$ is used in \refChapter{constraint-model} to model \gls{block
+  ordering}.
+
+
+\paragraph{The Table Constraint}
+
+The \gls!{table constraint} constrains a list of \glspl{variable} such that the
+values appear as a row in a given matrix.
+%
+By encoding legal \gls{variable} assignments into the matrix, any relation can
+be expressed using a \gls{table constraint}, thus belonging to a group of
+so-called \glspl!{extensional
+  constraint}~\cite[Sect.\thinspace11.5.4]{Smith:2006}.
+%
+We refer to this \gls{constraint} as $\mTable$, which is defined as follows.
+
+\begin{definition}[$\mTable$]
+  Let \mbox{$\mVar{x}_1, \ldots, \mVar{x}_k$} be a list of \glspl{variable}, and
+  let $T$ be an \mbox{$m \times k$} matrix, where \mbox{$m \in \mathbb{N}$}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mTable(
+      \mTuple{\mVar{x}_1, \ldots, \mVar{x}_k} \hspace{-1pt},
+      T
+    )
+    \equiv
+    \mTuple{\mVar{x}_1, \ldots, \mVar{x}_k} \in T\!.
+  \end{displaymath}
+  \labelDefinition{table}
+\end{definition}
+
+For example, assume we are given a matrix
+%
+\begin{displaymath}
+    A =
+    \begin{aMatrix}{cc}
+      1 & 1 \\
+      2 & 4
+    \end{aMatrix}\!\!.
+\end{displaymath}
+%
+Then \mbox{$\mTable(\mVar{x}_1 = 2, \mVar{x}_2 = 4, A)$} holds because the tuple
+\mbox{$\mTuple{2, 4}$} appears as a row in~$A$.
+%
+Similarly, \mbox{$\mTable(\mVar{x}_1 = 3, \mVar{x}_2 = 3, A)$} does not hold
+because the tuple \mbox{$\mTuple{3, 3}$} appears as a row in~$A$.
+
+$\MTable$ is used in \refChapter{solving-techniques} to refine the
+\glsshort{constraint model} and to model several of the solving techniques.
+
+
+\paragraph{The Value-Precede-Chain Constraint}
+\labelSection{cp-vpc}
+
+The \gls!{value-precede-chain constraint}~\cite{LawLee:2004} requires a list of
+\glspl{variable} to be sorted according to a given chain of values.
+%
+We refer to this \gls{constraint} as $\mValuePrecChain$, which is defined as
+follows.
+
+\begin{definition}[$\mValuePrecChain$]
+  Let \mbox{$c_1, \ldots, c_n$} be a list of values and \mbox{$\mVar{x}_1,
+    \ldots, \mVar{x}_k$} be a list of \glspl{variable}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mValuePrecChain(c_1, \ldots, c_n, \mVar{x}_1, \ldots, \mVar{x}_k)
+    \equiv
+    \mBigAnd_{
+      \mathclap{
+        \substack{
+          1 \,\leq\, i \,\leq\, k \hspace{-.8pt}, \\
+          1 \,\leq\, j \,<\, n \phantom{\hspace{-.8pt},}
+        }
+      }
+    }
+    \mVar{x}_i = c_{j+1} \mImp (\exists l < j : \mVar{x}_l = c_j).
+  \end{displaymath}
+  \labelDefinition{vpc}
+\end{definition}
+
+For example, \mbox{$\mValuePrecChain(6, 5, 4, \mVar{x}_1 = 6, \mVar{x}_2 = 1,
+  \mVar{x}_3 = 5, \mVar{x}_4 = 4)$} holds because the~\num{4} is preceded by
+a~\num{5}, which in turn is preceded by a~\num{6}, in the list of
+$\mVar{x}$~\glspl{variable}.
+%
+Likewise, \mbox{$\mValuePrecChain(5, 4, \mVar{x}_1 = 5, \mVar{x}_2 = 1)$} also
+holds because \num{4} does not appear among the $\mVar{x}$~\glspl{variable} (the
+fact that \num{5} appears in the list does not matter).
+%
+However, \mbox{$\mValuePrecChain(5, 4, \mVar{x}_1 = 1, \mVar{x}_2 = 4)$} does
+not hold because the~\num{4} is not preceded by a~\num{5}.
+
+$\MValuePrecChain$ is used in \refChapter{solving-techniques} to implement a
+\gls{dominance breaking.c} \gls{constraint}.
+
+
+\paragraph{The Cumulative Constraint}
+\labelSection{cp-cumulative}
+
+The \gls!{cumulative constraint}~\cite{AggounBeldiceanu:1993} is used in
+scheduling to constrains the scheduling times for a given set of tasks such that
+the capacity of a given resource is not exceeded.
+%
+We refer to this \gls{constraint} as $\mCumulative$, which is defined as
+follows.
+%
+\begin{definition}[$\mCumulative$]
+  Let \mbox{$c \in \mNatNumSet$} represent the capacity of a resource to be used
+  by $k$ optional tasks.
+  %
+  For each task~\mbox{$i = 1, \ldots, k$}, let \mbox{$\mVar{s}_i \in
+    \mNatNumSet$} be a \gls{variable} representing the time at which $i$ is
+  scheduled to start, and \mbox{$\mVar{b}_i \in \mSet{0, 1}$} be a
+  \gls{variable} representing whether $i$ is scheduled.
+  %
+  Let also \mbox{$l_i \in \mNatNumSet$} represent task~$i$'s duration, and
+  \mbox{$u_i \in \mNatNumSet$} represent the amount of resource required by~$i$,
+  %
+  Lastly, let \mbox{$t_{\mathsc{max}} = \mMax(\cup_{1 \,\leq\, j \,\leq\, k}
+    \mDomain(\mVar{s}_j))$}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mCumulative(
+      c \hspace{-1pt},
+      \mTuple{
+        \mVar{s}_1 \hspace{-.8pt},
+        l_1 \hspace{-.8pt},
+        u_1 \hspace{-.8pt},
+        \mVar{b}_1
+      } \hspace{-1pt},
+      \ldots,
+      \mTuple{
+        \mVar{s}_k \hspace{-.8pt},
+        l_k \hspace{-.8pt},
+        u_k \hspace{-.8pt},
+        \mVar{b}_k
+      }
+    )
+    \equiv
+    \mBigAnd_{\mathclap{0 \,\leq\, t \,<\, t_{\mathsc{max}}}}
+    \hspace{26pt}
+    \sum_{
+           \mathclap{
+             \substack{
+               1 \,\leq\, i \,\leq\, k \hspace{-.8pt} \text{ \st} \\
+               \mVar{s}_i \,\leq\, t \,<\, \mVar{s}_i \,+\, l_i
+             }
+           }
+         }
+    \mVar{b}_i \times u_i
+    \leq c \hspace{-1pt}.
+  \end{displaymath}
+  \labelDefinition{cumulative}
+\end{definition}
+
+For example, the schedule shown in \refFigure{cumulative-example-solution} is a
+\gls{solution} to this \gls{constraint} because at no time is the capacity
+exceeded.
+%
+\begin{figure}
+  \subcaptionbox{A solution\labelFigure{cumulative-example-solution}}%
+                {%
+                  \input{%
+                    figures/constraint-programming/cumulative-example-solution%
+                  }%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Not a solution; the capacity is exceeded%
+                  \labelFigure{cumulative-example-failure}%
+                }%
+                [60mm]%
+                {%
+                  \input{%
+                    figures/constraint-programming/cumulative-example-failure%
+                  }%
+                }
+
+  \caption[Examples illustrating the cumulative constraint]%
+          {%
+            Examples illustrating the cumulative constraint.
+            %
+            Each box represents a task%
+          }
+  \labelFigure{cumulative-example}
+\end{figure}
+%
+Likewise, the schedule shown in \refFigure{cumulative-example-failure} is not a
+\gls{solution} because tasks~$t_4$ and~$t_5$ exceed the capacity when scheduled
+in parallel.
+
+$\MCumulative$ is used in \refChapter{proposed-model-extensions} to model
+\gls{instruction scheduling}.
+
+
+\paragraph{The No-Overlap Constraint}
+\labelSection{cp-no-overlap}
+
+The last \gls{global.c} \gls{constraint} we will look at is the \gls!{no-overlap
+  constraint} (often also called the \gls!{diffn
+  constraint}~\cite{BeldiceanuContejean:1994}), which is used in rectangle
+packing problems to enforce that no two rectangles may overlap.
+%
+We refer to this \gls{constraint} as $\mNoOverlap$, which is defined as follows.
+%
+\begin{definition}[$\mNoOverlap$]
+  For each rectangle~$i$, let \mbox{$\mVar{xl}_i, \mVar{xr}_i, \mVar{yl}_i,
+    \mVar{yu}_i \in \mNatNumSet$} be \glspl{variable} representing the
+  rectangle's left, right, lower, respectively upper boundary.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \begin{array}{c}
+      \mNoOverlap(
+        \mTuple{
+          \mVar{xl}_1 \hspace{-.8pt},
+          \mVar{xr}_1 \hspace{-.8pt},
+          \mVar{yl}_1 \hspace{-.8pt},
+          \mVar{yu}_1 \hspace{-.8pt}
+        } \hspace{-1pt},
+        \ldots,
+        \mTuple{
+          \mVar{xl}_k \hspace{-.8pt},
+          \mVar{xr}_k \hspace{-.8pt},
+          \mVar{yl}_k \hspace{-.8pt},
+          \mVar{yu}_k \hspace{-.8pt}
+        }
+      )
+      \equiv \mbox{} \\
+      \displaystyle\mBigAnd_{\mathclap{1 \,\leq\, i \,<\, j \,\leq\, k}}
+      \mVar{xr}_i \leq \mVar{xl}_j \mOr
+      \mVar{xr}_j \leq \mVar{xl}_i \mOr
+      \mVar{yu}_i \leq \mVar{yl}_j \mOr
+      \mVar{yu}_j \leq \mVar{yl}_i \hspace{-1pt}.
+    \end{array}
+  \end{displaymath}
+  \labelDefinition{no-overlap}
+\end{definition}
+
+For example, \refFigure{no-overlap-example-solution} is a \gls{solution} to this
+\gls{constraint} because the two squares do not overlap.
+%
+Likewise, \refFigure{no-overlap-example-failure} is a not \gls{solution} because
+the squares do overlap.
+
+\begin{figure}
+  \mbox{}%
+  \hfill\hfill%
+  \subcaptionbox{A solution\labelFigure{no-overlap-example-solution}}%
+                {%
+                  \input{%
+                    figures/constraint-programming/no-overlap-example-solution%
+                  }%
+                }%
+  \hfill%
+  \subcaptionbox{Not a solution\labelFigure{no-overlap-example-failure}}%
+                [30mm]%
+                {%
+                  \input{%
+                    figures/constraint-programming/no-overlap-example-failure%
+                  }%
+                }%
+  \hfill\hfill%
+  \mbox{}
+
+  \caption{Examples illustrating the no-overlap constraint}%
+  \labelFigure{no-overlap-example}
+\end{figure}
+
+$\MNoOverlap$ is used in \refChapter{proposed-model-extensions} to model
+\gls{register allocation}.
+
+
+\subsection{Optimization}
+
+An optimization problem is modeled by maximizing or minimizing a
+\gls{variable}~$\mVar{c}$ whose value is constrained according to an
+\gls{objective function}.
+%
+For example, if \mbox{$\mVar{x}_m \in \mSet{0, 1}$} is \gls{variable}
+representing whether a \gls{match}~$m$ is selected and $c_m$ denotes the cost of
+selecting~\mbox{$m$\hspace{-.8pt},} then a \gls{CP} idiom for modeling
+\gls{optimal.ps} \gls{pattern selection} is
+%
+\begin{equation}
+  \begin{array}{rl}
+      \text{minimize} & \mVar{c} \\
+    \text{subject to} & \mVar{c} = \displaystyle\sum_m c_m \mVar{x}_m
+  \end{array}
+  \labelEquation{pattern-selection-in-cp}
+\end{equation}
+%
+In this context, $\mVar{c}$ is called a \gls!{cost variable}.
+%
+Note that the \gls{objective function} is orthogonal to the rest of the
+\glsshort{constraint model}, thus allowing it to be easily customized to fit the
+desired optimization criterion.
+
+
+\section{Solving}
+\labelSection{cp-solving}
+
+A \gls!{constraint solver} (or just \gls!{solver}) finds \glspl{solution} to a
+\gls{constraint model} by interleaving \gls{propagation} and \gls{search}.
+%
+\Gls!{propagation} removes \gls{domain} values that are known to be in conflict
+with a \gls{constraint}, and \gls!{search} attempts several alternatives when
+\gls{propagation} alone is insufficient for finding a \gls{solution}.
+
+In practice, however, this alone is often not enough for many problem instances
+as the \gls{search space} is simply too large.
+%
+In such cases, the \gls{search space} can be further reduced by extending the
+\gls{constraint model} with additional \glspl{constraint} to strengthen
+propagation and remove uninteresting \glspl{solution} and by performing
+\gls{presolving}.
+
+
+\subsection{Propagation}
+\labelSection{cp-propagation}
+
+Performing \gls{propagation} requires an array of \gls{domain}-pruning
+algorithms and a system that allows these algorithms to interact.
+%
+\Gls{propagation} theory is discussed in detail by \textcite{Bessiere:2006}, and
+\glsdesc{CP} systems are thoroughly discussed by
+\textcite{SchulteCarlsson:2006}.
+
+\Gls{constraint solver} typically keep track of \glspl{variable} and their
+\glspl{domain} using \glspl{constraint store}.
+%
+A \gls!{constraint store} (or just \gls!{store}) is a data structure that maps a
+set of \glspl{variable} to sets of \glspl{domain}.
+%
+A \gls{store}~$S_1$ is \gls!{stronger.cs} than another \gls{store}~$S_2$,
+denoted \mbox{$S_1 \mStronger S_2$}, if \mbox{$\mDomain_1(\mVar{x}) \subseteq
+  \mDomain_2(\mVar{x})$} for all \glspl{variable}~$\mVar{x}$, where
+$\mDomain_i(\mVar{x})$ denotes the domain of \gls{variable}~$\mVar{x}$ in
+store~$S_i$.
+
+A function that takes a \gls{constraint store} as input and produces another
+\gls{store} is called a \gls!{propagator} (or \gls!{filtering algorithm}).
+%
+A \gls{propagator} implements a \gls{constraint} if it does not remove any
+\glspl{solution} to the \gls{constraint} and only keeps \gls{variable}
+assignments that are part of a \gls{solution}.
+%
+For solving to be well-behaved, \glspl{propagator} are also expected to be
+\gls!{decreasing.p} -- it does not add any values, hence \mbox{$p(S) \mStronger
+  S$} -- and \gls!{monotonic.p} -- if \mbox{$S_1 \mStronger S_2$}, then
+\mbox{$p(S_1) \mStronger p(S_2)$}.
+%
+A \gls{propagator} for which \mbox{$p(S) = S$} holds is said to be at
+\gls!{fixpoint}, and a \gls{store} is at \gls{fixpoint} if all
+\glspl{propagator} are at \gls{fixpoint} for that \gls{store}.
+%
+A \gls{propagator} that returns a \gls{store} with at least one empty
+\gls{domain} has \glsshort!{failure}, meaning there are no \glspl{solution} in
+that part of the \gls{search space}.
+
+\Glspl{propagator} implementing the same \gls{constraint} can differ in the
+amount of propagation they perform.
+%
+A \gls{propagator} is \glshyphened!{value consistency} if it only
+\glsshort{propagation}[es] when one of its \glspl{variable} becomes
+\gls{assigned.v}, \glshyphened!{bounds consistency} if it only reduces the
+bounds of a \gls{domain}, and \glshyphened!{domain consistency} if it removes
+all values that do not appear in any \gls{solution} to the \gls{constraint}.
+%
+For example, \refTable{cp-prop-strengths-example} shows solving of two versions
+of the \glsshort{constraint model} given in \refTable{cp-model-example}, one
+using $\mAllDifferent$ and another using inequality \glspl{constraint}.
+%
+\begin{table}
+  \centering%
+  \figureFont\figureFontSize%
+  \newcolumntype{C}{>{$}c<{$}}%
+  \subcaptionbox{%
+                  Solving with value-consistent inequality constraints%
+                  \labelTable{cp-prop-strengths-example-inequality-cons}%
+                }{%
+                  \begin{tabular}{%
+                                   p{4.5cm}%
+                                   C@{}C@{ }C@{}C%
+                                   C@{}C@{ }C@{}C%
+                                   C@{}C@{ }C@{ }C@{ }C@{}C%
+                                 }
+                    \toprule
+                      \multicolumn{1}{c}{\tabhead event}
+                        & \multicolumn{14}{c}{\tabhead store}\\
+                      \cmidrule(lr){2-15}%
+                        & \multicolumn{4}{c}{$\mVar{x}$}
+                        & \multicolumn{4}{c}{$\mVar{y}$}
+                        & \multicolumn{6}{c}{$\mVar{z}$}\\
+                    \midrule
+                      Initial store
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2, & 3, & 4 & \}\\
+                      Propagate until fixpoint
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2, & 3, & 4 & \}\\
+                      Search by attempting $\mVar{z} = 1$
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1\phantom{,}
+                                  &    &    &   & \}\\
+                      Propagate $\mVar{y} \neq \mVar{z}$
+                        & \{ & 1, & 2  & \}
+                        & \{ &    & 2  & \}
+                        & \{ & 1\phantom{,}
+                                  &    &    &   & \}\\
+                      Propagate $\mVar{x} \neq \mVar{z}$
+                        & \{ &    & 2  & \}
+                        & \{ &    & 2  & \}
+                        & \{ & 1\phantom{,}
+                                  &    &    &   & \}\\
+                      Propagate $\mVar{x} \neq \mVar{y}$
+                        & \{ &    &    & \}
+                        & \{ &    & 2  & \}
+                        & \{ & 1\phantom{,}
+                                  &    &    &   & \}\\
+                      Failure reached; backtrack
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2  & \}
+                        & \{ &    & 2, & 3, & 4 & \}\\
+                      \qquad\raisebox{0pt}[10pt]{$\vdots$}
+                        & & & & & & & & & & & & & & \\[-2pt]
+                    \bottomrule
+                  \end{tabular}%
+                }
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox{%
+                  Solving with domain-consistent all-different constraint%
+                  \labelTable{cp-prop-strengths-example-alldiff}%
+                }{%
+                  \begin{tabular}{%
+                                   p{4.5cm}%
+                                   C@{}C@{ }C@{}C%
+                                   C@{}C@{ }C@{}C%
+                                   C@{}C@{ }C@{ }C@{ }C@{}C%
+                                 }
+                    \toprule
+                      \multicolumn{1}{c}{\tabhead event}
+                        & \multicolumn{14}{c}{\tabhead store}\\
+                      \cmidrule(lr){2-15}%
+                        & \multicolumn{4}{c}{$\mVar{x}$}
+                        & \multicolumn{4}{c}{$\mVar{y}$}
+                        & \multicolumn{6}{c}{$\mVar{z}$}\\
+                    \midrule
+                      Initial store
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2, & 3, & 4 & \}\\
+                      Propagate $\mAllDifferent(\mVar{x}, \mVar{y}, \mVar{z})$
+                        & \{ & 1, & 2  & \}
+                        & \{ & 1, & 2  & \}
+                        & \{ &    &    & 3, & 4 & \}\\
+                      \qquad\raisebox{0pt}[10pt]{$\vdots$}
+                        & & & & & & & & & & & & & & \\[-2pt]
+                    \bottomrule
+                  \end{tabular}%
+                }
+
+  \caption[Example illustrating propagation]%
+          {%
+            Example illustrating propagation for two versions of the model given
+            in \refTable{cp-model-example}, one using the all-different
+            constraint and the other using a binary decomposition%
+          }
+  \labelTable{cp-prop-strengths-example}
+\end{table}
+%
+Because only \gls{value consistency} can be achieved for inequality
+\glspl{constraint}, they cannot \glsshort{propagation}[e] anything until at
+least one \gls{variable} becomes \gls{assigned.v}
+(\refTable{cp-prop-strengths-example-inequality-cons}).
+%
+As all \glspl{propagator} are already at \gls{fixpoint}, the \gls{solver} must
+resort to \gls{search}.
+%
+In this case, the \gls{solver} makes a wrong guess and is forced to backtrack.
+%
+In comparison, a \glshyphened{domain consistency} \gls{propagator} for the
+\gls{all-different constraint} can remove values~\num{1} and~\num{2} from the
+\gls{domain} of \gls{variable}~$\mVar{z}$ as these values do not appear in any
+\glspl{solution} (\refTable{cp-prop-strengths-example-alldiff}).
+%
+As the \gls{search space} grows exponentially with the number of
+\glspl{variable} and size of the \glspl{domain}, maximizing \gls{propagation} is
+key in making solving tractable.
+
+As to be expected, stronger \gls{propagation} comes at a price of greater
+complexity.
+%
+For the \gls{all-different constraint}, there exist \glsshort{bounds
+  consistency} and \glshyphened{domain consistency} \glspl{propagator} with
+worst-case time complexities~$\mBigO(n \log n)$~\cite{Lopez-OrtizEtAl:2003}
+and~$\mBigO(n^{2.5})$~\cite{Regin:1994}, respectively, where $n$ denotes the
+number of \glspl{variable}.
+%
+The same can be achieved for the \gls{global cardinality constraint} at similar
+cost~\cite{QuimperEtAl:2005, Regin:1996}.
+
+\Gls{domain consistency} for \gls{circuit constraint} cannot be achieved in
+polynomial time as it involves finding Hamiltonian cycles, which is
+NP-complete~\cite{GareyJohnson:1979}.
+%
+An incomplete, polynomial-time \gls{filtering algorithm} is given
+in~\cite{KayaHooker:2006}.
+
+Several \glshyphened{domain consistency} \gls{propagator} exist for the
+\glsshort{table constraint} \cite{LecoutreSzymanek:2006, Lecoutre:2011,
+  MairyEtAl:2014, PerezRegin:2014, LecoutreEtAl:2015, DemeulenaereEtAl:2016},
+\glsshort{cumulative constraint}~\cite{BaptisteEtAl:2001}, and \gls{no-overlap
+  constraint}~\cite{BeldiceanuCarlsson:2001, VanHentenryckEtAl:1998}, but these
+exhibit exponential worst-case time complexity.
+%
+For the \gls{value-precede-chain constraint}, there exist \glshyphened{domain
+  consistency} \glspl{propagator} with linear time
+complexity~\cite{LawLee:2004}.
+
+
+\subsection{Search}
+\labelSection{cp-search}
+
+When no more \gls{propagation} can be performed -- that is, when all
+\glspl{propagator} are at \gls{fixpoint} -- the \gls{solver} resorts to
+\gls{search}.
+%
+This is discussed in detail by \textcite{VanBeek:2006}.
+
+In exploring the \gls{search space}, two decisions need to be made repeatedly:
+%
+\begin{enumerate*}[label=(\roman*), itemjoin*={, and\ }]
+  \item select a \gls{variable} on which to branch
+  \item select one or more values (but not all) from its \gls{domain}
+\end{enumerate*}.
+%
+These decisions constitute a \gls!{branching strategy}.
+%
+The \gls{branching strategy} arranges the \gls{search space} into a \gls!{search
+  tree}, where each \gls{node} represents a \gls{store} at \gls{fixpoint} (see
+\refFigure{cp-search-tree-sat-example} for an example).
+%
+\begin{figure}
+  \centering%
+  \input{figures/constraint-programming/search-tree-sat-example}
+
+  \caption[Example of a search tree]%
+          {%
+            Example of a search tree for the model given in
+            \refTable{cp-model-example}.
+            %
+            Diamond-shaped nodes represent solutions%
+          }
+  \labelFigure{cp-search-tree-sat-example}
+\end{figure}
+%
+Since the \glspl{solution} (and \glspl{failure}) appear at the leaf
+\glspl{node}, the \gls{search tree} is typically explored depth-first.
+
+
+For \gls{search} to be well-behaved, a \gls{branching strategy} must preserve
+all \glspl{solution} in the \gls{search space} and must not duplicate any
+\gls{solution}.
+%
+A common strategy in choosing a \gls{variable}, called the \gls!{first-fail
+  principle}, is to select the \gls{variable} most likely to cause a
+\gls{failure}~\cite{HaralickElliott:1980}.
+%
+Other strategies involve selecting the \gls{variable} with the smallest or
+largest value in its \gls{domain}, or selecting a random \gls{variable}.
+%
+Similar strategies are applied in value selection, which is typically done by
+posting \gls{constraint} when branching.
+%
+Most common is to post unary \gls{constraint} that divides a \gls{domain} into
+an \gls{assigned.v} part an a non-\gls{assigned.v} part.
+%
+For example, at the root \gls{node} in \refFigure{cp-search-tree-sat-example},
+\gls{search} branches on \gls{variable}~$\mVar{x}$ by posting \mbox{$\mVar{x} =
+  1$} in one branch and \mbox{$\mVar{x} \neq 1$} in the other.
+%
+Another strategy is to split the domain by posting inequality \glspl{constraint}
+(for example, \mbox{$\mVar{x} \leq 3$} in one branch and \mbox{$\mVar{x} > 3$}
+in the other), which is useful for solving \glsplshort{constraint model} with
+arithmetic \glspl{constraint}.
+%
+More than one \gls{branching strategy} can be used for the same
+\glsshort{constraint model} and, if needed, they can be customized by the user,
+making it a key strength of \gls{CP}.
+
+
+\paragraph{Branch and Bound}
+\labelPage{cp-branch-and-bound}
+
+\Glspl{solution} to optimization problems are found using a method called
+\gls!{branch and bound}~\cite{LandDoig:1960}.
+%
+During \gls{search}, the best \gls{solution} found so far is kept and a
+\gls{constraint} is added to enforce all subsequent \glspl{solution} to have
+strictly less (or greater) cost.
+%
+Hence time can be traded for quality on a continuous time scale.
+%
+When the entire \gls{search space} has been explored, the last found
+\gls{solution} is guaranteed to be optimal.
+%
+An example of shown in \refFigure{cp-search-tree-opt-example}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/constraint-programming/search-tree-opt-example}
+
+  \caption[Example of a search tree for an optimization problem]%
+          {%
+            Example of a search tree for the model given in
+            \refTable{cp-model-example} with the additional requirement that
+            the value of $\mVar{z}$ should be maximized.
+            %
+            The search tree is explored depth first, left to right.
+            %
+            Diamond-shaped nodes represent solutions and square-shaped nodes
+            represent failures%
+          }
+  \labelFigure{cp-search-tree-opt-example}
+\end{figure}
+%
+Assuming the \gls{search tree} is explored depth first, left to right, the first
+solution to be found is \mbox{$S_1 = \mTuple{\mVar{x} = 1, \mVar{y} = 2,
+    \mVar{z} = 3}$}.
+%
+Since the value of $\mVar{z}$ is to be maximized, this causes the
+\gls{constraint} \mbox{$\mVar{z} > 3$} to be posted.
+%
+The next solution to be found is \mbox{$S_2 = \mTuple{\mVar{x} = 1, \mVar{y} =
+    2, \mVar{z} = 4}$}, which is clearly better than $S_1$, causing the
+\gls{constraint} \mbox{$\mVar{z} > 4$} to be posted.
+%
+Since the \gls{domain} of $\mVar{z}$ has no value greater than~\num{4}, the
+\gls{constraint} \mbox{$\mVar{z} > 4$} causes a \gls{failure} when the exploring
+the other branch at the root.
+%
+At this point the entire \gls{search space} has been explored, making $S_2$ the
+optimal \gls{solution}.
+
+
+\subsection{Solving Techniques}
+\labelSection{cp-solving-techniques}
+
+Solving can be improved by applying various solving techniques, which can be
+divided into two categories.
+%
+The first category involves additional \glspl{constraint} that are added to the
+\glsshort{constraint model} in order to increase \gls{propagation} and also
+reduce the \gls{search space}.
+%
+These \glspl{constraint} can be divided into three categories --
+\gls{implied.c}, \gls{symmetry breaking.c}, and \gls{dominance breaking.c} --
+which are discussed in detail by \mbox{\textcite{Smith:2006}},
+\textcite{GentEtAl:2006}, and \textcite{ChuStuckey:2015}, respectively.
+
+The second category -- \gls{presolving} -- involves applying methods that reduce
+the number of \glspl{variable} or shrink the \gls{variable} \glspl{domain},
+thereby reducing the \gls{search space}.
+
+
+\paragraph{Implied Constraints}
+
+An \gls!{implied.c}[ \gls{constraint}] is a \gls{constraint} that strengthens
+\gls{propagation} without removing any \glspl{solution}.
+%
+For example, assume a naive \glsshort{constraint model} for solving the
+\gls!{magic sequence problem}, which is defined as finding a sequence
+\mbox{$x_0, \ldots, x_{n-1}$} of integers such that for all \mbox{$0 \leq i <
+  n$\hspace{-.8pt},} the number~$i$ appears exactly $x_i$ times in the sequence.
+%
+Using the \gls{global cardinality constraint} and $n$~\glspl{variable}, this can
+be modeled as
+%
+\begin{equation}
+  \mGCC(
+    \cup_{0 \,\leq\, i \,<\, n} \mTuple{i, \mVar{x}_i} \hspace{-1pt},
+    \mVar{x}_0, \ldots, \mVar{x}_{n-1}
+  ).
+\end{equation}
+%
+While this \gls{constraint} is sufficient in capturing the problem,
+\gls{propagation} can be increased by adding the following \gls{implied.c}
+\gls{constraint}:
+%
+\begin{equation}
+  \sum_{\mathclap{0 \,\leq\, i \,<\, n}} \mVar{x}_i = n.
+\end{equation}
+%
+This always holds because the sum of all occurrences -- that is, the number of
+items in the sequence -- must always be equal to the length of the sequence.
+
+
+\paragraph{Symmetry Breaking Constraints}
+
+A \gls!{symmetry breaking.c}[ \gls{constraint}] is a \gls{constraint} that
+removes \glspl{solution} considered to be symmetric to one another.
+%
+For example, assume a \glsshort{constraint model} for solving a problem of
+packing $n$ squares of sizes \mbox{$1, \ldots, n$} inside another, larger
+square.
+%
+Given a \gls{solution} to this problem, more \glspl{solution} can found by
+rotating, flipping, and mirroring the initial \gls{solution}.
+%
+As these \glspl{solution} are essentially the same, only one of them should be
+kept in the \gls{search space}.
+%
+A simple method of removing most (but not all) symmetric \glspl{solution} is to
+force one of the squares to be packed into one of the quadrants of the enclosing
+square.
+
+
+\paragraph{Dominance Breaking Constraints}
+
+A \gls!{dominance breaking.c}[ \gls{constraint}] is a \gls{constraint} that
+removes \glspl{solution} known to be dominated by another \gls{solution}.
+%
+\Gls{dominance breaking.c} is therefore a generalization of \gls{symmetry
+  breaking.c}.
+%
+For an example, let us revisit the \glsshort{constraint model} capturing the
+square packing problem and assume the two partial \glspl{solution} shown in
+\refFigure{square-packing-partial-sol}.
+%
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \hfill%
+  \input{figures/constraint-programming/square-packing-partial-sol1}%
+  \hfill%
+  \input{figures/constraint-programming/square-packing-partial-sol2}%
+  \hfill%
+  \hfill%
+  \mbox{}
+
+  \caption[Example of dominating solutions]%
+          {%
+            Example of two partial solutions to the square packing problem,
+            where the left-most solution is dominated by the right-most
+            solution~\cite{Korf:2004}%
+          }
+  \labelFigure{square-packing-partial-sol}
+\end{figure}
+%
+In the left-most \gls{solution}, the positioning of the two squares form an
+empty \mbox{$2 \times 3$} rectangle in the corner.
+%
+If this is extended to a complete \gls{solution}, another \gls{solution} can be
+found by sliding the \mbox{$3 \times 3$} square all the way up and moving any
+squares packed above into the space created below.
+%
+Hence the left-most \gls{solution} is dominated by the right-most
+\gls{solution}.
+%
+We can remove such dominated \glspl{solution} from the \gls{search space} by
+forbidding each \mbox{$k \times k$} square from being placed a certain distance
+away from the edge of the enclosing square such that the \mbox{$k \times k$}
+square and the edge forms a rectangle large enough to pack all smaller squares
+inside it.
+
+The benefit of a given \gls{implied.c}, \gls{symmetry breaking.c}, or
+\gls{dominance breaking.c} \gls{constraint} depends on the amount of \gls{search
+  space} it prunes and the cost of \glsshort{propagation}[ing] the
+\gls{constraint}.
+%
+For example, if a \gls{constraint} is expensive to run and only has marginal
+effect on the \gls{variable} \gls{domain}, then adding it to a
+\glsshort{constraint model} will \emph{increase} solving time instead of
+decreasing it.
+%
+In addition, it is well known that such \glspl{constraint} often have synergy
+effects among each other, meaning a \gls{constraint} may not be useful on its
+own but may have a positive effect when combined with another \gls{constraint}.
+%
+Consequently, the decision of whether to add a \gls{implied.c}, \gls{symmetry
+  breaking.c}, or \gls{dominance breaking.c} \gls{constraint} to a
+\glsshort{constraint model} must be based on careful and thorough experimental
+evaluation.
+
+
+\paragraph{Presolving}
+
+\Gls!{presolving} is the process of applying problem-specific algorithms to
+reduce the number of \glspl{variable} or to shrink the \gls{variable}
+\glspl{domain} before solving.
+%
+Fewer \gls{variable} and smaller \glspl{domain} means smaller \glspl{constraint
+  model}, which means shorter solving times.
+
+When dealing with optimization problems, a common \gls{presolving} technique is
+to precompute lower and upper bounds on the \gls{cost variable}.
+%
+A lower bound can be found by solving a relaxed, and hence simpler, version of
+the \gls{constraint model}, which enables pruning of parts in the \gls{search
+  space} that contain no \glspl{solution}.
+%
+An upper bound can be found by solving the problem using a greedy but fast
+heuristic, which enables pruning of parts in the \gls{search space} that only
+contain inferior \glspl{solution}.
+%
+If applying the upper bound yields a \gls{search space} with no
+\glspl{solution}, then we know that the heuristic has already found the optimal
+\gls{solution}.
+
+In the context of \gls{instruction selection}, another \gls{presolving}
+technique is to remove \glspl{match} that we know cannot participate in any
+\gls{solution}.
+%
+Several such techniques are introduced in \refChapter{solving-techniques}.
+
+
+\section{Lazy Clause Generation}
+\labelSection{cp-lazy-clause-generation}
+
+\Gls!{LCG} is a solving technique where the \gls{constraint solver}, when
+reaching a \gls{failure} during \gls{search}, learns new \glspl{constraint} in
+order to avoid repeating the same mistakes.
+%
+The technique originates from \gls{SAT}~\cite{MarquesSilvaEtal:2014} but has
+been adapted to \glsdesc{CP} by adding \gls{CP} techniques on top of
+\gls{SAT}~solving~\cite{OhrimenkoEtAl:2007}.
+%
+An overview of a typical \gls{LCG}-based \gls{constraint solver} is shown in
+\refFigure{lcg-solver-overview}.\!%
+%
+\footnote{%
+  \textcite{FeydyStuckey:2009} describe how to re-engineer the original
+  implementation by embedding a \gls{SAT} solver inside a \gls{constraint
+    solver} instead of vice versa.
+}
+
+\begin{figure}
+  \centering%
+  \input{figures/constraint-programming/lcg-solver-overview}
+
+  \caption{Overview of a typical LCG-based constraint solver}
+  \labelFigure{lcg-solver-overview}
+\end{figure}
+
+To begin with, every \gls{variable} has two dual representations:
+%
+\begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+  \item one based on Boolean values
+  \item one based on integers, which is the \gls{domain} typically used in
+    \gls{CP}
+\end{inlinelist}.
+%
+Every integer variable~\mbox{$\mVar{x} \in [l, \ldots, u]$} results in two sets
+\mbox{$\mBoolRepVar{\mVar{x} = l}, \ldots, \mBoolRepVar{\mVar{x} = u}$} and
+\mbox{$\mBoolRepVar{\mVar{x} \leq l}, \ldots, \mBoolRepVar{\mVar{x} \leq u-1}$}
+of Boolean \glspl{variable}, where \mbox{$\mBoolRepVar{e}$} denotes a Boolean
+\gls{variable} representing whether the expression~$e$ holds.
+%
+For example, \mbox{$\mVar{x} \in [1, 2, 3]$} results in
+\mbox{$\mBoolRepVar{\mVar{x} = 1}$}, \mbox{$\mBoolRepVar{\mVar{x} = 2}$},
+\mbox{$\mBoolRepVar{\mVar{x} = 3}$}, \mbox{$\mBoolRepVar{\mVar{x} \leq 1}$}, and
+\mbox{$\mBoolRepVar{\mVar{x} \leq 2}$}.
+%
+These Boolean \glspl{variable} are sufficient for capturing any \gls{constraint}
+since \mbox{$\mVar{x} < k$}, \mbox{$\mVar{x} > k$}, and \mbox{$\mVar{x} \geq k$}
+are equivalent to \mbox{$\mBoolRepVar{\mVar{x} \leq k - 1}$},
+\mbox{$\mNot\mBoolRepVar{\mVar{x} \leq k - 1}$}, and
+\mbox{$\mNot\mBoolRepVar{\mVar{x} \leq k - 1}$}.
+
+\Glspl{constraint} are applied over the integer \glspl{variable} as before, but
+during \gls{propagation} the \glspl{constraint} do not directly shrink the
+\gls{domain} of the integer \glspl{variable}.
+%
+Instead they generate clauses consisting of disjunctions of \glspl{literal},
+where a \gls!{literal} is a Boolean \glspl{variable} that may optionally be
+negated.
+%
+For example, if $\mAllDifferent$ \glsshort{propagation}[es] that two
+\glspl{variable} \mbox{$\mVar{x}, \mVar{y} \in \mSet{1, 2, 3}$} cannot be
+assigned value~\num{2}, then it will produce two clauses
+\mbox{$\mNot\mBoolRepVar{x = 2} \mOr \mBoolRepVar{y = 1} \mOr \mBoolRepVar{y =
+    3}$} and \mbox{$\mNot\mBoolRepVar{y = 2} \mOr \mBoolRepVar{x = 1} \mOr
+  \mBoolRepVar{x = 3}$} (these are equivalent to \mbox{$\mVar{x} = 2 \mImp
+  \mVar{y} \in \mSet{1, 3}$} and \mbox{$\mVar{y} = 2 \mImp \mVar{x} \in \mSet{1,
+    3}$}, respectively).
+%
+Hence the Boolean dual \glsshort{constraint model} is built lazily as solving
+proceeds.
+
+If a clause consist of one unassigned Boolean \gls{variable}~$v$ and all other
+\glspl{literal} resolve to false, then in order for the clause to hold $v$ must
+be assigned such that the literal becomes true.
+%
+This is called \gls!{unit propagation}~\cite{DarwichePipatsrisawat:2014}.
+%
+For example, if we are given a clause~\mbox{$\mBoolRepVar{\mVar{x} = 1} \mOr
+  \mNot\mBoolRepVar{\mVar{y} = 4}$} and $\mVar{x} = 2$, then the Boolean
+\gls{variable} \mbox{$\mBoolRepVar{\mVar{y} = 4}$} must be assigned false,
+meaning \mbox{$\mVar{y} \neq 4$}.
+
+When these \glspl{unit propagation} are caused by assignments that were made
+during \gls{search}, we can use this information to build an \gls!{implication
+  graph}.
+%
+In this \gls{directed.g} \gls{graph}, each \gls{node} represents a \gls{literal}
+that resolves to true and each \gls{edge} between two \glspl{literal}~$l_1$
+and~$l_2$ represents the fact that $l_1$ causes $l_2$ to become true.
+%
+When \gls{failure} is reached, we can then use the \gls{implication graph} to
+derive an explanation for why a \gls{constraint} \glsshort{failure}.
+%
+This explanation can be captured as a clause, called \gls!{no-good}, to be added
+to the existing body of clauses.
+%
+The \gls{no-good} prevents the \glsshort{constraint solver} from making the same
+mistake again, thus effectively cutting away those parts of the \gls{search
+  space}.
+%
+An example is given in \refFigure{no-good-learning-example}.
+%
+\begin{figure}
+  \centering%
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Search tree%
+                  \labelFigure{no-good-learning-example-search-tree}%
+                }%
+                [20mm]%
+                {%
+                  \input{%
+                    figures/constraint-programming/%
+                    no-good-learning-example-search-tree%
+                  }%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Constraints%
+                  \labelFigure{no-good-learning-example-constraints}%
+                }{%
+                  \begin{tabular}{>{$}c<{$}>{$}c<{$}}
+                    \toprule
+                        \text{\tabhead \#}
+                      & \text{\tabhead constraint}\\
+                    \midrule
+                        c_1
+                      & \mBoolRepVar{\mVar{z} \leq 3} \mOr
+                        \mBoolRepVar{\mVar{x} = 2} \mOr
+                        \mBoolRepVar{\mVar{y} = 2}\\
+                        c_2
+                      & \mNot\mBoolRepVar{\mVar{z} = 4} \mOr
+                        \mNot\mBoolRepVar{\mVar{z} \leq 3}\\
+                        c_3
+                      & \mNot\mBoolRepVar{\mVar{x} = 2} \mOr
+                        \mNot\mBoolRepVar{\mVar{y} = 2}\\
+                        c_4
+                      & \mNot\mBoolRepVar{\mVar{z} = 4} \mOr
+                        \mNot\mBoolRepVar{\mVar{x} = 2} \mOr
+                        \mBoolRepVar{\mVar{y} = 2}\\
+                    \bottomrule
+                  \end{tabular}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \vspace{\betweensubfigures}
+
+  \mbox{}
+  \hfill%
+  \subcaptionbox{%
+                  Implication graph%
+                  \labelFigure{no-good-learning-example-impl-graph}%
+                }{%
+                  \input{%
+                    figures/constraint-programming/%
+                    no-good-learning-example-impl-graph%
+                  }%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  No-good%
+                  \labelFigure{no-good-learning-example-no-good}%
+                }{%
+                  $\mNot\mBoolRepVar{\mVar{z} = 4} \mOr
+                   \mNot\mBoolRepVar{\mVar{x} = 2}$
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Example of no-good learning]%
+          {%
+            Example of no-good learning.
+            %
+            First \mbox{$\mBoolRepVar{\mVar{z} = 4}$} is assigned to true ($T$)
+            through search.
+            %
+            This triggers unit propagation of constraint $c_2$, which assigns
+            \mbox{$\mNot\mBoolRepVar{\mVar{z} \leq 3} = T$}\!.
+            %
+            Since no further propagation can be done, search is resumed by
+            assigning \mbox{$\mBoolRepVar{\mVar{z} = 4} = T$}\!.
+            %
+            This triggers unit propagation of constraint $c_3$, which assigns
+            \mbox{$\mNot\mBoolRepVar{\mVar{y} = 2} = T$}\!.
+            %
+            This in turn causes constraint $c_4$ to fail.
+            %
+            By choosing the literals closest to the failure node such that
+            all decisions flow through those literals, we learn the no-good
+            \mbox{$\mNot\mBoolRepVar{\mVar{z} = 4} \mOr
+              \mNot\mBoolRepVar{\mVar{x} = 2}$}%
+          }
+  \labelFigure{no-good-learning-example}
+\end{figure}
+%
+For more details, see~\cite{MarquesSilvaEtal:2014}.
+
+It is well known that the effectiveness of \gls{LCG} is heavily impacted by how
+the problem is modeled as that affects which \glspl{no-good} can be
+learned~\cite{SchuttEtAl:2011, ChuStuckey:2013, SchuttEtAl:2016}.
+%
+For the same reason, \gls{LCG} is also influenced by the \gls{implied.c},
+\gls{symmetry breaking.c}, and \gls{dominance breaking.c} \glspl{constraint}
+that have been added to the \glsshort{constraint model}.
+%
+Consequently, due to \gls{LCG} there may arise strong synergy effects between
+such \glspl{constraint} that would not have appeared when using a non-\gls{LCG}
+\gls{constraint solver}.

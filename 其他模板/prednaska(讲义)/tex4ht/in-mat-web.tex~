@@ -1,0 +1,390 @@
+\long\def\DVIorPDF#1#2{#1}
+\documentclass[fleqn,oneside]{report}
+
+\def\shifticon{40}
+\def\biggershifticon{70}
+
+
+\def\podcast#1{
+\edef\temp{#1}%
+\HCode{<span  style="float:right ; position:relative; top: -48px ; left:\shifticon px; z-index: 1"><a href="../podcasts/podcasts.php?\temp" target="mat-web-podcasts" style="float:left"/><img src="images/sound.png" border=0></a></span>}}
+
+
+\def\maw#1{\HCode{<span style="float:right; position:relative; top: -48px ; left :\shifticon px; z-index: 1"><a href="http://user.mendelu.cz/marik/maw/index.php?form=#1" target="mat-web-maw"/><img src="images/calc.png" border=0></a></span>}}
+
+\def\pdfcalc#1{\HCode{<span style="float:right; position:relative; top: -48px; left :\shifticon px; z-index: 1 "><a href="#1"/><img src="images/calc.png" border=0></a></span>}}
+
+\def\kvizy#1{\HCode{<span style="float:right; position:relative; top: -48px ; left :\shifticon px; z-index: 1"><a href="http://user.mendelu.cz/marik/kvizy/#1.pdf" style="float:left"/><img src="images/kviz.png" border=0></a></span>}}
+
+\def\nic{}
+\def\kvizy#1{\def\neco{#1}\ifx\neco\nic \def\odkaz{http://user.mendelu.cz/marik/index.php?item=32} \else\def\odkaz{http://user.mendelu.cz/marik/kvizy/#1.pdf}\fi\HCode{<span style="float:right; position:relative; top: -48px ; left :\shifticon px; z-index: 1"><a href="\odkaz" style="float:left"/><img src="images/kviz.png" border=0></a></span>}}
+
+
+\def\DUL{\HCode{<img border="0px solid"  width="30px"  height="32px"  style="float:right; position:relative; left :\shifticon px; z-index: 1" alt="!!!" src="images/dulezite.png"/>}}
+
+
+\usepackage{url}
+\usepackage{mdwlist}
+\usepackage{hyperref}
+
+\usepackage{color}
+
+\usepackage{amsmath,amsfonts,bm}
+\usepackage[latin2]{inputenc}
+\usepackage[czech]{babel}
+
+\def\uv#1{"#1"}
+\usepackage{verbatim}
+\usepackage{a4wide}
+\usepackage{epsf}
+\usepackage{psfrag}
+
+\setlength\parindent{0pt}
+\usepackage{amsthm}
+
+
+\makeatletter
+\def\th@definition{\normalfont \thm@headfont{\bfseries}}
+\def\th@plain{\thm@headfont{\bfseries} \normalfont}
+\makeatother
+
+\theoremstyle{plain}
+
+\newtheorem{veta}{Vìta}[chapter]
+\newtheorem{definice}{Definice}[chapter]
+
+
+\theoremstyle{definition} 
+
+\newtheorem{poznamka}{Poznámka}[chapter] 
+\newtheorem{priklad}{Pøíklad}[chapter]
+\def\theenumi{(\roman{enumi})} \def\labelenumi{\theenumi}
+
+
+\input fig2
+\setlength\parindent{0pt}
+
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\tg}{tg}
+\DeclareMathOperator{\arctg}{arctg}
+\DeclareMathOperator{\arccotg}{arccotg}
+\def\Dom{D}
+\def\Im{H}
+
+\let\epsilon\varepsilon
+\let\eps\varepsilon
+\let\phi\varphi
+\def\dx{\,\mathrm{d}x}
+\def\dy{\,\mathrm{d}y}
+\def\dt{\,\mathrm{d}t}
+\def\dr{\,\mathrm{d}r}
+\def\du{\,\mathrm{d}u}
+\def\dv{\,\mathrm{d}v}
+\def\dd{\,\mathrm{d}}
+\def\dphi{\,\mathrm{d}\phi}
+
+\def\implies{\Rightarrow}
+
+\pagestyle{headings}
+
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\Q{\mathbb{Q}}
+\def\Z{\mathbb{Z}}
+\def\N{\mathbb{N}}
+\let\mathbf\bm
+
+\DeclareMathOperator{\adj}{adj}
+\DeclareMathOperator{\tr}{Tr}
+
+\def\cdotsp{\cdots}
+\def\vertp{\vdots}
+\def\diagp{\ddots}
+
+\everymath{\displaystyle}
+\interdisplaylinepenalty 50
+
+\makeatletter
+\def\tooltipname#1#2{\expandafter\xdef\csname FancyToolTip@#1\endcsname{#2}}
+
+\def\FindTipNumber#1{\expandafter\ifx \csname FancyToolTip@#1\endcsname\relax
+  #1\else\csname FancyToolTip@#1\endcsname\fi}
+
+\def\checkTipNumber#1{\expandafter\ifx
+  \csname FancyToolTip@#1\endcsname\relax \PackageWarning{fancytooltips}{No
+    framenumber is assigned to keyword #1. I assume that #1 is the
+    number of the frame.}%
+  \fi}
+
+\makeatother
+
+\IfFileExists{fancytips.tex}{\input{fancytips.tex}}%
+  {\PackageWarning{fancytooltips}{No file fancytips.tex!
+      Your keywords for tooltips will not work!}}
+
+\newcount\tipnumbercount
+
+% \def\ttp#1{\edef\TipNumber{\FindTipNumber{#1}}%
+% \expandafter\tipnumbercount\TipNumber 
+% \edef\temp{images/ttp-\the\tipnumbercount.jpg}%
+% \HCode{<a href="javascript:void(0);"  
+% onmouseover="picturettp='<img src=\temp>'; 
+% return overlib(picturettp, HAUTO, VAUTO, FULLHTML, STICKY, MOUSEOFF);" 
+% onmouseout="nd();"><img border="0px solid"; width="15px"; height="20px"; src=images/znacka.png></a>}}
+
+
+% \def\atp#1#2{\edef\TipNumber{\FindTipNumber{#1}}%
+% \expandafter\tipnumbercount\TipNumber 
+% \edef\temp{images/ttp-\the\tipnumbercount.gif}%
+% \HCode{<a href="javascript:void(0);"  
+% onmouseover="picturettp='<img src=\temp>'; 
+% return overlib(picturettp, HAUTO, VAUTO, 10, FULLHTML, STICKY, MOUSEOFF);" 
+% onmouseout="nd();"><img border="0px solid"; width="15px"; height="20px"; src=images/znacka.png></a>}}
+
+
+% \def\ttp#1{\edef\TipNumber{\FindTipNumber{#1}}%
+% \expandafter\tipnumbercount\TipNumber 
+% \edef\temp{images/ttp-\the\tipnumbercount.jpg}%
+% \HCode{<a href="javascript:void(0);"  
+% onmouseover="picturettp='<img src=images/banner.jpg><BR><img src=\temp>'; 
+% return overlib(picturettp, RELX,10, RELY, 10, FULLHTML, STICKY, MOUSEOFF);" 
+% onmouseout="nd();"><img border="0px solid"; width="15px"; height="20px"; src=images/znacka.png></a>}}
+
+
+% \def\atp#1#2{\edef\TipNumber{\FindTipNumber{#1}}%
+% \expandafter\tipnumbercount\TipNumber 
+% \edef\temp{images/ttp-\the\tipnumbercount.gif}%
+% \HCode{<a href="javascript:void(0);"  
+% onmouseover="picturettp='<img src=images/banner.jpg><BR><img src=\temp>'; 
+% return overlib(picturettp, RELX,10, RELY, 10, FULLHTML, STICKY, MOUSEOFF);" 
+% onmouseout="nd();"><img border="0px solid"; width="15px"; height="20px"; src=images/znacka.png></a>}}
+
+\def\ttpold#1{\edef\TipNumber{\FindTipNumber{#1}}%
+\expandafter\tipnumbercount\TipNumber 
+\edef\temp{images/ttp-\the\tipnumbercount.jpg}%
+\HCode{%<span style="position:absolute"><span style="position:relative; left:-3px; top:-4px">
+<a href="javascript:void(0);" onmouseover="picturettp='&lt;img src=images/banner.jpg&gt;&lt;BR&gt;&lt;img src=\temp&gt;'; return overlib(picturettp, RELX,10, RELY, 10, FULLHTML, STICKY, MOUSEOFF);" onmouseout="nd();"><img border="0px solid" width="13px" height="20px" src="images/znacka.png" alt=""/></a>%</span></span>&nbsp; 
+}}
+
+\def\wtp#1\ttp#2{\edef\TipNumber{\FindTipNumber{#2}}%
+\expandafter\tipnumbercount\TipNumber 
+\edef\temp{images/ttp-\the\tipnumbercount.gif}%
+\HCode{%<span style="position:absolute"><span style="position:relative; left:-3px; top:-4px">
+<a href="javascript:void(0);" onmouseover="picturettp='&lt;img src=images/banner.jpg&gt;&lt;BR&gt;&lt;img src=\temp&gt;'; return overlib(picturettp, RELX,10, RELY, 10, FULLHTML, STICKY, MOUSEOFF);" onmouseout="nd();"><i>}#1\HCode{</i></a>%</span></span>&nbsp; 
+}}
+
+\def\wtp#1\ttp#2{\edef\TipNumber{\FindTipNumber{#2}}%
+\expandafter\tipnumbercount\TipNumber 
+\edef\temp{images/ttp-\the\tipnumbercount.gif}%
+\HCode{%<span style="position:absolute"><span style="position:relative; left:-3px; top:-4px">
+<a href="javascript:void(0);" onmouseover="picturettp='&lt;img src=\temp&gt;'; return overlib(picturettp, FULLHTML);" onmouseout="nd();"><i>}#1\HCode{</i></a>%</span></span>&nbsp; 
+}}
+
+\def\wtp#1\ttp#2{\edef\TipNumber{\FindTipNumber{#2}}%
+\expandafter\tipnumbercount\TipNumber 
+\edef\temp{images/ttp-\the\tipnumbercount.gif}%
+\HCode{%<span style="position:absolute"><span style="position:relative; left:-3px; top:-4px">
+<a href="http://user.mendelu.cz/marik/in-mat-web/\temp" onmouseover="picturettp='&lt;img src=\temp&gt;'; return overlib(picturettp, FULLHTML);" onmouseout="nd();"><i>}#1\HCode{</i></a>%</span></span>&nbsp; 
+}}
+
+
+\def\atp#1#2{\edef\TipNumber{\FindTipNumber{#1}}%
+\expandafter\tipnumbercount\TipNumber 
+\edef\temp{images/ttp-\the\tipnumbercount.gif}%
+\HCode{<a href="javascript:void(0);"  
+onmouseover="picturettp='&lt;img src=images/banner.jpg&gt;&lt;BR&gt;&lt;img src=\temp&gt;'; 
+return overlib(picturettp, RELX,10, RELY, 10, FULLHTML, STICKY, MOUSEOFF);" 
+onmouseout="nd();"><img border="0px solid" width="13px" height="20px" src="images/znacka.png" alt=""/></a>}}
+
+
+\Configure{@BODY}{\ifvmode \IgnorePar\fi \EndP\HCode{
+ <table style="text-align: left; width: 100\%;" border="0" cellpadding="2" cellspacing="0"> <tbody> 
+<tr> <td style="background-color: rgb(34, 255, 0);"> 
+<span style="font-size: 65\%; font-weight:bold; font-family: sans-serif;">&nbsp;&nbsp; 
+In&\#x17e;en&\#xFD;rsk&\#xE1; matematika
+</span></td>
+<td style="text-align:right; background-color: rgb(34, 255, 0);">
+<span style="font-size: 65\%; font-weight:bold; font-family: sans-serif;">
+<a href="http://user.mendelu.cz/marik" target="_blank" style="color:black; text-decoration:none;">Robert Ma&\#x159;&iacute;k</a> &copy; 2007-2009&nbsp; 
+</span>
+</td> 
+</tr> </tbody> </table> }}
+
+\Configure{@/BODY}{\ifvmode \IgnorePar\fi \EndP\HCode{
+</div>
+ <table style="text-align: left; width: 100\%;" border="0" cellpadding="2" cellspacing="0"> <tbody> 
+<tr> <td style="background-color: rgb(34, 255, 0);"> 
+<span style="font-size: 65\%; font-weight:bold; font-family: sans-serif;">&nbsp;&nbsp; 
+Robert Ma&\#x159;&iacute;k,
+&Uacute;stav matematiky, Lesnick&aacute; a d&\#x159;eva&\#x159;sk&aacute; fakulta MZLU v Brn&\#x11B;</span></td>
+<td style="text-align:right; background-color: rgb(34, 255, 0);">
+<span style="font-size: 65\%; font-weight:bold; font-family: sans-serif;">
+ &copy; 2007-2009&nbsp; 
+</span>
+</td> 
+</tr> </tbody> </table><div> }}
+
+
+\usepackage[metapost]{mfpic}
+\clipmfpic
+
+\let\overbar\overline
+
+\begin{document}
+
+
+\catcode`\-=12 \catcode`\"=12 
+
+\author{\href{mailto:marik@mendelu.cz}{Robert Maøík}\\
+  \href{http://www.mendelu.cz}{Mendelova zemìdìlská a lesnická univerzita v Brnì}\\
+  \url{http://user.mendelu.cz/marik}}
+
+   \title{\textsc{In¾enýrská matematika}}
+
+ \maketitle
+
+ \begin{abstract}
+   % {\begin{minipage}{0.6\hsize}\normalcolor
+   Uèební text k mým pøedná¹kám z pøedmìtu In¾enýrská matematika.
+   Oproti pøedná¹kám a skriptùm jsou v textu èasto vypu¹tìny
+   motivaèní, aplikaèní a vzorové pøíklady a doprovodné obrázky.  Text
+   je pomìrnì krátký a hutný, proto není mínìn jako náhrada doporuèené
+   literatury.  PDF verze pro tisk a pro prohlí¾ení offline na
+   obrazovce jsou k dipozici pod odkazem \uv{Poznámky k elektronickému
+     textu}.
+   
+   Pro pøípadné jiné pou¾ití ne¾ pro pøípravu ke zkou¹ce si
+   prostudujte
+   \href{http://user.mendelu.cz/marik/licence.html}{licenèní
+     podmínky}.
+   
+   Za \href{mailto:marik@mendelu.cz}{upozornìní} na pøípadné pøeklepy,
+   chyby a nepøesnosti, jako¾ i za dal¹í relevantní komentáøe pøedem
+   dìkuji.
+
+
+   Tento uèební materiál byl vytvoøen s podporou grantu 99/2008 \href{http://www.frvs.cz/}{Fondu rozvoje vysokých ¹kol}.
+
+   % \end{minipage}
+   % }
+ \end{abstract}
+ 
+
+% \leavevmode
+% \tableofcontents
+
+\section*{Poznámky k elektronickému textu}
+  \begin{itemize}
+  \item Text je ¹íøen v elektronické podobì a je nepøípustné do nìj
+    jakkoliv zasahovat. Text není pøíli¹ vhodný k tisku, k tisku
+    doporuèuji
+    \href{http://user.mendelu.cz/marik/inzmat/in-mat.pdf}{verzi v
+      PDF}.
+  \item Nìkteré prohlí¾eèe zobrazují nekorektnì prùhledné obrázky
+    (Internet Explorer), jsou pomalé pøi zobrazování matematiky
+    (Firefox) nebo lámou øádky v matematickém textu na místì, kde by
+    to èlovìk neèekal, napøíklad mezi funkcí a argumentem (Opera). V
+    tìchto pøípadech doporuèuji
+    \href{http://user.mendelu.cz/marik/inzmat/in-mat-screen.pdf}{PDF verzi}
+    urèenou pro prohlí¾ení na obrazovce.
+  \item V textu jsou pou¾ity Javascripty k zobrazování matematiky.
+    \begin{itemize}
+    \item V následujícím odstavci je vzorec pro øe¹ení kvadratické
+      rovnice. Pokud jej z tohoto nevidíte, nefunguje to nebo to
+      funguje pomalu, povolte si v prohlí¾eèi Javascripty (nemusíte
+      mít strach, pou¾ívám pouze \textbf{jsMath}), pokud to nepomù¾e,
+      pou¾ijte jiný prohlí¾eè (vyzkou¹eno v prohlí¾eèích Opera,
+      Firefox, IE, Epiphany, K-Meleon, Konqueror).
+    \item Pokud je odezva pøíli¹ pomalá, pøesto¾e máte rychlé
+      pøipojení, zkuste nìjaký odlehèený prohlí¾eè, tj. ne Firefox ani
+      IE.
+    \end{itemize}
+  \item Test matematiky:
+    \begin{itemize}
+    \item Koøeny kvadratické rovnice jsou
+      $x_{1,2}=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$.
+    \item Matematika vypadá rùznì kvalitnì a rùznì rychle se zobrazuje
+      v závislosti na tom, jaké máte v operaèním systému fonty a
+      jestli prohlí¾eè bere tyto fonty v potaz. To se dá pøepínat po
+      vyvolání kontrolního panelu kliknutím na tlaèítko
+      \textbf{jsMath} (v pravém dolním rohu prohlí¾eèe) a kliknutím na
+      Options, nastavit co potøebuji a znovu naèíst stránku.
+    \item Varianta "Use image fonts" funguje v¾dy, ale je nejpomalej¹í -- znamená ¾e se v¹echny matematické fonty tahají ze
+      serveru jako obrázky.
+%     \item Pro èastìj¹í práci doporuèuji doinstalovat \TeX ovské fonty
+%       podle
+%       \url{http://www.math.union.edu/~dpvc/jsMath/download/jsMath-fonts.html}.
+    \end{itemize}
+%   \item Test nápovìdných textù:
+%     \begin{itemize}
+%     \item  V textu jsou takzvaná ``oslí okénka\ttp{ukazka}'' --
+%       nìkteré dùle¾ité pojmy jsou doprovázeny modrými bublinami, které
+%       jsou aktivní a po najetí na tyto bubliny se ètenáøi otevøe
+%       okénko pøipomínající definici, vyu¾ití a metodu výpoètu, které
+%       se týkají daného pojmu (vyzkou¹ejte si to na této stránce).
+%     \item Okénko s nápovìdným textem zavøete, pokud pøes nìj pøejedete
+%       my¹í (tj vjedete dovnitø a vyjedete ven).
+%     \end{itemize}
+  \item Test nápovìdných textù:
+    \begin{itemize}
+    \item V textu jsou takzvaná ``\wtp oslí okénka\ttp{ukazka}'' --
+      nìkteré dùle¾ité pojmy jsou aktivními odkazy a po najetí na tyto
+      odkazy se ètenáøi otevøe okénko pøipomínající definici, vyu¾ití
+      a metodu výpoètu, které se týkají daného pojmu (vyzkou¹ejte si
+      to na této stránce).
+    \item Okénko s nápovìdným textem zavøete, pokud z odkazu vyjedete
+      ven. pokud je okénko ¹patnì umístìno na stránce tak jej zavøete
+      a znovu otevøete.
+    \end{itemize}
+  \item \DUL Na pravém kraji tohoto odstavce je znaèka, která nás informuje
+    o tom, ¾e dùle¾itost takto oznaèeného materiálu je zcela zásadní.
+    V¹echno ostatní je \uv{jenom} dùle¾ité.  
+    \end{itemize}
+    \begin{itemize}
+\item Je-li text na pravém okraji doprovázen ikonou\kvizy{}, tak jako tento
+  odstavec, je mo¾no si kliknutím na ikonu otevøít interaktivní test
+  na procvièení pøíslu¹ného pojmu èi metody. 
+    \end{itemize}
+    \begin{itemize}
+\item K nìkterým pasá¾ím testu jsou pøipojeny zvukové komentáøe.
+  Poznáte je podle ikony, jaká doprovází i tento odstavec. \podcast{} 
+    \end{itemize}
+    \begin{itemize}
+\item Pro nìkteré typy úloh jsou k textu vytvoøeny online kalkulátory,
+  které usnadní øe¹ení nebo umo¾ní vygenerovat øe¹ení úlohy vèetnì
+  postupu. Odkazy na tyto kalkulátory jsou oznaèeny ikonou, která
+  doprovází i tento odstavec. \maw{}
+\end{itemize}
+
+
+ \chapter{Diferenciální poèet funkcí dvou promìnných}
+ \input{../dveprom}
+
+ \def\tag#1{\relax}
+ \chapter{Diferenciální rovnice}
+ \input{../drce}
+
+\opengraphsfile{autsyst}
+\mfpicunit=1pt
+\chapter{Autonomní systémy}
+\input{../autsyst}
+\closegraphsfile
+
+
+ \opengraphsfile{obrint}
+ \mfpicunit=1cm
+ \chapter{Dvojný integrál}
+ \input{../dvojint}
+ \closegraphsfile
+
+ \opengraphsfile{obrdr}
+ \tlabelsep{3pt}
+ \mfpicunit=1pt
+\chapter{Numerické øe¹ení diferenciálních rovnic}
+ \input{../numerika}
+ \closegraphsfile
+
+\end{document}
+
+
+

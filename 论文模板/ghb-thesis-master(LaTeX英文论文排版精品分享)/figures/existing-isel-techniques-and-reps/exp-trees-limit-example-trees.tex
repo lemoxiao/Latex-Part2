@@ -1,0 +1,60 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize%
+\pgfdeclarelayer{background1}%
+\pgfdeclarelayer{background2}%
+\pgfsetlayers{background2,background1,main}%
+\begin{tikzpicture}[%
+    value node/.style={%
+      computation node,
+    },
+    outer match node/.style={%
+      match node,
+      draw=none,
+      inner sep=0,
+    },
+  ]
+
+  % Trees
+  \node [computation node] (add) {\nAdd};
+  \node [value node, position=-135 degrees from add] (a) {\nVar{a}};
+  \node [value node, position=- 45 degrees from add] (b) {\nVar{b}};
+  \begin{scope}[data flow]
+    \draw (a) -- (add);
+    \draw (b) -- (add);
+  \end{scope}
+
+  \node [value node, right=of b] (c) {\nVar{c}};
+  \node [computation node, position=45 degrees from c] (mul) {\nMul};
+  \node [value node, position=- 45 degrees from mul] (t1) {\nVar{t}};
+  \begin{scope}[data flow]
+    \draw (c) -- (mul);
+    \draw (t1) -- (mul);
+  \end{scope}
+
+  \node [value node, right=of t1] (t2) {\nVar{t}};
+  \node [computation node, above=of t2] (load) {\nLoad};
+  \begin{scope}[data flow]
+    \draw (t2) -- (load);
+  \end{scope}
+
+  % Matches
+  \begin{pgfonlayer}{background1}
+    \foreach \i/\m in {a/1, b/2, c/3, t1/4, t2/5} {
+      \node [match node, fill=shade2, fit=(\i)] (m\m) {};
+      \node [match label, below=of m\m] (m\m l){$m_{\m}$};
+      \draw [match attachment line] (m\m) -- (m\m l);
+    }
+    \foreach \i/\m/\p in {add/6/left, mul/7/left, load/9/right} {
+      \node [match node, fill=shade2, fit=(\i)] (m\m) {};
+      \node [match label, \p=of m\m] (m\m l) {$\strut m_{\m}$};
+      \draw [match attachment line] (m\m) -- (m\m l);
+    }
+  \end{pgfonlayer}
+\end{tikzpicture}%
+\endgroup%

@@ -1,0 +1,973 @@
+
+
+%************************************************
+\chapter{Implementation}
+\label{chp:impl}
+%************************************************
+
+\quotegraffito{In theory, there is no difference between theory and practice. But, in practice, there is.}
+{Jan L.A. van de Snepscheut}
+%
+The realization of the described algorithms is greatly aided by using the \vtk framework~\cite{VTK}. \paraview is a visualization application based on \vtk~\cite{ParaView}. They will be shortly introduced in the next section. The following sections will describe the implementation of the algorithmic building blocks in detail. Finally, the last section of this chapter will briefly address the user interface.
+
+
+%===================================================================================
+\section[VTK and ParaView]{\textsmaller{VTK} and ParaView}
+
+\emph{\vtk}is an open source visualization framework for \Cpp and includes a variety of algorithms and data structures to process and visualize geometric data. It was introduced by \cauthor{VTKPaper}~\cite{VTKPaper}.
+
+All \vtk algorithms and operations are encapsulated in classes with the common interface \cclass{vtkFilter}. This approach allows the arbitrary combination of compatible filters to \emph{filter chains}. Each black block in the processing overview of the previous chapter (\autoref{fig:theory:intro}) is implemented by a combination of these filters. Some of them came with \vtk, the others were implemented as part of this thesis.
+\vtk also supports the visualization of its data structures via \textsmaller{OpenGL}.
+Chaining instances of \cclass{vtkFilter} and visualizing the output requires only a few lines of code.
+
+\threed \ac{CFD} mesh data is stored within an instance of \cclass{vtkUnstructuredGrid}, surface and streamline data is stored within an instance of \cclass{vtkPolyData}, and graph data is stored within an instance of \cclass{vtkGraph}.
+
+The former two data structures consist in essence of points, cells, and associated data, which are all stored in arrays. Removing points or cells from these structures would require the removal of elements from the middle of arrays. It is therefore a slow operation and not supported by public \vtk interfaces. Hence, \vtk algorithms usually do not alter the input, but create a new output from scratch. The \cclass{vtkFilter} interface enforces this convention %of separating inputs and outputs 
+by passing the empty output data structure together with the inputs. This separation of input and output encourages clean algorithms, but consumes more memory.% which is a problem for applications with high memory requirements. 
+ 
+Consider for example the preprocessing stage. Fixing the cell normals is possible in-place, because no cells or points are removed. For removing the outside cells however, a separate output dataset is required. This almost doubles the required memory during this step to about \SI{2}{GB} for the \toyotadataset.
+
+\vtk has no direct user interface, but is accessed through \Cpp or any of the other wrapper languages, like Java and Tcl. Sometimes constant changes to the filter chain or the visualization settings are required, for example during exploration of new datasets or debugging of new filter outputs. The repeated compilation and execution for these small adaptations quickly becomes a cumbersome task.
+
+In \graffito{All dataset figures of this thesis where rendered using \paraview.}these cases \emph{\paraview}is a helpful additional tool. \paraview is a \ac{GUI} front end for \vtk, allows the creation and adaptation of filter chains, and therefore makes most of the functionality of \vtk easily accessible.
+
+
+
+%\cclass{vtkGraph} and its implementations allow all modifications, including removal of vertices and edges. As the graphs in this thesis are quite small and do not require considerable memory, the clean convention of separate outputs is retained for clarity.
+
+
+%===================================================================================
+\section{Preprocessing} 
+\label{sec:impl:preprocessing}
+Basic preprocessing steps can be performed directly in \paraview. This includes loading data with different formats, cleaning unnecessary or redundant \ac{CFD} values and removing uninteresting parts of the dataset, like \twod surface structures.
+
+More complex preprocessing steps, as the removal of outside geometry, are implemented as custom subclasses of \cclass{vtkFilter}.
+
+
+%===================================================================================
+\subsection{Rectifying inconsistent surface normals}
+\label{sec:impl:surface-normals}
+
+\autoref{fig:impl:vtk-celltypes} shows the four common cell types supported in this thesis, together with their \vtk names and point orders.% Other cell types are unusual for \threed \ac{CFD} simulations.
+
+\bigfigure[pos=tbhp,
+           %opt={width=8.25cm},
+           label={fig:impl:vtk-celltypes},
+           shortcaption={\vtk \threed cell types and point orders.}]
+{impl-vtk-celltypes}
+{The common \threed cell types used for \ac{CFD} simulations and their \vtk names and point orders. (Images taken from the document ``\cauthor{VTKFileFormats}''~\cite{VTKFileFormats}.)}
+
+After importing the \toyotadataset into \vtk, the surface normals of most cells are flipped. This means that the points of most cells are labeled in the wrong order. Consider for example, the tetrahedron in \autoref{fig:impl:vtk-celltypes}. After the points \numlist{0;1;2} are fixed, point \num{3} is expected to lie \emph{above} the triangle when using the right hand rule. If point \num{3} is \emph{below} the triangle however, all surface normals point inwards instead of outwards. Determining the source of the problem is out of scope for this thesis, but it must lie either in \cauthor{EnSight} export or in \vtk import. 
+
+All tetrahedra, hexahedra, and pyramids show this problematic behavior. The surface normals of the wedges are correct, because they have different point orders in \cauthor{EnSight} and \vtk which compensates the problem.\footnote{In \vtk, the normal vector (using the right hand rule) of the wedge base points \emph{away} from the wedge. In \cauthor{EnSight} this normal points \emph{into} the wedge. Notice that the \vtk wedge is inconsistently defined to the other \vtk cell types, which always have the base normal pointing inwards. This has led to confusion in several cases in \vtk. For example the ``Normal Glyphs Filter'' of \paraview (Version 3.8.0) produces incorrect results for wedges.}
+
+If a dataset is imported from \cauthor{EnSight} and processed using \vtk or \paraview, newly created cells have the \emph{correct} point order. This leads to an even worse situation, where cells having either correct or incorrect surface normals are randomly mixed. Correct surface normals are not only required for visualization, but more importantly for integrating flows between regions in the ``Map Region to Graph'' module.
+
+Therefore the correctness of surface normals has to be ensured for all cells during the preprocessing phase. This is done by checking simple geometric constraints and switching point orders if necessary.
+%For example, a possible check for a tetrahedron would be to verify that point \num{3} lies ``above'' the triangle \numlist{0;1;2}. If this is not the case, switching the point labels \numlist{0;1} corrects the surface normals. All other checks and fixes are given in \autoref{ssec:impl:surface-normals}.
+
+The cells in \vtk are stored within a linearized cell array that arranges the point \acp{ID} for each cell in succeeding order. Fixing surface normals can therefore be achieved by swapping the point \acp{ID} of the affected cells. This does not affect the point coordinates or any other cell. The applied checks and changes are as follows (see also \autoref{fig:impl:vtk-celltypes}):\footnote{$\rhsvec{0}{1}{2}$ denotes the normal vector of the plane which is defined by the three given points using the right hand rule. $\dirvec{0}{1}$ denotes the vector pointing from the first point to the second point. To determine if vectors point into or away from each other, the scalar product is used.}
+
+\begin{description}
+%
+	\item[VTK\_TETRA:] If $\rhsvec{0}{1}{2}$ points away from $3$% (\ie, $\scalprod{\rhsvec{0}{1}{2}}{\dirvec{3}{0}} > 0$)
+, swap the point \acp{ID} of $0$ and $1$.
+%
+	\item[VTK\_HEXAHEDRON:] If $\rhsvec{0}{1}{2}$ points away from $4$% (\ie, $\scalprod{\rhsvec{0}{1}{2}}{\dirvec{4}{0}}$ $> 0$)
+	, swap the point \acp{ID} of $0$ and $2$, and the point \acp{ID} of $4$ and $6$.)
+%
+  \item[VTK\_PYRAMID:] If $\rhsvec{0}{1}{2}$ points away from $4$% (\ie, $\scalprod{\rhsvec{0}{1}{2}}{\dirvec{4}{0}}$ $> 0$)
+  , swap the point \acp{ID} of $0$ and $2$.
+%
+  \item[VTK\_WEDGE:] If $\rhsvec{0}{1}{2}$ points \emph{into} $3$% (\ie, $\scalprod{\rhsvec{0}{1}{2}}{\dirvec{0}{3}} > 0$)
+  , swap the point \acp{ID} of $0$ and $1$, and the point \acp{ID} of $3$ and $4$.
+%
+\end{description}
+
+%These checks and changes have to be performed once for each cell. The complete algorithm is implemented in \cclass{vtkFixNormalsFilter}.\footnote{The names of classes which were written for this thesis and directly implement \vtk filter interfaces start with \cclass{vtk} to differentiate them from mere helper classes. Therefore, the prefix \cclass{vtk} does not automatically imply that a class came with \vtk.}
+
+
+
+%===================================================================================
+\subsection{Removing undesired outside geometry}
+\label{sec:impl:undesired-geometry}
+
+The problem descriptions and basic solution ideas behind these algorithms were treated in \autoref{sec:theory:undesired-geometry}. The following sections cover the implementation in greater detail.
+
+%===================================================================================
+\subsubsection{Region growing}
+\label{sec:impl:region-growing}
+
+To separate the outside cells from the inside cells by region growing, two problems need to be solved. The first one is finding appropriate seed cells to start the growing process, and the second one is finding a suitable stopping criterion. Without a stopping criterion, the outside region would grow also to inside cells, because outside and inside cells are connected through holes in the vehicle hull, \eg, at air intakes.
+
+\normfigure[pos=tbhp,
+           %opt={width=8.25cm},
+           label={fig:impl:outside-geometry-veryclose},
+           shortcaption={Surface structure of undesired geometry.}]
+{impl-outside-geometry-veryclose}
+{Closeup view of undesired geometry. The surface structure of undesired geometry is rough. Some of the cells are very exposed and only have one neighbor. The idea is to start region growing from these exposed cells.}
+
+\autoref{fig:impl:outside-geometry-veryclose} shows a closeup view of typical outside cells. Notice the exposed cells at the surface near the top. These can be used to start region growing.
+The first step in the region growing approach is therefore to identify surface cells. This is achieved using the existing \cclass{vtkDataSetSur\-fa\-ceFil\-ter}. Afterwards, exposed surface cells having only a few neighbors % (\eg, \num{1} for tetrahedra or \num{2} for hexahedra),
+are identified as seed cells.
+
+Finding a suitable stopping criterion is more difficult. One possibility is to grow only into cells with weak support, \ie, cells with relatively few neighbors. Inside cells have strong support, because of their compact arrangement, whereas outside cells have weak support, as they are thin and contain holes.
+This approach leads to practical results, but misses small islands of outside cells that support each other.
+
+Another idea is to grow only into cells that are within a certain distance from the seed cells. %, \eg, \num{40} cells
+For datasets with rough geometry at the inlets however, like the \toyotadataset, this grows into inside cells near the inlet too.
+
+The best results can be achieved by combining both stopping criteria. The problem that some rough inside cells near the inlets are labeled as outside cells is reduced, but remains.
+
+The best thresholds for the \toyotadataset are as follows:
+
+\begin{itemize}
+%
+  \item Surface seed cells are chosen to be pyramids and tetrahedra with only one neighbor, or  hexahedra and wedges with up to two neighbors.
+%
+  \item Starting from the seed cells, the outside region grows only into pyramids and tetrahedra with up to two neighbors, or into hexahedra and wedges with up to three neighbors.
+%
+  \item The maximum distance of any cell from a seed cell (\emph{seed distance}) is a parameter of the filter.
+%
+\end{itemize}
+
+
+%===================================================================================
+\subsubsection{Depth probing}
+\label{sec:impl:depth-probing}
+
+Identifying the outside cells by depth probing is based on two observations:
+\begin{enumerate}
+%
+  \item Outside geometry is thin in at least one direction whereas inside geometry is compact, and therefore thick, in every direction.
+%
+  \item Outside geometry consists mainly of flat wedges and hexahedra, \ie, it is mainly composed of stacks of hexahedra and wedges.
+%
+\end{enumerate}
+
+
+These observations are utilized by performing a \emph{depth probe} starting at every surface cell of the whole dataset. \autoref{fig:impl:depth-probe} demonstrates this for all cells within a zoomed cut through the dataset.
+
+\normfigure[pos=tbhp,
+            %opt={},
+            label={fig:impl:depth-probe},
+            shortcaption={Depth probe illustration.},
+           ]
+{impl-depth-probe}
+{Illustration of depth probing within a zoomed cut at the transition from outside cells to inside cells. Depth probes are performed from all surface cells. Short stacks of cells are classified as outside (maroon chains).}
+
+Starting from all faces at the surface, iteratively jump to the neighbor at the opposite face of this cell, creating a stack of neighboring cells. Stop if there is no cell at the opposite face, or a maximum depth (\ie, number of jumps) is reached. In the former case, the whole stack is considered ``thin'' and therefore classified as being outside (maroon chains).
+
+Notice that the notion of an opposite face is only defined for all faces of hexahedra and the triangular faces of wedges. All other cell types have several opposite face candidates. One approach to solve this problem would be to create cell trees instead of cell chains. In the current problem however, almost all cells are either hexahedra or wedges stacked with their triangular faces. The jump to the opposite face is therefore defined as follows:
+\begin{enumerate}
+%
+  \item If the cell is a hexahedron, jump to the obvious opposite face.
+%
+  \item If the cell is a wedge and the incoming face is a triangle, jump to the opposite triangle.
+%
+  \item In all other cases:
+  \begin{enumerate}
+    \item If there is no neighbor cell at any opposite face, report the end of chain, \ie, a thin stack was found.
+    \item If there is exactly one neighbor cell at any opposite face, jump to this candidate.
+    \item Otherwise stop as if the maximum depth is reached.
+  \end{enumerate}
+%
+\end{enumerate}
+
+\bigfigure[	pos=tbhp,
+            %opt={},
+            label={fig:impl:depth-probe-pathtypes},
+            shortcaption={Depth probe path types.},
+           ]
+{impl-depth-probe-pathtypes}
+{Example of some depth probes with different cell types. Leftmost figure: Traversing a stack of hexahedra with a final pyramid. Second from left: Same situation for wedges and a tetrahedron. Second from right: Stop depth probe, if multiple neighbors are found at opposite faces. Rightmost figure: Continue depth probe, if only one opposite face connects a neighbor.}
+
+
+
+\autoref{fig:impl:depth-probe-pathtypes} illustrates and explains the different jump types.
+All stacks are traversed from top to bottom. The leftmost figure shows how a stack of hexahedra is traversed. The bottom cell is a pyramid, but has no other neighbors. The traversal is therefore valid, and the stack will be classified as thin\slash outside. The second figure from the left demonstrates the same situation for a stack of wedges and a final tetrahedron. The figure next to it illustrates that depth probing is stopped, if multiple jumps are possible. The classification in this case is thick\slash inside. The rightmost example shows the same situation, but with only one possible jump at the wedge, which is then performed. This results in a thin\slash outside stack again.
+
+A cell may be visited multiple times, if it is close to multiple faces on the dataset surface. It is classified thin\slash outside, if it is part of \emph{any} thin stack. Therefore, after all surface tiles have been processed every cell which is part of any thin stack is classified as being outside.
+
+Results for both approaches to remove undesired geometry can be found in \autoref{sec:results:preprocessing}.
+
+
+%===================================================================================
+\section{Partitioning}
+
+The theory behind the following sections can be found in \autoref{sec:theory:partitioning}.
+The partitioning algorithm of \cauthor{McKenzie} was implemented as described in their paper. % in \cclass{McKenzieClusterFilter}.
+From the implementation perspective, the \kMeans algorithm differs only in the details from \cauthor{McKenzie}'s algorithm. %It is implemented in \cclass{KMeansClusterFilter}.
+Both implementations allow choosing from different distance measures, \eg, the distance function introduced by \cauthor{DuWang}.
+
+The implementation of the streamline bundling algorithm is subject of the following sections.
+
+
+%===================================================================================
+\subsection{Seeding}
+
+\emph{Random seeding} is straightforward, uniform, random sampling from all available grid points. The first idea to improve random seeding was to assign different selection probabilities to the grid points according to their velocity. Increasing the selection probability of grid points with low velocity was expected to increase the overall coverage of the dataset. In practice however, the results of later stages did not improve because streamlines starting at low velocity grid points are quickly dragged into higher velocity areas.
+
+
+For \emph{interface seeding}, the first step is to find grid points which are part of in- or outlets. This is accomplished by first selecting all grid points at the dataset surface using the built-in \vtk algorithm \cclass{vtkDataSetSurfaceFilter}. Afterwards, the surface normals of these surface grid points are computed by averaging over the normals of the neighboring surfaces. This functionality also comes with \vtk (\cclass{vtkPolyDataNormals}).
+
+At this point the surface normal vector $\vec{n}(d_i)$ and velocity $\vec{v}(d_i)$ of all surface grid points $d_i$ are known. Grid points at in- or outlets have a small angle between these two vectors, whereas for other grid points this angle is close to \ang{90}. Interface grid points can therefore be identified by thresholding this angle:
+%
+\begin{equation}
+  \left| \cos(\alpha) \right| = 
+  	\left|
+			\scalprod{
+			  \frac{
+				  \vec{v}(d_i)
+				}{
+				  \|\vec{v}(d_i)\|
+				}
+			}{
+				\vec{n}(d_i)
+			}
+		\right| > \cos(\alpha_\text{thres}) 
+\end{equation}
+
+From all surface grid points which satisfy this condition, the desired number is randomly chosen.
+
+%Good values for the \toyotadataset are to choose \SI{5}{\percent} of the interface grid points ($\cos(\alpha_\text{thres})=0.8$) and add a few thousand random points (\eg, 3000). The number of required seed points also depends on the simulation velocity of the operation point.
+The number of required seed points depends on %both the geometric complexity and 
+the flow field complexity of the dataset, \ie, to cover many small and detailed areas of the dataset, many streamlines are required. The number and placement of seed points also depends on the application. If only the main flow paths are sought-after -- \eg, for a visualization application -- fewer streamlines starting only from inlets and outlets will suffice.
+
+%===================================================================================
+\subsection{Stream tracing}
+Stream tracing is a standard method and is included in \vtk. \cclass{vtkStreamTracer} features many parameters to control the integration scheme, the integration direction, the step size, and the termination conditions.
+
+The stream tracing phase consumes a minor part of the total computation time. Therefore the decisions for these algorithmic parameters can be made to improve streamline quality instead of stream tracing speed. Using the best available integrator type (Runge-Kutta~4.5) and integrating into both directions is therefore an easy decision.
+
+The Runge-Kutta integrators can automatically adapt the step size during integration. The step size parameters allow defining the minimum, the maximum, and the initial step size. These lengths can be defined either absolute or relative to the current cell size.
+
+The termination settings can and should be used to reduce curling streamlines in dead zones. The best way to reduce these curls is to set a high terminal speed. This instructs \cclass{vtkStreamTracer} to stop stream tracing if the particle velocity drops below the given threshold.
+
+
+%===================================================================================
+\subsection{Streamline bundling}
+
+\quotegraffito{Science is what we understand well enough to explain to a computer, Art is all the rest.}
+{Donald E. Knuth}% (foreword to A=B by Petkovsek, Wilf and Zeilberger) 
+%
+The main idea, the basic algorithm, and the theoretic formulas for bundling streamline segments were already described in \autoref{sec:theory:streamline-bundling}. This section will connect these theoretic pieces using pseudo code and accompanying text.
+
+
+%===================================================================================
+\subsubsection{Data types}
+Before discussing the algorithm, the following basic data types are described: \emph{slice},  \emph{segment}, \emph{bundle}, and \emph{bundle store}.
+
+\paragraph{slice}
+A slice is the result of the intersection of a plane with a streamline field (\funref{fun:sliceAt}). It contains a list of intersections and the following associated data:
+
+\begin{enumerate}
+%
+	\item A reference to the intersected streamline (\eg, cell \ac{ID} of the streamline).
+%
+	\item A reference to the streamline point index before the intersection, \eg, \num{5} if the streamline is intersected between its \num{5}\textsuperscript{th} and \num{6}\textsuperscript{th} point.
+%
+	\item The coordinates of the exact intersection.
+%
+	\item The distance of the exact intersection to the slice point (the \emph{radius}).
+%
+	\item Interpolated values of all associated data (\eg, velocity, pressure\dots) for the exact intersection.
+%
+\end{enumerate}
+
+As slices are just temporary structures, only insertion and iteration are required. The list of intersections is therefore best within a dictionary sorted by radius, because this is the usual iteration order.
+
+\paragraph{Segment}
+
+\graffito{A point index on a streamline is \emph{not} the point ID. It is an index into the cell array of this streamline. The cell array stores the point IDs.}
+A segment specifies a part of a streamline and consists of a reference to the streamline (cell ID), and the segment index interval. The interval is specified by the first and last point index on this streamline.%, \eg, the segment consists of all points between the 5\textsuperscrpt{th} and 27\textsuperscript{th} point on the streamline with cell \ac{ID} 674.
+
+\paragraph{Bundle}
+
+A bundle is a list of segments. As the segments are usually accessed by streamline cell ID, a dictionary is a good choice. The dictionary must support multiple entries with the same key, because different segments of the same streamline might be part of the same bundle.
+
+\paragraph{Bundle store}
+
+A bundle store is a collection of bundles. In the current implementation, it also maintains an inverse map from point \acp{ID} to their respective bundles.
+
+
+%===================================================================================
+\subsubsection{Global bundling algorithm}
+\label{sec:impl:global-bundling-algorithm}
+
+The global bundling loop is simple. It traces bundles and adds them to the bundle store until a stopping criterion is met (\autoref{alg:stream-bundling-overview}).
+
+
+\begin{algorithm}[tbhp]
+  \SetKwFunction{traceBundle}{traceBundle}
+  %\SetKwFunction{PrototypePreprocessing}{prototypePreprocessing}
+  \SetKwData{protoPoint}{protoPoint}
+  \SetKwData{bundle}{bundle}
+  \SetKwData{bundleStore}{bundleStore}
+  
+  \KwIn{Streamlines}
+	\KwOut{Streamline segment bundles}
+	\BlankLine	
+
+	perform prototype selection preprocessing\;								\label{lin:sbo-preproc}
+	\Repeat{any bundling stopping criterion met}{								\label{lin:sbo-repeat}
+		\protoPoint \assign select next prototype starting point\; 
+		                                                        \label{lin:sbo-protosel}
+		\bundle  \assign \traceBundle{\protoPoint}\;            \label{lin:sbo-trace}
+		insert \bundle into \bundleStore according to collision strategy\;
+		                                                        \label{lin:sbo-insert}
+	}                                                         \label{lin:sbo-stop}
+\caption{Streamline bundling overview}
+\label{alg:stream-bundling-overview}
+\end{algorithm}
+
+\begin{description}
+%
+	\item[Line \ref{lin:sbo-preproc}:] Currently two prototype selection schemes are in use: subsampling and random selection. The former one requires expensive preprocessing, whereas the latter one requires none at all. For a theoretic discussion of prototype selection schemes see \autoref{sec:theory:prototype-selection}.
+
+Implementation of these schemes is straightforward, but there is one implementation detail: For the initial slices during prototype subsampling, it is advisable to use stricter similarity thresholds than for the following incremental slices. This ensures that the assigned rating of an initial slice is a good estimator of the bundle size not only for this one slice, but is also maintained after a few incremental steps. Without this ``reliable start'', a subsampling slice could contain many streamlines at the very edge of similarity. After a few incremental slices, most of these would be dropped from the bundle because of dissimilarity. In short, the initial rating would be less expressive.
+%
+	\item[Lines \ref{lin:sbo-protosel} and \ref{lin:sbo-trace}:] After a prototype point has been selected, it is used as a starting point for tracing a bundle. \funref{fun:traceBundle} is treated in the following section.
+%
+	\item[Line \ref{lin:sbo-insert}:] Finally the bundle is inserted into the bundle store according to the bundle collision strategy. All three collision strategies described in \autoref{sec:theory:bundle-collision} are supported.
+%
+	\item[Line \ref{lin:sbo-stop}:] No stopping criterion is required for bundling with \emph{subsampling prototype selection}. Streamline bundling is simply stopped after all prototype candidates are processed.
+In order to support \emph{random prototype selection}, there are three options to stop the global bundling loop:
+%
+	\begin{enumerate}
+	  \item When a \emph{maximum number of bundles} is reached.
+	  \item When a \emph{minimum bundle coverage}, \ie, the percentage of streamline points which are bundled, is reached.
+	  \item By \emph{user intervention} (manual stop).
+	\end{enumerate}
+%
+\end{description}
+
+
+%===================================================================================
+\subsubsection{Bundle tracing function}
+
+\quotegraffito{We think in generalities, but we live in details.}
+{Alfred North Whitehead}% (1861-1947) 
+%
+Bundling from a single prototype point is done by performing an initial slice and moving it along the prototype streamline as described in \autoref{sec:theory:streamline-bundling-idea}. \autoref{fig:impl:streamline-bundling} illustrates the actual process in \twod. 
+
+\normfigure[pos=h!tbp,
+						%opt={},
+						label={fig:impl:streamline-bundling},
+						shortcaption={\twod view of bundle formation.}
+					 ]
+{impl-streamline-bundling-2d}
+{Two-dimensional view of the formation of a bundle showing \emph{streamlines} (curved lines) with \emph{prototype streamline} (thick curved line), \emph{streamline points} (dots), \emph{initial slice} (vertical blue line), \emph{incremental slices} (other vertical lines), \emph{stop slices} (maroon lines), the incremental slice order (numbers), a \emph{lost mate} (dashed line), and the points in the final bundle (green).}
+
+At the initial prototype point (blue circle) an initial slice (blue line) is created. In the subsequent steps, incremental slices are performed along the prototype streamline. The incremental slices are carried out at the prototype streamline points, and initially alternate into both directions. The expansion of the bundle proceeds until a stopping criterion for each direction is met.
+
+Alternating the initial directions aims to improve the bundles in case of prototype selection by subsampling. Growing into only one direction from ``good'' initial slices leads to smaller bundles than growing simultaneously into both directions.
+After the initial slice was performed (\num{0}), the next incremental slice is at its right (\num{1}) and loses one mate at the top. The next incremental slice (\num{2}) is immediately left of the initial slice and preserves all mates. The third incremental slice (\num{3}) would lose many non-parallel mates. It is therefore not incorporated into the bundle and bundling is stopped in this direction. The following three slices (\numlist{4;5;6}) are performed into the only remaining direction until finally the seventh slice stops the bundle tracing. All green points are part of the fresh bundle.
+%
+
+\funref{fun:traceBundle} lists the bundle tracing algorithm.
+
+\begin{function}[htbp]
+  \SetKwData{protoPoint}{protoPoint}
+  \SetKwData{slicePoint}{slicePoint}
+  \SetKwData{sliceParameters}{sliceParameters}
+  \SetKwData{bundle}{bundle}
+  \SetKwData{oldBundle}{oldBundle}
+  \SetKwData{slice}{slice}
+  \SetKwData{initialSlice}{initialSlice}
+  
+  \SetKwFunction{sliceAt}{sliceAt}
+  \SetKwFunction{createInitialBundle}{createInitialBundle}
+  \SetKwFunction{mergeBundleWithSlice}{mergeBundleWithSlice}
+  
+  \KwIn{\protoPoint}
+  \KwOut{\bundle}
+	\BlankLine
+  
+  set initial slice radius in \sliceParameters\;							 \label{lin:tB-iniRad}
+  \initialSlice \assign \sliceAt{\protoPoint, \sliceParameters}\;
+                                                             \label{lin:tB-iniSlice}
+  \bundle \assign \createInitialBundle{\initialSlice}\;			\label{lin:tB-iniBundle}
+
+  adapt slice radius in \sliceParameters according to \initialSlice\;
+  																										         \label{lin:tB-incRad}
+  \Repeat{iteration stopped for both directions}{
+  	\oldBundle \assign \bundle\;														\label{lin:tB-incOldBnd}
+  	pick next \slicePoint\;                                 \label{lin:tB-incPickPt}
+  	\slice \assign \sliceAt{\slicePoint, \sliceParameters}\; \label{lin:tB-incSlice}
+  	\bundle \assign \mergeBundleWithSlice{\bundle, \slice}\; \label{lin:tB-incMerge}
+  	\If{any slicing stopping criterion is met by \bundle}{ 
+  	                                                          \label{lin:tB-incStop}
+  		\bundle \assign \oldBundle\;                          \label{lin:tB-incRevert}
+  		stop iteration into current direction\;              \label{lin:tB-incStopDir}
+  	}
+  }                                                        \label{lin:tB-incStopItr}
+  
+  clear \bundle if it does not meet the minimum requirements\; \label{lin:tB-clrBnd}
+                                          
+	\Return{\bundle}\;
+\caption{traceBundle(protoPoint)}
+\label{fun:traceBundle}
+\end{function}
+
+\begin{description}
+%
+	\item[Line \ref{lin:tB-iniRad}:] The slice parameters contain the similarity thresholds. For the initial slice, a maximum bundle radius is employed. Using no bundle radius (\ie, complete slice through the whole dataset) is also supported, but slow for large datasets.
+%
+	\item[Line \ref{lin:tB-iniSlice} and \ref{lin:tB-iniBundle}:] After performing the initial slice (see \autoref{sec:impl:slice-creation}), the initial bundle is constructed from it (see \autoref{sec:impl:initial-bundle-creation}).
+%
+	\item[Line \ref{lin:tB-incRad}:] For incremental slices, the slice radius is given in relation to the actual radius of the initial slice. The ratio is a parameter. Notice that the actual radius of the initial slice is usually smaller than the maximum initial bundle radius.
+Another parameter controls the cone-shape of the final bundle, \eg, a value of \num{2.0} allows the bundle radius to increase up to twice the radius of the initial slice. 
+%
+	\item[Line \ref{lin:tB-incOldBnd}:] Incremental slicing starts by backing up the current bundle to support rollback functionality.
+%
+	\item[Line \ref{lin:tB-incPickPt}:] Afterwards, the next slice point is picked as explained in \autoref{fig:impl:streamline-bundling} and its accompanying text. 
+%
+	\item[Lines \ref{lin:tB-incSlice} and \ref{lin:tB-incMerge}:] After the incremental slice has been performed (see \autoref{sec:impl:slice-creation}), it is merged with the current bundle (see \autoref{sec:impl:bundle-slice-merging}).
+%
+	\item[Lines \ref{lin:tB-incStop} to \ref{lin:tB-incStopDir}:] If the resulting bundle meets any slicing stopping criterion, expansion in the current direction is stopped and the merge is rolled back. Slicing stopping criteria are discussed in \autoref{sec:theory:slicing-stopping-criterion}
+%
+	\item[Line \ref{lin:tB-incStopItr}:] The bundle tracing ends if expansion is stopped in both directions.
+%
+	\item[Line \ref{lin:tB-clrBnd}:] Finally, if the resulting bundle does not meet minimum requirements, the bundle is cleared and an empty bundle is returned. Currently implemented parameters are:
+	\begin{itemize}
+		\item The minimum number of slices the bundle consists of.
+		\item The minimum length of the bundle in world coordinates, measured along the prototype streamline.
+		\item The minimum number of streamline segments in the bundle.
+	\end{itemize}
+%
+\end{description}
+
+%===================================================================================
+\subsubsection{Slice creation function}
+\label{sec:impl:slice-creation}
+\quotegraffito{If you had done something twice, you are likely to do it again.}
+{The Unix Programming Environment, by Brian Kernighan and Bob Pike}
+
+
+A slice is created by intersecting a plane, with dense streamlines. The plane is given by a point and its normal vector. \funref{fun:sliceAt} shows this process in detail.
+
+
+\begin{function}[tbhp]
+  \SetKwData{point}{point}
+  \SetKwData{sliceParameters}{sliceParameters}
+  \SetKwData{slice}{slice}
+  \SetKwData{closeSegments}{closeSegments}
+  \SetKwData{segment}{segment}
+  \SetKwData{slicePlane}{slicePlane}
+  \SetKwData{intersections}{intersections}
+  \SetKwData{intersection}{intersection}
+  \SetKwFunction{findCloseStreamlineSegments}{findCloseStreamlineSegments}
+  
+  \KwIn{\point, \sliceParameters}
+  \KwOut{\slice}
+	\BlankLine
+	
+	\closeSegments \assign find streamline segments within given radius\; 
+																									   \label{lin:slAt-closeSegments}
+	determine \slicePlane\ from \point\;               \label{lin:slAt-plane}
+	\ForEach{\segment in \closeSegments}{               \label{lin:slAt-loop}
+		\intersections \assign intersect \segment with \slicePlane\;
+		                                                 \label{lin:slAt-isec}
+		\ForEach{\intersection in \intersections}{       \label{lin:slAt-isecloopbegin}
+			append intersection and interpolation data to \slice\;
+		}                                                \label{lin:slAt-isecloopend}
+	}
+	
+	\Return{\slice}\;
+	
+\caption{sliceAt(point, sliceParameters)}
+\label{fun:sliceAt}
+\end{function}
+
+\begin{description}
+%
+	\item[Line \ref{lin:slAt-closeSegments}:] Most of the time, a slice is only required to contain intersections up to the given radius from the slice point. Therefore only a subset of all streamlines segments needs to be considered for intersection. A $kd$-tree over all streamline points is constructed in order to quickly find all points within the given radius. These points are then mapped to all streamline segments that lie within the radius.
+%
+	\item[Line \ref{lin:slAt-plane}:] The slice plane through the given slice point $d_i$ is uniquely defined by the slice point position $\vec{x}(d_i)$ and its normal vector $\vec{v}(d_i)/\|\vec{v}(d_i)\|$.
+%
+	\item[Lines \ref{lin:slAt-loop} and \ref{lin:slAt-isec}:] Each of the close segments is then intersected with the slice plane, by iterating over the individual line pieces of the segment. This can result into multiple intersections of the same streamline, if the streamline segment is curled.
+%
+	\item[Lines \ref{lin:slAt-isecloopbegin} to \ref{lin:slAt-isecloopend}:] All found intersections are stored within the slice, together with the interpolated values at the intersection points.
+%
+\end{description}
+
+%===================================================================================
+\subsubsection{Initial bundle creation function}
+\label{sec:impl:initial-bundle-creation}
+
+During initial bundle creation, the entries of the initial slice are processed with increasing distance from the prototype point. The image of \autoref{fig:impl:sliceat} (left) shows this principle. 
+
+%Subfloat has problems with figures and tables (spacing?)
+\begin{figure}[bhtp]
+  \centering
+  \begin{minipage}[c]{0.47\textwidth}
+    \centering
+		\includegraphics{impl-sliceat}
+  \end{minipage}
+  \begin{minipage}[c]{0.47\textwidth}
+  	\centering
+		\begin{tabular}{ccc} 
+			\toprule
+			\tableheadline{Mate} & \tableheadline{Total} & \tableheadline{Ratio} \\
+			\midrule
+			\num{4} & \num{5} & \num{0.8} \\
+			\num{7} & \num{9} & \num{0.78} \\
+			\num{10} & \num{13} & \num{0.77} \\
+			\num{10} & \num{14} & \num{0.71} \\
+			\num{11} & \num{16} & \num{0.69} \\
+			%\midrule
+			%quaestio philosophia & facto & demonstrated  \\
+			%\bottomrule
+		\end{tabular}
+  \end{minipage}
+	\caption[Illustration of \cfunc{createInitialBundle}.]{Depiction of initial bundle creation (left). The circle shows the \twod projection of an \emph{initial slice} with its \emph{initial slice radius} (black circle). The intersected streamlines are represented by points which are numbered in processing order. \emph{Slice point} (blue), \emph{mate points} (maroon), and \emph{non-mate points} (black) are also highlighted. The table at the right demonstrates the evolution of the \emph{slice mate ratio} (``purity'') of the bundle. Bundle creation stops after point \num{16}, when the mate ratio drops below \num{0.7}.}
+	\label{fig:impl:sliceat}
+\end{figure}
+
+Starting with the prototype point \num{1} (blue), the sliced points are added to the bundle if they are similar (mates), and ignored if not. Counters keep track of the number of mates (maroon) and the number of total entries. Bundle expansion stops early, if the ratio ``number of mates to number of total entries'' falls below a pre-specified threshold. This \emph{slice mate ratio} allows to specify the initial bundle purity. Lowering the mate ratio enables non-circular bundles, but at the cost of introducing noisy bundles.
+
+The table in \autoref{fig:impl:sliceat} (right) shows how the slice mate ratio develops for one specific example. Table entries are only given if an additional non-mate was found (\ie, if the ratio decreases). The processing is stopped if the mate ratio drops below \num{0.7}. In the end, the initial bundle contains the blue and all maroon segments.
+
+\funref{fun:createInitialBundle} explains the process using pseudo code. Implementation details are given in the following code descriptions.
+
+\begin{function}[tbhp]
+  \SetKwData{initialSlice}{initialSlice}
+  \SetKwData{bundle}{bundle}
+  \SetKwData{entry}{entry}
+  \SetKwData{isIntersecting}{isIntersecting}
+  \SetKwData{isSimilar}{isSimilar}
+  \SetKwData{isMate}{isMate}
+  \SetKwData{totalCnt}{totalCnt}
+  \SetKwData{mateCnt}{mateCnt}
+  
+  \SetKwFunction{not}{not}
+  \SetKw{Break}{Break}
+  
+  \KwIn{\initialSlice}
+  \KwOut{\bundle}
+	\BlankLine
+	
+	\totalCnt \assign 0\;
+	\mateCnt \assign 0\;
+	\ForEach{\entry in \initialSlice ordered by radius}{
+	                                                           \label{lin:cIB-foreach}
+		\isIntersecting \assign does \entry intersect an existing bundle?\;
+																														    \label{lin:cIB-isec}
+		\isSimilar \assign is \entry similar to slice point (initial settings)?\;
+		                                                           \label{lin:cIB-simil}
+		\isMate \assign \isSimilar and \not{\isIntersecting}\;
+		\If{\isMate}{                 \label{lin:cIB-ifsim}
+			insert line segment of \entry to \bundle\;              \label{lin:cIB-insert}
+	    \mateCnt \assign \mateCnt + 1\;
+		}                                                       \label{lin:cIB-endifsim}
+	 
+	  \totalCnt \assign \totalCnt + 1\;
+	  
+		\If{$\frac{\mateCnt}{\totalCnt} < $ minimum initial mate ratio}{
+		                                                         \label{lin:cIB-ifratio}
+			\Break\;
+		}                                                     \label{lin:cIB-endifratio}
+	}
+	
+	\Return{\bundle}\;
+		
+\caption{createInitialBundle(initialSlice)}
+\label{fun:createInitialBundle}
+\end{function}
+
+\begin{description}
+%
+	\item[Line \ref{lin:cIB-isec}:] An initial slice entry might intersect segments of an existing bundle. These segments are never considered mates for the initial slice, regardless of the collision strategy. The intersecting segments are identified by querying the bundle store.
+%
+	\item[Line \ref{lin:cIB-simil}:] Similarity measures were discussed in \autoref{sec:theory:similarity-of-sliced-streamlines}. %\graffito{Currently the similarity is computed within \ref{fun:sliceAt} and stored within the slice.}
+In the current implementation a threshold parameter for each of the discussed similarity measures is provided. The final similarity decision is a \emph{logical and} of the individual similarity threshold decisions.
+%
+	\item[Lines \ref{lin:cIB-ifsim} to \ref{lin:cIB-endifsim}:] As bundle tracing does not introduce new points into the dataset, only points lying \emph{completely within two slices} are part of the final bundle. %The initial bundle segments are therefore of length \num{-1}. 
+For example, if a streamline is intersected between the point at index \num{7} and the point at index \num{8}, the interval is $(8,7)$ and has length \num{-1}.
+  If then, at an incremental slice, the same streamline is intersected between index \num{10} and index \num{11}, the end-index of this interval will be shifted to be \num{10}, making the interval $(8,10)$.
+% The point indices \numlist{8;9;10} of this streamline are currently part of the bundle, because they are completely enclosed between two slices.
+%The initial bundle therefore contains only one point, the prototype point, which lies exactly on the initial slice plane.
+%
+	\item[Lines \ref{lin:cIB-ifratio} to \ref{lin:cIB-endifratio}:] Application of the minimum initial mate ratio (purity) as discussed immediately before this listing.
+%
+\end{description}
+
+
+%===================================================================================
+\subsubsection{Bundle-slice merging function}
+\label{sec:impl:bundle-slice-merging}
+
+The merging of slices into bundles follows the same structure as the initial bundle creation described in the previous section. The differences are highlighted in \funref{fun:mergeBundleWithSlice} and the following descriptions.
+
+\enlargethispage{\baselineskip}
+
+\begin{function}[H]
+  \SetKwData{slice}{slice}
+  \SetKwData{oldBundle}{oldBundle}
+  \SetKwData{newBundle}{newBundle}
+  \SetKwData{entry}{entry}
+  \SetKwData{interval}{interval}
+  \SetKwData{breakBecauseIntersection}{breakBecauseIntersection}
+  \SetKwData{isSimilar}{isSimilar}
+  \SetKwData{isMate}{isMate}
+  \SetKwFunction{not}{not}
+  \SetKwFunction{distance}{distance}
+  \SetKwData{totalCnt}{totalCnt}
+  \SetKwData{mateCnt}{mateCnt}
+  \SetKw{Break}{Break}
+  
+    
+  \KwIn{\slice}
+  \KwIn{\oldBundle}
+  \KwOut{\newBundle}
+	\BlankLine
+	
+	\mateCnt \assign 0\;
+	\totalCnt \assign 0\;
+	
+	\ForEach{\entry in \slice ordered by radius}{
+																								              \label{lin:mB-foreach}
+		\breakBecauseIntersection \assign handle Intersections\;
+																										             \label{lin:mB-isec}
+		\isSimilar \assign Is \entry similar to slice point?\;        \label{lin:mB-sim}
+		\isMate \assign \isSimilar and \not{\breakBecauseIntersection}\;
+		\If{\isMate}{                                              \label{lin:mB-ifMate}
+			\If{line of \entry exists in \oldBundle}{              \label{lin:mB-findLine}
+				\interval \assign find closest interval on line\;    \label{lin:mB-findIval}
+				\If{\distance{\entry, \interval} < maximum line segment distance}{
+				                                                  \label{lin:mB-ifIvalClose}
+					enlarge \interval to include \entry\;               \label{lin:mB-enlarge}
+					insert segment for \interval into \newBundle\;      \label{lin:mB-insert}
+					\mateCnt \assign \mateCnt + 1\;
+				}                                              \label{lin:mB-endifIvalClose}
+		  }
+		}
+		
+		\totalCnt \assign \totalCnt + 1\;
+	 
+		\If{$\frac{\mateCnt}{\totalCnt} < $ minimum incremental slice mate ratio}{
+		                                                          \label{lin:mB-ifratio}
+			\Break\;
+		}                                                      \label{lin:mB-endifratio}
+	}
+	
+	\Return{\newBundle}\;
+		
+\caption{mergeBundleWithSlice(oldBundle, slice)}
+\label{fun:mergeBundleWithSlice}
+\end{function}
+
+\begin{description}
+%
+	\item[Line \ref{lin:mB-isec}:] The check for intersections with existing bundles is different from initial bundle creation, because the intersections are handled according to the collision strategy (see \autoref{sec:theory:bundle-collision}):
+	\begin{description}
+		\item[Keep existing bundles:] Set \cclass{breakBecauseIntersection} to true, if a collision was found.
+		\item[Remove existing bundles if worse:] Remove the existing bundle, if it has less mates then the currently traced bundle. Set \cclass{breakBecauseIntersection} to true, if a collision with an existing, but better bundle was found.
+		\item[Overwrite existing bundle if worse:] Set \cclass{breakBecauseIntersection} to true, if a collision with an existing, but better bundle was found. Otherwise set it to false. Overwriting is performed automatically during insertion into the bundle store.
+	\end{description}
+%
+	\item[Line \ref{lin:mB-findLine}:] If a slice entry is found to be a mate, a check if the streamline is already a mate in the existing bundle is performed. (A mate must be similar in \emph{all} slices).
+%
+	\item[Lines \ref{lin:mB-findIval} and \ref{lin:mB-ifIvalClose}:] For helix-shaped streamlines multiple intervals of the same streamline can be segments in the same bundle. Therefore different intervals for the same streamline need to be maintained. If there are too many points along the streamline between the closest interval and the current intersection, the entry is not considered a part of an existing interval. Hence, it is not included in the bundle.
+%
+	\item[Lines \ref{lin:mB-enlarge} and \ref{lin:mB-insert}:] Once a valid line and interval is found, the interval is extended to include the current entry, and the extended segment is inserted into the new bundle.
+%
+	\item[Lines \ref{lin:mB-ifratio} to \ref{lin:mB-endifratio}:] The purity of the individual bundle slices can be controlled -- similar to the initial slice -- using the \emph{incremental slice mate ratio}.
+%
+\end{description}
+
+%===================================================================================
+\subsection{Mapping bundles to regions}
+\label{sec:impl:map-bundles-to-regions}
+
+The theory for this section was treated in \autoref{sec:theory:map-bundles-to-regions}. The implementation is presented in \autoref{alg:mapBundlesToRegion}.
+
+\begin{algorithm}[tbhp]
+  \SetKwData{bundles}{bundles}
+  \SetKwData{mesh}{mesh}
+  \SetKwData{bundlePoint}{bundlePoint}
+  \SetKwData{bundle}{bundle}
+  \SetKwData{cell}{cell}
+  \SetKwData{meshPartition}{meshPartition}
+  \SetKwFunction{distance}{distance}
+  
+  \KwIn{\bundles}
+  \KwIn{\mesh}
+  \KwOut{\meshPartition}
+	\BlankLine
+	
+	build $kd$-tree from all bundled points in \bundles\;	       \label{lin:mBTR-kdTree}
+	\ForEach{\cell in \mesh}{
+		\bundlePoint \assign find closest point to \cell center in \bundles by utilizing $kd$-tree\;
+		\bundle \assign bundle of \bundlePoint\;
+		\eIf{\distance{\cell center, \bundlePoint} $<$ threshold}{ \label{lin:mBTR-thres}
+			mark \cell as belonging to \bundle in \meshPartition\;
+		}{
+			mark \cell as not belonging to any \bundle\;
+		}
+	}                                                     \label{lin:mBTR-endForEach1}
+	\ForEach{\cell in \mesh}{                                \label{lin:mBTR-ForEach2}
+		\If{\cell does not belong to any region in \meshPartition}{
+			grow a new region from \cell\;
+			mark all cells of the new region in \meshPartition\;
+		}
+	}                                                     \label{lin:mBTR-EndForEach2}
+	
+	\Return{\meshPartition}\;
+		
+\caption{mapBundlesToRegion}
+\label{alg:mapBundlesToRegion}
+\end{algorithm}
+
+\begin{description}
+%
+	\item[Lines \ref{lin:mBTR-kdTree} to  \ref{lin:mBTR-endForEach1}:] The assignment of each cell to its closest streamline bundle is straightforward using \cclass{vtkKdTreePointLocator}, \cclass{vtkCellCenters}, and standard \vtk data structures.
+%
+	\item[Line \ref{lin:mBTR-thres}:] The threshold distance is a parameter of the algorithm. High values assign all cells to their closest bundles.
+%
+	\item[Lines \ref{lin:mBTR-ForEach2} to \ref{lin:mBTR-EndForEach2}:] If cells remain unassigned, simple region growing is performed until all cells are assigned to a region. Notice that only the first visited cell of each connected, unclustered region triggers a region growing operation. After this operation all other connected cells belong to the new region and do not start further region growing.
+%
+\end{description}
+
+
+%===================================================================================
+\section{Mapping regions to a graph}
+\label{sec:impl:map-regions-to-graph}
+
+%
+To compute the vertex and edge values described in \autoref{sec:theory:map-regions-to-graph}, some implementation problems have to be solved. Basically the algorithm needs to iterate over all cells and update the according vertex data. In addition it needs to find interfaces to neighboring cells and update the according edge data (\emph{summation phase}).\footnote{Usually numerical issues need to be addressed if many small values are accumulated into a grand sum. This is even more true for sums of squared values which are required for running standard deviation computations. The results of the ``naive'' summation where therefore compared to results of summations within binary trees. No differences where found, because the accumulated values are all within the same, small magnitude.}
+
+The final result should be a directed graph, with edge directions matching the net flow rates between neighboring regions. Notice that the individual interfaces between two regions can have different net flow directions. Therefore the edge direction is unknown until the summation of all interface flow rates has been finished. In addition, the naive approach would count each interface flow twice, once from cell $c_i$ to its neighbor $c_j$ and once from $c_j$ to its neighbor $c_i$.
+To solve these problems the following approach was chosen:
+
+\begin{itemize}
+%
+	\item Each region is strictly linked to one fixed vertex by using ordered \acp{ID}.
+%
+	\item During the summation phase, a \emph{undirected graph} is used. All edges are \emph{implicitly oriented} from higher to lower vertex \ac{ID}. This solves the edge orientation problem.
+%
+	\item During the summation phase, all interfaces from regions with lower \acp{ID} to regions with higher \acp{ID} are ignored. This solves the double counting problem.
+%
+	\item After the summation phase, the undirected graph is converted into a directed graph. This is achieved by orienting edges with \emph{positive flow rate} from \emph{high vertex \ac{ID}} to \emph{low vertex \ac{ID}} and vice versa.%edges with negative flow rate from high \ac{ID} to low identifier.
+%
+\end{itemize}
+
+The pseudo code is presented in \autoref{alg:mapRegionsToGraph}. There are no additional descriptions, as the everything has been explained either by \autoref{sec:theory:map-regions-to-graph} or the introductory text above.
+
+\begin{algorithm}[hbtp]
+  \SetKwData{vertex}{vertex}
+  \SetKwData{undirEdge}{undirEdge}
+  \SetKwData{undirGraph}{undirGraph}
+  \SetKwData{dirGraph}{dirGraph}
+  \SetKwData{partitionedMesh}{partitionedMesh}
+  \SetKwData{cell}{cell}
+  \SetKwData{face}{face}
+  \SetKwData{region}{region}
+  \SetKwData{neighborCell}{neighborCell}
+  \SetKwData{neighborRegion}{neighborRegion}
+  \SetKwData{neighborVertex}{neighborVertex}
+ 
+  \SetKwFunction{distance}{distance}
+  
+  \KwIn{\partitionedMesh}
+  \KwOut{\dirGraph}
+	\BlankLine
+	
+	for each region create an empty \vertex in \undirGraph\;     \label{lin:mRtG-crtVerts}
+	
+	\ForEach{\cell in \partitionedMesh}{                     \label{lin:mRtG-ForEach1}
+		\region \assign region of \cell\;                        \label{lin:mRtG-region}
+		\vertex \assign vertex of \region\;                      \label{lin:mRtG-vertex}
+		update \vertex with data of \cell\;                \label{lin:mRtG-updateVertex}
+		\ForEach{\neighborCell of \cell}{                      \label{lin:mRtG-ForEach2}
+			\neighborRegion \assign region of \neighborCell\;    \label{lin:mRtG-neighReg}
+			\neighborVertex \assign vertex of \neighborRegion\; \label{lin:mRtG-neighVert}
+			\If{\ac{ID} of \region $>$ \ac{ID} of \neighborRegion}{        \label{lin:mRtG-IfBigger}
+				\face \assign face between \cell and \neighborCell\;   \label{lin:mRtG-face}
+				create\slash update \undirEdge between \vertex and \neighborVertex\;
+				  																							 \label{lin:mRtG-updateEdge}
+			}                                                       \label{lin:mRtG-endif}
+		}                                                       \label{lin:mRtG-endFor2}
+	}                                                         \label{lin:mRtG-endFor1}
+	
+	optionally convert \undirGraph to \dirGraph\;                        \label{lin:mRtG-convert}
+	
+	\Return{\dirGraph}\;
+		
+\caption{mapRegionsToGraph}
+\label{alg:mapRegionsToGraph}
+\end{algorithm}
+
+
+%\begin{description}
+%
+%\item[Line \ref{lin:mRtG-updateVertex}:] Some values (cell count, region volume) are computed by simple summation. Additional data structures are required to hold intermediate data for running computations of means and standard deviations.
+%
+%\item[Line \ref{lin:mRtG-updateEdge}:] The update
+%\end{description}
+
+
+
+
+%===================================================================================
+\section{Graph collapse}
+\label{sec:impl:graph-collapse}
+
+\autoref{sec:theory:graph-collapse} treats the theory of graph collapse and explains the underlying edge collapse operation. % using \autoref{fig:theory:graph-collapse}. 
+Graph collapse was implemented for \emph{undirected graphs} in this thesis.\footnote{This is mainly because graph collapse was implemented before the converter from undirected to directed graphs.} Several implementation problems arise from the way \vtk stores and manages undirected graphs.
+Instead of describing these problems and their solutions here, the simpler implementation for \emph{directed graphs} is listed in \autoref{alg:graphCollapse}. The individual steps are thoroughly explained by \autoref{fig:theory:graph-collapse} and its accompanying notes.
+
+%%
+%\begin{itemize}
+%	\item Edge collapse was implemented on the undirected graph.\footnote{This is mainly due to the fact that directed graphs where not yet required at that point. A new implementation of graph collapse should definitely use directed graphs.} As described in the previous section, edge direction in undirected graphs is implicitly defined from lower vertex \ac{ID} to higher vertex \ac{ID} in this thesis.
+%	
+%	\item Vertices in \vtk are stored in linear arrays. Edges store indices into these arrays as their source and target. If a vertex is removed, \vtk moves the very last vertex from the vertex array to the place of the removed vertex and updates all associated edges accordingly.
+%\end{itemize}
+%%
+%The first problem is that vertices are moved around within their array and their \acp{ID} can therefore change. This invalidates the whole concept of implicit directions. Consider for example an edge implicitly directed from vertex \ac{ID} \num{9} to vertex \ac{ID} \num{10}, which is the last vertex in this example. If any vertex with an  \ac{ID} lower than \num{9} is deleted, \eg, \num{5}, the edge direction becomes invalid (\ie, the new edge no implicitly points from \num{5} to \num{9}, which is the opposite from before).
+%
+%This problem can be solved by using \emph{pedigree IDs}. \vtk contains this concept to uniquely associate elements (like vertices) with fixed labels. Pedigree \acp{ID} therefore do \emph{not} change when vertices are moved within their array. During initialization, each vertex is associated with a pedigree  \ac{ID} equal to its vertex ID. Afterwards, only pedigree \acp{ID} are used to define the implicit edge direction.
+%
+%Unfortunately this introduce another problem
+
+\begin{algorithm}[htbp]
+  \SetKwData{inGraph}{inGraph}
+  \SetKwData{targetVertexCnt}{targetVertexCnt}
+  \SetKwData{outGraph}{outGraph}
+  \SetKwData{edge}{edge}
+  \SetKwData{newEdgesList}{newEdgesList}
+  \SetKwData{srcVtx}{srcVtx}
+  \SetKwData{dstVtx}{dstVtx}
+  \SetKwData{edgePairList}{edgePairList}
+  \SetKwData{edgePair}{edgePair}
+  \SetKwData{mergedEdge}{mergedEdge}
+  \SetKwData{error}{error}
+  \SetKwData{errorList}{errorList}
+  
+  %\SetKwFunction{initialGraph}{initialGraph}
+  
+  \KwIn{\inGraph}
+  \KwIn{\targetVertexCnt}
+  \KwOut{\outGraph}
+	\BlankLine
+	
+	\outGraph \assign copy of \inGraph\;
+	initialize \errorList\;
+	\ForEach{\edge in \outGraph}{
+		\errorList{\edge} \assign compute collapsing error of \edge\;
+	}
+	
+	\Repeat{number of vertices in  \outGraph $\le$ \targetVertexCnt}{
+		\edge \assign edge with lowest collapsing error\;
+		\srcVtx \assign source vertex of \edge\;
+		\dstVtx \assign destination vertex of \edge\;
+		
+		\edgePairList \assign edges to\slash from shared neighbor vertices\;
+		\ForEach{\edgePair in \edgePairList}{
+			\mergedEdge \assign merge \edgePair into new edge connecting \srcVtx and shared neighbor\;
+			insert \mergedEdge into \outGraph and into \newEdgesList\;
+			remove old edges in \edgePair from \outGraph\;%also removes them from errorList
+		}
+		remove \edge from \outGraph\;
+		merge \srcVtx and \dstVtx into \srcVtx\;%relink...
+		delete (now isolated) \dstVtx\;%deletes edges to it
+		
+		update collapsing error in \errorList for all edges in \newEdgesList\;
+		clear \newEdgesList\;
+	}
+	
+	\Return{\outGraph}\;
+		
+\caption{graphCollapse}
+\label{alg:graphCollapse}
+\end{algorithm}
+
+
+
+
+
+
+%===================================================================================
+\section{User interface}
+\label{sec:impl:gui}
+
+\quotegraffito{For a list of all the ways technology has failed to improve the quality of life, please press three.}{Alice Kahn}
+
+Usually \vtk filters are chained together using \Cpp code or any of the supported wrapper languages (\eg, Python, Tcl, and Java). Alternatively \vtk filters can be made available to \paraview via plugins.
+
+The problem with these approaches is the way \vtk chains the filters by default. It basically has two modes, namely
+%
+\begin{enumerate}
+	\item Store all intermediate data to \ac{RAM}, and
+	\item Store no intermediate data.
+\end{enumerate}
+
+The length of the filter chain and size of the dataset makes both of these approaches unsuitable for this thesis. If all intermediate data of processing large datasets within long filter chains is stored to \ac{RAM}, memory becomes short quickly. If no intermediate data is stored at all, even minor changes to late filters lead to the time intense re-computations of the whole chain. To circumvent these problems, \emph{user interaction wrappers} for the filters were introduced.
+
+
+
+
+
+\subsection{User interaction wrappers}
+
+The contract for \ac{UI} wrappers is defined in the \Cpp interface \cclass{IUIWrapper}. Implementations of this interface wrap chainable \vtk functionality and provide a unified interface to the \ac{UI} layer. Each instance usually wraps exactly one \vtk filter. The interface supports to set the \emph{mode of loading} (``From file'', ``From \ac{RAM}'', ``From both'', or ``None'') and \emph{saving} (``To file'', ``To \ac{RAM}'', ``To both'', or ``None''). In addition, the interface supports unified access to filter parameters, which are split into \emph{simple parameters} and \emph{advanced parameters}. The interface also specifies two actions, namely, 
+\begin{itemize}
+  \item \cfunc{update}, which recomputes or loads the result of the underlying \vtk filter, and 
+  \item \cfunc{render}, which renders this result.
+\end{itemize}
+
+The usual use case is to define a wrapper chain, which implicitly defines a filter chain. After the user has selected the parameters for saving, loading, and processing, a call of \cfunc{update} triggers the actions described in \autoref{alg:update}.
+
+\begin{algorithm}[tbhp]
+  \SetKwData{inputs}{inputs}
+  \SetKwData{result}{result}
+ 
+  \SetKwFunction{update}{update}
+  
+  %\KwIn{\partitionedMesh}
+  \KwOut{\result}
+	%\BlankLine
+	
+	\eIf{result should be loaded and is loadable}{
+		\result \assign load from file or \ac{RAM}, according to load settings\;
+	}{
+		\inputs \assign trigger \update on input wrappers\;
+		\result \assign recompute this wrapper using \inputs\;
+		save \result according to save settings\;
+	}
+	
+	\Return{\result}
+\caption{userInterfaceUpdate}
+\label{alg:update}
+\end{algorithm}
+
+
+This approach enables the user to tune saving and loading of intermediate results very precisely. A good default is to ``save to'' and ``load from'' file, and to recompute if any parameter has changed. Files are written to a user specified folder using fixed names for each wrapper. The \ac{UI} wrappers are designed mainly for data processing. The \cfunc{render} action is only intended to \emph{preview} the result. In-depth exploration of results is best accomplished by utilizing \paraview.
+
+\subsection{Graphical user interface}
+
+\quotegraffito{Read the directions and directly you will be directed in the right direction.}
+{Doorknob, Alice in Wonderland~\cite{Alice}}
+%
+The front end for the user interaction wrappers was implemented using \qt~\cite{Qt}. Initially, the user selects one of the possible paths defined in \autoref{fig:theory:intro}. This automatically constructs and chains the according filter wrappers. The following screens allow to jump from wrapper to wrapper using the ``Previous'' and ``Next'' buttons. \autoref{fig:impl:qtgui} shows an example screen for the surface clean wrapper. On each screen, the settings of the wrapper can be adapted, and the \cfunc{update} and \cfunc{render} actions can be triggered. The console at the bottom shows progress, debug, and error messages.
+
+\bigfigure[pos=tbhp,
+           %opt={width=8.25cm},
+           label={fig:impl:qtgui},
+           shortcaption={\qt \acs{GUI}.}
+           ]
+{impl-qtgui-big}
+{Screenshot of the \qt-\ac{GUI} with \emph{simple parameters}, \emph{advanced parameters}, \emph{autosave} and \emph{-load} parameters, \emph{action buttons}, and \emph{console output}.}
+
+
+
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+
+
+
+

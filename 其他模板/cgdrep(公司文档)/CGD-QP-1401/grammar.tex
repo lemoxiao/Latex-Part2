@@ -1,0 +1,102 @@
+\chapter{对某些对象的排版要求}
+\lstset{language={[LaTeX]TeX}}
+本章介绍的是关于几个常用对象的排版要求。这些要求的效果属于常见的排版效果，于是公司模板中不需要自定义的宏包，只在本章做些要求或建议。为帮助理解这些要求和建议，本章会对一些基本概念做简单的解释，而这些解释不足以向新手介绍清楚对象的用法。
+
+\section{用户自己增加宏包}
+如果用户需要增加新的宏包，可以在 preamble 区（\filename{\textbackslash documentclass} 语句之后，\filename{\textbackslash begin\{document\}} 语句之前）加入语句\filename{\textbackslash RequirePackage\{Package\}}。不建议用\filename{\textbackslash usepackage}。
+
+\section{交叉引用和参考文献}
+\LaTeX 排版的一个优点是交叉引用的逻辑清晰而严谨，以下做一个简单的介绍。
+
+\subsection{交叉引用}
+所有有\filename{Label} 的表格、图片、代码、公式和章节都可以被引用，语法为\filename{\textbackslash ref\{Label\}}。举例：如果想实现“如表~\ref{triline} 所示”字样，\LaTeX 语法为
+\footnotesize\begin{verbatim}
+如表~\ref{triline} 所示
+\end{verbatim}
+\normalsize
+中间的波浪线的功能是实现“表”字与编号 \ref{triline} 之间的留空。这个留空不用普通的空格来实现，是为了避免在这里换行。
+
+如果想提到某一\filename{Label}对象所在的页码，语法为\filename{\textbackslash pageref\{Label\}}。如果想给某些章节加\filename{Label}，方法是在章节名如 \filename{\textbackslash chapter\{Chapter\}}后加一句\filename{\textbackslash label\{Label\}}。\filename{Label} 可能会非常多，作者自己会记不请。对此可参考的建议有：
+\begin{itemize}
+\item 不需要引用的就不用给\filename{Label}，等到需要的时候再给也不迟。
+\item 分类取名，比如表格都用\filename{tab:}开头，图片都用\filename{fig:}开头。
+\item 用比较清晰的英文简称作为\filename{Label}。
+\end{itemize}
+
+\subsection{参考文献及引用}
+建议参考文献用\command{bibtex} 来编译。参考文献集中在文件 \filename{main.bib}中，文献格式示例：
+\begin{lstlisting}[caption={参考文献格式示例}]
+@article{katz1979history,
+  title={The History of Stokes's Theorem},
+  author={Victor J. Katz},
+  journal={Mathematics Magazine},
+  volume={52},
+  pages={146-156},
+  year={1979},
+}
+\end{lstlisting}
+Label 在其中第一行。
+
+这篇文献的引用方法为：
+\begin{lstlisting}
+\cite\{katz1979history\}
+\end{lstlisting}
+
+\section{数学环境}
+\LaTeX 是数学系的至爱，因为其数学公式排版漂亮。\LaTeX 有三种数学环境：
+\begin{enumerate}
+\item math：行内数学环境，像在正文行内出现 $E=mc^2$ 这样。
+\item displaymath：独立占行，不参与公式编号，无\filename{Label}。
+\item equation：独立占行，参与公式编号，可以设\filename{Label}来引用。
+\end{enumerate}
+
+我们要求所有的数学内容都用数学环境，包括物理量。比如提到深度变量的时候用 $d$ 而不是 d，前者变用了 math 环境。排出漂亮的公式需要不少数学语法，可以准备网页版的参考手册，也可以考虑 lyx 或其他软件来生成。
+
+\begin{paraitem}
+\item math 环境的语法为两端用\textbackslash(和\textbackslash)括起来（或者用\$括起来）。例如质能方程的语法为\textbackslash(E=mc\^{}2\textbackslash)，也可以是\$E=mc\^{}2\$。
+
+\item display 环境的语法是两端用\textbackslash[和\textbackslash]括起来。（也可以用 \$\$ 括，但据介绍可能会与其他宏包冲突，不推荐。）举例：\[\int_0^\infty \mathrm{e}^{-x}\,\mathrm{d}x\]
+其语法为：
+\begin{lstlisting}
+\[ \int_0^\infty \mathrm{e}^{-x}\,\mathrm{d}x \]
+\end{lstlisting}
+
+\item equation 环境来表达同一个积分式，效果为：
+\begin{equation}\label{eq:integral}
+\int_0^\infty \mathrm{e}^{-x}\,\mathrm{d}x
+\end{equation}
+式~\ref{eq:integral} 的语法为：
+\begin{lstlisting}
+\begin{equation}\label{eq:integral}
+\int_0^\infty \mathrm{e}^{-x}\,\mathrm{d}x
+\end{equation}
+\end{lstlisting}
+\end{paraitem}
+
+需要注意的是，在数学模式中，一般的字母会被解释为变量，于是变成了斜体，当你不需要斜体的时候，就要作特别声明，如\filename{\textbackslash mathrm}。也有宏包做其他的定义方式，$\diff x$ 中的 $\diff$ 可以用\filename{\textbackslash diff}；$r=\unit{2.5cm}$ 中的 $\unit{2.5cm}$ 可以用\filename{\textbackslash unit\{2.5cm\}}。
+
+
+\section{算法}
+有些宏包可以帮助\LaTeX 排版算法（伪代码）。这里举一个例子：
+\begin{algorithmic}
+\If {$i\geq maxval$}
+    \State $i\gets 0$
+\Else
+    \If {$i+k\leq maxval$}
+        \State $i\gets i+k$
+    \EndIf
+\EndIf
+\end{algorithmic}
+
+这个例子的代码为（用了\filename{algpseudocode} 宏包）：
+\begin{lstlisting}
+\begin{algorithmic}
+\If {$i\geq maxval$}
+    \State $i\gets 0$
+\Else
+    \If {$i+k\leq maxval$}
+        \State $i\gets i+k$
+    \EndIf
+\EndIf
+\end{algorithmic}
+\end{lstlisting}

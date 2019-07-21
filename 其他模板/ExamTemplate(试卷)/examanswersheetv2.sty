@@ -1,0 +1,267 @@
+%密封线功能：自动布局奇偶页样式\mifengxian
+%答题卡功能AB样式：自动布局奇偶页样式\tatikaa或datikab
+%选项功能：自动均匀排版\xx{}{}{}{}或\xxs{}{}{}{}
+%试卷横线、括号、单位功能等试卷文本特效
+
+%ctex、miktex相关路径
+%刷新文件系统
+%\miktex\bin\mo_admin.exe
+%安装宏包
+%\miktex\bin\mpm_mfc_admin.exe
+%更新MikTex
+%\miktex\bin\miktex-update_admin.exe
+%http://www.jyeoo.com/%-------菁优网数学试题
+
+\NeedsTeXFormat{LaTeX2e}%-----------------------------------------------------------------------------必填
+\ProvidesPackage{examanswersheet}[2016/07/14;gyg;ZhengZhou]%------------------------------------------包名称，参数有顺序要求
+%共引用13个包，其中两个未启用,,,,
+\usepackage{amssymb,amsmath}%-------------------------------------------------------------------------标准不等号\neq、\geqslant、\leqslant
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{enumerate,multicol,enumitem}%-------------------------------------------------------------列表增强
+\usepackage{xcolor}%----------------------------------------------------------------------------------彩色增强\color{}
+\usepackage{array}%-----------------------------------------------------------------------------------水平居中功能{p{3cm}<{\centering}}
+\usepackage{multirow}%--------------------------------------------------------------------------------合并表格行
+\usepackage{lastpage}
+\usepackage{graphicx,calc}
+%-----------------------------------------------------------------------------------------------------垂直居中\mbox{}
+
+%-----------------font区域开-----------------------
+\setCJKfamilyfont{STCaiyun}{STCaiyun}
+\newcommand{\cy}{\CJKfamily{STCaiyun}}
+\setCJKfamilyfont{fzxiaobiaosong}{FZXiaoBiaoSong-B05S}
+\newcommand{\bs}{\CJKfamily{fzxiaobiaosong}}
+\setCJKfamilyfont{song}{SimSun}
+\setCJKfamilyfont{newsong}{NSimSun}
+\setCJKfamilyfont{fs}{FangSong_GB2312}
+%\setCJKfamilyfont{kai}{KaiTi_GB2312}
+\setCJKfamilyfont{kai}{KaiTi}
+\setCJKfamilyfont{lishu}{LiSu}
+\setCJKfamilyfont{youyuan}{YouYuan}
+\newcommand{\song}{\CJKfamily{song}}    			% 宋体
+\newcommand{\newsong}{\CJKfamily{newsong}}    		% 宋体
+\newcommand{\fs}{\CJKfamily{fs}}        			% 仿宋体
+\renewcommand{\kaishu}{\CJKfamily{kai}}      		% 楷体
+\newcommand{\hei}{\CJKfamily{hei}}      			% 黑体
+\newcommand{\ls}{\CJKfamily{lishu}}      			% 隶书
+\newcommand{\yy}{\CJKfamily{youyuan}}      			% 幼圆
+% \setCJKmainfont{STZhongsong}
+% \setCJKmainfont{FangSong_GB2312}
+% \setCJKmainfont{STSong}
+\setmainfont{Times New Roman}
+%-----------------font区域关-----------------------
+
+
+%-----------------总分栏开-----------------------
+\newcommand{\zongfenlan}{%----------------------------------------------------------------------------☆总分栏
+\begin{center}\setlength{\tabcolsep}{4mm}%------------------------------------------------------------列宽
+\renewcommand{\arraystretch}{2}%----------------------------------------------------------------------行高
+\begin{tabular}{*{11}{|c}|}%--------------------------------------------------------------------------格式化列样式
+\hline\multirow{2}*{题号}&\multirow{2}*{一}&\multirow{2}*{二}&\multicolumn{7}{c|}{三}&\multirow{2}*{总分}\\
+\cline{4-10}&&&19 &20&21&22&23&24&25&\\\hline\raisebox{-3pt}{得分}&&&&&&&&&& \\[3mm]
+\hline\end{tabular}\end{center}\vskip1mm}
+\newcommand{\zongfenlana}{%----------------------------------------------------------------------------☆总分栏
+\begin{center}\setlength{\tabcolsep}{4mm}%------------------------------------------------------------列宽
+\renewcommand{\arraystretch}{1.5}%----------------------------------------------------------------------行高
+\begin{tabular}{*{12}{|c}|}%--------------------------------------------------------------------------格式化列样式
+\hline
+题号&一&二&三&四&五&六&七&八&总分&总分人&复核人\\\hline
+分数&&&&&&&&&&&\\
+%\hline\multirow{2}*{题号}&\multirow{2}*{一}&\multirow{2}*{二}&\multicolumn{7}{c|}{三}&\multirow{2}*{总分}\\
+%\cline{4-10}&&&19 &20&21&22&23&24&25&\\\hline\raisebox{-3pt}{得分}&&&&&&&&&& \\[3mm]
+\hline\end{tabular}\end{center}\vskip-3mm}
+\newcommand{\dafenlan}{%----------------------------------------------------------------------------☆总分栏
+\setlength{\tabcolsep}{4mm}%------------------------------------------------------------列宽
+\renewcommand{\arraystretch}{1.5}%----------------------------------------------------------------------行高
+\begin{tabular}[c]{*{2}{|c}|}%--------------------------------------------------------------------------格式化列样式
+\hline
+评卷人&得分\\\hline
+&\\[2mm]
+\hline\end{tabular}~~}
+%-----------------总分栏关-----------------------
+
+\newcommand{\dxataitou}[4]{\par{\color{black}\kaishu\large%-------------------------------------------☆导学案抬头、空白字\phantom{备}
+\makebox{3em}[s]{年级}：八年级\quad\makebox{3em}[s]{学科}：数学\quad\makebox{3em}[s]{课型}：
+#1\quad{}时间：\rule{2cm}{0.4pt}\par主备人：{\color{black}#2}\quad审核人：{#3}\quad审定人：{#4}}\par}
+
+
+%----------------☆数学试卷符号定制、文本特效开-------------------------------------------------------
+%\usepackage{fancybox}%-------------------------------------------------------------------------------页面边框
+%\fancyput(10cm,-20cm){\tikz\draw[dashed](0,0)--(0,\textheight);}
+%文本特效1：带圈文字；花括号不等式组，中文式或数学式--------------------------------------------------
+%文本特效2：括号；填空横线；--------------------------------------------------------------------------
+%文本特效3：大于号、小于号、摄氏度；填空横线；--------------------------------------------------------
+%文本特效4：均匀横排试题；----------------------------------------------------------------------------
+\newcommand{\du}{\ensuremath{^{\circ}}}
+\renewcommand{\line}[1]{\rule[-3pt]{#1cm}{0.4pt}}
+\newcommand{\kh}{(\rule[-2pt]{1cm}{0pt})}
+\newcommand{\dayu}{\geqslant}
+\newcommand{\xiaoyu}{\leqslant}
+\newcommand{\budeng}{\neq}
+\newcommand{\huakuohao}[2]{$\left\{\vphantom{\begin{array}{c}a\\[5ex]\end{array}}\right.\kern-7pt 
+\begin{array}{l}#1\\[3mm]#2\\\end{array}$}%-----------------------------------------------------------
+\newcommand{\huakuohaocn}[2]{$\left\{\vphantom{\begin{array}{c}a\\[5ex]\end{array}}\right.\kern-7pt$
+\begin{tabular}{l}#1\\[3mm]#2\\\end{tabular}}
+\newcommand*{\dq}[1]{\lower.7ex\hbox{\tikz\draw(0pt,0pt) circle (.5em) node {\makebox[1em][c]{\small #1}};}}
+\newcommand{\twowb}[2]{\par\begin{multicols}{2}\setlength{\columnseprule}{0pt}#1\\#2\end{multicols}\par}
+\newcommand{\twowbs}[2]{\par\begin{multicols}{2}\setlength{\columnseprule}{0pt}$#1$\\$#2$\end{multicols}\par}
+\newcommand{\threewb}[3]{\par\begin{multicols}{3}\setlength{\columnseprule}{0pt}#1\\#2\\#3\end{multicols}\par}
+\newcommand{\twomt}[2]{\par\begin{multicols}{2}\setlength{\columnseprule}{0pt}#1\\#2\end{multicols}\par}
+\newcommand{\itemy}{$\because{}$}%-----------------------因为、所以、对、错---------
+\newcommand{\items}{$\therefore{}$}
+\newcommand{\duihao}{$\surd{}$}
+\newcommand{\cuohao}{$\times{}$}
+%\renewcommand{\baselinestretch}{1.5}%行高
+%\setlength{\parskip}{0.5\baselineskip}%段落
+%\renewcommand{\arraystretch}{1.25}%表格内行高
+% \newcommand{\du}{\ensuremath{^{\circ}}}
+% \usepackage{schemata}%概念分类使用
+%--------------------------☆数学试卷符号定制、文本特效关------------------------------------------------
+
+
+
+
+
+
+
+%-----------------------选项自动均匀排版\xx，\xxs---------------
+% 当你排版选择题的时候，你只需输入
+% \xx{选项 A 的内容}{选项 B 的内容}{选项 C 的内容}{选项 D 的内容}
+% 或
+% \xxs{选项 A 的内容}{选项 B 的内容}{选项 C 的内容}{选项 D 的内容}
+% 上面代码的意思是取四个选项的最长宽度，加上 “A.” 以及左右留空，作为选项的最长宽度。 将
+% 它和行宽的 1/2 以及 1/4 作比较， 来决定把 4 个选项排成一行、两行或者四行及以上。
+
+% 作者：夏栩笙
+% 链接：http://www.zhihu.com/question/26414466/answer/32740927
+% 来源：知乎
+% 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+% 2016.06.13对以上内容有所改动
+
+% 把以下内容在 \begin{document} 之前加上
+
+\usepackage{ifthen}
+\newlength{\la}
+\newlength{\lb}
+\newlength{\lc}
+\newlength{\ld}
+\newlength{\lhalf}
+\newlength{\lquarter}
+\newlength{\lmax}
+%-------------------------纯数学选项开-------------------------------
+\newcommand{\xx}[4]{\hfill\kh\\[.5pt]%
+\settowidth{\la}{A.~#1~~~}
+\settowidth{\lb}{B.~#2~~~}
+\settowidth{\lc}{C.~#3~~~}
+\settowidth{\ld}{D.~#4~~~}
+\ifthenelse{\lengthtest{\la>\lb}}{\setlength{\lmax}{\la}}{\setlength{\lmax}{\lb}}
+\ifthenelse{\lengthtest{\lc>\lmax}}{\setlength{\lmax}{\lc}}{}
+\ifthenelse{\lengthtest{\ld>\lmax}}{\setlength{\lmax}{\ld}}{}
+\setlength{\lhalf}{0.5\linewidth}
+\setlength{\lquarter}{0.25\linewidth}
+\ifthenelse{\lengthtest{\lmax>\lhalf}}{\noindent{}A.~#1 \\ B.~#2 \\ C.~#3 \\ D.~#4}{
+\ifthenelse{\lengthtest{\lmax>\lquarter}}{\noindent\makebox[\lhalf][l]{A.~#1~~~}%
+\makebox[\lhalf][l]{B.~#2~~~}\\\noindent%
+\makebox[\lhalf][l]{C.~#3~~~}%
+\makebox[\lhalf][l]{D.~#4~~~}}%
+{\noindent\makebox[\lquarter][l]{A.~#1~~~}%
+\makebox[\lquarter][l]{B.~#2~~~}%
+\makebox[\lquarter][l]{C.~#3~~~}%
+\makebox[\lquarter][l]{D.~#4~~~}}}}
+%-------------------------纯数学选项关-------------------------------
+%-------------------------含中文选项开-------------------------------
+\newcommand{\xxs}[4]{\hfill\kh\\[.5pt]%
+\settowidth{\la}{A.~$#1$~~~}
+\settowidth{\lb}{B.~$#2$~~~}
+\settowidth{\lc}{C.~$#3$~~~}
+\settowidth{\ld}{D.~$#4$~~~}
+\ifthenelse{\lengthtest{\la>\lb}}{\setlength{\lmax}{\la}}{\setlength{\lmax}{\lb}}
+\ifthenelse{\lengthtest{\lc>\lmax}}{\setlength{\lmax}{\lc}}{}
+\ifthenelse{\lengthtest{\ld>\lmax}}{\setlength{\lmax}{\ld}}{}
+\setlength{\lhalf}{0.5\linewidth}
+\setlength{\lquarter}{0.25\linewidth}
+\ifthenelse{\lengthtest{\lmax>\lhalf}}{\noindent{}A.~$#1$ \\ B.~$#2$ \\ C.~$#3$ \\ D.~$#4$}{
+\ifthenelse{\lengthtest{\lmax>\lquarter}}{\noindent\makebox[\lhalf][l]{A.~$#1$~~~}%
+\makebox[\lhalf][l]{B.~$#2$~~~}\\\noindent%
+\makebox[\lhalf][l]{C.~$#3$~~~}%
+\makebox[\lhalf][l]{D.~$#4$~~~}}%
+{\noindent\makebox[\lquarter][l]{A.~$#1$~~~}%
+\makebox[\lquarter][l]{B.~$#2$~~~}%
+\makebox[\lquarter][l]{C.~$#3$~~~}%
+\makebox[\lquarter][l]{D.~$#4$~~~}}}}
+%-------------------------含中文选项关-------------------------------
+
+
+
+
+
+
+%-----------------------试卷密封线\mifengxian---------
+%
+%	试卷样式1:传统B4正反面，根据奇偶页自动排版。
+%
+\newcommand{\mifengxianaaa}{
+\ifthenelse{\isodd{\value{page}}}%判断是否奇数页
+{%B4正面密封线、座号
+\begin{tikzpicture}[remember picture,overlay]
+\path 	(current page.south east) coordinate (a0);
+%定义右下角座号坐标
+%\draw 	(a0)[shift={(-2.5,1.25)}] node (a1) [draw=black,fill=gray!0,minimum height=1cm,minimum width=1cm]{\kaishu{}座号}
+%		(a1) node [right=0.5cm,draw=black,fill=gray!0,minimum height=1cm,minimum width=1cm]{};
+\path 	(current page.north) coordinate (a0);
+\draw 	(a0)[shift={(0,-2)}] node (a1) [rotate=0,fill=gray!0,minimum height=1cm,minimum width=1cm]
+		{\kaishu{}\zihao{4}
+		系别\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		专业\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		年级\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		姓名\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		学号\raisebox{-2pt}{\rule{35mm}{0.4pt}}}
+		(a1)[shift={(0,-1.5)}] node [rotate=0,fill=gray!0,minimum height=1cm,minimum width=1cm]
+		{\kaishu{}\zihao{4}...........................................%
+		\raisebox{-0.6ex}{装}............................................%
+		\raisebox{-0.6ex}{订}............................................%
+		\raisebox{-0.6ex}{线}...........................................};
+\end{tikzpicture}
+}
+{%B4反面装订线
+\begin{tikzpicture}[remember picture,overlay]
+\path 	(current page.south east) coordinate (a0);
+%定义右下角座号坐标
+%\draw 	(a0)[shift={(-2.5,1.9)}] node (a1) [draw=black,fill=gray!0,minimum height=1cm,minimum width=1cm]{\kaishu{}座号}
+%		(a1) node [right=0.5cm,draw=black,fill=gray!0,minimum height=1cm,minimum width=1cm]{};
+\path 	(current page.north) coordinate (a0);
+\draw 	(a0)[shift={(0,-2)}] node (a1) [rotate=0,fill=gray!0,minimum height=1cm,minimum width=1cm]
+		{\kaishu{}\zihao{4}
+		系别\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		专业\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		年级\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		姓名\raisebox{-2pt}{\rule{35mm}{0.4pt}}%
+		学号\raisebox{-2pt}{\rule{35mm}{0.4pt}}}
+		(a1)[shift={(0,-1.5)}] node [rotate=0,fill=gray!0,minimum height=1cm,minimum width=1cm]
+		{\kaishu{}\zihao{4}...........................................%
+		\raisebox{-0.6ex}{装}............................................%
+		\raisebox{-0.6ex}{订}............................................%
+		\raisebox{-0.6ex}{线}...........................................};
+\end{tikzpicture}
+}
+}
+
+%--------------------页眉页脚开---
+%
+%	边距、纸张设置
+%
+\newcommand{\mifengxian}{
+\geometry{b4paper,hmargin={2cm,2cm},vmargin={5cm,2.5cm},footskip=1.25cm,headsep=3cm}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\columnseprule}{0.4pt}
+\fancyfoot[CE,CO]{第~\thepage{}~页~~共~\pageref{LastPage}~页}
+\fancyhead[CE,CO]{\mifengxianaaa}
+}
+%--------------------页眉页脚关---
+
+
+%\usepackage[colorlinks,linkcolor=black,urlcolor=black,anchorcolor=black,citecolor=black]{hyperref}
+
+\endinput

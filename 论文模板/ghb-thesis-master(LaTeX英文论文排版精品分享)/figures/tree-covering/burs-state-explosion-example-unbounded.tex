@@ -1,0 +1,42 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\input{figures/tree-covering/burs-state-explosion-example-styles}%
+\begin{tikzpicture}
+  % Tree
+  \node [computation node] (n1) {\nVar{A}};
+  \node [computation node, above=of n1] (n2) {\nLoad};
+  \node [root node, above=of n2] (nn) {\nLoad};
+  \begin{scope}[data flow]
+    \draw (n1) -- (n2);
+  \end{scope}
+  \draw [etcetera] (n2.north) -- (nn.south);
+
+  % States
+  \node [state, right=of nn] {%
+    \begin{tabular}{ll}
+      goal: $\mNT{R}$\\
+      rule: 2\\
+      cost: \rlap{$N+1$}% LAYOUT FIX: makes figure appear centered over caption
+    \end{tabular}
+  };
+  \node [state, right=of n2] {%
+    \begin{tabular}{ll}
+      goal: $\mNT{R}$\\
+      rule: 2\\
+      cost: 2
+    \end{tabular}
+  };
+  \node [state, right=of n1] {%
+    \begin{tabular}{ll}
+      goal: $\mNT{R}$\\
+      rule: 1\\
+      cost: 1
+    \end{tabular}
+  };
+\end{tikzpicture}%
+\endgroup%

@@ -1,0 +1,211 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize\relsize{-0.5}%
+\def\compStageWidth{1.5cm}%
+\def\compStageHeight{8mm}%
+\def\compStageDist{0.6*\compStageWidth}%
+\def\compWrapperInnerSep{0.5*\compStageDist}%
+\def\optStageWidth{\compStageWidth}%
+\def\optStageHeight{\compStageHeight}%
+\def\optStageDist{0.5*\compStageDist}%
+\def\optWrapperInnerSep{3mm}%
+\def\backStageWidth{\compStageWidth}%
+\def\backStageHeight{\compStageHeight}%
+\def\backStageDist{0.5*\compStageDist}%
+\def\backWrapperInnerSep{3mm}%
+\def\wrapperOuterSep{9mm}%
+\pgfdeclarelayer{background}%
+\pgfsetlayers{background,main}%
+\begin{tikzpicture}[%
+    box/.style={%
+      draw,
+    },
+    box/.append style={%
+      thick,
+    },
+    compiler stage/.style={%
+      box,
+      inner sep=0,
+      outer sep=0,
+      minimum width=\compStageWidth,
+      minimum height=\compStageHeight,
+      node distance=\compStageDist,
+      fill=shade0,
+    },
+    compiler wrapper/.style={%
+      box,
+      inner sep=\compWrapperInnerSep,
+      rounded corners=6pt,
+      fill=shade2,
+    },
+    compiler input/.style={%
+      inner sep=0,
+      outer sep=2pt,
+      node distance=\compStageDist,
+      font=\strut,
+    },
+    compiler output/.style={%
+      compiler input,
+    },
+    backend stage/.style={%
+      compiler stage,
+      minimum width=\backStageWidth,
+      minimum height=\backStageHeight,
+      node distance=\backStageDist,
+    },
+    backend wrapper/.style={%
+      box,
+      inner sep=\backWrapperInnerSep,
+      rounded corners=3pt,
+      fill=shade1,
+    },
+    backend input/.style={%
+      compiler input,
+      node distance=\backStageDist,
+      font=\rule[-.25\baselineskip]{0pt}{\baselineskip},
+    },
+    backend output/.style={%
+      backend input,
+    },
+    optimizer stage/.style={%
+      backend stage,
+      minimum width=\optStageWidth,
+      minimum height=\optStageHeight,
+      node distance=\optStageDist,
+    },
+    optimizer intermediate stage/.style={%
+      optimizer stage,
+      minimum width=0,
+      outer xsep=3pt,
+      draw=none,
+      fill=none,
+    },
+    optimizer wrapper/.style={%
+      backend wrapper,
+      inner xsep=\optWrapperInnerSep,
+      inner ysep=\optWrapperInnerSep,
+    },
+    optimizer input/.style={%
+      compiler input,
+      node distance=\optStageDist,
+      font=\rule[-.25\baselineskip]{0pt}{\baselineskip},
+    },
+    optimizer output/.style={%
+      optimizer input,
+    },
+    flow/.style={%
+      ->,
+      thick,
+    },
+    label/.style={%
+      inner sep=0,
+      outer sep=3pt,
+      node distance=0,
+    },
+    wrapper label/.style={%
+      label,
+      outer sep=0,
+      font=\strut\bfseries,
+    },
+  ]
+
+  % Compiler stages
+  \node [compiler input] (compiler-input) {program};
+  \node [compiler stage, right=of compiler-input] (frontend) {frontend};
+  \node [compiler stage, right=of frontend] (optimizer) {optimizer};
+  \node [compiler stage, right=of optimizer] (backend) {backend};
+  \node [compiler output, right=of backend] (compiler-output) {assembly code};
+  \begin{pgfonlayer}{background}
+    \node [compiler wrapper, fit=(frontend) (optimizer) (backend)]
+          (compiler-wrapper) {};
+  \end{pgfonlayer}
+  \node [wrapper label, above=of compiler-wrapper] {compiler};
+
+  % Compiler execution flow
+  \begin{scope}[flow]
+    \draw (compiler-input) -- (frontend);
+    \draw (frontend) -- node [label, above] {IR} (optimizer);
+    \draw (optimizer) -- node [label, above] {IR} (backend);
+    \draw (backend) -- (compiler-output);
+  \end{scope}
+
+  % Optimizer stages
+  \node [optimizer stage, below=\wrapperOuterSep of compiler-wrapper]
+        (gcmotion) {%
+    \begin{tabular}{c}
+      global\\
+      code mover
+    \end{tabular}
+  };
+  \node [optimizer intermediate stage, left=of gcmotion] (pre-gcmotion)
+        {$\ldots$};
+  \node [optimizer intermediate stage, right=of gcmotion] (post-gcmotion)
+        {$\ldots$};
+  \begin{pgfonlayer}{background}
+    \node [optimizer wrapper, fit=(pre-gcmotion) (gcmotion) (post-gcmotion)]
+          (optimizer-wrapper) {};
+  \end{pgfonlayer}
+  \node [optimizer input, left=of optimizer-wrapper.west] (opt-input) {IR};
+  \node [optimizer output, right=of optimizer-wrapper.east] (opt-output) {IR};
+  \node [wrapper label, above=of optimizer-wrapper] {optimizer};
+
+  % Optimizer execution flow
+  \begin{scope}[flow]
+    \draw (opt-input) -- (pre-gcmotion);
+    \draw (pre-gcmotion) -- (gcmotion);
+    \draw (gcmotion) -- (post-gcmotion);
+    \draw (post-gcmotion) -- (opt-output);
+  \end{scope}
+
+  % Backend stages
+  \node [backend stage,
+         below left=\wrapperOuterSep and 0pt of optimizer-wrapper]
+        (isel)
+  {%
+    \begin{tabular}{c}
+      instruction\\
+      selector
+    \end{tabular}
+  };
+  \node [backend stage, right=of isel] (regalloc) {%
+    \begin{tabular}{c}
+      register\\
+      allocator
+    \end{tabular}
+  };
+  \node [backend stage, right=of regalloc] (isched) {%
+    \begin{tabular}{c}
+      instruction\\
+      scheduler
+    \end{tabular}
+  };
+  \node [backend stage, right=of isched] (ordering) {%
+    \begin{tabular}{c}
+      block\\
+      orderer
+    \end{tabular}
+  };
+  \begin{pgfonlayer}{background}
+    \node [backend wrapper, fit=(isel) (regalloc) (isched) (ordering)]
+          (backend-wrapper) {};
+  \end{pgfonlayer}
+  \node [backend input, left=of backend-wrapper.west] (back-input) {IR};
+  \node [backend output, right=of backend-wrapper.east] (back-output)
+        {assembly code};
+  \node [wrapper label, above=of backend-wrapper] {backend};
+
+  % Backend execution flow
+  \begin{scope}[flow]
+    \draw ([xshift=-\backStageDist] backend-wrapper.west) -- (isel);
+    \draw (isel) -- (regalloc);
+    \draw (regalloc) -- (isched);
+    \draw (isched) -- (ordering);
+    \draw (ordering) -- ([xshift=\backStageDist] backend-wrapper.east);
+  \end{scope}
+\end{tikzpicture}%
+\endgroup%

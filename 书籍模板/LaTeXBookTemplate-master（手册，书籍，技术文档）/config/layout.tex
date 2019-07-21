@@ -1,0 +1,308 @@
+\usepackage{ifthen}
+
+% page dimensions
+%--------------------------------------
+% see https://de.sharelatex.com/learn/Page_size_and_margins
+\ifthenelse{\equal{\CONFIGOneTwoSided}{oneside}}
+{
+    \usepackage{geometry}\geometry{
+        a4paper, % a4 size 210x297 mm
+        %paperheight=297mm,
+        %paperwidth=210mm,
+        left=35mm,
+        right=20mm,
+        top=35mm,
+        bottom=25mm,
+        footskip=10mm,
+        headheight=20mm % required for header
+    }
+}
+{
+    \usepackage{geometry}\geometry{
+        a4paper, % a4 size 210x297 mm
+        %paperheight=297mm,
+        %paperwidth=210mm,
+        twoside,
+        left=35mm,
+        right=20mm,
+        top=35mm,
+        bottom=25mm,
+        footskip=10mm,
+        headheight=20mm % required for header
+    }
+}
+%--------------------------------------
+
+% reduce chapter margin
+\renewcommand*{\chapterheadstartvskip}{\vspace*{0mm}}
+
+% remove vertical stretch
+\ifthenelse{\equal{\CONFIGRaggedbottom}{true}}
+{
+  \raggedbottom
+}
+
+% Multi line comments
+%--------------------------------------
+\usepackage{verbatim}
+%--------------------------------------
+
+% font
+%--------------------------------------
+\usepackage{fontspec}
+
+\ifthenelse{\equal{\CONFIGFontFamily}{Roboto}}
+{
+    \setmainfont[ExternalLocation=fonts/Roboto/,
+        BoldFont = Roboto-Bold.ttf,
+        ItalicFont = Roboto-Italic.ttf ,
+        BoldItalicFont = Roboto-BoldItalic.ttf]{Roboto-Regular.ttf}
+}{}
+
+\ifthenelse{\equal{\CONFIGFontFamily}{NotoSans}}
+{
+    \setmainfont[ExternalLocation=fonts/NotoSans/,
+        BoldFont = NotoSans-Bold.ttf,
+        ItalicFont = NotoSans-Italic.ttf ,
+        BoldItalicFont = NotoSans-BoldItalic.ttf]{NotoSans-Regular.ttf}
+}{}
+
+\ifthenelse{\equal{\CONFIGFontFamily}{NotoSerif}}
+{
+    \setmainfont[ExternalLocation=fonts/NotoSerif/,
+        BoldFont = NotoSerif-Bold.ttf,
+        ItalicFont = NotoSerif-Italic.ttf ,
+        BoldItalicFont = NotoSerif-BoldItalic.ttf]{NotoSerif-Regular.ttf}
+}{}
+
+\ifthenelse{\equal{\CONFIGFontFamily}{CMUSerif}}
+{
+    % CMU Serif - Use 12pt
+    \setmainfont[ExternalLocation=fonts/CMUSerif/,
+        BoldFont = cmunbx.ttf,
+        ItalicFont = cmunti.ttf,
+        BoldItalicFont = cmunbi.ttf]{cmunrm.ttf}
+}{}
+
+\ifthenelse{\equal{\CONFIGFontFamily}{Arial}}
+{
+    % Arial - Use 11pt
+    \setmainfont[ExternalLocation=fonts/Arial/,
+        BoldFont = arialbd.ttf,
+        ItalicFont = ariali.ttf,
+        BoldItalicFont = arialbi.ttf]{arial.ttf}
+}{}
+
+\ifthenelse{\equal{\CONFIGFontFamily}{Times New Roman}}
+{
+    % Times New Roman - Use 12pt
+    \setmainfont[ExternalLocation=fonts/Times New Roman/,
+        BoldFont = timesbd.ttf,
+        ItalicFont = timesi.ttf,
+        BoldItalicFont = timesbi.ttf]{times.ttf}
+}{}
+
+% language Japanese
+%--------------------------------------
+    \usepackage{xeCJK}
+    \setCJKmainfont[ExternalLocation=fonts/NotoSerifCJKjp/,
+        BoldFont = NotoSerifCJKjp-Bold.otf]{NotoSerifCJKjp-Regular.otf}
+    \ifthenelse{\equal{\CONFIGFontFamily}{NotoSans}}
+    {
+        \setCJKmainfont[ExternalLocation=fonts/NotoSansCJKjp/,
+            BoldFont = NotoSansCJKjp-Bold.otf]{NotoSansCJKjp-Regular.otf}
+    }{}
+    \ifthenelse{\equal{\CONFIGFontFamily}{NotoSerif}}
+    {
+        \setCJKmainfont[ExternalLocation=fonts/NotoSerifCJKjp/,
+            BoldFont = NotoSerifCJKjp-Bold.otf]{NotoSerifCJKjp-Regular.otf}
+    }{}
+
+    % Furigana
+    \usepackage[CJK,overlap]{ruby}
+%--------------------------------------
+
+% set line height/spacing
+\renewcommand{\baselinestretch}{1.5}
+
+\ifthenelse{\equal{\CONFIGLanguage}{DE}}
+{
+    % German hyphenation
+    \usepackage[ngerman]{babel}
+    \usepackage{csquotes}
+}{}
+%--------------------------------------
+
+% Remove indentation
+%--------------------------------------
+\parindent0pt
+%-------------------------------------
+
+% Landscape
+%--------------------------------------
+\usepackage{pdflscape}
+%--------------------------------------
+
+% dictionary
+%--------------------------------------
+\input{dictionary/dictionary}
+%--------------------------------------
+
+% colors
+%--------------------------------------
+\usepackage[table]{xcolor}
+\input{config/colors}
+% Package required to temove justification from a longtable. And you must add
+% >{\raggedright\arraybackslash}
+% to the longtable
+\usepackage{array}
+%--------------------------------------
+
+% images
+%--------------------------------------
+\usepackage{graphicx}
+\usepackage{float}
+\input{config/images}
+%--------------------------------------
+
+% Tables
+%--------------------------------------
+\usepackage{longtable}
+% alternate rowcolors for all long-tables
+\let\oldlongtable\longtable
+\let\endoldlongtable\endlongtable
+%--------------------------------------
+
+% date
+%--------------------------------------
+\usepackage[yyyymmdd]{datetime}
+% format date
+\renewcommand{\dateseparator}{--}
+%--------------------------------------
+
+% Header & footer
+%--------------------------------------
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{etoolbox}
+%--------------------------------------
+
+% Footnote numbering throughout the whole document
+%--------------------------------------
+\usepackage{chngcntr}
+\counterwithout{footnote}{chapter}
+%--------------------------------------
+
+% Enable linking e.g. for table of contents
+%--------------------------------------
+\usepackage{hyperref}
+\ifthenelse{\equal{\CONFIGEnableHrefColor}{false}}
+{
+    % Removes red border of links
+    \hypersetup{
+        colorlinks=false,
+        pdfborder={0 0 0},
+        pdftitle={\DICTDocTitle},
+        pdfauthor={\DICTDocAuthor},
+        pdfsubject={\DICTDocTitle}
+    }
+}{}
+
+% Fix line break for long URLs
+\renewcommand{\UrlBreaks}{\do\/\do\-\do\_\do\.\do\a\do\b\do\c\do\d\do\e\do\f\do\g\do\h\do\i\do\j\do\k\do\l\do\m\do\n\do\o\do\p\do\q\do\r\do\s\do\t\do\u\do\v\do\w\do\x\do\y\do\z\do\A\do\B\do\C\do\D\do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N\do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X\do\Y\do\Z}
+% reset mono space font style of URLs
+\urlstyle{rm}
+%--------------------------------------
+
+% Table of contents - define indent width
+%--------------------------------------
+%\usepackage{tocloft}
+%% \cftsetindents{kind}{indent}{numwidth}
+%\cftsetindents{section}{0em}{3em}
+%\cftsetindents{subsection}{2em}{5em}
+%% Remove space before toc, lof and lot
+%\setlength{\cftbeforetoctitleskip}{-1em}
+%\setlength{\cftbeforeloftitleskip}{-1em}
+%\setlength{\cftbeforelottitleskip}{-1em}
+%--------------------------------------
+
+% Listings - e.g. List of code snippets
+%--------------------------------------
+\usepackage{listings}
+% load style
+\input{config/lstdefinestyle}
+% init file variables
+\input{config/snippets}
+%--------------------------------------
+
+% Change numbering for figures and tables. If true the number will be not affected by the chapter number.
+%--------------------------------------
+\ifthenelse{\equal{\CONFIGCounterWithoutChapter}{true}}
+{
+    \usepackage{chngcntr}
+    \counterwithout{figure}{chapter}
+    \counterwithout{table}{chapter}
+    % \counterwithout{lstlisting}{chapter} is specified in main.tex
+}{}
+%--------------------------------------
+
+% Abbreviations
+%--------------------------------------
+\usepackage[printonlyused]{acronym}
+%--------------------------------------
+
+% methods for decorating text
+%--------------------------------------
+\usepackage{soul}
+\setuldepth{Berlin} % adjust the height of the lines
+%--------------------------------------
+
+% Bibliography/References
+%--------------------------------------
+\usepackage[
+    backend=biber,
+    style=alphabetic,%chicago-authordate
+    sorting=ynt,
+	  citestyle=authoryear
+ ]{biblatex}
+% define reference resource
+\addbibresource{base/bibliography/references.bib}
+%--------------------------------------
+
+% Index
+%--------------------------------------
+\usepackage{imakeidx}
+
+% uncomment to at numbering
+%\indexsetup{level=\chapter}
+
+% Activate index commands
+\makeindex
+%--------------------------------------
+
+% Appendix
+%--------------------------------------
+\usepackage{appendix}
+\usepackage[german,nohints]{minitoc}
+\usepackage{titletoc}
+%--------------------------------------
+
+% Glossary
+%--------------------------------------
+\usepackage[nonumberlist]{glossaries}
+\makeglossaries
+\IfFileExists{base/glossary/\CONFIGLanguage}{
+    \loadglsentries{base/glossary/\CONFIGLanguage}
+}{
+    GLOSSARY: UNSUPPORTED LANGUAGE ,,\CONFIGLanguage ``
+}
+%--------------------------------------
+
+% PDF
+%--------------------------------------
+\usepackage{pdfpages}
+\input{config/pdf}
+% Define scale and margin. Might be changed if paper size is not A4.
+\def\PDFPropertyScale{0.73}
+\def\PDFPropertyOffset{7.5mm}
+%--------------------------------------

@@ -1,0 +1,1013 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{Universal Representation}
+\labelChapter{universal-representation}
+
+This chapter introduces a new representation used for modeling \glspl{function}
+and \glspl{instruction}.
+%
+Based on the conclusions drawn in
+\refChapter{existing-isel-techniques-and-reps}, we begin in
+\refSection{uni-rep-design-requirements} with listing the design requirements
+that must be fulfilled by a graph-based representation.
+%
+From these requirements, in \refSection{uni-rep-program-rep} we design such a
+representation, called \gls!{universal representation}, and describe how it is
+used for modeling \glspl{function}.
+%
+We then do the same for \glspl{instruction} in \refSection{uni-rep-instr-rep}.
+%
+In \refSection{uni-rep-pattern-matching}, we describe how to perform
+\gls{pattern matching} using the \gls{universal representation}.
+%
+In \refSection{uni-rep-ir-comparison}, we compare \gls{universal representation}
+with other, existing \glspl{sea-of-nodes IR}.
+%
+Lastly, a summary is given in \refSection{uni-rep-summary}.
+
+
+\section{Design Requirements}
+\labelSection{uni-rep-design-requirements}
+
+As discussed in \refChapter{existing-isel-techniques-and-reps}, in order to
+address the limitations of existing approaches we need a \gls{constraint model}
+capable of capturing the problems described in \refChapter{introduction}.
+%
+To this end, we need a \gls{graph}-based representation that fulfills the
+following requirements:
+%
+\def\typesetReq#1{\emph{#1}}%
+\begin{requirements}
+  \item \labelRequirement{uni-rep-capture-data-control}
+    \typesetReq{It must capture the data and control flow of an entire
+      \gls{function}.}
+    %
+    This is needed for modeling \gls{global.is} \gls{instruction selection},
+    which demands access to the entire \gls{function} under compilation.
+    %
+    This is also needed for uniform selection of data and control
+    \glspl{instruction}, which requires that both data and control flow be
+    captured in a single \gls{graph}.
+
+  \item \labelRequirement{uni-rep-explicit-blocks}
+    \typesetReq{\Glspl{block} must be explicitly represented as \glspl{node}.}
+    %
+    This is needed for \gls{pattern matching}, where we must not be allowed to
+    match \glspl{pattern} whose control flow is inconsistent with the
+    \gls{function graph}.
+    %
+    For example, assume that the \gls{pattern} is derived from a saturated
+    addition \gls{instruction}.
+    %
+    Such a \gls{pattern} will consist of three \glspl{block}~$b_1$, $b_2$, and
+    $b_3$, where $b_1$ represents the \gls{instruction}'s point of entry, $b_2$
+    represents the part where clamping is performed, and $b_3$ represents the
+    \gls{instruction}'s point of exit.
+    %
+    The control flow in this \gls{pattern} will be such that there are two
+    conditional jumps from $b_1$ to either $b_2$ or $b_3$, and an unconditional
+    jump from $b_2$ to $b_3$.
+    %
+    To be matched, part of the \gls{function graph} must exhibit the same
+    control flow structure.
+    %
+    This is also useful for modeling \gls{global code motion} as each such
+    \gls{node} will correspond to a \gls{variable} in the \gls{constraint
+      model}.
+
+  \item \labelRequirement{uni-rep-explicit-ops}
+    \typesetReq{Data and control \glspl{operation} must be explicitly
+      represented as \glspl{node}.}
+    %
+    This is to retain the notion of \gls{cover}[age] and to treat
+    \glspl{instruction} uniformly regardless of whether they operate on data or
+    control flow.
+
+  \item \labelRequirement{uni-rep-explicit-values}
+    \typesetReq{Values produced and used by the \glspl{operation} must be
+      explicitly represented as \glspl{node}.}
+    %
+    This is useful for modeling \gls{global code motion} and \gls{data copying}
+    as every such \gls{node} will introduce a \gls{variable} in the
+    \gls{constraint model}.
+
+  \item \labelRequirement{uni-rep-exactly-one-inbound-edge-for-values}
+    \typesetReq{In a \gls{function graph}, every \gls{node} representing a
+      value must have exactly one inbound \gls{data-flow edge}.}
+    %
+    This ensures that every value has exactly one \gls{match} defining that
+    value, which is useful when modeling \gls{global code motion}.
+
+  \item \labelRequirement{uni-rep-fixed-operations}
+    \typesetReq{The \gls{block} in which a particular \gls{operation} in the
+      \gls{function} is to be performed must not be fixed.}
+    %
+    Without this, \gls{global code motion} is not possible.
+
+  \item \labelRequirement{uni-rep-preserve-semantics}
+    \typesetReq{Data \glspl{operation} must not be placed in \glspl{block} that
+      will break \gls{program} semantics.}
+    %
+    This is needed to ensure correctness when performing \gls{global code
+      motion}.
+
+  \item \labelRequirement{uni-rep-ssa}
+    \typesetReq{The representation must be based on \gls{SSA}.}
+    %
+    This is needed in modeling \gls{global code motion} as it explicitly
+    states which values must be defined in which \glspl{block} in order to
+    preserve \gls{program} semantics.
+    %
+    This is also useful for practical reasons as most \glspl{IR} used in modern
+    \glspl{compiler} are already based on \gls{SSA}.
+\end{requirements}
+
+While there exist many \gls{graph}-based representations (see
+\cite{StanierWatson:2013} for a survey), most fulfill only some of the
+requirements but not all.
+%
+Consequently, a new representation has to be designed.
+
+
+\section{Program Representation}
+\labelSection{uni-rep-program-rep}
+
+The \gls{universal representation} is essentially a combination of two existing
+representations -- the \gls{SSA graph} and the \gls{control-flow graph}%
+%
+\footnote{%
+  A \gls!{control-flow graph} is a \gls{graph} where each \gls{node} represents
+  a \gls{block} in the \gls{function} and each \gls{edge} represents a jump from
+  one \gls{block} to another.
+  %
+  \Glspl{edge} representing conditional jumps are labeled with a Boolean
+  value indicating under which conditions the jump is taken.
+  %
+  An example is given in \refFigure{function-example-cf-graph}.
+}
+%
+-- which are extended to fulfill the missing requirements and then merged into a
+single \gls{graph}.
+%
+This makes for a simple construction process as the \glsshort{control-flow
+  graph} and \glspl{SSA graph} are already used inside principally all modern
+\glspl{compiler}.
+
+
+\paragraph{Capturing Control Flow}
+
+We start with the \gls{control-flow graph}.
+%
+As it captures the control flow for an entire \gls{function},
+\refRequirement{uni-rep-capture-data-control} is already partially fulfilled.
+%
+\refRequirement{uni-rep-explicit-blocks} is also fulfilled since \glspl{block}
+in the \gls{control-flow graph} are already represented as \glspl{node}, which
+we call \glspl!{block node}.
+%
+In contexts where is no risk of confusion, the terms \emph{\glspl{block}} and
+\emph{\glspl{block node}} can be used interchangeably.
+
+To partially achieve \refRequirement{uni-rep-explicit-ops}, we insert
+\glspl!{control node} to represent \glspl{operation} that change the control
+flow from on \gls{block} to another.
+%
+We also redirect the \glspl{edge} such that control flows through these
+\glspl{node}.
+%
+For example, in the \gls{control-flow graph} shown in
+\refFigure{function-example-cf-graph}, \glspl{control node} representing
+unconditional branches are inserted along the \glspl{edge} between the
+\irBlock*{entry} and \irBlock*{head} \glspl{node} and between the
+\irBlock*{body} and \irBlock*{head} \glspl{node}.
+%
+\begin{filecontents*}{uf-example-ssa.c}
+int factorial(int $\irVar{n}[1]$) {
+  entry:
+    int $\irVar{f}[1]$ = 1;
+  head:
+    int $\irVar{f}[2]$ = $\mPhi$($\irVar{f}[1]$:entry, $\irVar{f}[3]$:body);
+    int $\irVar{n}[2]$ = $\mPhi$($\irVar{n}[1]$:entry, $\irVar{n}[3]$:body);
+    bool b = $\irVar{n}[2]$ <= 1;
+    if b goto end;
+  body:
+    int $\irVar{f}[3]$ = $\irVar{f}[2]$ * $\irVar{n}[2]$;
+    int $\irVar{n}[3]$ = $\irVar{n}[2]$ - 1;
+    goto head;
+  end:
+    return $\irVar{f}[2]$;
+}
+\end{filecontents*}%
+%
+\begin{figure}
+  \centering
+
+  \subcaptionbox{Function in SSA form\labelFigure{function-example-ssa-c}}%
+                {%
+                  \begin{lstpage}{60mm}%
+                    \lstinputlisting[%
+                                      language=c,
+                                      mathescape,
+                                      morekeywords={bool}%
+                                    ]%
+                                    {uf-example-ssa.c}%
+                  \end{lstpage}%
+                }
+
+  \vspace{\baselineskip}
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Control-flow graph%
+                  \labelFigure{function-example-cf-graph}%
+                }%
+                [32mm]%
+                {%
+                  \input{figures/universal-representation/%
+                    control-flow-graph-example}%
+                }%
+  \hfill\hfill%
+  \subcaptionbox{SSA graph\labelFigure{function-example-ssa-graph}}%
+                {\input{figures/universal-representation/ssa-graph-example}}
+  \hfill%
+  \mbox{}
+
+  \caption[Example of function used to describe the program representation]%
+          {%
+            Running example of a function and its corresponding control-flow and
+            SSA graph, which will be used in describing the program
+            representation%
+          }
+  \labelFigure{function-example}
+\end{figure}%
+%
+For the conditional control flow originating from the \irBlock*{head}
+\gls{block}, a \gls{control node} representing a conditional branch is inserted
+and connected to the \irBlock*{head} \gls{node}, and the labeled \glspl{edge}
+are redirected to the new \gls{node}.
+%
+Lastly, a \gls{control node} representing a \gls{function} return is inserted
+and connected to the \irBlock*{end} \gls{node}.
+%
+This results in the \gls{graph} shown in
+\refFigure{uf-graph-example-extended-cf-graph}.
+
+\begin{figure}
+  \centering
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Extended control-flow graph%
+                  \labelFigure{uf-graph-example-extended-cf-graph}%
+                }%
+                [46mm]%
+                {%
+                  \input{figures/universal-representation/%
+                    uf-graph-example-control-part}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Extended SSA graph%
+                  \labelFigure{uf-graph-example-extended-ssa-graph}%
+                }%
+                {%
+                  \input{%
+                    figures/universal-representation/%
+                    uf-graph-example-data-part%
+                  }%
+                }%
+  \hfill%
+  \mbox{}
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox{%
+                  Universal function graph%
+                  \labelFigure{uf-graph-example-full-graph}%
+                }%
+                {%
+                  \parbox{\textwidth}{%
+                    \parbox[b]{32mm}{%
+                      \input{figures/universal-representation/%
+                        uf-graph-example-control-part}%
+                    }%
+                    \hfill%
+                    \parbox[b]{63mm}{%
+                      \input{%
+                        figures/universal-representation/%
+                        uf-graph-example-data-part%
+                      }%
+                      \vspace*{1cm}%
+                    }%
+                    \input{%
+                      figures/universal-representation/%
+                      uf-graph-example-cross-edges%
+                    }%
+                  }%
+                }%
+
+  \caption[Example of a universal function graph]%
+          {%
+            Example of a universal function graph, built from the \gls{function}
+            shown in \refFigure{function-example}.
+            %
+            Thick-lined diamonds, boxes, and arrows represent control nodes,
+            block nodes, and control-flow edges, respectively.
+            %
+            Thin-lined circles, boxes, and arrows represent computation nodes,
+            value nodes, and data-flow edges, respectively.
+            %
+            Dotted lines represent definition edges%
+          }
+  \labelFigure{uf-graph-example}
+\end{figure}
+
+An invariant here is that each \gls{control node} has exactly one \gls{edge}
+flowing \emph{from} a \gls{block node}, and each \gls{block node} has exactly
+one \gls{edge} flowing \emph{to} a \gls{control node}.
+%
+In other words, every control \gls{operation} belongs to exactly one
+\gls{block}, and every \gls{block} has exactly one point where changes in
+control occur.
+%
+This also means that the extended \gls{control-flow graph} forms a
+\gls{bipartite.g} \gls{graph}, with \glspl{block node} on one end and
+\glspl{control node} on the other.
+
+
+\paragraph{Capturing Data Flow}
+
+We continue with the \gls{SSA graph}.
+%
+As it captures the data flow for an entire \gls{function} and represents data
+\glspl{operation} as \glspl{node} -- we call these \glspl!{computation node} --
+the remaining parts of \refRequirement{uni-rep-capture-data-control} and
+\refRequirement{uni-rep-explicit-ops} are fulfilled.
+%
+\refRequirement{uni-rep-ssa} is inherently fulfilled as the \gls{SSA graph}
+requires the \gls{function} to be in \gls{SSA}~form.
+
+To achieve \refRequirement{uni-rep-explicit-values}, we insert \glspl!{value
+  node} to represent the entities produced and used by the data
+\glspl{operation}.
+%
+We also redirect the \glspl{edge} in same fashion as when extending the
+\gls{control-flow graph}.
+%
+\Glspl{node} representing \gls{function} returns are removed as these are
+already represented in the extended \gls{control-flow graph}.
+%
+Using the \gls{SSA graph} shown in \refFigure{function-example-ssa-graph} as
+example, this results in the \gls{graph} shown in
+\refFigure{uf-graph-example-extended-ssa-graph}.
+
+Note that at this point the invariant specified in
+\refRequirement{uni-rep-exactly-one-inbound-edge-for-values} that every
+\gls{value node} has exactly one inbound \gls{data-flow edge} is broken, but
+this will be addressed shortly.
+
+
+\paragraph{Combining The Graphs}
+
+We now connect the two extended \glspl{graph} together.
+%
+First, \glspl{data-flow edge} are inserted to connect control \glspl{operation}
+with the values used by these \glspl{operation}.
+%
+In the case of our running example, such \glspl{edge} are added from
+values~\irVar*{b} and~\irVar*{f}[2] to the \irCode*{\irCondBrText} and
+\irCode*{\irRetText} \glspl{operation}, respectively.
+
+To achieve the invariant specified in
+\refRequirement{uni-rep-exactly-one-inbound-edge-for-values}, \glspl{data-flow
+  edge} are also inserted from the \glsshort{entry block} \gls{block node} to
+each \gls{value node} representing constants and function arguments.
+%
+Intuitively, this means that such values are produced at the point of entry to
+the \gls{function}.
+%
+Like with the extended \gls{control-flow graph}, the extended \gls{SSA graph}
+also forms a \gls{bipartite.g} \gls{graph}, with \glspl{value node} on one end
+and \glspl{computation node} on the other.
+
+Since there are no \glspl{edge} connecting \glspl{computation node} with
+\glspl{block node}, the assignment of data \glspl{operation} to \glspl{block} is
+free, thus fulfilling \refRequirement{uni-rep-fixed-operations}.
+%
+This alone, however, permits \glspl{operation} to be moved to \glspl{block} that
+will break \gls{program} semantics.
+%
+For example, assume the code snippet and corresponding, extended
+\glsshort{control-flow graph} and \glspl{SSA graph} shown in
+\refFigure{preserving-semantics-example}.
+%
+\begin{filecontents*}{preserving-semantics-code.c}
+  $\ldots$
+  int $\irVar{x}[1]$ = $\ldots$;
+check:
+  bool b = $\ldots$;
+  if b goto dec;
+inc:
+  int $\irVar{x}[2]$ = $\irVar{x}[1]$ + 1;
+  goto merge;
+dec:
+  int $\irVar{x}[3]$ = $\irVar{x}[1]$ - 1;
+join:
+  int $\irVar{x}[4]$ = $\mPhi$($\irVar{x}[2]$:inc, $\irVar{x}[3]$:dec);
+\end{filecontents*}
+%
+\begin{figure}
+  \centering
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Code snippet%
+                  \labelFigure{preserving-semantics-example-code-snippet}%
+                }{%
+                  \begin{lstpage}{51mm}%
+                    \lstinputlisting[language=c,mathescape]%
+                                    {preserving-semantics-code.c}%
+                  \end{lstpage}%
+                }%
+  \hfill\hfill\hfill%
+  \subcaptionbox{%
+                  UF subgraph%
+                  \labelFigure{preserving-semantics-graph}%
+                }{%
+                  \input{figures/universal-representation/%
+                    preserving-semantics-example-graph}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Example illustrating the need for definition edges]%
+          {%
+            Example illustrating the need for definition edges to prevent
+            certain operations from being moved into blocks that will break
+            program semantics%
+          }
+  \labelFigure{preserving-semantics-example}
+\end{figure}
+%
+In the original code, the addition should be performed in the \irBlock*{inc}
+\gls{block} while the subtraction should be performed in the \irBlock*{dec}
+\gls{block}.
+%
+But according to the \gls{graph}, swapping the placement of these
+\glspl{operation} would be considered a valid move, which clearly results in a
+different \gls{program}.
+%
+We recognize that such problems occur exactly in situations where a value is
+expected to be produced in a particular \gls{block}, which are precisely the
+\glspl{constraint} captured by the \glspl{phi-function}.
+%
+Consequently, for each value-\gls{block} pair \mbox{$\mPair{v\hspace{-1pt}}{b}$}
+appearing as argument to a \gls{phi-function}, we add a \gls!{definition edge}
+between the corresponding \glsshort{value node} and \gls{block node}.
+%
+This forces $v$ to be produced in~\mbox{$b$\hspace{-1pt},} which in turn
+prevents the \gls{operation} producing $v$ from being moved out
+of~\mbox{$b$\hspace{-1pt}.}
+%
+Hence \refRequirement{uni-rep-preserve-semantics} is achieved.
+
+Lastly, for convenience we prevent \glspl{phi-function} from being moved by
+inserting a \gls{definition edge} between the value produced by the
+\gls{phi-function} and the \gls{block} wherein the \gls{phi-function} originally
+resides in the \gls{function}.
+%
+This results in the \gls{graph} shown in
+\refFigure{uf-graph-example-full-graph},\!%
+%
+\footnote{%
+  In this case, the \glspl{definition edge} from the \irBlock*{entry} \gls{node}
+  to the \irVar*{n}[1] and \irVar*{1} \glspl{node} are redundant since the
+  \glspl{data-flow edge} are sufficient to force these values to be produced in
+  the \irBlock*{entry} \gls{block}.
+}
+%
+which is called \gls!{UF graph}.
+
+
+\paragraph{Refining the Notion of Coverage}
+
+Since new \glspl{node} have been introduced, we must refine the definition of
+\gls{cover}[age] to apply for \glspl{UF graph}.
+%
+If an \gls!{operation} denotes either a \glsshort{computation node} or
+\gls{control node} in a \gls{UF graph}~$G$, then a subset~\mbox{$M' \subseteq
+  M$}, where $M$ is a \gls{match set}, \gls!{cover}[s] $G$ if every
+\gls{operation} in $G$ appears in at least one match in~$M'$\!.
+%
+Similarly, \gls{exact.c} \gls{cover}[age] is also redefined as above.
+
+
+\subsection{Representing Constants As Single Or Multiple Nodes}
+
+Duplicated constants may either be represented using individual \glspl{value
+  node} (as in \refFigure{uf-graph-example-full-graph}) or through a single
+\gls{value node} (as in \refFigure{preserving-semantics-graph}).
+%
+The former is simpler from a \gls{code generation} perspective, but may result
+in redundant \glspl{instruction} where the same constant is needlessly reloaded.
+%
+This can be avoided by using the latter together with a technique to be
+described in \refSection{modeling-value-reuse} in the next chapter, but this
+also requires the \gls{UF graph} to be transformed and extended with additional
+\glspl{operation} in order to guarantee correctness.
+%
+For example, assume a \gls{function} containing two \glspl{phi-function}
+\irCode*{\irPhi{$\ldots$, 1:\irBlock{a}, $\ldots$}} and
+\irCode*{\irPhi{$\ldots$, 1:\irBlock{b}, $\ldots$}}.
+%
+If the constant~\irVar*{1} is represented using a single \gls{value node}, then
+the \gls{value node} will have two \glspl{definition edge}, one from
+\gls{block}~\irBlock*{a} and another from \gls{block}~\irBlock*{b}.
+%
+Since a value cannot be defined in two \gls{block} simultaneously, there exist
+no \gls{solution} for this \gls{UF graph}.
+%
+This problem is fixed by applying \gls{copy extension}, which will be described
+in \refChapter{constraint-model}.
+
+
+\subsection{Data Types of Values}
+\labelSection{uni-rep-data-types-of-values}
+
+Both \glspl{program} and \glspl{instruction} expect their argument values to be
+represented in a specific format.
+%
+For example, in integer arithmetic the values are typically represented using
+signed or unsigned two's complement values of a certain width.
+%
+It is also common that the result is given using the same format as the argument
+values.
+%
+As this could lead to overflow, mechanisms are often in place to detect such
+occurrences.
+%
+However, if the selected \gls{instruction} produces results of wider bit width
+than specified in the \gls{function graph}, the expected overflow may not occur.
+%
+Consequently, for both \glsshort{function graph} and \glspl{pattern graph} the
+data type of a value is also specified in the corresponding \gls{value node}.
+%
+For integers this entails the value's bit width, and two values are compatible
+if they have the same bit width.
+%
+\Glspl{value node} representing constants also have a value range, which is a
+singleton for constants appearing in the \gls{UF graph}.
+%
+A constant~$c$ is compatible with another constant~$d$ if the value range of~$d$
+is a subset of the value range of~$c$.
+%
+Note that this relation is not necessarily commutative.
+
+
+\subsection{Common Subexpression Elimination}
+
+Common subexpressions may appear as part of legalizing the \gls{function} before
+passing it to the \gls{instruction selector}.
+%
+For example, in \gls{LLVM} there is an \gls{operation} called
+\instrCode*{getelementptr} which takes care of computing the address when
+accessing an array element or object field.
+%
+To construct the corresponding \gls{UF graph}, these \glspl{operation} first
+need to be lowered into a series of additions and multiplications.
+%
+However, if two or more \instrCode*{getelementptr}s compute the same address
+then these expressions will be duplicated, thus resulting in redundant
+\glspl{instruction}.
+%
+Consequently, such common subexpressions should be eliminated after having
+performed legalization but before constructing the \gls{UF graph}.
+
+
+\subsection{Handling Implicit Dependencies}
+
+The representation described thus far is sufficient for handling simple
+\glspl{operation}, such as arithmetic computations.
+%
+Certain \Glspl{operation}, such as memory \glspl{operation} and function calls,
+require additional \gls{graph} structures as they may implicitly depend on one
+another.
+%
+Consequently, if these dependencies are not taken into account for \gls{global
+  code motion}, then such \glspl{operation} can be moved in a way that breaks
+\gls{program} semantics.
+
+We capture implicit dependencies using \glspl!{state node}.
+%
+In addition to its normal value arguments, an \gls{operation} that may
+implicitly depend on another \gls{operation} takes exactly one \gls{state node}
+as input and produces another \gls{state node}.
+%
+Hence, if an \gls{operation}~$o_1$ implicitly depends on another
+\gls{operation}~$o_2$, then $o_1$ takes as input the \gls{state node} produced
+by $o_2$.
+%
+For each \gls{block} in the \gls{function}, a new \gls{state node} is created
+and remembered as the last \gls{state node}.
+%
+When a \gls{computation node} with potential for implicit dependencies is
+created, a \gls{state-flow edge} is also inserted from the last \gls{state node}
+to the currently last \gls{state node}.
+%
+Afterwards a new \gls{state node} is created and set as last, and another
+\gls{state-flow edge} is inserted from the \gls{computation node} to the
+just-created \gls{state node}.
+%
+Once all \glspl{operation} in the \gls{block} has been processed, the first and
+last \glspl{state node} are connected to the \gls{block node} through a
+\gls{state-flow edge} and a \gls{definition edge}, respectively.
+%
+Because the first and the last \gls{state node} must both be defined within the
+\gls{block}, this effectively forbids \glspl{operation} with implicit
+dependencies from being moved out of the \gls{block}, which could break
+\gls{program} semantics.
+%
+An example is shown in \refFigure{uni-rep-impl-dep-example}.
+%
+\begin{filecontents*}{impl-dep-example-ir.c}
+block:
+  $\ldots$
+  store p, $\ldots$
+  call foo, p
+  store p, $\ldots$
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{Code snippet\labelFigure{uni-rep-impl-dep-example-ir}}%
+                {%
+                  \begin{lstpage}{26mm}
+                    \lstinputlisting[language=c,mathescape]%
+                                    {impl-dep-example-ir.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  UF subgraph.
+                  %
+                  Gray boxes represent state nodes, and dashed lines represent
+                  state-flow edges%
+                  \labelFigure{uni-rep-impl-dep-example-graph}%
+                }%
+                [70mm]%
+                {%
+                  \input{figures/universal-representation/%
+                    impl-dep-example-graph}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption{%
+    Example illustrating how to handle implicit dependencies in UF graphs%
+  }%
+  \labelFigure{uni-rep-impl-dep-example}
+\end{figure}
+
+Note that, unlike with \glspl{value node}, the \gls{state-flow edge} must not be
+drawn from the \glsshort{entry block} \gls{block node}.
+%
+Hence the same invariant for \glspl{value node} also apply for \glspl{state
+  node}.
+
+
+\subsection{Edge Numbers}
+
+During \gls{graph} construction, every \gls{edge} is given two \glspl!{edge
+  number} which allows the \glspl{edge} to be ordered \wrt to a given
+\gls{node}.
+%
+This is needed for \gls{pattern matching}, which will be described in
+\refSection{uni-rep-pattern-matching}.
+%
+For a given \gls{edge}~\mbox{$e = \mEdge{n_1}{n_2}$} of
+type~\mbox{$t$\hspace{-1pt},} where $t$ represents either \glslong{control-flow
+  edge}, \glslong{data-flow edge}, or \glslong{state-flow edge}, the
+\gls!{inbound.en}[ \gls{edge number}], denoted \mbox{$\mInEdgeNr(e) =
+  i$\hspace{-.8pt},} indicates that $e$ is the $i$th \gls{ingoing.e} \gls{edge}
+of type~$t$ connected to~$n_2$.
+%
+Similarly, the \gls!{outbound.en}[ \gls{edge number}], denoted
+\mbox{$\mOutEdgeNr(e) = i$\hspace{-.8pt},} indicates that $e$ is the $i$th
+\gls{outgoing.e} \gls{edge} of type~$t$ connected to~$n_1$.
+%
+Consequently, all \glspl{edge} which are of the same type and have the same
+\gls{source} \gls{node} must be given distinct \gls{outbound.en} \glspl{edge
+  number} such that they form a contiguous sequence.
+%
+Similarly, the same also applies for the \gls{inbound.en} \glspl{edge number} of
+all \glspl{edge} with the same type and \gls{target} \gls{node}.
+
+An example is given in \refFigure{edge-numbers-example}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/universal-representation/edge-numbers-example-graph}
+
+  \caption[Example of edge numbers]%
+          {%
+            Example of edge numbers.
+            %
+            The inbound and outbound edge numbers are attached to the edges'
+            heads and tails, respectively%
+          }%
+  \labelFigure{edge-numbers-example}
+\end{figure}
+%
+Note that the \glspl{definition edge} in the example are oriented and labeled
+with the same \glspl{edge number} as the \glspl{data-flow edge} connected to the
+same \gls{value node}.
+%
+This is to be able to identify which \gls{definition edge} belongs to which
+\gls{data-flow edge} when there exist multiple such \glspl{edge}, which is
+needed when performing \gls{copy extension} (to be described in
+\refChapter{constraint-model}).
+%
+In terms of restricting the definition placements, however, the orientation of
+the \glspl{definition edge} does not matter and is thus skipped in cases where
+this information is not needed.
+
+
+\section{Instruction Representation}
+\labelSection{uni-rep-instr-rep}
+
+Modeling \glspl{instruction} as \glspl{pattern} is identical to modeling
+\glspl{function} with two exceptions.
+%
+First, the \gls{control-flow graph} becomes empty if the output is not dependent
+on control flow.
+%
+Hence a \gls{pattern} has either none or exactly one \gls{entry block}.
+%
+Second, no additional \glspl{data-flow edge} are added for \glspl{value node}
+representing constants and \gls{instruction} input.
+%
+In other words, the invariant specified in
+\refRequirement{uni-rep-exactly-one-inbound-edge-for-values} that every
+\gls{value node} has exactly one inbound \gls{data-flow edge} does not need to
+(and should not) hold for such values.
+%
+This results in a \gls{graph} called \gls!{UP graph}, for which two examples are
+given in \refFigure{up-graph-examples}.
+
+\begin{filecontents*}{add-code.c}
+int add(int $\irVar{s}$, int $\irVar{t}$) {
+  entry:
+    int $\irVar{d}$ = $\irVar{s}$ + $\irVar{t}$;
+    return $\irVar{d}$;
+}
+\end{filecontents*}
+
+\begin{filecontents*}{satadd-code.c}
+int satadd(int $\irVar{s}$, int $\irVar{t}$) {
+  entry:
+    int $\irVar{d}[1]$ = $\irVar{s}$ + $\irVar{t}$;
+    if ($\irVar{d}[1]$ > MAX) goto clamp;
+  clamp:
+    int $\irVar{d}[2]$ = MAX;
+  end:
+    int $\irVar{d}[3]$ = $\mPhi$($\irVar{d}[3]$:entry, $\irVar{d}[2]$:clamp);
+    return $\irVar{d}[3]$;
+}
+\end{filecontents*}
+
+\begin{figure}
+  \centering%
+  \setlength{\tmpLength}{2\baselineskip + \betweensubfigures}%
+  \begin{tabular}{@{}c@{\quad}c@{}}
+    \subcaptionbox{%
+                    Semantic behavior of an \mbox{\instrFont*add \$d, \$s, \$t}
+                    instruction%
+                    \labelFigure{up-graph-examples-add-code}%
+                  }%
+                  {%
+                    \begin{lstpage}{42mm}%
+                      \lstinputlisting[%
+                                        language=c,
+                                        mathescape,
+                                        morekeywords={bool}
+                                      ]%
+                                      {add-code.c}%
+                    \end{lstpage}%
+                  }%
+    &
+    \subcaptionbox{%
+                    UP graph of {\instrFont*add}%
+                    \labelFigure{up-graph-examples-add-graph}%
+                  }%
+                  [28mm]%
+                  {\input{figures/universal-representation/up-graph-add}}%
+    \\[\tmpLength]
+    \subcaptionbox{%
+                    Semantic behavior of a
+                    \mbox{\instrFont*satadd \$d, \$s, \$t} instruction%
+                    \labelFigure{up-graph-examples-satadd-code}%
+                  }%
+                  [64mm]%
+                  {%
+                    \begin{lstpage}{62mm}%
+                      \lstinputlisting[%
+                                        language=c,
+                                        mathescape,
+                                        morekeywords={bool}
+                                      ]%
+                                      {satadd-code.c}%
+                    \end{lstpage}%
+                  }%
+    &
+    \subcaptionbox{%
+                    UP graph of {\instrFont*satadd}%
+                    \labelFigure{up-graph-examples-satadd}%
+                  }{\input{figures/universal-representation/up-graph-satadd}}
+  \end{tabular}
+
+  \caption{Example of universal pattern graphs}
+  \labelFigure{up-graph-examples}
+\end{figure}
+
+For the \gls{Haskell} prototype used in the experiments, the \glspl{UP graph}
+are generated from a proprietary \gls{machine description} format where the
+behavior of each \gls{instruction} is captured as \gls{LLVM} \gls{IR} code.
+
+
+\subsection{Covering $\mPhi$-Nodes}
+
+Since covering of a \gls{UF graph} also includes the \glspl{node} representing
+\glspl{phi-function} -- we call these \glspl!{phi-node}, which typically do not
+correspond to any \gls{instruction} on the \gls{target machine} -- we need a
+special \gls{pattern} for covering such \glspl{node}.
+%
+Consequently, we assume that the \gls{pattern set} always includes a
+\gls!{phi-pattern}, which is illustrated in \refFigure{phi-pattern}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/universal-representation/phi-pattern}
+
+  \caption{The $\mPhi$-pattern}
+  \labelFigure{phi-pattern}
+\end{figure}
+%
+The \gls{phi-pattern} has a variable number of input values since a
+\gls{phi-function} may take an arbitrary number of arguments.
+%
+In our experiments, it proved sufficient to duplicate the \gls{phi-pattern} for
+\mbox{$k = 2, \ldots, 15$}.
+%
+A \gls{match} derived from a \gls{phi-pattern} is called a \gls!{phi-match},
+which has zero cost and emits nothing if selected.
+
+
+\section{Pattern Matching}
+\labelSection{uni-rep-pattern-matching}
+
+Because neither \glsshort{UF graph} nor \glspl{UP graph} are necessarily
+tree-shaped, a \gls{subgraph isomorphism} algorithm is needed for performing
+\gls{pattern matching}.
+%
+The prototype applies the \gls{VF2}~algorithm~\cite{CordellaEtAl:2001} due to
+its simplicity and ease of implementation.\!%
+%
+\footnote{%
+  In his dissertation, \textcite{McCreesh:2017} cautions against using \gls{VF2}
+  after showing that, for a large body of problem instances, it exhibits
+  considerably worse performance compared to two other \gls{subgraph
+    isomorphism} algorithms (\gls!{LAD}~\cite{Solnon:2010} and
+  \gls!{Glasgow}~\cite{McCreeshProsser:2015}).
+  %
+  In case of \gls{instruction selection}, however, the problem instances are
+  typically small enough that the time to find all \glspl{match} is negligible
+  compared to the time to solve the \gls{constraint model}.
+}
+%
+The algorithm is described in detail in
+\refChapter{existing-isel-techniques-and-reps} on
+\refPageOfSection{ex-isel-rep-vf2-algorithm}.
+
+To adapt it for the \gls{universal representation}, we need to customize the
+semantic rules (see \refDefinition{pm-semantic-rules} on
+\refPageOfDefinition{pm-semantic-rules}).
+%
+For two \glspl{node}~$n$ and~\mbox{$m$\hspace{-.8pt},} \mbox{$n \mVFTwoAttrCmp
+  m$} holds if $n$ and $m$ are of the same type.
+%
+That is, the \glspl{node} must either be two \glspl{block node}, two
+\glspl{computation node}, two \glspl{value node}, \etc*.
+%
+For \glspl{value node}, their data types must also be compatible (as described
+in \refSection{uni-rep-data-types-of-values}).
+
+The same applies for two \glspl{edge}~$e$ and~\mbox{$d$\hspace{-.8pt},} with the
+additional condition that, for certain \glspl{node}, the order of compatible
+\glspl{edge} must also match.
+%
+Consequently, in a \gls{match} where $e$ and $d$ are connected to \glspl{node}
+representing non-commutative \glspl{operation} -- such as subtraction and
+division, but also memory stores and function calls -- the \gls{inbound.en}
+\glspl{edge number} of $e$ and $d$ must be identical.
+%
+This prevents the arguments of such \glspl{instruction} from being swapped,
+which would obviously break \gls{program} semantics.
+%
+Similarly, in a \gls{match} where $e$ and $d$ are connected to \glspl{node} with
+multiple outgoing \gls{edge} of the same type -- such as conditional jump
+\glspl{operation} -- the \gls{outbound.en} \glspl{edge number} of $e$ and $d$
+must be identical, thus preventing swapping of target labels.
+
+
+\subsection{Matching SIMD Instructions Efficiently}
+
+Although the \gls{VF2} algorithm supports matching of \glspl{pattern} derived
+from \gls{disjoint-output.ic} \glspl{instruction}, doing so directly will result
+in many redundant \glspl{match}.
+%
+For example, if a \gls{SIMD.i} \gls{pattern} consists of $k$ identical
+\glspl{operation} and the function contains $n$ such \glspl{operation}, then
+this \gls{pattern} alone will result in \mbox{$n! / (n - k)!$} \glspl{match}.
+%
+However, since all \gls{SIMD.i} \glspl{instruction} consist of disjoint
+\glspl{pattern} that are symmetric to one another, the order in which the
+\gls{pattern} \glspl{node} are mapped to \gls{function} \glspl{node} does not
+matter.
+%
+Hence at most $\binom{n}{k}$ \glspl{match} should be produced.
+
+To this end, instead of matching the full \gls{SIMD.i} \gls{pattern} over the
+\gls{UF graph}, we do so only for one of the disjoint \glspl{subgraph} in the
+\gls{pattern}.
+%
+After having found all \glspl{match} for the \gls{subgraph}, we then compute all
+combinations of these \glspl{match} and construct for each combination a
+\gls{match} of the full \gls{SIMD.i} \gls{pattern}.
+%
+We also ignore combinations that will lead to cyclic data dependencies by
+applying a variant of the method to be described in
+\refSection{forbidding-cyclic-data-dependencies} in the next chapter.
+
+To further reduce the number of \glspl{match}, we remove all \gls{SIMD.i}
+\glspl{match} where at least one of its arguments is a constant value.
+%
+This is because such values will typically always require the \gls{SIMD.i}
+\gls{instruction} to be preceded by a copy \gls{instruction}, which would
+typically nullify the benefit of the \gls{SIMD.i} \gls{instruction}.
+
+
+\section{Comparison with Other Sea-of-Nodes IRs}
+\labelSection{uni-rep-ir-comparison}
+
+The \gls{UF graph} is similar to the \gls{Click-Paleczny graph} (compare for
+example \refFigure{uf-graph-example-full-graph} on
+\refPageOfFigure{uf-graph-example-full-graph} with
+\refFigure{click-paleczny-graph-example} on
+\refPageOfFigure{click-paleczny-graph-example}).
+%
+Both are combinations of \glsshort{control-flow graph} and \glspl{SSA graph},
+they represent (some) of the control \glspl{operation} as \glspl{node}, and they
+can restrict the placement of \glspl{operation} to \glspl{block} through
+auxiliary edges.
+%
+However, the \gls{Click-Paleczny graph} does not completely fulfill
+\refRequirement{uni-rep-explicit-ops} as unconditional branches are not
+represented as \glspl{node}, nor does it fulfill
+\refRequirement{uni-rep-explicit-values} or
+\refRequirement{uni-rep-exactly-one-inbound-edge-for-values}.
+
+\textcite{BraunEtAl:2011} introduced another graph-based \gls{IR}, called
+\gls!{Firm}, that is based on the \gls{Click-Paleczny graph} and fulfills
+\refRequirement{uni-rep-explicit-ops}.
+%
+However, it does not fulfill \refRequirement{uni-rep-explicit-values} nor
+\refRequirement{uni-rep-exactly-one-inbound-edge-for-values}.
+
+
+\section{Summary}
+\labelSection{uni-rep-summary}
+
+In this chapter, we have introduced a novel graph-based representation, called
+\gls{universal representation}, that models both data and control flow on a
+global scope.
+%
+This means that entire \gls{function} can be captured as a single graph and that
+complex \glspl{instruction}, with or without control flow, can be modeled as
+\glspl{pattern}.
+%
+The \gls{universal representation} also provides enough freedom to move
+computations from one \gls{block} to another without breaking \gls{program}
+semantics.
+%
+These features jointly enable the problems of \gls{global.is} \gls{instruction
+  selection}, \gls{global code motion}, and \gls{data copying} to be modeled as
+a \gls{constraint model}, which is introduced in the next chapter.

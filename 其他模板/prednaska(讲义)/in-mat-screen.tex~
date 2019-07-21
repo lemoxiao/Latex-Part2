@@ -1,0 +1,737 @@
+\documentclass{report}
+
+
+
+
+
+
+\usepackage[%latextoc,
+usetemplates,navibar,czech,pdftex]{web}
+
+\long\def\DVIorPDF#1#2{#2}
+\usepackage[pdftex]{eforms}
+\usepackage{color}
+\usepackage[filename=tooltipy,movetips,mouseover]{fancytooltips}
+
+
+\usepackage{hvmaths}
+\usepackage[scaled=0.9]{helvet}
+\usepackage[czech]{babel}
+\AtBeginDocument{\catcode`\-=12 \catcode`\"=12}
+\usepackage[IL2]{fontenc}
+
+
+\makeatletter
+
+\def\PRVNI#1#2#3{%
+% Pokud jeste na strane #3 nebylo heslo #1, schovame si cislo tooltipu, ktery sel jako prvni.
+\expandafter\xdef\csname ttp:#2\endcsname{#3}%
+\expandafter\ifx\csname #1:#3\endcsname\relax
+\expandafter\xdef\csname #1:#3\endcsname{#2}\fi}
+
+\def\PRVNIM#1#2#3{% ale vyskyty ve vetach a definicih maji prednost
+\expandafter\xdef\csname ttp:#2\endcsname{#3}%
+\expandafter\xdef\csname #1:#3\endcsname{#2}}
+
+\newcount\ttpcount 
+\newcount\ttpaction 
+\newtoks\ttpactiontoks
+\ttpactiontoks{\thepage} 
+
+\def\anone#1{\global\advance\ttpcount by 1
+  \edef\act{\noexpand\write\noexpand\@auxout{\noexpand\string
+      \noexpand\PRVNI{#1}{\the\ttpcount}{\the\ttpactiontoks}}}%
+  \act
+  \edef\pom{\the\ttpcount}%
+  \expandafter\ifx\csname ttp:\the\ttpcount\endcsname\relax
+  \expandafter\xdef\expandafter\pomm\expandafter{}%
+  \else
+  \expandafter\xdef\expandafter\pomm\expandafter{\csname ttp:\the\ttpcount\endcsname}\fi%
+  \expandafter\ifx\csname #1:\pomm\endcsname\pom
+  \global\ttpaction=1\else \global\ttpaction=0\fi\relax
+  }
+
+\def\anoneM#1{\global\advance\ttpcount by 1
+  \edef\act{\noexpand\write\noexpand\@auxout{\noexpand\string
+      \noexpand\PRVNIM{#1}{\the\ttpcount}{\the\ttpactiontoks}}}%
+  \act
+  }
+
+
+\newcount\tooltip@count
+\newtoks\tooltip@toks
+\newtoks\tooltip@pagetoks
+\tooltip@pagetoks={\thepage}
+\def\tooltippage{}
+
+\def\TooltipPage#1#2{
+\expandafter\gdef\csname TooltipPage#2\endcsname{#2}
+\expandafter\gdef\csname Tooltipcount2page#1\endcsname{#2}
+}
+
+
+\def\ttpan#1{%
+  \anone{#1}%
+  \global\advance\tooltip@count by 1
+  \edef\act{\write\@auxout{\noexpand\string\noexpand\TooltipPage{\the\tooltip@count}{\the\tooltip@pagetoks}}}\act
+  \edef\tooltippage{\csname Tooltipcount2page\the\tooltip@count \endcsname}%
+  \checkTipNumber{#1}\edef\TipNumber{\FindTipNumber{#1}}%
+  \ifnum\ttpaction=1
+  \setbox0=\hbox{{\raisebox{0.3em}{\includegraphics[width=0.7em]%
+        {fancytipmark.pdf}}}}\hbox to 0 pt{\hskip -0.0em\copy0\hss}%
+  \hbox to 0 pt{\hskip -0.0em%
+    \pushButton[\BC{}\BG{}\S{}\AA{\AAMouseExit{\JS{CloseTooltips();}}
+      \AAMouseEnter{\JS{this.getField("ikona."+(\tooltippage)).hidden=false;
+          try {app.clearInterval(animace);}catch (e) {}
+          \ifmovetips nastav(\TipNumber,\tooltippage);\fi
+          zobraz(\TipNumber,\tooltippage);
+        }}}]
+    {TooltipField}{\wd0}{\ht0}\hss}
+%  \else\hbox to 0 pt{\hss\textbf{**}\hss}
+\fi
+}
+
+\def\ttpa#1{%
+  \anoneM{#1}%
+  \global\advance\tooltip@count by 1
+  \edef\act{\write\@auxout{\noexpand\string\noexpand\TooltipPage{\the\tooltip@count}{\the\tooltip@pagetoks}}}\act
+  \edef\tooltippage{\csname Tooltipcount2page\the\tooltip@count \endcsname}%
+  \checkTipNumber{#1}\edef\TipNumber{\FindTipNumber{#1}}%
+  \setbox0=\hbox{{\raisebox{0.3em}{\includegraphics[width=0.7em]%
+        {fancytipmark.pdf}}}}\hbox to 0 pt{\hskip -0.0em\copy0\hss}%
+  \hbox to 0 pt{\hskip -0.0em%
+  \pushButton[\BC{}\BG{}\S{}\AA{\AAMouseExit{\JS{CloseTooltips();}}
+    \AAMouseEnter{\JS{this.getField("ikona."+(\tooltippage)).hidden=false;
+      try {app.clearInterval(animace);}catch (e) {}
+      \ifmovetips nastav(\TipNumber,\tooltippage);\fi
+      zobraz(\TipNumber,\tooltippage);
+    }}}]
+  {TooltipField}{\wd0}{\ht0}\hss}}
+
+% \let\ttpan\ttpa
+\let\ttp\ttpan
+\let\wtp\relax
+
+\def\atp#1#2{%
+  \global\advance\tooltip@count by 1
+  \edef\act{\write\@auxout{\noexpand\string\noexpand\TooltipPage{\the\tooltip@count}{\the\tooltip@pagetoks}}}\act
+  \edef\tooltippage{\csname Tooltipcount2page\the\tooltip@count \endcsname}%
+  \checkTipNumber{#1}\edef\TipNumberA{\FindTipNumber{#1}}%
+  \checkTipNumber{#2}\edef\TipNumberB{\FindTipNumber{#2}}%
+  \setbox0=\hbox{{\raisebox{0.3em}{\includegraphics[width=0.7em]%
+        {fancytipmark.pdf}}}}\hbox to 0 pt{\hskip -0.0em\copy0\hss}%
+  \hbox to 0 pt{\hskip -0.0em%
+  \pushButton[\BC{}\BG{}\S{}\AA{\AAMouseExit{\JS{CloseTooltips();}}
+  \AAMouseEnter{\JS{
+      try {app.clearInterval(animace);}catch (e) {}
+      var cislo=\TipNumberA;
+      \ifmovetips nastav(\TipNumberA,\tooltippage);\fi
+      function animuj()
+      {
+        if (cislo<\TipNumberB) cislo=cislo+1;
+        this.getField('ikona.'+(\tooltippage)).buttonSetIcon(this.getField("animtiph."+cislo).buttonGetIcon());
+      };
+      this.getField('ikona.'+(\tooltippage)).buttonSetIcon(this.getField("animtiph."+\TipNumberA).buttonGetIcon());
+      this.getField("ikona."+(\tooltippage)).hidden=false;
+      animace=app.setInterval('animuj();', \delayinterval);
+    }}}
+  ]{TooltipField}{\wd0}{\ht0}\hss}}
+\makeatother
+
+
+
+
+\makeatletter
+\renewcommand{\sectionmark}[1]{%
+  \markright{\web@section\ \thechapter.\thesection: #1}}
+
+
+\renewcommand\web@navigationbar{%
+\hfil\bfseries\footnotesize
+\insertwebtoc
+\web@FirstPage\
+\web@LastPage\
+\web@PrevPage\
+\web@NextPage\
+\web@GoBack\
+\hfil}
+
+
+\def\insert@webtoc{\hyperlink{webtoc}
+    {\web@colorbox@w@transparency{\@menuBgColor}%
+{\makebox[30pt][c]{\footnotesize\color{webblue}Obsah}}\ }}
+
+
+\def\webtableofcontents
+{%
+    \begingroup
+    \parindent=\toc@indent
+    \settowidth{\@tempdima}{\normalfont\textbf{\widest@Number})}%
+    \@tempdimb = \@tempdima
+    \advance\@tempdimb by\parindent
+    \def\par{\endgraf\leftskip=0pt}%
+    \def\numberline##1{\makebox[0pt]{##1 AAA\enspace}}%
+    \def\contentsline##1##2##3##4{%
+        \csname web@##1\endcsname{##2}{##3}{##4}}%
+    \def\web@parse##1##2##3\\{%
+        \def\web@title{##3}\def\numberline{##2}}%
+    \def\web@part##1##2##3{%
+        \par\noindent{\bfseries\hyperlink{##3}{##1}}\par\smallskip}
+    \def\web@chapter##1##2##3{%
+        \web@parse##1\\\par\bigskip\mbox{}\textbf{%
+        \makebox[0pt][r]{\hyperlink{##3}
+            {\numberline.\phantom{0}}\space}\web@title{} \\\smallskip}%
+    }%
+    \def\web@section##1##2##3{%
+        \penalty-500\web@parse##1\\\par\smallskip\mbox{}\textbf{%
+            \ifx\numberline\empty
+                \hyperlink{##3}{\web@title}%
+            \else
+                \makebox[0pt][r]{\hyperlink{##3}{\numberline.}\space}%
+                \web@title
+            \fi}%
+        \endgraf
+    }%
+    \def\web@section##1##2##3{\web@parse##1\\\par\smallskip
+        \penalty-50 \hspace*{\@tempdima}\mbox{}\textbf{%
+        \makebox[0pt][r]{\makebox[\@tempdima][l]%
+        {\hyperlink{##3}{\numberline.}}}\web@title}\endgraf
+    }%
+    \def\web@section##1##2##3{%
+        \web@parse##1\\\def\numberline{\strut$\color{webgreen}\bullet$}%
+    \leftskip\@tempdimb\noindent\unskip\mbox{}\penalty-50
+    \hyperlink{##3}{\numberline}~\web@title\ }%
+    \def\web@subsection##1##2##3{\ignorespaces%
+  %      \web@parse##1\\\def\numberline{\strut$\color{webgreen}\bullet$}%
+  %  \leftskip\@tempdimb\noindent\unskip\mbox{}\penalty-50
+  %  \hyperlink{##3}{\numberline}~\web@title\ 
+  }%
+    \def\web@subsubsection##1##2##3{\ignorespaces%
+  %      \web@parse##1\\\def\numberline{\strut$\color{webgreen}\bullet$}%
+  %  \leftskip\@tempdimb\noindent\unskip\mbox{}\penalty-50
+  %  \hyperlink{##3}{\numberline}~\web@title\ 
+  }%
+    \@starttoc{toc}
+    \leftskip\@tempdimb
+    \par\endgroup
+}
+
+
+   \def\hyper@refstepcounter#1{%
+     \edef\This@name{#1}%
+     \ifx\This@name\name@of@eq
+       \make@stripped@name{\theequation}%
+       \let\theHequation\newname
+     \fi
+     \@ifundefined{theH#1}{%
+       \expandafter\def\csname theH#1\endcsname{Chap.:\theHchapter.\thesection.\arabic{#1}}%
+ %  %%%%%%%%%%%%%%% uprava R.M. listopad 2003
+     }{}%
+     \hyper@makecurrent{#1}%
+     \ifmeasuring@
+     \else
+       \Hy@raisedlink{%
+         \hyper@anchorstart{\@currentHref}\hyper@anchorend
+       }%
+     \fi
+   }
+   \def\make@stripped@name#1{%
+    \begingroup
+      \escapechar\m@ne
+      \global\let\newname\@empty
+      \protected@edef\Hy@tempa{Chap.:\theHchapter.#1}%
+ %  %%%%%%%%%%%%%%% uprava R.M. listopad 2003
+      \edef\@tempb{%
+        \noexpand\@tfor\noexpand\Hy@tempa:=%
+          \expandafter\strip@prefix\meaning\Hy@tempa
+      }%
+      \@tempb\do{%
+        \if{\Hy@tempa\else
+          \if}\Hy@tempa\else
+            \xdef\newname{\newname\Hy@tempa}%
+          \fi
+        \fi
+      }%
+    \endgroup
+  }
+ \makeatother
+
+\hypersetup{bookmarks=true,pdfpagemode=UseOutlines}
+
+
+% \usepackage[czech]{babel}
+\def\uv#1{\leavevmode\clqq#1\crqq}
+% \usepackage[IL2]{fontenc}
+% \usepackage{mathpazo}
+% \usepackage{times}
+\usepackage{amsmath,amsfonts,bm}
+\usepackage{mdwlist}
+
+
+\def\uv#1{``#1''}
+\usepackage{multido}
+
+
+\long\def\obrazek#1{#1}
+\usepackage[metapost]{mfpic}
+\clipmfpic
+
+
+% \usepackage{epsf}
+% \usepackage{psfrag}
+\hypersetup{hypertexnames=false}
+\setlength\parindent{0pt}
+\usepackage{amsthm}
+
+\makeatletter
+\def\th@definition{\normalfont \thm@headfont{\bfseries}}
+\def\th@plain{\thm@headfont{\bfseries} \itshape }
+\makeatother
+
+\theoremstyle{plain}
+
+\topskip 0 pt plus 40 pt
+ \newtheorem{vetapom}{\color{red}Vìta}[section]
+ \newenvironment{veta}{\par\penalty -100\bgroup\let\ttp\ttpa\begin{vetapom}
+ }{\end{vetapom}\egroup}
+
+
+
+\theoremstyle{definition} 
+\newtheorem{definice}{Definice}[section]
+%\newtheorem{ddefinice}{Definice}[section]
+\newtheorem{poznamka}{Poznámka}[section] 
+\newtheorem{priklad}{%\hbox to  0pt{\hss\HandPencilLeft\quad}
+Pøíklad}[section]
+\def\theenumi{(\roman{enumi})} \def\labelenumi{\theenumi}
+
+
+
+
+\makeatletter
+\@addtoreset{equation}{section} 
+\def\zacatek{\@ifnextchar[{\speczacatek}{\normalzacatek}}
+\def\normalzacatek{\textbf{.} }
+\def\speczacatek[#1]{ (#1)\textbf{.} }
+\makeatother
+
+\def\theequation{\thesection.\arabic{equation}}
+\def\theveta{\thesection.\arabic{veta}}
+\def\koment(#1){\hfill\penalty
+  0\null\nobreak\hfill\nobreak\hbox{\textit{#1}}} 
+\def\hop{\kern 2mm}
+\def\oramujbox#1{\hbox{\vrule \vbox{\hrule\hop\hbox{\hop
+        \vbox{\parindent 0pt \advance \hsize by -4mm #1}\hop
+      }\hop\hrule}\vrule}} 
+
+
+
+
+\input fig2
+\setlength\parindent{0pt}
+
+\def\Dom{D}
+\def\Im{H}
+
+\let\epsilon\varepsilon
+\let\phi\varphi
+\def\dx{\,\mathrm{d}x}
+\def\dy{\,\mathrm{d}y}
+\def\dt{\,\mathrm{d}t}
+\def\dd{\,\mathrm{d}}
+\def\implies{\Rightarrow}
+
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\Q{\mathbb{Q}}
+\def\Z{\mathbb{Z}}
+\def\N{\mathbb{N}}
+\let\mathbf\bm
+
+
+\input mat-mak
+\def\posledniradek{\konec}
+\def\cdotsp{\noexpand\cdots}
+\def\vertp{\noexpand\vdots}
+\def\diagp{\noexpand\ddots}
+% \def\cdotsp{...}
+% \def\vertp{:}
+% \def\diagp{:.}
+
+\interdisplaylinepenalty 50
+
+\raggedbottom 
+
+
+\def\appendixname{PØÍLOHA}
+
+\newdimen \stranka
+% \stranka=\hsize
+\font\manfnt=manfnt at 7 pt
+\def\DUL{\setbox0=\hbox to \hsize{\hskip \hsize \kern 0.25in \hbox to
+    0 pt{\hss\manfnt \char "7F}\hss %\kern -0.6cm
+}%
+   \ht0=-3.5pt\dp0=3.5pt \strut\vadjust{{\color{red} \box0}}}
+
+
+% \DeclareFontFamily{OT1}{mvs}{}
+% \DeclareFontShape{OT1}{mvs}{m}{n}{<-> fmvr8x}{}
+% \def\mvs{\usefont{OT1}{mvs}{m}{n}}
+% \def\mvchr{\mvs\char}
+% \def\textmvs#1{{\mvs #1}}
+% \def\Lightning{{\mvchr69}}
+
+\usepackage{marvosym}
+
+
+\font\manfnt=manfnt at 7 pt
+\def\DUL{\setbox0=\vbox to 0 pt{\vss\hbox to \hsize{\hskip \hsize \kern 0.3in \hbox to
+    0 pt{\hss%\manfnt \char "7F
+%\small\HandCuffLeft
+\color{red}
+\LARGE \Lightning
+}\hss %\kern -0.6cm
+}\vss}%
+%\ht0=-3.5pt\dp0=3.5pt 
+\strut\vadjust{\box0}}
+
+\def\kvizy#1{\setbox0=\vbox to 0 pt{\vss\hbox to \hsize{\hskip \hsize \kern 0.20in \hbox to
+    0 pt{\hss%\manfnt \char "7F
+%\small\HandCuffLeft
+\color{blue}
+\def\nic{}\def\neco{#1}
+\ifx\nic\neco \def\jmeno{http://user.mendelu.cz/marik/index.php?item=32} \else \def\jmeno{http://user.mendelu.cz/marik/kvizy/#1.pdf}\fi
+\href{\jmeno}{\Large \Writinghand}
+}\hss %\kern -0.6cm
+}\vss}%
+%\ht0=-3.5pt\dp0=3.5pt 
+\strut\vadjust{\box0}}
+
+\def\podcast#1{\setbox0=\vbox to 0 pt{\vss\hbox to \hsize{\hskip \hsize \kern 0.25in \hbox to
+    0 pt{\hss%\manfnt \char "7F
+%\small\HandCuffLeft
+\color{blue}
+\def\jmeno{http://user.mendelu.cz/marik/podcasts/podcasts.php?#1}
+\href{\jmeno}{\Large \Info}
+}\hss %\kern -0.6cm
+}\vss}%
+%\ht0=-3.5pt\dp0=3.5pt 
+\strut\vadjust{\box0}}
+
+
+\def\maw#1{\def\odkaz{http://user.mendelu.cz/marik/maw/index.php?form=#1}\linkmaw}
+\def\pdfcalc#1{\def\odkaz{#1}\linkmaw}
+
+\def\linkmaw{\setbox0=\vbox to 0 pt{\vss\hbox to \hsize{\hskip \hsize \kern 0.25in \hbox to
+    0 pt{\hss%\manfnt \char "7F
+%\small\HandCuffLeft
+\color{blue}%
+\href{\odkaz}{\Large \Printer}%
+}\hss %\kern -0.6cm
+}\vss}%
+%\ht0=-3.5pt\dp0=3.5pt 
+\strut\vadjust{\box0}}
+
+
+
+
+
+
+\definecolor{LemonChiffon}{rgb}{1.,0.98,0.8}
+\definecolor{LightBlue}   {rgb}{0.8,0.85,0.95}
+\definecolor{PaleGreen}   {rgb}{0.88,1,0.88}
+\definecolor{PeachPuff}   {rgb}{1.0,0.85,0.73}
+\definecolor{brown}{rgb}{.65, .16, .16}
+\definecolor{lightblue}{rgb}{.68, .85, .9}
+\definecolor{palegreen}{rgb}{.6, .98, .6}
+\definecolor{pink}{rgb}{1, .75, .8}
+\definecolor{wheat}{rgb}{.96, .87, .7}
+\definecolor{svetlapsenice}{rgb}{.98, .93, .85}
+\definecolor{svetlapsenice}{rgb}{.97, .90, .78}
+
+
+
+\raggedbottom
+
+
+
+\color{black}  
+%%%%%%%%%%%%%%%%%%%%%% Zmeny barev v matematice a kurzive
+\let\originaltextit\textit
+\def\textit#1{{\color{red}\originaltextit{#1}}}
+\let\originaltext\text
+\def\text#1{{\color{black}\originaltext{#1}}}
+\everymath{\displaystyle \matikacolor}
+\definecolor{darkblue}{rgb}{0,0,0.85}
+\def\matikacolor{\color{darkblue}}
+\def\textb#1{\text{\matikacolor#1}}
+\makeatletter
+\def\mathdisplay@push{\matikacolor}
+\def\th@definition{\normalfont \thm@headfont{\bfseries}}
+\def\th@plain{\thm@headfont{\bfseries} \itshape }
+\makeatother
+
+\emergencystretch=1cm
+
+
+\usepackage{amsthm}
+
+\makeatletter
+\def\th@definition{\normalfont \thm@headfont{\bfseries}}
+\def\th@plain{\thm@headfont{\bfseries} \itshape }
+\makeatother
+
+\theoremstyle{plain}
+
+% \newtheorem{veta}{%\hbox to 0pt{\hss\HandRight \quad}
+% Vìta}[section]
+
+
+\makeatletter
+\@addtoreset{equation}{section}
+\def\zacatek{\@ifnextchar[{\speczacatek}{\normalzacatek}}
+\def\normalzacatek{\textbf{.} }
+\def\speczacatek[#1]{ (#1)\textbf{.} }
+\makeatother
+\def\theequation{\thesection.\arabic{equation}}
+\def\koment(#1){\hfill\penalty
+  0\null\nobreak\hfill\nobreak\hbox{\textit{#1}}} \def\hop{\kern 2mm}
+\def\oramujbox#1{\hbox{\vrule \vbox{\hrule\hop\hbox{\hop
+        \vbox{\parindent 0pt \advance \hsize by -4mm #1}\hop
+      }\hop\hrule}\vrule}}
+
+\renewenvironment{definice}{\refstepcounter{definice}
+\setbox0=\vbox
+\bgroup\noindent\advance\hsize by -2\fboxsep\relax
+\let\ttp\ttpa
+\linewidth=\hsize\textbf{Definice}\zacatek
+}{\egroup\par\smallbreak\noindent\fbox{\box0}\smallskip}
+
+
+\input fig2
+\parindent 0pt
+
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\tg}{tg}
+\DeclareMathOperator{\arctg}{arctg}
+\DeclareMathOperator{\arccotg}{arccotg}
+\let\epsilon\varepsilon
+\let\eps\epsilon
+\let\phi\varphi
+\def\dx{\,\mathrm{d}x}
+\def\dy{\,\mathrm{d}y}
+\def\dt{\,\mathrm{d}t}
+\def\dr{\,\mathrm{d}r}
+\def\du{\,\mathrm{d}u}
+\def\dv{\,\mathrm{d}v}
+\def\dphi{\,\mathrm{d}\phi}
+\def\dd{\,\mathrm{d}}
+
+\def\implies{\Rightarrow}
+
+
+
+%\pagestyle{plain}
+%\pagestyle{headings}
+
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\Q{\mathbb{Q}}
+\def\Z{\mathbb{Z}}
+\def\N{\mathbb{N}}
+
+\DeclareMathOperator{\adj}{adj}
+\DeclareMathOperator{\tr}{Tr}
+
+\input mat-mak
+\def\posledniradek{\konec}
+\def\cdotsp{...}
+\def\vertp{:}
+\def\diagp{:.}
+
+\interdisplaylinepenalty 50
+
+\raggedbottom
+\def\appendixname{PØÍLOHA}
+
+%%%%%%%%%%%% Pro oboustranny tisk
+ %\addtolength{\oddsidemargin}{12mm}
+ %\addtolength{\evensidemargin}{-12mm}
+\let\overbar\overline
+
+\makeatletter
+% \def\@maketitle{%
+%   \cleardoublepage \thispagestyle{empty}%
+%   \begingroup \topskip\z@skip
+%   \null\vfil
+%   \begingroup
+%   \LARGE\bfseries \centering
+%   \openup\medskipamount
+%   \@title\par\vspace{24pt}%
+%   \def\and{\par\medskip}\centering
+%   \mdseries\authors\par\bigskip
+%   \endgroup
+%   \vfil
+%   \begin{center}\epsfbox{logocb.eps}  \end{center}
+%   \ifx\@empty\addresses \else \@setaddresses \fi
+%   \vfil
+%   \ifx\@empty\@dedicatory
+%   \else \begingroup
+%     \centering{\footnotesize\itshape\@dedicatory\@@par}%
+%     \endgroup
+%   \fi
+% %   \vfill
+% \vfil
+% %   \newpage\thispagestyle{empty}
+%   \begin{center}
+%     \ifx\@empty\@subjclass\else\@setsubjclass\fi
+%     \ifx\@empty\@keywords\else\@setkeywords\fi
+%     \ifx\@empty\@translators\else\vfil\@settranslators\fi
+%     \ifx\@empty\thankses\else\vfil\@setthanks\fi
+%   \end{center}
+%   \vfil
+%   \@setabstract
+%   \endgroup
+%   \newpage}
+
+\makeatother
+
+\def\blokobrazek{}
+
+
+
+
+\screensize{4.875in}{6.5in}
+\margins{12pt}{24pt}{24pt}{24pt}
+\usepackage[colored]{shadethm}
+% \newshadetheorem{veta}{%\hbox to 0pt{\hss\HandRight \quad}
+% Vìta}[section]
+
+\renewenvironment{shadebox}%   % shadow boxes or something. 
+{\begin{lrbox}{\shadesavebox}\begin{minipage}{\shadedtextwidth}%
+\normalcolor\shadesetinsideminipage}%
+{\end{minipage}\end{lrbox}%
+\begin{trivlist}\item[]% In a trivlist because theorems are in trivlists.
+\setlength{\fboxsep}{\shadeboxsep}%
+\setlength{\fboxrule}{\shadeboxrule}%
+\mbox{\hspace{\shadeleftshift}\fcolorbox{shaderulecolor}{shadethmcolor}{\usebox{\shadesavebox}}\hspace{\shaderightshift}}%
+\end{trivlist}}
+
+
+
+\newshadetheorem{ddefinice}{Definice}[section]
+
+%%%%%%%%%%%% Definice oramovana, pres shadetheorem a ddefinice
+%  \definecolor{shadethmcolor}{gray}{.92}  
+%  \definecolor{shaderulecolor}{gray}{0}
+ \renewenvironment{definice}{%
+%   \let\ttp\ttpa
+ \bgroup\let\oldtextit\textit \color{black}\def\textit##1{\oldtextit{\color{red}##1}}%
+ \begin{ddefinice}}{\end{ddefinice}\egroup}
+
+
+\let\rmdefault\sfdefault
+
+\definecolor{pozadi}{rgb}{1,1,0.9}
+\pagecolor{pozadi}
+
+
+\begin{document}
+
+
+  \author{Robert Maøík\\
+    \href{http://www.mendelu.cz}{MZLU v Brnì}\\
+  \href{mailto:marik@mendelu.cz}{marik@mendelu.cz}, \\
+  \href{http://user.mendelu.cz/marik}{http://user.mendelu.cz/marik}
+}
+
+   \title{\textsc{In¾enýrská matematika}}
+
+   \def\optionalpagematter{
+     \begin{center}
+       \colorbox{lightgray}{\begin{minipage}{0.75\hsize}\normalcolor
+           Uèební text k mým pøedná¹kám z pøedmìtu In¾enýrská
+           matematika.  Text je ¹íøen z~adresy
+           \url{http://user.mendelu.cz/marik}, kde je dostupný ve
+           formì vhodné pro tisk i ve formì vhodné pro prohlí¾ení na
+           obrazovce z adresy \url{http://is.mendelu.cz/eknihovna/}, kde je ve formì elearningového kurzu.\\
+           Pro pøípadné jiné pou¾ití ne¾ pro pøípravu ke zkou¹ce si
+           prostudujte
+           \href{http://user.mendelu.cz/marik/licence.html}{licenèní
+             podmínky.}
+         \end{minipage}
+       }
+     \end{center}
+}
+
+ \maketitle
+
+\newpage
+
+Text obsahuje nìkolik interaktivních prvkù.
+
+\begin{itemize}\item 
+  V textu jsou takzvaná ``oslí okénka\ttp{ukazka}'' -- nìkteré
+  dùle¾ité pojmy jsou doprovázeny modrými bublinami\footnote{Pokud se
+    dané dùle¾ité slovo vyskytuje na stránce vícekrát, automatický
+    mechanismus tvorbu nápovìdných bublin potlaèuje, tak aby ka¾dý
+    pojem ke kterému je k dispozici nìjaká nápovìda, mìl tuto nápovìdu
+    uvedenu jenom jednou -- a to pøednostnì ve vìtì èi v definici.},
+  které jsou aktivní a po najetí na tyto bubliny se ètenáøi otevøe
+  okénko pøipomínající definici, vyu¾ití a metodu výpoètu, které se
+  týkají daného pojmu (vyzkou¹ejte si to na této stránce). Musíte
+  pou¾ít komerèní Adobe Acrobat nebo volnì ¹iøitelný Adobe Reader,
+  abyste tyto mo¾nosti mohli vyu¾ívat.
+\item Je-li text na pravém okraji doprovázen ikonou\kvizy{}, tak jako tento
+  odstavec, je mo¾no si kliknutím na ikonu otevøít interaktivní test
+  na procvièení pøíslu¹ného pojmu èi metody. 
+\item Takto vyznaèený odstavec obsahuje obzvlá¹» dùle¾itou informaci. \DUL{}
+\item K nìkterým pasá¾ím testu jsou pøipojeny zvukové komentáøe.
+  Poznáte je podle ikony, jaká doprovází i tento odstavec. \podcast{} 
+\item Pro nìkteré typy úloh jsou k textu vytvoøeny online kalkulátory,
+  které usnadní øe¹ení nebo umo¾ní vygenerovat øe¹ení úlohy vèetnì
+  postupu. Odkazy na tyto kalkulátory jsou oznaèeny ikonou, která
+  doprovází i tento odstavec. \maw{}
+\end{itemize}
+
+\vfill 
+Tento uèební materiál byl vytvoøen s podporou grantu 99/2008 Fondu rozvoje vysokých ¹kol.
+\newpage
+
+\tableofcontents
+\thispagestyle{empty}
+\def\thispagestyle#1{\relax}
+\newpage
+\topskip 0 pt plus 50 pt
+
+
+\chapter{Diferenciální poèet funkcí dvou promìnných}
+\input{dveprom}
+
+\chapter{Diferenciální rovnice}
+\input{drce}
+
+
+\opengraphsfile{autsyst}
+\mfpicunit=1pt
+\chapter{Autonomní systémy}
+\input{autsyst}
+\closegraphsfile
+
+\opengraphsfile{obrint}
+\mfpicunit=1cm
+\chapter{Dvojný integrál}
+\input{dvojint}
+\closegraphsfile
+
+\opengraphsfile{obrdr}
+\tlabelsep{3pt}
+\mfpicunit=1pt
+\chapter{Numerické øe¹ení diferencálních rovnic}
+\input{numerika}
+\closegraphsfile
+
+\end{document}
+
+
+

@@ -1,0 +1,18 @@
+load(ctensor);
+ct_coords:[t,r,phi,z];
+c: cos(sqrt(3)*r);
+s: sin(sqrt(3)*r);
+tt : exp(r)*c;
+phit : exp(r)*s;
+lg:matrix([tt,0,phit,0],
+          [0,-1,0,0],
+          [phit,0,-tt,0],
+          [0,0,0,-exp(-2*r)]
+);
+cmetric();
+lriemann(false);
+uriemann(false);
+R:scurvature(); /* scalar curvature */
+k:rinvariant (); /* Kretchmann */
+taylor(R,r,0,12);
+taylor(k,r,0,12);

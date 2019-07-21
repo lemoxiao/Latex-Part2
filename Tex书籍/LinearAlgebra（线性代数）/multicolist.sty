@@ -1,0 +1,240 @@
+%%
+%% This is file `multicolist.sty',
+
+\NeedsTeXFormat{LaTeX2e}[1997/12/01]
+\ProvidesPackage{multicolist}
+         [2011/11/06 version 1.0]
+
+\RequirePackage{varwidth,calc}
+
+\newif\if@mcl@left@\@mcl@left@false
+\newif\if@mcl@top@\@mcl@top@true
+\newif\if@mcl@adjust@\@mcl@adjust@false
+
+\DeclareOption{flushleft}{\@mcl@left@true}
+\DeclareOption{alwaysadjust}{\@mcl@adjust@true}
+\DeclareOption{neveradjust}{\@mcl@adjust@false}
+
+\ExecuteOptions{alwaysadjust}
+
+\ProcessOptions\relax
+
+\def\@mcl@if@empty#1#2#3{%
+  \def\@mcl@tempa{#1}%
+  \ifx\@mcl@tempa\@empty#2\else#3\fi}
+
+\def\itemcolsinlist{\@mcl@top@false}
+
+\newskip\runitemsep
+\runitemsep = 1em \@plus .5em \@minus .5em
+
+\newenvironment{runitem}{%
+    \ifnum\@itemdepth >\thr@@
+      \@toodeep
+    \else
+      \advance\@itemdepth\@ne
+      \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+      \def\@itemlabel{\csname\@itemitem\endcsname}%
+      \let\@item\@mcl@run@item
+      \let\par\relax
+      \ignorespaces
+    \fi}
+  {\unskip\hspace\runitemsep\ignorespacesafterend}
+\newenvironment{runenumitem}{%
+    \ifnum\@enumdepth >\thr@@
+      \@toodeep
+    \else
+      \advance\@enumdepth\@ne
+      \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
+      \usecounter{\@enumctr}%
+      \def\@itemlabel{\csname label\@enumctr\endcsname}%
+      \let\@item\@mcl@run@item
+      \let\par\@empty
+      \ignorespaces
+    \fi}%
+  {\unskip\hspace\runitemsep\ignorespacesafterend}
+\def\@mcl@run@item[#1]{%
+  \ifhmode
+    \unskip\hspace\runitemsep
+  \else
+    \leavevmode
+  \fi
+  \if@noitemarg
+    \@noitemargfalse
+    \if@nmbrlist
+      \refstepcounter{\@listctr}%
+    \fi
+  \fi
+  \mbox{#1}\kern\labelsep\ignorespaces}
+
+\newdimen\listcolswidth
+\newdimen\totalistcolswidth
+\newdimen\listcolsleftmargin
+\totalistcolswidth=.5\textwidth
+\listcolsleftmargin=\leftmargini
+
+\newenvironment{multitems}[1][]{%
+    \ifnum\@itemdepth >\thr@@
+      \@toodeep
+      \let\@end@mcl@item\relax
+    \else
+      \ifx\item\@mcl@item@
+        \@mcl@nesterr
+        \let\@end@mcl@item\relax
+      \else
+        \if@mcl@top@
+          \advance\@itemdepth\@ne
+          \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+        \fi
+        \list{}{\leftmargin\listcolsleftmargin
+                \parsep\parskip
+                \partopsep\z@
+                \topsep\z@
+                \itemindent\z@}%
+        \item\relax
+        \@rightskip\@flushglue
+        \rightskip\@rightskip
+        \let\@end@mcl@item\noindent
+        \let\item\@mcl@item@
+        \def\@itemlabel{\csname\@itemitem\endcsname}%
+        \settowidth\labelwidth{\@itemlabel}%
+        \@mcl@if@empty{#1}{%
+          \listcolswidth\dimexpr\totalistcolswidth-\labelwidth-\labelsep\relax}{%
+          \settowidth\listcolswidth{#1}}%
+        \totalistcolswidth\dimexpr\listcolswidth+\labelwidth+\labelsep\relax
+      \fi
+    \fi\ignorespaces}%
+  {\@end@mcl@item\endlist}
+
+\if@mcl@adjust@
+  \newdimen\@mclaw@t
+  \newdimen\@mclaw@s
+  \newcount\@mcl@cur@ctr
+\fi
+
+\newif\if@mcl@adjust@o@ \@mcl@adjust@o@false
+\newif\if@mcl@adj@it@   \@mcl@adj@it@false
+\newif\if@mcl@no@arg@   \@mcl@no@arg@false
+
+\newenvironment{multienumitems}[1][]{%
+    \ifnum\@enumdepth >\thr@@
+      \@toodeep
+      \let\@end@mcl@item\relax
+    \else
+      \ifx\item\@mcl@item@
+        \@mcl@nesterr
+        \let\@end@mcl@item\relax
+      \else
+        \if@mcl@top@
+          \if@mcl@adjust@
+            \global\advance\@mcl@cur@ctr\@ne
+            \edef\@mcl@cnt{mclabel@\romannumeral\the\@mcl@cur@ctr}%
+          \fi
+          \advance\@enumdepth\@ne
+          \edef\@enumctr{enum\romannumeral\the\@enumdepth}%
+        \fi
+        \list{}{\leftmargin\listcolsleftmargin
+                \parsep\parskip
+                \partopsep\z@
+                \topsep\z@
+                \itemindent\z@}%
+        \item\relax
+        \@rightskip\@flushglue
+        \rightskip\@rightskip
+        \def\@itemlabel{\csname label\@enumctr\endcsname}%
+        \settowidth\labelwidth{\@itemlabel}%
+        \@nmbrlisttrue
+        \def\@listctr{\@enumctr}%
+        \if@mcl@top@
+          \setcounter{\@enumctr}{\@ne}%
+          \if@mcl@adjust@
+            \settowidth\@mclaw@t{\@itemlabel}%
+            \settowidth\@mclaw@s{\@itemlabel}%
+            \@ifundefined{\@mcl@cnt}{\labelwidth=\@mclaw@s\relax}{%
+              \setlength\labelwidth{\@nameuse{\@mcl@cnt}}%
+              \@mcl@adjust@o@true
+              \advance\@mclaw@s-\labelwidth}%
+          \else
+            \settowidth\labelwidth{\@itemlabel}%
+          \fi
+          \setcounter{\@enumctr}\z@
+        \fi
+        \@mcl@if@empty{#1}{%
+          \listcolswidth\dimexpr\totalistcolswidth-\labelwidth-\labelsep\relax}{%
+          \settowidth\listcolswidth{#1}}%
+        \totalistcolswidth\dimexpr\listcolswidth+\labelwidth+\labelsep\relax
+        \let\@end@mcl@item\noindent
+        \let\item\@mcl@item@
+      \fi
+    \fi\ignorespaces}%
+  {\@end@mcl@item\@mcl@top@true\@mcl@adjust@o@false\endlist}
+
+\def\@mcl@item@{%
+  \@end@mcl@item
+  \@inmatherr\item
+  \@ifnextchar[\@mcl@item{\@noitemargtrue\@mcl@no@arg@true\@mcl@item[\@itemlabel]}}
+
+\def\@mcl@item[#1]{%
+  \def\@end@mcl@item{%
+    \endvarwidth\unskip\ignorespaces\endlrbox\endgroup
+    \@tempdima = \wd\@tempboxa
+    \@tempdimb = \totalistcolswidth
+    \advance\@tempdima -1sp\relax % subtract a Very Small Length
+    \divide\@tempdima \@tempdimb
+    \advance\@tempdima 1sp\relax %  add one
+    \multiply\@tempdimb \@tempdima
+    \advance\@tempdimb -\wd\@tempboxa
+    \usebox\@tempboxa
+    \hspace\@tempdimb
+  }%
+  \if@noitemarg
+    \@noitemargfalse
+    \if@nmbrlist
+      \refstepcounter{\@listctr}%
+      \if@mcl@top@\if@mcl@adjust@
+        \setlength\@tempdima{\widthof{#1}}%
+        \ifdim\@tempdima < \labelwidth\relax
+          \global\@mcl@adj@it@true
+        \fi
+        \ifdim\@tempdima > \@mclaw@t\relax
+          \global\@mclaw@t=\@tempdima\relax
+          \protected@write\@auxout{}{%
+            \string\global\string\@namedef{\@mcl@cnt}{\widthof{#1}}}%
+      \fi\fi\fi
+    \fi
+  \fi
+  \begingroup\lrbox{\@tempboxa}\varwidth[t]{\linewidth}%
+  \leftskip-\leftmargin
+  \if@mcl@adjust@
+    \if@mcl@left@\relax\else\if@mcl@adjust@o@
+      \advance\leftskip\@mclaw@s\relax
+  \fi\fi\fi
+  \parindent\leftmargin\unskip
+  \if@mcl@no@arg@
+    \global\@mcl@no@arg@false
+    \if@mcl@top@
+      \if@mcl@left@
+        \makebox[\labelwidth][l]{#1\strut}%
+        \if@mcl@adjust@\if@mcl@adj@it@
+          \global\@mcl@adj@it@false
+          \if@mcl@adjust@o@
+            \advance\labelsep\@mclaw@s\relax
+        \fi\fi\fi
+      \else
+        \makebox[\labelwidth][r]{#1\strut}%
+      \fi
+    \else
+      \mbox{#1\strut}%
+    \fi
+  \else
+    \@mcl@if@empty{#1}{\labelsep\z@\strut}{%
+      \mbox{#1\strut}}%
+  \fi\hspace\labelsep\relax
+  \ignorespaces}
+
+\def\@mcl@nesterr{\PackageError{multicolist}%
+   {nested multicols-list, don't nest multicols-list environments within each other.}}
+
+\endinput
+%%
+%% End of file `multicolist.sty'.

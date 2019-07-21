@@ -1,0 +1,911 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This package takes care of setting up the preamble for the entire
+% document.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mypreamble}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    PACKAGES TO LOAD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[style=numeric-comp,sortcites=true]{biblatex}
+\RequirePackage{babel}
+\RequirePackage{csquotes}
+\RequirePackage[oldstylenums]{kpfonts}
+\RequirePackage{microtype}
+\RequirePackage{textcase}
+\RequirePackage[inline]{enumitem}
+\RequirePackage{xspace}
+\RequirePackage{graphicx}
+\RequirePackage{ifthen}
+\RequirePackage{amsmath}
+\RequirePackage{amsthm}
+\RequirePackage{pifont}
+\RequirePackage{array}
+\RequirePackage{varioref}
+\RequirePackage{lettrine}
+\RequirePackage{lipsum}
+\RequirePackage{relsize}
+\RequirePackage{svn-multi}
+\RequirePackage{siunitx}
+\RequirePackage[bottom]{footmisc}
+\RequirePackage{xstring}
+\RequirePackage{multirow}
+\RequirePackage{datetime}
+\RequirePackage{etoolbox}
+\RequirePackage{ragged2e}
+\RequirePackage{nicefrac}
+\RequirePackage{listings}
+\RequirePackage[rgb,hyperref]{xcolor}
+% Load hyperref package last
+\RequirePackage{hyperref}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    PACKAGE SETTINGS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% BibLaTeX
+\bibliography{bibliography} % Specify file
+\defbibheading{bibliography}{\bibsection} % Fix header problem
+
+% Hyperref: settings
+\hypersetup{pdfborder={0 0 0}, colorlinks=false}
+
+% Memoir
+\abstractnum   % Format heading as chapter
+\abstractintoc % Include "Abstract" in ToC
+\newsubfloat{figure} % Creates commands for subfigures
+\newsubfloat{table} % Creates commands for subtables
+
+% Listings
+% Register listings
+\begingroup%
+\makeatletter%
+\let\newcounter\@gobble\let\setcounter\@gobbletwo%
+  \globaldefs\@ne \let\c@loldepth\@ne%
+  \newlistof{listings}{lol}{\lstlistlistingname}%
+  \newlistentry{lstlisting}{lol}{0}%
+\endgroup%
+\makeatletter%
+\g@addto@macro\insertchapterspace%
+  {\addtocontents{lol}{\protect\addvspace{10pt}}}%
+\makeatother%
+\makeatletter%
+\AtBeginDocument{\addtocontents{lol}{\protect\addvspace{10\p@}}}%
+\makeatother
+
+% Tell xspace to add space before hyphen
+\xspaceremoveexception{-}
+\makeatletter
+\renewcommand*\@xspace@hook{%
+  \ifx\@let@token-%
+    \expandafter\@xspace@dash@i
+  \fi
+}
+\def\@xspace@dash@i-{\futurelet\@let@token\@xspace@dash@ii}
+\def\@xspace@dash@ii{%
+  \ifx\@let@token-%
+  \else
+    \unskip
+  \fi
+  -%
+}
+\makeatother
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    NEW COMMANDS AND ENVIRONMENTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Commands for producing theorems
+\newtheoremstyle{mystyle}%
+  {\baselineskip}% Space above
+  {\baselineskip}% Space below
+  {}% Body font
+  {}% Indent amount
+  {\scshape}% Theorem head font
+  { -- }% Punctuation after theorem head
+  {0pt}% Space after theorem head
+  {}% Theorem head spec (empty means normal)
+\theoremstyle{mystyle}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{definition}{Definition}[chapter]
+
+% Commands for producing superscripts and subscripts in text
+\newcommand{\superscript}[1]{\ensuremath{^{\textrm{#1}}}}
+\newcommand{\subscript}[1]{\ensuremath{_{\textrm{#1}}}}
+
+% Style-changing commands in text (may also do more stuff)
+\newcommand{\keyword}[1]{%
+  \emph{#1}%
+}
+
+% Environment for including notes within the text
+\newenvironment{notes}
+{%
+  \vspace{0.25\baselineskip plus 0.1\baselineskip minus 0.1\baselineskip}%
+
+  \footnotesize\itshape%
+}
+{%
+  \vspace{0.25\baselineskip plus 0.1\baselineskip minus 0.1\baselineskip}%
+}
+
+% Text strings not set in small caps
+\newcommand{\etal}{et~al.\xspace}
+\newcommand{\eg}{e.g.\xspace}
+\newcommand{\ie}{i.e.\xspace}
+\newcommand{\etc}{etc.\xspace}
+\newcommand{\st}{\superscript{st}\xspace}
+\newcommand{\nd}{\superscript{nd}\xspace}
+\newcommand{\rd}{\superscript{rd}\xspace}
+\newcommand{\msc}{M.Sc.\xspace}
+\renewcommand{\th}{\superscript{th}\xspace}
+\newcommand{\phd}{PhD\xspace}
+\newcommand{\geforce}{GeForce\xspace}
+\newcommand{\directCompute}{DirectCompute\xspace}
+\newcommand{\obsidian}{Obsidian\xspace}
+\newcommand{\cudaGlobal}{\dataElement{\_\_global\_\_}\xspace}
+\newcommand{\cudaDevice}{\dataElement{\_\_device\_\_}\xspace}
+\newcommand{\cudaHost}{\dataElement{\_\_host\_\_}\xspace}
+\newcommand{\cudaShared}{\dataElement{\_\_shared\_\_}\xspace}
+\newcommand{\cudaThreadfence}{\dataElement{\_\_threadfence()}\xspace}
+\newcommand{\forsyde}{ForSyDe\xspace}
+
+% Text strings set in small caps (these should not be used in headings or
+% captions which will be used in the ToC)
+\newcommand{\nvidia}{\setInSC{NVIDIA}\xspace}
+\newcommand{\Nvidia}{\setInSCCF{NVIDIA}\xspace}
+\newcommand{\cuda}{\setInSC{CUDA}\xspace}
+\newcommand{\Cuda}{\setInSCCF{CUDA}\xspace}
+\newcommand{\cpu}{\setInSC{CPU}\xspace}
+\newcommand{\cpus}{\setInSC{CPU}s\xspace}
+\newcommand{\gpu}{\setInSC{GPU}\xspace}
+\newcommand{\Gpu}{\setInSCCF{GPU}\xspace}
+\newcommand{\gpus}{\setInSC{GPU}s\xspace}
+\newcommand{\Gpus}{\setInSCCF{GPU}s\xspace}
+\newcommand{\gpgpu}{\setInSC{GPGPU}\xspace}
+\newcommand{\gpgpus}{\setInSC{GPGPU}s\xspace}
+\newcommand{\ieee}{\setInSC{IEEE}\xspace}
+\newcommand{\Ieee}{\setInSCCF{IEEE}\xspace}
+\newcommand{\sigplan}{\setInSC{SIGPLAN}\xspace}
+\newcommand{\Sigplan}{\setInSCCF{SIGPLAN}\xspace}
+\newcommand{\acm}{\setInSC{ACM}\xspace}
+\newcommand{\Acm}{\setInSCCF{ACM}\xspace}
+\newcommand{\vhdl}{\setInSC{VHDL}\xspace}
+\newcommand{\Vhdl}{\setInSCCF{VHDL}\xspace}
+\newcommand{\simd}{\setInSC{SIMD}\xspace}
+\newcommand{\simt}{\setInSC{SIMT}\xspace}
+\newcommand{\dram}{\setInSC{DRAM}\xspace}
+\newcommand{\sm}{\setInSC{SM}\xspace}
+\newcommand{\sms}{\setInSC{SM}s\xspace}
+\newcommand{\spSC}{\setInSC{SP}\xspace} % \sp was already defined
+\newcommand{\sps}{\setInSC{SP}s\xspace}
+\newcommand{\sfu}{\setInSC{SFU}\xspace}
+\newcommand{\sfus}{\setInSC{SFU}s\xspace}
+\newcommand{\pj}{pJ\xspace}
+\newcommand{\kb}{\setInSC{KB}\xspace}
+\newcommand{\mb}{\setInSC{MB}\xspace}
+\newcommand{\gb}{\setInSC{GB}\xspace}
+\newcommand{\mhz}{\setInSC{MHz}\xspace}
+\newcommand{\ghz}{\setInSC{GHz}\xspace}
+\newcommand{\spfp}{\setInSC{SPFP}\xspace}
+\newcommand{\dpfp}{\setInSC{DPFP}\xspace}
+\newcommand{\ilp}{\setInSC{ILP}\xspace}
+\newcommand{\xml}{\setInSC{XML}\xspace}
+\newcommand{\kth}{\setInSC{KTH}\xspace}
+\newcommand{\ict}{\setInSC{ICT}\xspace}
+\newcommand{\es}{\setInSC{ES}\xspace}
+\newcommand{\cSC}{C\xspace} % \c was already defined
+\newcommand{\cpp}{C++\xspace}
+\newcommand{\systemc}{SystemC\xspace}
+\newcommand{\opencl}{Open\setInSC{CL}\xspace}
+\newcommand{\directx}{DirectX\xspace}
+\newcommand{\openmp}{Open\setInSC{MP}\xspace}
+\newcommand{\skepu}{Ske\setInSC{PU}\xspace}
+\newcommand{\starpu}{Star\setInSC{PU}\xspace}
+\newcommand{\graphml}{Graph\setInSC{ML}\xspace}
+\newcommand{\xaarjet}{XaarJet~\setInSC{AB}\xspace}
+\newcommand{\dph}{\setInSC{DPH}\xspace}
+\newcommand{\bfs}{\setInSC{BFS}\xspace}
+\newcommand{\dfs}{\setInSC{DFS}\xspace}
+\newcommand{\fifo}{\setInSC{FIFO}\xspace}
+\newcommand{\ticpp}{Tiny\setInSC{XML}++\xspace}
+\newcommand{\id}{\setInSC{ID}\xspace}
+\newcommand{\ids}{\setInSC{ID}s\xspace}
+\newcommand{\astSC}{\setInSC{AST}\xspace} % \ast was already defined
+\newcommand{\fpu}{\setInSC{FPU}\xspace}
+\newcommand{\fpus}{\setInSC{FPU}s\xspace}
+\newcommand{\ram}{\setInSC{RAM}\xspace}
+\newcommand{\api}{\setInSC{API}\xspace}
+\newcommand{\sdk}{\setInSC{SDK}\xspace}
+\newcommand{\dsl}{\setInSC{DSL}\xspace}
+% Sets a string in small caps, but it is only set in small caps if the
+% current font is roman or italics (where fake small caps are used) - otherwise
+% the string is set in upper case
+\makeatletter
+\DeclareRobustCommand{\setInSC}[1]{%
+  \ifx\f@shape\code@Roman
+    \expandafter\textsc{\MakeTextLowercase{#1}}%
+  \else
+    \ifdim\fontdimen\@ne\font>\z@
+      \begingroup
+      \check@mathfonts
+      \fontsize\sf@size\z@\selectfont
+      \let\MakeTextLowercase\@firstofone
+      \expandafter\MakeUppercase{#1}%
+      \endgroup
+    \else
+      \expandafter\MakeTextUppercase{#1}%
+    \fi
+  \fi
+}
+\newcommand*{\code@Roman}{n}
+\newcommand*{\code@Italics}{it}
+\makeatother
+% The next command performs the same as \setInSC, but will always capitalize the
+% first letter ("Small Caps, Capitalize First"), and set the remainder in small 
+% caps
+\DeclareRobustCommand{\setInSCCF}[1]{%
+  \StrLeft{#1}{1}[\first]%
+  \StrGobbleLeft{#1}{1}[\remainder]%
+  \MakeTextUppercase{\first}\setInSC{\remainder}%
+}
+
+% Command for converting a month number into corresponding month name
+\newcommand{\monthName}[1]{%
+  \ifcase #1%
+  \or January%
+  \or February%
+  \or March%
+  \or April%
+  \or May%
+  \or June%
+  \or July%
+  \or August%
+  \or September%
+  \or October%
+  \or November%
+  \or December%
+\fi%
+}
+
+% Other text strings
+\newcommand{\thesisNumber}{TRITA-ICT-EX-2012:13}
+\newcommand{\appModel}{%
+  \ifnum\currentgrouptype = 6 %
+    \ifnum\lastnodetype = 0 %
+    \else
+      \ifnum\lastnodetype = 7 %
+      \else
+        \relax
+      \fi
+    \fi
+  \fi
+  \ifmmode
+    \mathcal{LSM}%
+  \else
+    $\mathcal{LSM}$\xspace%
+  \fi
+}
+% Schedule Finding Methods
+\newcommand{\sfmEp}{\textsc{sfm-ep}\xspace}
+\newcommand{\sfmFps}{\textsc{sfm-fps}\xspace}
+\newcommand{\sfmBps}{\textsc{sfm-bps}\xspace}
+% When citing sources in figures and tables
+\newcommand{\source}[2][]{%
+  % #1 = prefix text (optional)
+  % #2 = citation(s)
+  \ifthenelse{\equal{#1}{}}{%
+    Source: #2%
+  }{%
+    Source: #1 #2%
+  }%
+}
+\newcommand{\sources}[2][]{%
+  % #1 = prefix text (optional)
+  % #2 = citation(s)
+  \ifthenelse{\equal{#1}{}}{%
+    Sources: #2%
+  }{%
+    Sources: #1 #2%
+  }%  
+}
+
+
+% Lists
+% Lengths
+\newlength{\listAllLeftMarginI}
+\setlength{\listAllLeftMarginI}{2\parindent}
+\newlength{\listItemizeLeftMarginI}
+\setlength{\listItemizeLeftMarginI}{\listAllLeftMarginI}
+\newlength{\listItemizeLeftMarginII}
+\setlength{\listItemizeLeftMarginII}{\parindent}
+\newlength{\listEnumerateLeftMarginI}
+\setlength{\listEnumerateLeftMarginI}{\listAllLeftMarginI}
+\newlength{\listEnumerateLeftMarginII}
+\setlength{\listEnumerateLeftMarginII}{\parindent}
+\addtolength{\listEnumerateLeftMarginII}{4pt}
+\newlength{\listTopSep}
+\setlength{\listTopSep}{0pt}
+\newlength{\listParSep}
+\setlength{\listParSep}{0pt}
+\newlength{\listLabelSep}
+\setlength{\listLabelSep}{1em}
+\newlength{\listItemSep}
+\setlength{\listItemSep}{0.5\baselineskip}
+% Labels
+\newcommand{\listItemizeLabelI}{\raisebox{0.1ex}{\tiny\ding{110}}}
+\newcommand{\listItemizeLabelII}{$\diamond$}
+\newcommand{\listEnumerateLabelI}{{\arabic*}.}
+\newcommand{\listEnumerateRefI}{{\arabic*}}
+\newcommand{\listEnumerateLabelII}{{\alph*}.}
+\newcommand{\listEnumerateRefII}{{\alph*}}
+\newcommand{\listInlineEnumerateLabel}{({\roman*})}
+% Global list settings
+\setlist{%
+  noitemsep,
+  topsep=\listTopSep,
+  parsep=\listParSep,
+  leftmargin=\listAllLeftMarginI,
+  labelsep=\listLabelSep,
+}
+\setlist[itemize, 1]{%
+  label=\listItemizeLabelI,
+}
+\setlist[itemize, 2]{%
+  label=\listItemizeLabelII,
+  leftmargin=\listItemizeLeftMarginII,
+}
+\setlist[enumerate, 1]{%
+  label=\listEnumerateLabelI,
+  ref=\listEnumerateRefI,
+}
+\setlist[enumerate, 2]{%
+  label=\listEnumerateLabelII,
+  ref=\listEnumerateRefII,
+  leftmargin=\listEnumerateLeftMarginII,
+}
+\newenvironment{inlineEnumerate}
+{%
+  \begin{enumerate*}[%
+      label=\listInlineEnumerateLabel,
+    ]%
+}
+{%
+  \end{enumerate*}
+}
+
+% Timeline
+\newlength{\timelineTopSkip}
+\newlength{\timelineBottomSkip}
+\newlength{\timelineItemWidth}
+\newlength{\timelineDescWidth}
+\setlength{\timelineTopSkip}{0.25\baselineskip}
+\setlength{\timelineBottomSkip}{\timelineTopSkip}
+\setlength{\timelineItemWidth}{6em}
+\setlength{\timelineDescWidth}{\textwidth}
+\addtolength{\timelineDescWidth}{-\timelineItemWidth}
+\addtolength{\timelineDescWidth}{-1em}
+\addtolength{\timelineDescWidth}{-3.5em}
+\newenvironment{timeline}
+{%
+  \par\addvspace{\timelineTopSkip}%
+  \hfill%
+  \begin{tabular}{p{\timelineItemWidth}@{\quad}p{\timelineDescWidth}}%
+}
+{%
+  \end{tabular}%
+  \par\addvspace{\timelineBottomSkip}%
+}
+\newcommand{\milestone}[3]{%
+  % #1 = Start week
+  % #2 = End week (leave empty if this only spans one week)
+  % #3 = Mile stone
+  \ifthenelse{\equal{#2}{}}{%
+    \raggedleft Week #1: & #3 \\
+  }{%
+    \raggedleft Weeks #1--#2: & #3 \\
+  }
+}
+
+% Objectives
+\newenvironment{objectives}
+{%
+  \begin{enumerate}%
+}
+{%
+  \end{enumerate}%
+}
+\newenvironment{subobjectives}
+{%
+  \begin{itemize}[label=\listEnumerateLabelII]%
+}
+{%
+  \end{itemize}%
+}
+
+% Challenges
+\newenvironment{challenges}
+{%
+  \begin{itemize}[itemsep=\listItemSep]
+}
+{%
+  \end{itemize}
+}
+\newenvironment{challenge_category}[1]
+  % #1 = category
+{%
+  \item #1
+    \begin{itemize}[itemsep=\listItemSep]
+}
+{%
+    \end{itemize}
+}
+\newcommand{\priorityLevel}[1]{\textsc{#1}}
+\newcommand{\challenge}[3]{%
+  % #1 = problem
+  % #2 = description
+  % #3 = priority (Critical, High, Medium, Low)
+  \item \textit{#1} (\priorityLevel{#3}) \\ #2
+}
+
+% Command options
+\newenvironment{componentOptions}
+{%
+  \begin{trivlist}
+}
+{%
+  \end{trivlist}
+}
+\newcommand{\option}[2]{%
+  \item[] \hspace{\parindent}{\ttfamily #1}
+  \begin{itemize}
+    \item[] #2
+  \end{itemize}
+}
+
+% List of Abbreviations
+\newlength{\abbrItemWidth}
+\newlength{\abbrDescWidth}
+\setlength{\abbrItemWidth}{6em}
+\setlength{\abbrDescWidth}{\textwidth}
+\addtolength{\abbrDescWidth}{-\abbrItemWidth}
+\addtolength{\abbrDescWidth}{-3em}
+\newenvironment{abbreviations}
+{%
+  \begin{tabular}{p{\abbrItemWidth}p{\abbrDescWidth}}
+}
+{%
+  \end{tabular}
+}
+\newcommand{\abbrItem}[2]{%
+  % #1 = Abbreviation
+  % #2 = Description
+  #1 & #2 \\
+}
+
+
+
+% Texts
+\newenvironment{introduction}
+{%
+  \begin{minipage}{\textwidth}%
+   \itshape%
+}
+{%
+  \end{minipage}%
+  \par\addvspace{2\baselineskip plus 0.2\baselineskip minus 0.2\baselineskip}%
+}
+\newenvironment{warning}
+{%
+  {\warningColor\scshape Warning!}
+  \par\addvspace{0.5\baselineskip}
+  \begin{minipage}{\textwidth}%
+   \itshape%
+}
+{%
+  \end{minipage}%
+  \par\addvspace{2\baselineskip}%
+}
+
+% TODO command (for drafting only)
+\newcommand{\todo}[1]{{\todoColor\textsc{todo}: \textit{#1}}}
+
+
+
+% Referencing
+% Path "varioref" to remove "... on the facing page", "... on the
+% next page", etc., and only use "... on page XX" when necessary.
+\makeatletter
+\AtBeginDocument{%
+  \patchcmd{\NR@@vpageref}{\reftextfacebefore}{\unskip}%
+           {\typeout{*** SUCCESS ***}}{\typeout{*** FAIL ***}}%
+  \patchcmd{\NR@@vpageref}{\reftextfaceafter}{\unskip}%
+           {\typeout{*** SUCCESS ***}}{\typeout{*** FAIL ***}}%
+  \patchcmd{\NR@@vpageref}{\reftextbefore}{\unskip}%
+           {\typeout{*** SUCCESS ***}}{\typeout{*** FAIL ***}}%
+  \patchcmd{\NR@@vpageref}{\reftextbefore}{\unskip}%
+           {\typeout{*** SUCCESS ***}}{\typeout{*** FAIL ***}}%
+  \patchcmd{\NR@@vpageref}{\reftextafter}{\unskip}%
+           {\typeout{*** SUCCESS ***}}{\typeout{*** FAIL ***}}%
+  \patchcmd{\NR@@vpageref}{\reftextafter}{\unskip}%
+           {\typeout{*** SUCCESS ***}}{\typeout{*** FAIL ***}}%
+}
+\makeatother
+% Figures
+\newcommand{\labelFigure}[1]{%
+  % #1 = label
+  \label{fig:#1}%
+}
+\newcommand{\refFigure}[1]{%
+  % #1 = reference
+  \figurename~\vref{fig:#1}\xspace%
+}
+\newcommand{\refFigureOnly}[1]{%
+  % #1 = reference
+  \figurename~\ref{fig:#1}\xspace%
+}
+\newcommand{\refSubfigureOnly}[1]{%
+  % #1 = reference
+  \subcaptionref{fig:#1}\xspace%
+}
+% Tables
+\newcommand{\labelTable}[1]{%
+  % #1 = label
+  \label{tab:#1}%
+}
+\newcommand{\refTable}[1]{%
+  % #1 = reference
+  \tablename~\vref{tab:#1}\xspace%
+}
+\newcommand{\refTableOnly}[1]{%
+  % #1 = reference
+  \tablename~\ref{tab:#1}\xspace%
+}
+\newcommand{\refSubtableOnly}[1]{%
+  % #1 = reference
+  \subcaptionref{tab:#1}\xspace%
+}
+% Code
+\newcommand{\refListing}[1]{%
+  % #1 = reference
+  \lstlistingname~\vref{lst:#1}\xspace%
+}
+\newcommand{\refListingOnly}[1]{%
+  % #1 = reference
+  \lstlistingname~\ref{lst:#1}\xspace%
+}
+% Lists
+\newcommand{\labelList}[1]{%
+  % #1 = label
+  \label{list:#1}%
+}
+\newcommand{\refList}[1]{%
+  % #1 = reference
+  List~\vref{list:#1}\xspace%
+}
+\newcommand{\refListOnly}[1]{%
+  % #1 = reference
+  List~\ref{list:#1}\xspace%
+}
+% List items
+\newcommand{\labelListItem}[1]{%
+  % #1 = label
+  \label{list:item:#1}%
+}
+\newcommand{\refListItem}[1]{%
+  % #1 = reference
+  \vref{list:item:#1}\xspace%
+}
+\newcommand{\refListItemOnly}[1]{%
+  % #1 = reference
+  \ref{list:item:#1}\xspace%
+}
+% Parts
+\newcommand{\labelPart}[1]{%
+  % #1 = label
+  \label{chap:#1}%
+}
+\newcommand{\refPart}[1]{%
+  % #1 = reference
+  Part~\vref{chap:#1}\xspace%
+}
+\newcommand{\refPartOnly}[1]{% Doesn't include the page referencing
+  % #1 = reference
+  Part~\ref{chap:#1}\xspace%
+}
+% Chapters
+\newcommand{\labelChapter}[1]{%
+  % #1 = label
+  \label{chap:#1}%
+}
+\newcommand{\refChapter}[1]{%
+  % #1 = reference
+  Chapter~\vref{chap:#1}\xspace%
+}
+\newcommand{\refChapterOnly}[1]{% Doesn't include the page referencing
+  % #1 = reference
+  Chapter~\ref{chap:#1}\xspace%
+}
+% Sections
+\newcommand{\labelSection}[1]{%
+  % #1 = label
+  \label{sec:#1}%
+}
+\newcommand{\refSection}[1]{%
+  % #1 = reference
+  Section~\vref{sec:#1}\xspace%
+}
+\newcommand{\refSectionOnly}[1]{% Doesn't include the page referencing
+  % #1 = reference
+  Section~\ref{sec:#1}\xspace%
+}
+% Appendices
+\newcommand{\labelAppendix}[1]{%
+  % #1 = label
+  \label{appen:#1}%
+}
+\newcommand{\refAppendix}[1]{%
+  % #1 = reference
+  Appendix~\vref{appen:#1}\xspace%
+}
+\newcommand{\refAppendixOnly}[1]{% Doesn't include the page referencing
+  % #1 = reference
+  Appendix~\ref{appen:#1}\xspace%
+}
+
+% Command for reverting to normal number style
+\newcommand\normalNumberStyle{%
+  \renewcommand{\rmdefault}{jkp}%
+  \renewcommand{\sfdefault}{jkpss}%
+  \normalfont
+}
+
+% Command for getting current time stamp
+\newcommand{\getTimestamp}{%
+  \dashdate\today~\currenttime%
+}
+
+% Command for writing out email addresses
+\newcommand{\email}[1]{\url{#1}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    DOCUMENT CUSTOMIZATIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Set left and right margins to equal ratio
+\setlrmargins{*}{*}{1}
+\checkandfixthelayout
+
+% Rules
+\newcommand{\thinRule}{\rule{\textwidth}{0.25pt}}
+
+% Customize heading appearances
+% Define styles
+\newcommand{\partSize}{\Huge}
+\newcommand{\partStyle}{\lsstyle\scshape}
+\newcommand{\chapterSize}{\Huge}
+\newcommand{\chapterStyle}{\lsstyle\scshape}
+\newcommand{\chapterAfter}{\vspace*{3ex}\thinRule}
+\newcommand{\sectionSize}{\large}
+\newcommand{\sectionStyle}{\lsstyle\scshape\MakeTextLowercase}
+\newcommand{\subsectionSize}{\normalfont}
+\newcommand{\subsectionStyle}{\itshape}
+\newcommand{\subsubsectionSize}{\normalfont}
+\newcommand{\subsubsectionStyle}{}
+\newlength{\partNumSizePt}
+\setlength{\partNumSizePt}{60pt}
+\newlength{\chapterNumSizePt}
+\setlength{\chapterNumSizePt}{60pt}
+\newcommand{\partNumSize}{%
+  \fontsize{\partNumSizePt}{1.2\partNumSizePt}\selectfont%
+}
+\newcommand{\partNumStyle}{\partChapterNumColor}
+\newcommand{\chapterNumSize}{%
+  \fontsize{\chapterNumSizePt}{1.2\chapterNumSizePt}\selectfont%
+}
+\newcommand{\chapterNumStyle}{\partChapterNumColor}
+% Customize parts
+\renewcommand{\partnamefont}{\partSize\partStyle}
+\renewcommand{\partnumfont}{\partNumSize\partNumStyle}
+\renewcommand{\printpartname}{}
+\renewcommand{\printparttitle}[1]{%
+  \normalfont\normalcolor\partnamefont #1
+}
+% Customize chapters
+\makeatletter
+\setlength{\beforechapskip}{30pt}
+\renewcommand*{\chapterheadstart}{\vspace*{\beforechapskip}}
+\setlength{\afterchapskip}{3ex}
+\setlength{\midchapskip}{3ex}
+\renewcommand*{\chapnamefont}{%
+  \Large\flushright\chapterStyle\partChapterNumColor%
+}
+\renewcommand*{\chapnumfont}{\chapterNumSize\chapterNumStyle}
+\renewcommand*{\chaptitlefont}{%
+  \normalfont\flushleft\normalcolor\chapterSize\chapterStyle%
+}
+\renewcommand*{\printchaptername}{%
+  \chapnamefont\MakeTextLowercase{\@chapapp}%
+}
+\renewcommand*{\chapternamenum}{\quad}
+\renewcommand*{\printchapternum}{%
+  \chapnumfont\textls[-75]{\classicstylenums{\thechapter}}%
+}
+\renewcommand*{\printchaptertitle}[1]{%
+  \chaptitlefont #1
+  \chapterAfter
+}
+\makeatother
+% Customize sections and subsections
+\setsecnumformat{\csname my#1\endcsname\quad}
+\setsecheadstyle{\sectionSize\sectionStyle}
+\newcommand{\mysection}{{\thesection}}
+\setsubsecheadstyle{\subsectionSize\subsectionStyle}
+\newcommand{\mysubsection}{{\normalfont\subsectionSize\thesubsection}}
+\setsubsubsecheadstyle{\subsubsectionSize\subsubsectionStyle}
+\newcommand{\mysubsubsection}{{\normalfont\subsubsectionSize\thesubsubsection}}
+
+% Customize "Table of ..." appearance
+% Customize headings
+\newcommand{\renewPrintXTitle}[1]{%
+  \renewcommand{#1}[1]{%
+    \printchaptertitle{##1}%
+  }%
+}
+\renewPrintXTitle{\printtoctitle}
+\renewPrintXTitle{\printlottitle}
+\renewPrintXTitle{\printloftitle}
+% Customize ToC headings
+\renewcommand{\cftpartfont}{\partChapterNumColor\partStyle}
+\renewcommand{\cftchapterfont}{\chapterStyle}
+\renewcommand{\cftsectionfont}{}
+\renewcommand{\cftsubsectionfont}{}
+\renewcommand{\cftfigurefont}{}
+\renewcommand{\cfttablefont}{}
+\renewcommand{\cftlstlistingfont}{}
+% Increase number width
+\newlength{\cftNumWidthIncrease}
+\setlength{\cftNumWidthIncrease}{0.25em}
+\addtolength{\cftpartnumwidth}{\cftNumWidthIncrease}
+\addtolength{\cftchapternumwidth}{\cftNumWidthIncrease}
+\addtolength{\cftsectionindent}{\cftNumWidthIncrease}
+\addtolength{\cftsubsectionindent}{\cftNumWidthIncrease}
+% No leader dots
+\renewcommand*{\cftpartdotsep}{\cftnodots}
+\renewcommand*{\cftchapterdotsep}{\cftnodots}
+\renewcommand*{\cftsectiondotsep}{\cftnodots}
+\renewcommand*{\cftsubsectiondotsep}{\cftnodots}
+\renewcommand*{\cftfiguredotsep}{\cftnodots}
+\renewcommand*{\cfttabledotsep}{\cftnodots}
+\renewcommand*{\cftlstlistingdotsep}{\cftnodots}
+% Set page numbers immediately after entry text
+\newcommand{\tocEntryPageSep}{\hspace{1em}}
+\renewcommand{\cftpartleader}{\tocEntryPageSep}
+\renewcommand{\cftpartafterpnum}{\cftparfillskip}
+\renewcommand{\cftchapterleader}{\tocEntryPageSep}
+\renewcommand{\cftchapterafterpnum}{\cftparfillskip}
+\renewcommand{\cftsectionleader}{\tocEntryPageSep}
+\renewcommand{\cftsectionafterpnum}{\cftparfillskip}
+\renewcommand{\cftsubsectionleader}{\tocEntryPageSep}
+\renewcommand{\cftsubsectionafterpnum}{\cftparfillskip}
+\renewcommand{\cftfigureleader}{\tocEntryPageSep}
+\renewcommand{\cftfigureafterpnum}{\cftparfillskip}
+\renewcommand{\cfttableleader}{\tocEntryPageSep}
+\renewcommand{\cfttableafterpnum}{\cftparfillskip}
+\renewcommand{\cftlstlistingleader}{\tocEntryPageSep}
+\renewcommand{\cftlstlistingafterpnum}{\cftparfillskip}
+% Customize page numbers
+\newcommand{\tocPageStyle}{\tocPageColor}
+\renewcommand{\cftpartpagefont}{\tocPageStyle}
+\renewcommand{\cftchapterpagefont}{\tocPageStyle}
+\renewcommand{\cftsectionpagefont}{\tocPageStyle}
+\renewcommand{\cftsubsectionpagefont}{\tocPageStyle}
+\renewcommand{\cftfigurepagefont}{\tocPageStyle}
+\renewcommand{\cfttablepagefont}{\tocPageStyle}
+\renewcommand{\cftlstlistingpagefont}{\tocPageStyle}
+
+% Fix "List of Listings" appearance (make it coherent with other listings)
+\renewcommand{\lstlistlistingname}{List of Listings}
+
+% Abstract
+% Remove indents around abstract text
+\setlength{\absleftindent}{0pt}
+\setlength{\absrightindent}{0pt}
+% Change font size to conform with the rest of the document text
+\renewcommand{\abstracttextfont}{\normalsize}
+
+% Customize headers and footers
+\newcommand{\hfTextSize}{\footnotesize}
+\newcommand{\headTextStyle}{\lsstyle\scshape\MakeTextLowercase}
+\nouppercaseheads
+\makeevenhead{headings}%
+             {\hfTextSize\thepage}%
+             {}%
+             {\hfTextSize\headTextStyle\leftmark}
+\makeoddhead{headings}%
+            {\hfTextSize\headTextStyle\rightmark}%
+            {}%
+            {\hfTextSize\thepage}
+% Add SVN date and revision to footer (remove in final version)
+%\newcommand{\svnInfo}{\$ Revision: \svnrev ~ Date: \svndate~\$}
+%\makeevenfoot{headings}{}{\tiny \svnInfo}{}
+%\makeoddfoot{headings}{}{\tiny \svnInfo}{}
+%\makeevenhead{plain}{}{\tiny \svnInfo}{}
+%\makeoddhead{plain}{}{\tiny \svnInfo}{}
+% Set 'headings' as page style
+\pagestyle{headings}
+% Clear style for title page (no header nor footer)
+\makepagestyle{titlepage}
+
+% Use numbering down until and including subsubsections
+\setsecnumdepth{subsubsection}
+
+% Set ToC to include subsections
+\setcounter{tocdepth}{2}
+
+% Customize captions
+\newcommand{\captionSize}{\small}
+\newcommand{\captionStyle}{\scshape}
+\newcommand{\captionWidthRatio}{0.9}
+\captionnamefont{\captionSize\captionStyle}
+\captiontitlefont{\captionSize}
+\captiondelim{ -- }
+\captiontitlefinal{.}
+\changecaptionwidth
+\captionwidth{\captionWidthRatio\textwidth}
+
+% Customize drop caps
+\setcounter{DefaultLines}{2}
+\renewcommand{\LettrineFontHook}{\dropCapColor}
+\renewcommand{\DefaultFindent}{0pt}
+\renewcommand{\DefaultNindent}{0pt}
+
+% Do not use old-style numbers for typewriter fonts
+\renewcommand{\ttdefault}{jkptt}
+\normalfont
+
+% Redefine date/time format
+\newdateformat{dashdate}{%
+  \THEYEAR-\twodigit{\THEMONTH}-\twodigit{\THEDAY}%
+}
+\renewcommand{\timeseparator}{:}
+\settimeformat{hhmmsstime}
+
+% Make URLs in bibliography entries smaller
+\AtBeginBibliography{\def\UrlFont{\small\ttfamily}}
+
+% Define colors
+\newcommand{\titleColor}{\color[rgb]{0.616, 0.0627, 0.176}}
+\newcommand{\partChapterNumColor}{\titleColor}
+\newcommand{\dropCapColor}{\titleColor}
+\newcommand{\tocPageColor}{\color[rgb]{0.0980, 0.329, 0.651}}
+\definecolor{shade0}{rgb}{1.0 , 1.0 , 1.0 }
+\definecolor{shade1}{rgb}{0.9 , 0.9 , 0.9 }
+\definecolor{shade2}{rgb}{0.8 , 0.8 , 0.8 }
+\definecolor{shade3}{rgb}{0.65, 0.65, 0.65}
+\definecolor{shade4}{rgb}{0.45, 0.45, 0.45}
+\definecolor{shade5}{rgb}{0.0 , 0.0 , 0.0 }
+\definecolor{nodeColor}{named}{shade1}
+\definecolor{nodeInnerColor}{named}{shade5}
+\definecolor{portColor}{named}{shade5}
+\definecolor{processColor}{named}{shade1}
+\definecolor{networkColor}{named}{shade0}
+\newcommand{\codeBackgroundColor}{\color[rgb]{0.95, 0.95, 0.95}}
+\newcommand{\codeKeywordsColor}{\color[rgb]{0.498, 0.557, 0.167}}
+\newcommand{\codeCommentsColor}{\color[rgb]{0.251, 0.275, 0.086}}
+\newcommand{\warningColor}{\color[rgb]{1.0, 0.0, 0.0}}
+\newcommand{\todoColor}{\color[rgb]{1.0, 0.0, 0.0}}

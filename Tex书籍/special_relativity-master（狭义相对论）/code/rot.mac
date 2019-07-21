@@ -1,0 +1,33 @@
+theta:0.1;
+Rx:matrix([1,       0,        0],
+         [0,        cos(theta), -sin(theta)],
+         [0,        sin(theta), cos(theta)]);
+Ry:matrix([cos(theta), 0,        sin(theta)],
+         [0,        1,           0],
+         [-sin(theta), 0,           cos(theta)]);
+Rz:matrix([cos(theta),   -sin(theta),  0],
+         [sin(theta),  cos(theta),    0],
+         [0,        0,        1]);
+Rmx:matrix([1,       0,        0],
+         [0,        cos(theta), sin(theta)],
+         [0,        +sin(theta), cos(theta)]);
+Rmy:matrix([cos(theta), 0,        -sin(theta)],
+         [0,        1,           0],
+         [sin(theta), 0,           cos(theta)]);
+Rmz:matrix([cos(theta),   sin(theta),  0],
+         [-sin(theta),  cos(theta),    0],
+         [0,        0,        1]);
+
+/* Calculate the product of the four matrices: */
+/* T:Lx.Ly.Lmx.Lmy; */
+/* Define a column vector along the z axis: */
+P:matrix([0],[0],[1]);
+/*
+taylor(Rx.Ry.P,theta,0,2);
+taylor(Ry.Rx.P,theta,0,2);
+*/
+float(Rx.P);
+float(Ry.Rx.P);
+float(Ry.P);
+float(Rx.Ry.P);
+/* taylor(Ry.Rx.Rmy.Rmx.P,theta,0,2); */

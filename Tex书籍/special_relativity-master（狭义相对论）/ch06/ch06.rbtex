@@ -1,0 +1,865 @@
+\addtocontents{toc}{\protect\vfill} % cosmetic
+
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '06',
+    %q{Waves},
+    'ch:waves'
+  )
+%>
+
+This chapter and the preceding one have good, solid physical titles. Inertia.
+Waves. But underlying the physical content is a thread of mathematics designed
+to teach you a language for describing spacetime. Without this language,
+the complications of relativity rapidly build up and become unmanageable.
+In section \ref{subsec:varying-metric}, we saw that there are physically compelling
+reasons for switching back and forth between different coordinate systems ---
+different ways of attaching \emph{names} to the events that make up spacetime.
+A toddler in a bilingual family gets a payoff for switching back and forth
+between asking \emph{Mam\'a} in Spanish for \emph{dulces} and alerting Daddy in English
+that Barbie needs to be rescued from falling off the couch. She may bounce back and forth between
+the two languages in a single sentence --- a habit that linguists call
+``code switching.'' In relativity, we need to build fluency in a language that
+lets us talk about actual phenomena without getting hung up on the naming system.
+
+<% begin_sec("Frequency",nil,'frequency') %>
+<% begin_sec("Is time's flow constant?",nil,'time-constant') %>
+The simplest naming task is in $0+1$ dimensions: a time-line like the ones in history class.
+If we name the points in time A, B, C, \ldots or 1, 2, 3, \ldots, or Bush, Clinton,
+Bush, \ldots, how do we know that we're marking off equal time intervals? Does it make
+sense to imagine that time itself might speed up and slow down, or even start and stop?
+The second law of thermodynamics encourages us to think that it could. If the universe
+had existed for an infinite time, then entropy would have maximized itself --- a long time
+ago, presumably --- and we would not exist, because the heat death of the universe would
+already have happened.
+<% end_sec('time-constant') %>
+
+<% begin_sec("Clock-comparison experiments",nil,'clock-comparison') %>
+But what would it actually mean empirically for time's rate of flow to vary?
+Unless we can tie this to the results of experiments, it's nothing but cut-rate metaphysics.
+In a Hollywood movie where time could stop, the scriptwriters would
+show us the stopping through the eyes of an observer, who would stroll past
+frozen waterfalls and snapshotted bullets in mid-flight. The observer's brain is
+a kind of clock, and so is the waterfall. We're left with what's known as a
+clock-comparison experiment.\index{clock-comparison experiments}
+To date, all clock-comparison experiments have given null results.
+Matsakis \emph{et al.}\footnote{Astronomy and Astrophysics 326 (1997) 924,\\
+\url{adsabs.harvard.edu/full/1997A&26A...326..924M}}
+found that pulsars match the rates of atomic clocks with a drift of less
+than about $10^{-6}$ seconds over 10 years.
+Gu\'ena \emph{et al.}\footnote{\url{arxiv.org/abs/1205.4235}}
+observed that atomic clocks using atoms of different isotopes drifted
+relative to one another by no more than about $10^{-16}$ per year.
+Any non-null result would have caused serious problems for relativity.
+One of the expectations in an Aristotelian description of spacetime
+is that the motion of material objects on earth would naturally slow
+down relative to celestial phenomena such as the rising and setting of the sun.
+The relativistic interpretation of time dilation as an effect on time itself
+(p.~\pageref{time-dilation}) also depends crucially on the null results of these experiments.
+<% end_sec('clock-comparison') %>
+
+<% begin_sec("Birdtracks notation",nil,'birdtracks') %>
+As a simple example of clock comparison, let's imagine using the hourly
+emergence of a mechanical bird from a pendulum-driven cuckoo
+clock to measure the rate at which the earth spins. There is clearly a kind of
+symmetry here, since we could equally well take our planet's
+rotation as the standard and use it to measure the frequency with which the bird pops out of the door.
+Schematically, let's represent this measurement process with
+the following notation, which is part of a system called called birdtracks:\index{birdtracks notation}%
+\footnote{The system used in this book
+follows the one defined by Cvitanovi\'{c}, which was based closely on a graphical
+notation due to Penrose. For a more complete exposition, see the Wikipedia article
+``Penrose graphical notation'' and Cvitanovi\'{c}'s 
+online book at \url{birdtracks.eu}.}\index{birdtracks}\index{Cvitanovi\'{c}, Predrag}
+\index{Penrose!graphical notation for tensors}\index{tensor!Penrose graphical notation}
+\index{vector!Penrose graphical notation}
+\begin{equation*}
+  __birdscalarproduct(c,e) = 24
+\end{equation*}
+Here $c$ represents the cuckoo clock and $e$ the rotation of the earth.
+Although the measurement relationship is nearly symmetric, the arrow has a direction, because,
+for example, the measurement of the earth's rotational period in terms of the clock's frequency is
+$__birdscalarproduct(c,e)=(1\ \zu{hr}^{-1})(24\ \zu{hr})=24$, but the clock's period in terms of the earth's frequency
+is $__birdscalarproduct(e,c)=1/24$. We say that the relationship is
+not symmetric but ``dual.''\index{duality} By the way, it doesn't matter
+how we arrange these diagrams on the page. The notations __birdscalarproduct(c,e)
+and __birdflipscalarproduct(c,e) mean exactly the same thing, and expressions like this can even be drawn
+vertically.
+
+Suppose that $e$ is a displacement along some one-dimensional line of time, and we want to think of it as the
+thing being measured. Then we expect that the measurement process represented by $c$
+produces a real-valued result and is a linear function of $e$. Since the relationship
+between $c$ and $e$ is dual, we expect that $c$ also belongs to some
+vector space. For example, vector spaces allow multiplication by a scalar:
+we could double the frequency of the cuckoo clock by making the bird
+come out on the half hour as well as on the hour, forming $2c$. Measurement should
+be a linear function of both vectors; we say it is ``bilinear.'' 
+<% end_sec('birdtracks') %>
+
+<% begin_sec("Duality",nil,'duality') %>\index{duality}
+The two vectors $c$ and $e$ have different units,
+$\zu{hr}^{-1}$ and hr, and
+inhabit two different one-dimensional vector spaces.
+The ``flavor'' of the vector is represented by whether the arrow goes into
+it or comes out. Just as we used notation like $\overrightarrow{v}$ in freshman physics to
+tell vectors apart from scalars, we can employ arrows in the birdtracks
+notation as part of the notation for
+the vector, so that
+instead of writing the two vectors as $c$ and $e$, we can notate them
+as __birddualvec(c) and __birdvec(e). Performing a measurement is like plumbing.
+We join the two ``pipes'' in __birddualvec(c)__birdvec(e) and simplify to
+__birdscalarproduct(c,e).
+
+A confusing and nonstandardized jungle of notation and terminology has grown up around these concepts. For now,
+let's refer to a vector such as __birdvec(e), with the arrow coming in, simply as a ``vector,''\index{vector!distinguished from covector}
+and the type like __birddualvec(c) as a ``covector.''\index{covector}
+In the one-dimensional example of the earth and the cuckoo clock, the roles played by the two
+things were completely equivalent, and it didn't matter which one we expressed as a vector
+and which as a covector.
+<% end_sec('duality') %>
+
+<% end_sec('frequency') %>
+<% begin_sec("Phase",nil,'phase') %>
+<% begin_sec("Phase is a scalar",nil,'phase-is-scalar') %>
+In section \ref{subsec:invariants}, p.~\pageref{subsec:invariants}, we defined a (Lorentz)
+\emph{invariant} as a quantity that was unchanged under rotations and Lorentz boosts.
+A measurement such as $__birdscalarproduct(c,e)=24$ is an invariant because it is simply
+a count. We've counted the number
+of periods. In fact, a count is not just invariant under rotations and boosts but under any 
+well-behaved change of coordinates --- 
+the technical condition being
+that each coordinate in each set is a differentiable function of each coordinate in the other
+set. Such a change of coordinates is called a \emph{diffeomorphism}.\index{diffeomorphism}\label{diffeomorphism}
+For example, a uniform scaling of the coordinates $(t,x,y,z)\rightarrow(kt,kx,ky,kz)$, which is
+analogous to a change of units,\footnote{The appropriate relativistic way of defining
+a change of units is subject to some ambiguity. 
+See section \ref{sec:tensor-units}, p.~\pageref{sec:tensor-units}.} is all right
+as long as $k$ is nonzero. A quantity that stays the same under any diffeomorphism is called
+a \emph{scalar}.\index{scalar}
+Since a Lorentz transformation is a diffeomorphism,
+every scalar is a Lorentz invariant. Not every Lorentz invariant
+is a scalar.\index{scalar!compared to Lorentz invariant}\index{invariant!compared to scalar}
+\label{scalar-vs-lorentz-invariant}
+
+\begin{eg}{The determinant of the metric}\label{eg:det-g}
+Minkowski coordinates can be defined as coordinates in which the metric has the standard
+form $g=\operatorname{diag}(1,-1,-1,-1)$. If we rescale these coordinates according to
+$(t,x,y,z)\rightarrow(kt,kx,ky,kz)$, then the metric changes according to
+$g\rightarrow k^{-2}g$. To keep track of how ``un-Minkowski'' this scaling is, we could
+use the determinant of the metric $\operatorname{det}(g)=-k^{-8}$. This determinant
+tells us how many coordinate-grid boxes fit in a unit volume, and it is of interest in
+a more general context than this example of uniform rescaling, e.g., it serves a similar
+function when converting from Cartesian coordinates to polar coordinates.
+
+Under a Lorentz transformation or a rotation, the metric retains its standard form,
+and therefore $\operatorname{det}(g)$ is Lorentz invariant. 
+Another way of seeing this is that spacetime volume is Lorentz invariant (p.~\pageref{sec:area-is-scalar}),
+so that a Lorentz transformation doesn't change how many coordinate-grid boxes fit in a unit volume.
+
+But although $\operatorname{det}(g)$ is a Lorentz invariant, it is not a
+scalar, because it changes under the transformation described above.
+\end{eg}
+
+In birdtracks notation, any expression that has no external arrows at all represents a scalar. Since the
+expression $__birdscalarproduct(c,e)=24$ has no external arrows, only internal ones, it represents
+a scalar. Another way of describing this measurement is as a phase. If we prefer to measure
+the phase $\phi$ in units of cycles, then we have $\phi=__birdscalarproduct(c,e)$. If we
+like radians, we can use $\phi=2\pi __birdscalarproduct(c,e)$.
+<% end_sec('phase-is-scalar') %>
+
+<% begin_sec("Scaling",nil,'scaling') %>
+A convenient way of summarizing all of our categories of variables is by their behavior
+when we rescale our coordinates. If we switch our time unit from
+hours to minutes, the number of apples in a bowl is unchanged, the earth's period of
+rotation gets 60 times bigger, and the frequency of the cuckoo clock changes by a
+factor of 1/60. In other words, a quantity $u$ under rescaling of coordinates
+by a factor $\alpha$ becomes $\alpha^p u$, where the exponents $-1$, $0$, and $+1$
+correspond to covectors, scalars, and vectors, respectively. We can therefore see that
+these distinctions are of interest even in one dimension, contrary to what one would have
+expected from the freshman-physics concept of a vector as something transforming in a certain
+way under rotations.
+
+In section \ref{subsec:invariants} (p.~\pageref{subsec:invariants}), we defined an invariant
+as a quantity that did not change under rotations or Lorentz boosts, i.e., one that was independent
+of the frame of reference.\index{invariant!compared to scalar}\index{scalar}\index{Lorentz scalar|see{scalar}}
+For a scalar we have the even more restrictive condition that it must not change
+under any change of coordinates. For example, 
+area in $1+1$-dimensional spacetime is an invariant, but it's not a scalar; it changes when we rescale
+our coordinates.
+<% end_sec('scaling') %>
+<% end_sec('phase') %> 
+
+<% begin_sec("The frequency-wavenumber covector",nil,'f-vector') %>
+Generalizing from $0+1$ dimensions to $3+1$, we could have an observer moving inertially
+along velocity vector $__birdvec(\vc{o})$, while counting the phase $\phi$ (in radians) of a
+plane wave (perhaps a water wave or an electromagnetic wave) that is washing over her.
+Since $\phi$ is just a count, it's clearly a scalar. That means that we have some
+function that takes as its input a vector $__birdvec(\vc{o})$ and gives as an output the scalar $\phi$.
+This function has all the right characteristics to be described as a measurement
+$__birdscalarproduct(\bomega,\vc{o})$
+of $__birdvec(\vc{o})$ with some covector $__birddualvec(\bomega)$, and in a constructive style of mathematics this is a good
+way of \emph{defining} a covector: it's a linear function from the space of vectors to the real numbers.
+We call $__birddualvec(\bomega)$ the frequency-wavelength covector, or just the frequency covector for short.
+If $__birdvec(\vc{o})$ represents one second as measured on the clock of this observer, then 
+$__birdscalarproduct(\bomega,\vc{o})$ is the frequency $\omega$ measured by this
+observer in units of radians per second.
+If the same observer considers $\vc{s}$ to be a vector of simultaneity with a length of
+one meter, then $__birdscalarproduct(\bomega,\vc{s})$ is
+the observer's measurement of the wavenumber $k$, defined as $2\pi$ divided by the wavelength.\index{wavenumber}
+
+<% begin_sec("Visualization",nil,'visualization') %>
+In more than one dimension, there are natural ways of visualizing the different vector spaces inhabited by
+vectors and covectors. A vector is an arrow.
+A covector
+can be visualized as a set of parallel, evenly spaced lines
+on a topographic map, \subfigref{vector-measuring-covector}{2}, with an arrowhead to 
+show which way is ``uphill.''
+The act of measurement consists of counting how many of these
+lines are crossed by a certain vector, \subfigref{vector-measuring-covector}{3}.
+
+\begin{eg}{Parallelism between vectors and covectors}\label{eg:vector-parallel-to-covector}
+It seems visually obvious in figure \subfigref{vector-measuring-covector}{3} that the vector and covector
+are almost, but not exactly, parallel, since the arrowheads point in almost the same direction.
+Ordinarily, parallelism of nonzero vectors $\vc{u}$ and
+$\vc{v}$ would be expressed by the existence of a real number $\alpha$ such that $\vc{u}=\alpha\vc{v}$.
+But vectors and covectors are different kinds of beasts, belonging to different vector spaces. Scaling 
+up a zebra will never produce a giraffe. If there is no metric, then this is simply a fact of life:
+there is no natural way to define parallelism between a vector $\vc{v}$ and a covector $\bomega$.
+
+But if we have a metric, then we can define a magnitude for the vector $\vc{c}$
+in \subfigref{vector-measuring-covector}{3}, and keep that magnitude
+constant while rotating $\vc{v}$. If the metric is Euclidean, then this corresponds to rigidly
+rotating the arrow on the page, and $__birdscalarproduct(\bomega,\vc{v})$ is maximized for a certain
+orientation, which we define as the condition for parallelism. If the metric is noneuclidean, then
+things get a bit more complicated, but the same ideas apply if the vectors are either both spacelike
+or both timelike. For example, if both are timelike, then $__birdscalarproduct(\bomega,\vc{v})$
+is minimized by parallelism, because the Cauchy-Schwarz inequality is reversed
+(see sec.~\ref{subsec:triangle-t}, p.~\pageref{subsec:triangle-t}.)
+
+\end{eg}
+
+<% end_sec('visualization') %> 
+
+<% marg(300) %>
+<%
+  fig(
+    'vector-measuring-covector',
+    %q{1. A displacement vector. 2. A covector.
+       3. Measurement is reduced to counting. The observer, represented by the displacement
+          vector, counts 24 wavefronts.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'isotherms',
+    %q{Constant-temperature curves for January in North America, at intervals of $4\degcunit$.
+       The temperature gradient at a given point is a covector.}
+  )
+%>
+<% end_marg %>
+
+<% begin_sec("The gradient",nil,'gradient') %>
+Given a scalar field $\phi$, its gradient $\nabla \phi$ at any given point is a covector.
+The frequency covector is the gradient of the phase.
+In birdtracks notation, we indicate this by writing it with an
+outward-pointing arrow, $__birddualvec((\nabla \phi))$. Because
+gradients occur so frequently, birdtracks notation has a special shorthand for them, which is
+simply a circle:
+\begin{equation*}
+  __birdgrad(\phi)
+\end{equation*}
+This notation can also be extended to the case where the thing being differentiated is not
+a scalar, but then some complications are encountered when the coordinates are not Minkowski;
+see section \ref{subsec:covariant-derivative-notation},
+p.~\pageref{subsec:covariant-derivative-notation}.
+
+\begin{eg}{Cosmological observers}
+Time is relative, so what do people mean when they say that the universe is 13.8 billion years old?
+If a hypothetical observer had been around since shortly after the big bang, the time elapsed on
+that observer's clock would depend on the observer's world line. Two such observers, who had had
+different world-lines, could have differing clock readings.
+
+Modern cosmologists aren't naive about time dilation. They have in mind a cosmologically preferred
+world-line for their observer. One way of constructing this world-line is as follows. Over time, the
+temperature $T$ of the universe has decreased. (We define this temperature locally, but we average
+over large enough regions so that local variations don't matter.) The negative gradient of this temperature,
+$-\nabla T$, is a covector that points in a preferred direction in spacetime, and
+a preferred world-line for an observer is one whose velocity vector $\vc{v}$ is always parallel
+to $-\nabla T$, in the sense defined in example \ref{eg:vector-parallel-to-covector} above.
+\end{eg}
+<% end_sec('gradient') %> 
+
+<% end_sec('f-vector') %> 
+
+<% begin_sec("Duality",nil,'duality') %>
+<% begin_sec("Duality in 3+1 dimensions",nil,'duality-generalized') %>\index{duality}
+In our original $0+1$-dimensional example of the cuckoo clock and the earth, we had duality: the
+measurements $__birdscalarproduct(c,e)=24$ and $__birdscalarproduct(e,c)=1/24$ really provided
+the same information, and it didn't matter whether we made our scalar out of
+covector __birddualvec(c) and vector  __birdvec(e) or
+covector __birddualvec(e) and vector  __birdvec(c). All these quantities were simply
+clock rates, which could be described either by their frequencies (covectors) or their
+periods (vectors).
+
+To generalize this to $3+1$ dimensions, we need to use the metric --- a piece of machinery
+that we have never had to employ since the beginning of the chapter. Given a vector
+$__birdvec(\vc{r})$, suppose we knew how to produce its covector version $__birddualvec(\vc{r})$.
+Then we could hook up the plumbing to form $__birdscalarproduct(\vc{r},\vc{r})$, which is
+just a number. What number could it be? The only reasonable possibility is the
+squared magnitude of $\vc{r}$, which we calculate using the metric as $r^2=g(\vc{r},\vc{r})$.
+Since we can think of covectors as functions that take vectors to real numbers,
+clearly $__birddualvec(\vc{r})$ should be the function $f$ defined by
+$f(\vc{x})=g(\vc{r},\vc{x})$.
+
+\begin{eg}{Finding the dual of a given vector}\label{eg:find-dual}
+\egquestion Given the vector $__birdvec(\vc{v})=(3,4)$ in $1+1$-dimensional Minkowski coordinates, find
+the covector $__birddualvec(\vc{v})$, i.e., its dual.
+
+\eganswer Our goal is to write out an explicit expression for the covector in component form,
+\begin{equation*}
+  __birddualvec(\vc{v}) = (a,b)\eqquad.
+\end{equation*}
+To define these components, we have to have some basis in mind, consisting of one
+timelike observer-vector $\vc{o}$ and one spacelike vector of simultaneity $\vc{s}$.
+Since we're doing this in Minkowski coordinates (section
+\ref{sec:minkowski-coordinates}, \pageref{sec:minkowski-coordinates}), let's
+notate these as $__birdvec(\hat{\vc{t}})$ and $__birdvec(\hat{\vc{x}})$, where the hats indicate that these
+are unit vectors in the sense that $\hat{t}^2=1$ and $\hat{x}^2=-1$.
+Writing $__birddualvec(\vc{v})$ in terms of $a$ and $b$ means that we're identifying
+$__birddualvec(\vc{v})$ with the function $f$ defined by
+$f(\vc{x})=g(__birdvec(\vc{v}),\vc{x})$. Therefore
+\begin{equation*}
+  f(__birdvec(\hat{\vc{t}}))=a \qquad \text{and} \qquad f(__birdvec(\hat{\vc{x}}))=b
+\end{equation*}
+or
+\begin{equation*}
+  g(__birdvec(\vc{v}),__birdvec(\hat{\vc{t}}))=3=a \qquad 
+  \text{and} \qquad g(__birdvec(\vc{v}),__birdvec(\hat{\vc{x}}))=-4=b\eqquad.
+\end{equation*}
+\end{eg}
+
+The result of the formidable, fancy-looking calculation in example
+\ref{eg:find-dual} was simply to take the vector
+\begin{equation*}
+  (3,4)
+\end{equation*}
+and flip the sign of its spacelike component to give the its dual, the covector
+\begin{equation*}
+  (3,-4)\eqquad.
+\end{equation*}
+Looking back at why this happened, it was because we were using Minkowski coordinates, and
+in Minkowski coordinates the form of the metric is $g(p,q)=(+1)p_tq_t+(-1)p_xq_x+\ldots$.
+Therefore, we can always find duals in this way, provided that (1) we're using Minkowski
+coordinates, and (2) the signature of the metric is, as assumed throughout this book,
+$+---$, not $-+++$.
+
+\begin{eg}{Going both ways}\label{eg:going-both-ways}
+\egquestion Assume Minkowski coordinates and signature $+---$.
+Given the vector
+\begin{equation*}
+  __birdvec(\vc{e})=(8,7)
+\end{equation*} and
+the covector 
+\begin{equation*}
+  __birddualvec(\vc{f})=(1,2)\eqquad,
+\end{equation*}
+find $__birddualvec(\vc{e})$
+and $__birdvec(\vc{f})$
+
+\eganswer By the rule established above, we can find $__birddualvec(\vc{e})$ simply by
+flipping the sign of the 7,
+\begin{equation*}
+  __birddualvec(\vc{e})=(8,-7)\eqquad.
+\end{equation*}
+To find $__birdvec(\vc{f})$, we need to ask what vector $(a,b)$, if we flipped the sign of $b$,
+would give us $(a,-b)=(1,2)$. Obviously this is
+\begin{equation*}
+  __birdvec(\vc{f})=(1,-2)\eqquad.
+\end{equation*}
+In other words, flipping the sign of the spacelike part of a vector is also the recipe for
+changing covectors into vectors.
+\end{eg}
+
+Example \ref{eg:going-both-ways} shows that in Minkowski coordinates, the operation of
+changing a covector to the corresponding vector is the \emph{same} as that of
+changing a vector to its covector. Thus, the dual of a dual is the same thing you started with.
+In this respect, duality is similar to arithmetic operations such as $x\rightarrow -x$
+and $x\rightarrow 1/x$. That is, the duality is a self-inverse operation --- it undoes itself,
+like getting two sex-change operations in a row, or switching political parties twice in a
+country that has a two-party system.
+Birdtracks notation makes this self-inverse property
+look obvious, since duality means switching a inward
+arrow to an outward one or vice versa, and clearly doing two such switches gives back
+the original notation. This property was established in example \ref{eg:going-both-ways} by
+using Minkowski coordinates and assuming the signature to be $+---$, but it holds without
+these assumptions (problem \ref{hw:dual-of-dual}, p.~\pageref{hw:dual-of-dual}).
+
+In the general case where the coordinates may not be Minkowski, the above analysis plays
+out as follows. Covectors and vectors are represented by row and column vectors. The metric can
+be specified by a matrix $g$ so that the inner product of column vectors
+$p$ and $q$ is given by $p^Tgq$, where T represents the transpose. Rerunning the same logic
+with these additional complications, we find that the dual of a vector $q$ is $(gq)^T$, while
+the dual of a covector $\omega$ is $(\omega g^{-1})^T$, where $g^{-1}$ is the inverse of the matrix
+$g$.
+
+<% end_sec('duality-generalized') %>
+
+<% begin_sec("Change of basis",nil,'change-of-basis') %>
+We saw in section \ref{subsec:scaling} that in $0+1$ dimensions, vectors and covectors has
+opposite scaling properties under a change of units, so that switching our base unit from hours to minutes
+caused our frequency covectors to go up by a factor of 60, while our time vectors went down by the same
+factor. This behavior was necessary in order to keep scalar products the same.
+In more than one dimension, the notion of changing units is replaced with that of a change of
+basis.
+In linear algebra, row vectors and column vectors act like covectors and vectors; they are dual
+to each other.
+Let $B$ be a matrix made of column vectors, representing a basis for the column-vector space. Then
+a change of basis for a row vector $r$ is expressed as $r'=rB$, while
+the same change of basis for a column vector $c$ is $c'=B^{-1}c$. We then find that
+the scalar product is unaffected by the change of basis, since $r'c'=rBB^{-1}c=rc$.
+
+In the important special case where $B$ is a Lorentz transformation, this means that
+covectors transform under the \emph{inverse} transformation, which can be found by
+flipping the sign of $v$. This fact will be important in the following section.
+<% end_sec('change-of-basis') %> 
+<% end_sec('duality') %> 
+
+<% begin_sec("The Doppler shift and aberration",nil,'doppler-3d') %>\index{Doppler shift}
+<% begin_sec("Doppler shift",nil,'doppler-fancy') %>
+As an example, we generalize our previous discussion of the Doppler shift of light to $3+1$ dimensions.
+
+For clarity, let's first show how the $1+1$-dimensional case works in our new notation.
+For a wave traveling to the left,
+we have $__birddualvec(\bomega)=(\omega,\omega)$ (not $(\omega,-\omega)$ --- see
+figure \subfigref{surfer-phase}{1}).
+We now want to transform into the frame of an observer moving to the right with velocity $v$
+relative to the original frame. Because $__birddualvec(\bomega)$ is a covector, we do this
+using the \emph{inverse} Lorentz transformation. An ordinary Lorentz transformation
+would take a lightlike vector $(\omega,\omega)$ to $(\omega/D,\omega/D)$ (see section \ref{sec:doppler}).
+The inverse Lorentz transformation gives $(D\omega,D\omega)$.
+The frequency has been shifted upward by the
+factor $D$, as established previously.
+
+In $3+1$ dimensions, a
+spatial plane is determined by the light's direction of propagation and the relative velocity
+of the source and observer, so this case reduces without loss of generality to $2+1$ dimensions.
+The frequency four-vector must be lightlike, so its most general possible form is
+$(\omega,\omega\cos\theta,\omega\sin\theta)$,
+where $\theta$ is interpreted as the angle between the direction of
+propagation and the relative velocity.
+In $2+1$ dimensions, a Lorentz boost along the $x$ axis looks like this:
+\begin{align*}
+  t' &= \quad \gamma t - v\gamma x \\
+  x' &= -v\gamma t + \gamma x \\
+  y' &= y
+\end{align*}
+The inverse transformation is found by flipping the sign of $v$.
+Putting our frequency vector through an inverse Lorentz boost,
+we find 
+\begin{equation*}
+  \omega'=\gamma \omega(1+v\cos\theta)\eqquad.
+\end{equation*}
+For $\theta=0$ the Doppler factor
+reduces to $\gamma(1+v)=D$, recovering the $1+1$-dimensional result. For $\theta=90\degunit$,
+we have $\omega'=\gamma\omega$, which is interpreted as a pure time dilation effect when the source's
+motion is transverse to the line of sight.
+
+To see the power of the mathematical tools we've developed in this chapter, you may wish to
+look at sections 6 and 7 of Einstein's 1905 paper on special relativity, where a lengthy
+derivation is needed in order to arrive at the same result.
+<% end_sec('doppler-fancy') %> 
+<% begin_sec("Aberration",nil,'aberration') %>
+Imagine that rain is falling vertically
+while you drive in a convertible with the top down.
+To you, the raindrops appear to be moving at some nonzero angle relative to vertical. This is referred to as
+aberration:\index{aberration}
+a world-line's direction changes depending on one's frame of reference.
+In the street's frame of reference, the angle between the rain's three-velocity and the car's is
+$\theta=90\degunit$, but in the car's frame $\theta'\ne90\degunit$.
+In this example, aberration is a large effect because the car's speed $v$ is comparable to 
+the velocity $u$ of the raindrops. To a snail crawling along the sidewalk at a much
+lower $v$, the effect would be small. Using the small-angle approximation
+$\tan\epsilon\approx\epsilon$, we find that for small $v$, the difference $\Delta\theta=\theta'-\theta$ would
+be approximately $v/u$, in units of radians.
+
+Compared to a ray of light, we're all like snails.
+For example, the earth's orbital speed is about
+$v\sim10^{-4}$ in units where the speed of light $u=1$,
+so we expect a maximum effect of about $10^{-4}$ radians,
+or $20''$ of arc, which is small but not negligible for a telescope with a high-quality mount,
+being used at high magnification.
+
+This estimate of astronomical aberration of light is roughly right, but we don't expect it
+to be exact, both because of the small-angle approximation and because we calculated it using
+a Galilean picture of spacetime. Let's calculate the exact result.
+As shown in example \ref{eg:light-phase-gives-vel} on p.~\pageref{eg:light-phase-gives-vel},
+the direction of propagation of a light wave lies along the vector that is the dual
+to its frequency covector. Let's call this direction of propagation
+$__birdvec(\vc{u})$. Reusing the expression for  $__birddualvec(\bomega)$ defined in section
+\ref{subsec:doppler-fancy}, and arbitrarily
+fixing $__birdvec(\vc{u})$'s timelike component to be 1, we have
+\begin{equation*}
+  __birdvec(\vc{u}) =(1,-\cos\theta,-\sin\theta)\eqquad.
+\end{equation*}
+When this vector undergoes
+a boost $v$ along the $x$ axis it becomes
+\begin{equation*}
+  __birdvec(\vc{u}') =(\gamma(1+v\cos\theta),\gamma(-v-\cos\theta),-\sin\theta) 
+\end{equation*}
+The original angle $\theta=\tan^{-1}(u_y/u_x)$ has been transformed
+to $\theta'=\tan^{-1}(u_y'/u_x')$, the result being
+\begin{equation*}
+  \tan\theta' = \frac{\sin\theta}{\gamma(\cos\theta+v)}\eqquad.
+\end{equation*}
+
+\begin{eg}{A test of special relativity}
+An assumption underlying this treatment of aberration was that the speed of light was $u=c$,
+regardless of the velocity of the source. Not all prerelativistic theories had this property,
+and one would expect that in such a theory, aberration would not be in accord with the relativistic
+result. In particular, suppose that we believed in Galilean spacetime, so that when a distant galaxy,
+receding from us at some speed $w$, emitted a ray of light toward us, the light's velocity in our
+frame was $u=c-w$. That is, we imagine a theory in which emitting a ray of light is like shooting
+a bullet from a gun. Since aberration effects go approximately like $v/u$, we would expect that
+the reduced $u$ would lead to more aberration compared to the prediction of relativity.
+
+To test theories of this type,
+Heckmann\footnote{Annales d'Astrophysique 23 (1960) 410,
+\url{adsabs.harvard.edu/abs/1960AnAp...23..410H}.} used a
+24-inch reflector at Hamburg to take high-magnification photographic plates of a star field
+in Ursa Major containing 11 stars inside the Milky Way and 5 distant galaxies. Measurements
+of Doppler shifts showed that the galaxies were receding from us at velocities of about $w=0.05c$, whereas
+stars within the Milky Way move relative to us at speeds that are negligible in comparison.
+If, contrary to the relativistic prediction, this led to a 5\%
+decrease in $u$, then we would expect about a 5\%
+increase in aberration for the galaxies compared to the stars.
+
+Over the course of a year, the earth's orbit carries it toward and away
+from Ursa Major, so that in the earth's frame of reference, the stars and galaxies have varying velocities
+relative to us, and the $\sim20''$ aberration effect oscillates in direction.
+If the effect was different for the galaxies and the stars, then they ought to shift their apparent positions
+relative to one another. The shift ought to be on the order of 5\%
+of $20''$, or one second of arc.
+The results from the observations showed that these relative positions did not
+appear to vary at all over the course of a year, with the average relative shift
+being $0.00\pm0.06''$ of arc. This difference in aberration is
+consistent with zero, as predicted by special relativity.
+\end{eg}
+
+<%
+  fig(
+    'cube',
+    %q{1. The cube's rest frame. 2. The observer's frame. 3. The observer's view of the cube,
+       severely distorted by aberration.},
+    {'width'=>'fullpage','float'=>false}
+  )
+%>
+
+\begin{eg}{The view of an ultrarelativistic observer}\label{eg:cube}
+Figure \figref{cube} shows a visualization for an observer flying through a cube at $v=0.99$.
+In \subfigref{cube}{1}, the cube is shown in its own rest frame, where it has sides of unit length, and
+the observer, having already passed through, lies one unit to the right of the cube's center. The
+observer is facing to the right, away from the cube. The dashed line is a ray of light that travels
+from point P to the observer, and in this frame it appears as though the ray, 
+arriving from $\theta=162\degunit$,
+would not make it into
+the observer's eye.
+
+But in the observer's frame, \subfigref{cube}{2}, the ray
+is at $\theta'=47\degunit$, so it actually does fall within her field of view.
+The cube is length-contracted by a factor $\gamma\approx 7$.
+The ray was emitted earlier, when the cube was out in front of the observer, at the position
+shown by the dashed outline. 
+
+The image seen by the
+observer is shown in \subfigref{cube}{3}. The circular outline defining the field of
+view represents $\theta'=50\degunit$.
+Note that the relativistic length contraction is not at all
+what an observer \emph{sees} optically. The optical observation is influenced by length contraction,
+but also by aberration and by the time it takes for light to propagate to the observer. The time
+of propagation is different for different parts of the cube, so in the observer's frame,
+\subfigref{cube}{2}, rays from different points had to be emitted when the cube was at different
+points in its motion, if those rays were to reach the eye.
+
+A group at Australian National University has produced animations of similar scenes,
+which can be found online by searching for ``optical effects of special relativity.''
+
+It's fun to imagine the view of an observer oboard an ultrarelativistic
+starship. For $v$ sufficiently close to 1, any angle $\theta<180\degunit$
+transforms to a small $\theta'$. Thus, all light coming to this observer from the surrounding
+stars --- even those in extreme backward directions! --- is gathered into a small, bright patch of
+light that appears to come from straight ahead. Some visible light would be shifted into the extreme
+ultraviolet and infrared, while some infrared and ultraviolet light would become visible.
+\end{eg}
+
+
+<% end_sec('aberration') %> 
+<% end_sec('doppler-3d') %> 
+
+
+<% begin_sec("Phase and group velocity",nil,'phase-and-group-vel') %>
+<% begin_sec("Phase velocity",nil,'phase-vel') %>\index{velocity!wave!phase}
+A wavefront is a line or surface of constant phase.
+In a snapshot of a wave at one moment of time, the direction of propagation of the wave is across
+the wavefronts. The visual situation is different in a spacetime diagram. In $1+1$ dimensions,
+figure \subfigref{surfer-phase}{1}, suppose that the lines represent the crest of the water waves.
+The surfer is on top of a crest, riding along with it. His velocity vector $__birdvec(\vc{u})$ is in the spacetime
+direction that lies on top of the wavefront, not across it.
+Clearly both his motion and the propagation of the wave are to the right, not to the left as we might imagine
+based on experience with snapshots of waves.
+<% marg(-300) %>
+<%
+  fig(
+    'surfer-phase',
+    %q{The surfer moves directly to the right with velocity vector $\vc{u}$. The wave also propagates to
+       the right.}
+  )
+%>
+<% end_marg %>
+
+In $2+1$ dimensions, \subfigref{surfer-phase}{2}, the surfer's velocity is 
+visualized as an arrow lying within a plane of constant phase. 
+Given the wave's phase information, there is more than one possible arrow of this kind.
+We could try to resolve the ambiguity by requiring that the arrow's projection into the $xy$ plane
+be perpendicular to the intersection of the wavefronts with that plane, but (with the exception
+of the case where the wave  travels at $c$, example \ref{eg:light-phase-gives-vel},
+p.~\pageref{eg:light-phase-gives-vel}) this prescription gives
+results that change depending on our frame of reference, and the changes are not describable by
+a Lorentz transformation of the velocity vector.
+This shows that in the general case, the phase information of the wave, encoded in the
+frequency covector $__birddualvec(\bomega)$, does not describe the direction of the wave's
+propagation through space.\label{phase-does-not-determine-propagation}
+At most it tells us the wave's
+\emph{phase velocity}, $\omega/k$, which is not really a velocity. All of these are symptoms of
+the fact that a velocity is supposed to be a vector, but $__birddualvec(\bomega)$ is a covector.
+The phase velocity lacks
+physical interest, because it is not the velocity at which any ``stuff'' moves.\index{phase velocity}
+
+\begin{eg}{Velocity vector of a light wave, given its phase}\label{eg:light-phase-gives-vel}
+We've seen that in general, the information about
+the phase of a wave encoded in $__birddualvec(\bomega)$
+does not determine its direction of propagation.
+The exception is a wave, such as a light
+wave, that propagates at $c$. 
+Let a world-line of propagation of the wave lie along the vector $__birdvec(\vc{v})$.
+In the case of a wave propagating at $c$, we have $v^2=0$ (so that $__birdvec(\vc{v})$ can't have the usual
+normalization for a velocity vector), and the dispersion relation is simply
+$\bomega^2=0$. Since the phase stays constant along a world-line of propagation,
+$__birdscalarproduct(\bomega,\vc{v})=0$. We therefore find that $\vc{v}$ and
+$\bomega$ are two nonzero, lightlike vectors that are orthogonal to each other.
+But as shown in problem \ref{hw:orthogonal-lightlike-are-parallel} 
+on p.~\pageref{hw:orthogonal-lightlike-are-parallel}, this implies that the two vectors are
+parallel. Thus if we're given the covector $__birddualvec(\bomega)$, we just have to
+compute its dual $__birdvec(\bomega)$ to find the direction of propagation.
+\end{eg}
+<% end_sec('phase-vel') %>
+
+<% begin_sec("Group velocity",nil,'group-vel') %>\index{velocity!wave!group}
+The phase velocity is not the velocity at which ``stuff'' is transmitted by the wave.
+The velocity of the stuff is called the group velocity.\index{group velocity}
+To have a meaningully defined group velocity,
+we need to have a wave that is modulated, because an unmodulated wave is an infinite sine wave
+that stretches off to infinity, and such an unmodulated wave does not transmit any energy or information.
+An unmodulated wave has the same frequency
+covector $__birddualvec(\bomega)$ throughout all of spacetime, i.e., the same frequency $\omega$ and wavenumber $k$.
+One way of describing a modulated wave is by how $__birddualvec(\bomega)$ does change.
+
+But the different components of $__birddualvec(\bomega)$ are not free to change in any randomly chosen way.
+Normally they are constrained by a dispersion relation.
+For example, surface waves in deep water obey the constraint $C=0$, where
+$C=\omega^4-\alpha^2 k^2$ (figure \figref{dispersion})
+and $\alpha$ is a constant with units of acceleration, relating
+to the acceleration of gravity. (Since the water is infinitely deep, there is no other scale that
+could enter into the constraint.)
+
+Now if a certain bump on the envelope with which the
+wave is modulated visits spacetime events P and Q, then whatever frequency and wavelength
+the wave has near the bump are observed to be the same at P and Q. In general,
+$k$ and $\omega$ are constant along the spacetime displacement of any point on the envelope,
+so the spacetime displacement $__birdvec(\vc{r})$ from P to Q must satisfy
+the condition $__birdscalarproduct((\nabla \bomega),\vc{r})=0$.
+<% marg(300) %>
+<%
+  fig(
+    'dispersion',
+    %q{Points on the graph satisfy the dispersion relation $C=0$ for water waves.
+       At a given point on the graph, the covector $__birddualvec((\nabla C))$
+       tells us the group velocity.}
+  )
+%>
+<% end_marg %>
+
+In addition, $\nabla \bomega$ must be tangent to the surface of constraint $C=0$, so that the wave always
+obeys the constraint. Thus given a point $__birddualvec(\bomega)$ in frequency space, the direction of propagation
+$\vc{r}$ must be uniquely determined by the constraint.
+Suppose $C$ is a well-behaved function,
+so that it is approximately a linear function of any small change $\Delta\bomega$, i.e., in $1+1$
+dimensions we have
+\begin{equation*}
+  \Delta C = \frac{\partial C}{\partial \omega}\Delta\omega + \frac{\partial C}{\partial k}\Delta k.
+\end{equation*}
+In this approximation, $\Delta C$ is a linear function that acts on a covector $\Delta\bomega$ and gives back a scalar.
+In other words, $\Delta C$ acts like a vector with components
+\begin{equation*}
+  \Delta C = \left(\frac{\partial C}{\partial \omega}, \frac{\partial C}{\partial k}\right).
+\end{equation*}
+This vector is parallel to $\vc{r}$, so that it points in the wave's direction of propagation
+through spacetime, and tells us its group velocity $(\partial C/\partial k)/(\partial C/\partial\omega)$.
+In our example of water waves, a calculation shows that the group velocity is $\pm\alpha/2\omega$,
+which is half the phase velocity.
+
+<% end_sec('group-vel') %>
+<% end_sec('phase-and-group-vel') %>
+
+<% begin_sec("Abstract index notation",nil,'abstract-index') %>
+This chapter has centered on the physics of waves, but along the way we've found it helpful to build
+up some mathematical ideas such as covectors, which have applications in a much broader physical
+context. In this section we'll develop some related notation.
+
+Expressions in birdtracks notation such as
+\begin{equation*}
+  __birdgrad(C)s
+\end{equation*}
+can be awkward to type on a computer, which is why we've already been occasionally resorting to
+more linear notations such as $__birdscalarproduct((\nabla C),s)$. For
+more complicated birdtracks, the diagrams sometimes look like complicated electrical schematics, and
+the problem of generating them on a keyboard get more acute.
+There is in fact a systematic way of representing any such expression using only ordinary subscripts
+and superscripts. This is called abstract index notation, and was introduced by Roger Penrose
+at around the same time he invented birdtracks. For practical reasons, it was the abstract index
+notation that caught on.\index{abstract index notation}
+\index{birdtracks notation!equivalent to abstract index notation}
+\index{abstract index notation!equivalent to birdtracks}
+\index{abstract index notation}
+
+The idea is as follows. Suppose we wanted to describe a complicated birdtrack
+verbally, so that someone else could draw it. 
+The diagram would be made up of various smaller parts, a typical one looking something
+like the scalar product $__birdscalarproduct(u,v)$. The verbal instructions might be: ``We have
+an object $u$ with an arrow coming out of it. For reference, let's label this arrow as $a$.
+Now remember that other object $v$ I had you draw before? There was an arrow coming into
+that one, which we also labeled $a$. Now connect up the two arrows labeled $a$.''
+
+Shortening this lengthy description to its bare minimum, Penrose renders it like
+this: $u_av^a$. Subscripts depict arrows coming out of a symbol (think of water flowing
+from a tank out through a pipe below). Superscripts indicate arrows going in. When
+the same letter is used as both a superscript and a subscript, the
+two arrows are to be piped together.
+
+Abstract index notation evolved out of an earlier one 
+called the Einstein summation convention,\index{Einstein summation convention}
+in which superscripts and subscripts referred to specific coordinates.
+For example, we might take 0 to be the time coordinate, 1 to be $x$, and so on.
+A symbol like $u_\lambda$ would then indicate a component of the dual vector $u$,
+which could be its $x$ component if $\lambda$ took on the value 1. Repeated indices
+were summed over. 
+
+The advantage of the birdtrack and abstract index notations is that they are
+coordinate-independent, so that an equation written in them is valid regardless
+of the choice of coordinates. The Einstein and abstract-index notations look very similar,
+so for example if we want to take a general result expressed in abstract-index notation
+and apply it in a specific coordinate system, there is essentially no translation
+required. In fact, the two notations look so similar that we need an explicit way
+to tell which is which, so that we can tell whether or not a particular result
+is coordinate-independent. We therefore use the convention that Latin indices
+represent abstract indices, whereas Greek ones imply a specific coordinate system
+and can take on numerical values, e.g., $\lambda=1$.
+
+The following are some examples of equivalent equations written side by side
+in birdtracks and abstract index notations.
+
+Observer $\vc{o}$'s displacement in spacetime is a vector:
+\begin{equation*}
+  __birdvec(\vc{o}) \qquad o^a
+\end{equation*}
+In Einstein notation, it's awkward to express a vector as a whole, because in a notation
+like $o^\lambda$, $\lambda$ is supposed to take on a particular value. If we used
+$o^\lambda$ to mean the whole vector, it would be an abuse of notation. In abstract index
+notation, however, the $a$ is simply a name we gave to a pipe coming into vector $\vc{o}$;
+the fact that we didn't need to refer to the name in order to connect it to some other pipe
+is irrelevant.
+
+A wave's frequency is a covector:
+\begin{equation*}
+  __birddualvec(\bomega) \qquad \omega_a
+\end{equation*}
+
+An observer experiences proper time $\tau$:
+\begin{equation*}
+  __birdscalarproduct(\vc{o},\vc{o}) = \tau^2 \qquad o_a o^a = \tau^2
+\end{equation*}
+There are no external arrows in the birdtracks version, and in the abstract-index version
+all lower indices (pipes coming out) have been paired with upper indices (pipes coming in);
+this indicates that the proper time is a scalar, and therefore independent of any choice of
+coordinate system.
+In Einstein notation, this becomes $o_\lambda o^\lambda$, with an implied sum over the
+repeated index, $\sum_{\lambda} o_\lambda o^\lambda$. The $\lambda$ refers to a particular
+coordinate system, so in the Einstein notation it is no longer obvious that the equation holds
+regardless of our choice of coordinates.
+
+A world-line along which a wave propagates lies along a vector that is orthogonal to
+the wave's frequency covector:
+\begin{equation*}
+  __birdscalarproduct(\bomega,\vc{u}) = 0 \qquad \omega_a u^a = 0
+\end{equation*}
+The frequency covector is the gradient of the phase:
+\begin{equation*}
+  __birddualvec(\bomega) = __birdgrad(\phi) \qquad \omega_a = \nabla_a \phi
+\end{equation*}
+
+The following grammatical rules apply to both abstract-index and Einstein notation:
+
+\begin{enumerate}\label{index-grammar}
+\item Repeated indices occur in pairs, with one up and one down and the two factors multiplying each other.
+\item Disregarding indices that are paired as in rule 1, all other indices must appear uniformly in
+         all terms and on both sides of an equation.  ``Appear uniformly'' means that an index can't
+         be missing and can't be a superscript in some places but a subscript in others.
+\item For reasons to be explained in section \ref{sec:xfn-summary}, p.~\pageref{sec:xfn-summary},
+         a partial derivative with respect to a coordinate, such as $\partial/\partial x^k$,
+         is treated as if the index were a \emph{subscript}, and conversely
+         $\partial/\partial x_k$ is considered to have a superscripted $k$.
+\end{enumerate}
+
+\noindent In abstract-index notation, rule 1 follows because the indices are simply labels describing
+how, in birdtracks notation, the pipes should be hooked up. Violating rule 1, as in an expression like $v^a v^a$,
+produces a quantity that does not actually behave as a scalar. An example of a violation of rule
+2 is $v^a=\omega_a$. This doesn't make sense, for the same reason that it doesn't make sense to
+equate a row vector to a column vector in linear algebra. Even if an equation like this did hold
+in one frame of reference, it would fail in another, since the left-hand and right-hand sides
+transform differently under a boost.
+
+In section \ref{subsec:duality-generalized} we discussed the notion of finding the covector
+that was dual to a given vector, and the vector dual to a given covector. Because the distinction
+between vectors and covectors is represented in index notation by placing the index on the top
+or on the bottom, relativists refer to this kind of thing as raising and lowering indices.
+In general, this type of manipulation is called ``index gymnastics.''
+Here's what raising and lowering indices looks like.\index{raising an index}\index{lowering an index}
+
+Converting a vector to its covector form:
+\begin{equation*}
+  u_a = g_{ab} u^b
+\end{equation*}
+Changing a covector to the corresponding vector:
+\begin{equation*}
+  u^a = g^{ab} u_b
+\end{equation*}
+The symbol $g^{ab}$ refers to the inverse of the matrix $g_{ab}$.
+
+<% end_sec('abstract-index') %> 
+
+<% begin_hw_sec %>
+
+<% begin_hw('dual-of-dual') %>
+In section \ref{subsec:duality-generalized}, I proved that duality is a self-inverse operation,
+invoking Minkowski coordinates and assuming the signature to be $+---$. Show that these
+assumptions were not necessary.
+<% end_hw %>
+
+
+<% end_hw_sec %>
+
+<% end_chapter %>

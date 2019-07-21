@@ -1,0 +1,56 @@
+% !Mode:: "TeX:UTF-8"%確保文檔utf-8編碼
+%新加入的命令如下：addchtoc addsectoc reduline showendnotes hlabel
+%新加入的环境如下：common-format  fig linefig xverbatim
+
+\documentclass[11pt,oneside]{book}
+\newlength{\textpt}
+\setlength{\textpt}{11pt}
+\newif\ifphone
+\phonefalse
+
+\usepackage{myconfig}
+\usetikzlibrary{intersections,calc,external}
+
+\tikzset{external/system call={xelatex \tikzexternalcheckshellescape -halt-on-error
+-interaction=batchmode -jobname "\image" "\texsource";
+dvips -o "\image".ps "\image".dvi;
+ps2eps "\image.ps"}}
+\tikzexternalize
+
+\tikzexternalize % activate!
+
+\begin{document}
+
+\begin{tikzpicture}[
+information text/.style={rounded corners,fill=red!10,inner sep=1ex}]
+%\draw[step=1,color=gray!40] (-4,-3) grid (1,3);
+\coordinate (C) at (0,0);
+\draw(C) node[below] { C};
+\draw[name path = OO'] (-4,0) -- (1,0);
+\begin{scope}
+\clip[name path = Pr] (-4,-2) rectangle (-1.5,2);
+\draw[name path = Pc] (C) circle (3);
+\path[name intersections={of=Pr and Pc}] (intersection-1) coordinate (P);
+\end{scope}
+\draw(P)  node[above left] {P};
+\draw[name path = PC] (P) -- (C) ;
+\path[name path = PQ] (P) -- ++(0,-2);
+\path[name intersections={of=PQ and OO'}] (intersection-1) coordinate (Q);
+\draw(Q)  node[below] { Q};
+\draw (P) -- (Q);
+\draw[dotted,name path = QT] (Q) arc (180:130:2);
+\path[name intersections={of=PC and QT}] (intersection-1) coordinate (T);
+\draw(T)  node[above right] { T};
+\coordinate (V) at (-3,0);
+\draw(V)  node[below left] {V};
+\draw[xshift=1.2cm] node[right,text width =5cm ,information text] {我们可以看到$PT=VQ$，然后$PT$用上一节提到的估算方法约为$h^2/2R$。其中R是$ PC $长，然后同样这种估算方法在$ \angle PCQ $角度很小时才很精确。};
+\end{tikzpicture}
+
+
+
+%这里空一行
+
+\end{document}
+
+
+

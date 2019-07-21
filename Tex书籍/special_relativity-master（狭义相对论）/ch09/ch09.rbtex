@@ -1,0 +1,2034 @@
+\addtocontents{toc}{\protect\vfill} % cosmetic
+
+<%
+  require "./scripts/eruby_util.rb"
+%>
+<%
+  chapter(
+    '09',
+    %q{Flux},
+    'ch:flux'
+  )
+%>
+
+<% begin_sec("The current vector",nil,'j-vector') %>
+<% begin_sec("Current as the flux of charged particles",nil,'current-as-flux') %>
+The most fundamental laws of physics are conservation laws, which tell us that we can't
+create or destroy ``stuff,'' where ``stuff'' could mean quantities such as electric
+charge or energy-momentum. Since charge is a Lorentz invariant, it's an easy example
+to start with. Because charge is invariant, we might also imagine that charge density
+$\rho$ was invariant. But this is not the case, essentially because spatial (3-dimensional)
+volume isn't invariant; in $3+1$ dimensions, only \emph{four}-dimensional volume is
+an invariant (problem \ref{hw:no-transverse-length-contraction}, 
+p.~\pageref{hw:no-transverse-length-contraction}). For example, suppose we have an
+insulator in the shape of a cube, with charge distributed uniformly throughout it
+according to an observer $\vc{o}_1$ at rest relative to the cube. Then in a frame 
+$\vc{o}_2$ moving relative
+to the cube, parallel to one of its axes, the cube becomes foreshortened by length
+contraction, and its volume is reduced by the factor $1/\gamma$. The result is that
+the charge density in $\vc{o}_2$ is greater by a factor of $\gamma$. 
+
+This means that
+knowledge of the charge density $\rho$ in one frame is insufficient to determine the charge
+density in another frame. In the example of the cube, what would be sufficient would
+be knowledge of the vector $\vc{J}=\rho_0\vc{v}$, where $\rho_0$ is the charge density
+in the cube's rest frame, and $\vc{v}$ is the cube's velocity vector. $\vc{J}$, called
+the current vector,\index{current vector}
+transforms
+as a relativistic vector because of the transformation properties of the two factors
+that define it. The velocity $\vc{v}$ is a vector (section \ref{subsec:v-vector}). The
+factor $\rho_0$ is an invariant, since it in turn breaks down into charge divided by
+rest-volume. Charge is an invariant, and
+all observers agree on what the volume the cube \emph{would} have in its rest frame.
+<% marg(30) %>
+<%
+  fig(
+    'fluxes-of-charge',
+    %q{Charged particles with world-lines that contribute to $J_x$ and $\rho$. The $z$ dimension
+       isn't shown, so the cubical 3-surfaces appear as squares.}
+  )
+%>
+<% end_marg %>
+
+$\vc{J}$ can be expressed in Minkowski coordinates as $(\rho,J^x,J^y,J^z)$, where
+$\rho$ is the charge density and, e.g., $J^x$ is the density of electric current in the
+$x$ direction. Suppose we define the three-surface $S$ shown in figure
+\subfigref{fluxes-of-charge}{1}, consisting of the set of events
+with coordinates $(t,0,y,z)$ such that $0\le t\le 1$, $0\le y \le 1$, and $0\le z \le 1$.
+Some charged particles have world-lines that intersect this surface, passing through it
+either in the positive $x$ direction or the negative $x$ direction (which we count
+as negative charge transport). $S$ has a three-volume $V$. If we add up the total
+charge transport $\Delta q$ across this surface and divide by $V$, we get the average
+value of $J^x$. If we let $S$ shrink down to smaller and smaller three-surfaces surrounding
+the event $(0,0,0,0)$, then we get the the value of $J^x$ at this point, $\lim_{V\rightarrow0} \Delta q/V$.
+In other words, $J^x$ measures the \emph{flux density} of charge that passes through $S$.
+Of course this description in terms of a limit implies a large number of charges, not just
+one as in figure \figref{fluxes-of-charge}.
+
+You can write out the analogous definition for $J^t$, using a surface of simultaneity for like $S'$,
+figure \subfigref{fluxes-of-charge}{2},
+and you'll see that it expresses the density of charge $\rho$. In this case $S'$ represents a
+moment in time, and the flux through $S'$ means that
+the charges are crossing the threshold from the past into the future.
+
+Our argument that $\vc{J}$ transformed like a vector was based on a case where all
+the charged particles had the same velocity vector, but the above description in terms
+of the flux of charge eliminated any discussion of velocity.
+It's true, but less obvious, that the $\vc{J}$ described in this way also transforms
+as a vector, even in cases where the charged
+particles do not all have parallel world-lines.
+The current vector is the source of electric and magnetic fields.
+Remarkably, no macroscopic electrical measurement is
+capable of detecting anything more detailed about the motion of the charges than the
+averaged information provided by $\vc{J}$.
+
+\begin{eg}{Boosting a solenoid}\label{eg:boost-solenoid}
+The figure shows a solenoid, at rest, wound from copper wire.
+At point P, we construct a rectangular Amp\`erian
+loop in the $yz$ plane that has its right edge inside the solenoid and its left one outside.
+Amp\`ere's law,
+$\int \vc{B}\cdot\der\vc{s}=(4\pi k/c^2)I$, then tells us that
+the current density $J_x$ causes a difference between the exterior field $B_z=0$ and
+the interior field $B_z=(4\pi k/c^2)J_x \Delta y$, where $\Delta y$ is the thickness
+of the solenoid. There are two things we can get from this result, both of them
+nontrivial.
+<% marg(30) %>
+<%
+  fig(
+    'boost-solenoid',
+    %q{Example \ref{eg:boost-solenoid}.}
+  )
+%>
+<% end_marg %>
+
+First, the field depends only on the current density, not on any information about the
+details of the motion of the electrons in the copper. The electrons' motion is fast and highly
+random, but all that contributes to $J_x$ is the slow drift velocity, typically $\sim1\ \zu{cm}/\sunit$,
+superimposed on the randomness. This is exact and not at all obvious. For example, the total \emph{momentum}
+of the electrons \emph{does} depend on the random part of their motion, because $p_x=m\gamma v_x$ has
+a factor of $\gamma$ in it.
+
+Second, we can use the transformation properties of the current vector to find
+the field of this solenoid in a frame boosted along its axis. This is the kind of
+situation that would naturally arise, for example, in an electric motor whose rotor
+contains an electromagnet. A Lorentz transformation
+in the $z$ direction doesn't change the $x$ component of a vector, nor does it change
+$\Delta y$, so $B_z$ is the same
+in both frames. This is nontrivial both in the sense that it would have been difficult
+to figure out by brute force and in the sense that fields \emph{don't} have to be the
+same in different frames of reference --- for example, a boost in the $x$ or the $y$ direction
+would have changed the result.
+\end{eg}
+
+\begin{eg}{A wire}\label{eg:wire-four-current}
+In a solid conductor such as a copper wire, we have two types of charges, protons and electrons.
+The protons are at rest in the lab frame $\vc{o}$, with charge density $\rho_p$ and current density
+\begin{equation*}
+  \vc{J}_p = (\rho_p,0,0,0)
+\end{equation*}
+in Minkowski coordinates.
+The motion of the electrons is complicated. Some electrons
+are bound to a particular atom, but still move at relativistic speeds within their atoms. Others
+exhibit violent thermal motion that very nearly, but not quite, averages out to zero when there is
+a current measurable by an ammeter. For simplicity, we treat all the electrons (both the bound ones
+and the mobile ones) as a single density of charge $\rho_e$. Let the average velocity of the electrons,
+known as their drift velocity, be $v$ in the $x$ direction. Then in the frame $\vc{o}'$ moving along
+with the drift velocity we have
+\begin{equation*}
+  \vc{J}'_e = (\rho_e',0,0,0)\eqquad,
+\end{equation*}
+which under a Lorentz transformation back into the lab frame becomes
+\begin{equation*}
+  \vc{J}_e = (\rho_e' \gamma,\rho_e' v \gamma,0,0)\eqquad.
+\end{equation*}
+Adding the two current vectors, we have a total current in the lab frame
+\begin{equation*}
+  \vc{J} = (\rho_p+\rho_e' \gamma,\rho_e' v \gamma,0,0)\eqquad.
+\end{equation*}
+The wire is electrically neutral in this frame, so $\rho_p+\rho_e' \gamma=0$. Since $\rho_p$ is a fixed
+property of the wire, we express $\rho_e'$ in terms of it as $\rho_p/\gamma$. Eliminating $\rho_e'$ gives
+\begin{equation*}
+  \vc{J} = (0,-\rho_p v ,0,0)\eqquad.
+\end{equation*}
+Because the $\gamma$ factors canceled, we find that the current is exactly proportional to the
+drift velocity. Geometrically, we have added two timelike vectors and gotten a spacelike one;
+this is possible because one of the timelike vectors was future-directed and the other
+past-directed.
+\end{eg}
+
+<% end_sec('current-as-flux') %>
+
+<% begin_sec("Conservation of charge",4,'conservation-of-charge') %>
+
+Conservation of charge can be expressed elegantly in terms of $\vc{J}$. Charge density
+is the timelike component $J^t$. If this charge density near a certain point is, for example, increasing,
+then it might be because charge conservation has been violated as
+in figure \subfigref{charge-conservation}{1}. In this example,
+more world-lines emerge into the future at the top of the four-cube than had entered through the bottom
+in the past. Some process inside the cube is creating charge.
+In the limit where the cube is made very small, this would be measured by
+a value of $\partial J^t/\partial t$ that was greater than zero.
+
+<% marg(30) %>
+<%
+  fig(
+    'charge-conservation',
+    %q{1. Charge is not conserved. Charges mysteriously appear at a later time without having been present
+       before. 2. Charge is conserved. Although more world-lines come out through the top of the box than
+       came in through the bottom, the discrepancy is accounted for by others that entered through the sides.}
+  )
+%>
+<% end_marg %>
+
+But experiments have never detected any violation of charge conservation, so if
+more charge is emerging from the top (future) side of the cube than came in from the bottom (past),
+the more likely explanation is that the charges are not all at rest, as in \subfigref{charge-conservation}{1},
+but are moving, \subfigref{charge-conservation}{2}, and there has been a net flow in from 
+neighboring regions of
+space.
+We should find this reflected
+in the spatial components $J^x$, $J^y$ and $J^z$. Moreover, if these spatial components
+were all constant, then any given region of space would have just as much current flowing into
+it from one side as there was flowing out the other. We therefore need to have
+some nonzero partial derivatives such as $\partial J^x/\partial x$. 
+For example, figure \subfigref{charge-conservation}{2} has a positive $J^x$ on the left
+and a negative $J^x$ on the right, so $\partial J^x/\partial x<0$.
+Charge conservation is expressed by the simple equation
+$\partial J^\lambda/\partial x^\lambda=0$. Writing out the implied sum over $\lambda$, this
+says that $\partial J^t/\partial t+\partial J^x/\partial x+\partial J^y/\partial y+\partial J^z/\partial z=0$.
+with an implied sum over the index $\lambda$. If you've taken vector calculus, you'll
+recognize the
+operator being applied to $\vc{J}$ as a four-dimensional generalization of the
+divergence.\label{divergence}\index{divergence}
+This charge-conservation equation is valid regardless of the coordinate system,
+so it can also be rewritten in abstract index notation as
+\begin{equation}
+  \frac{\partial J^a}{\partial x^a} = 0\eqquad.
+\end{equation}
+
+\begin{eg}{Conservation of charge in a solenoid}
+In a solenoid, we have charge circulating at some drift velocity $v$. Ignoring the protons,
+and adapting the relevant expression from example \ref{eg:wire-four-current} to the case of
+circular rather than linear motion,
+we might have for the electrons' contribution to the current something of the form
+\begin{equation*}
+  \vc{J} = p (1,-qy,qx,0)\eqquad,
+\end{equation*}
+where $p=\gamma v$ and $q$ depends on the $v$ and on the radius of the solenoid.
+Conservation of charge is satisfied, because each of the four terms
+in the equation 
+$\partial J^t/\partial t+\partial J^x/\partial x+\partial J^y/\partial y+\partial J^z/\partial z=0$
+vanishes individually.
+\end{eg}
+<% end_sec('conservation-of-charge') %>
+<% end_sec('j-vector') %>
+
+<% begin_sec("The stress-energy tensor",4,'stress-energy') %>
+<% begin_sec("Conservation and flux of energy-momentum",nil,'p-flux') %>
+A particle such as an electron has a charge, but it also has a mass. We can't define a relativistic
+mass flux because flux is defined by addition, but mass isn't additive in relativity
+(example \ref{eg:mass-of-two-light-waves}, p.~\pageref{eg:mass-of-two-light-waves}).
+Mass-energy is additive, but unlike charge it isn't an invariant. Mass-energy is part
+of the energy-momentum four vector $\vc{p}=(E,p^x,p^y,p^z)$. We then have sixteen
+different fluxes we can define. For example, we could replay the description 
+in section \ref{sec:j-vector} of the three-surface $S$ perpendicular to the $x$ direction,
+but now we would be interested in a quantity such as the $z$ component of momentum.
+We then have a measure of the density of flux of $p^z$ in the $x$ direction, which we
+notate as $T^{zx}$. The matrix $T$ is called the stress-energy tensor,
+and it is an object of central importance in relativity.\index{stress-energy tensor}
+(The reason for the odd name will become more clear in a moment.)
+In general relativity, it is the source of gravitational fields.
+
+The stress-energy tensor is related to physical measurements as follows.
+Let $\vc{o}$ be the future-directed, normalized velocity vector of an observer; let $\vc{s}$ express
+a spatial direction according to this observer, i.e., it points in a direction
+of simultaneity and is normalized with $\vc{s}\cdot\vc{s}=-1$;
+and let $\vc{S}$ be a three-volume covector (p.~\pageref{three-vol-covector}), directed toward
+the future (i.e., $o^aS_a>0$). Then measurements by this observer come out as follows:
+\begin{subequations}\label{eqn:stress-energy-measurements}
+\begin{align}
+  T^{ab}o_a S_b &= \text{mass-energy inside the three-volume $\vc{S}$} \label{eqn:stress-energy-e-meas}\\
+  T^{ab}s_a S_b &= \text{momentum in the direction $\vc{s}$, inside $\vc{S}$} 
+                                                                       \label{eqn:stress-energy-p-meas}
+\end{align}
+\end{subequations}
+
+The stress-energy tensor allows us to express
+conservation of energy-momentum as
+\begin{equation}\label{eq:stress-energy-div-zero}
+  \frac{\partial T^{ab}}{\partial x^a} = 0\eqquad.
+\end{equation}
+This \emph{local} conservation of energy-momentum is all we get in general relativity. As discussed
+in section \ref{subsec:gr-no-e-cons}, p.~\pageref{subsec:gr-no-e-cons}, there is no such
+global law in curved spacetime. However, we will show in section
+\ref{subsec:p-vector} that in the special case of flat spacetime, i.e., special relativity,
+we do have such a global conservation law.
+<% end_sec('p-flux') %>
+<% begin_sec("Symmetry of the stress-energy tensor",nil,'stress-energy-symm') %>
+The stress-energy tensor is a symmetric matrix.
+For example, let's say we have some nonrelativistic particles. If we
+have a nonzero $T^{tx}$, it represents a flux of mass-energy ($p^t$) through a three-surface
+perpendicular to $x$. This means that mass is moving in the $x$ direction. But if mass
+is moving in the $x$ direction, then we have some $x$ momentum $p^x$. Therefore we must also
+have a $T^{xt}$, since this momentum is carried by the particles, whose world-lines pass through
+a hypersurface of simultaneity.
+<% end_sec('stress-energy-symm') %>
+<% begin_sec("Dust",nil,'dust') %>
+The simplest example of a stress-energy tensor would be a cloud of particles, all at rest
+in a certain frame of reference, described in Minkowski coordinates:
+\begin{equation*}
+  T^{\mu\nu} = \begin{pmatrix}
+    \rho & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 
+  \end{pmatrix}\eqquad,
+\end{equation*}
+where we now use $\rho$ to indicate the density of mass-energy, not charge as in section
+\ref{sec:j-vector}. This could be the stress-energy tensor of a stack of oranges at the
+grocery store, the atoms in a hunk of copper, or the galaxies in some small neighborhood of the universe.
+Relativists refer to this type of matter, in which the velocities are negligible, as ``dust.''\index{dust}
+The nonvanishing component $T^{tt}$ indicates that for a three-surface
+$S$ perpendicular to the $t$ axis, particles with mass-energy $E=P^t$ are crossing that
+surface from the past to the future.
+Conservation of energy-momentum is satisfied, since all the elements of this $T$ are constant,
+so all the partial derivatives vanish.
+<% end_sec('dust') %>
+
+<% begin_sec("Rank-2 tensors and their transformation law",nil,'rank-two') %>
+Suppose we were to look at this cloud in a different frame of reference. Some or all of the timelike
+row $T^{t\nu}$ and timelike column $T^{\mu t}$ would fill in because of the existence of
+momentum, but let's just focus for the moment on the change in the mass-energy density
+represented by $T^{tt}$. It will increase for two reasons. First, the kinetic energy
+of each particle is now nonzero; its mass-energy increases from $m$ to $m\gamma$. But
+in addition, the volume occupied by the cloud has been reduced by $1/\gamma$ due to length
+contraction. We've picked up two factors of gamma, so the result is $\rho\rightarrow\rho\gamma^2$.
+This is different from the transformation behavior of a vector. When a vector is purely
+timelike in one frame, transformation to another frame raises its timelike component only by
+a factor of $\gamma$, not $\gamma^2$. This tells us that a matrix like $T$ transforms differently
+than a vector (section \ref{sec:xfn-vectors}, p.~\pageref{sec:xfn-vectors}). The general rule is that
+if we transform from coordinates $x$ to $x'$, then:\label{rank-two-xfn}
+\begin{equation}\label{eqn:rank-two-xfn}
+  T'^{\mu\nu} = T^{\kappa\lambda} 
+                   \frac{\partial x'^\mu}{\partial x^\kappa}
+                   \frac{\partial x'^\nu}{\partial x^\lambda}
+\end{equation}
+An object that transforms in this standard way is called a rank-2 tensor. The 2 is because it
+has two indices. Vectors and covectors have rank 1, invariants rank 0.\index{tensor!rank}
+
+In section
+\ref{sec:xfn-metric}, p.~\pageref{sec:xfn-metric}, we developed a method of transforming the
+metric from one set of coordinates to another; we now see that technique as an application
+of the more general rule given in equation \eqref{eqn:rank-two-xfn}. Considered as a tensor,
+the metric is symmetric, $g_{ab}=g_{ba}$. In most of the example's we've been considering, the
+metric tensor is diagonal, but when it has off-diagonal elements, each of these is one half
+the corresponding coefficient in the expression for $\der s$, as in the following example.
+
+\begin{eg}{An non-diagonal metric tensor}
+The answer to problem \ref{hw:oblique-metric} on p.~\pageref{hw:oblique-metric} was the
+metric
+\begin{equation*}
+  \der s^2 = \der x^2 + \der y^2 + 2\cos\varphi\der x\der y\eqquad.
+\end{equation*}
+Writing this in terms of the metric tensor, we have
+\begin{align*}
+  \der s^2 &= g_{\mu\nu} \der x^\mu \der x^\nu \\
+           &= g_{xx} \der x^2 + g_{xy} \der x\der y + g_{yx} \der y \der x + g_{yy} \der y^2 \\
+           &= g_{xx} \der x^2 + 2g_{xy} \der x\der y + g_{yy} \der y^2\eqquad.
+\end{align*}
+Therefore we have $g_{xy}=\cos\varphi$, not $g_{xy}=2\cos\varphi$.
+\end{eg}
+
+\begin{eg}{Dust in a different frame}\label{eg:dust-stress-energy}
+We start with the stress-energy tensor of the cloud of particles, in the rest frame of the particles.
+\begin{equation*}
+T\indices{^\mu^\nu} = \left( \begin{matrix}
+                   \rho & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0    
+      \end{matrix} \right)\eqquad.
+\end{equation*}
+Under a boost by $ v $ in the $x$ direction, the tensor transformation law gives
+\begin{equation*}
+T\indices{^{\mu'}^{\nu'}} = \left( \begin{matrix}
+                   \gamma^2\rho & \gamma^2 v \rho & 0 & 0 \\
+                   \gamma^2 v \rho & \gamma^2 v ^2\rho & 0 & 0 \\
+                   0 & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0    
+      \end{matrix} \right)\eqquad.
+\end{equation*}
+The over-all factor of $\gamma^2$ arises for the reasons previously described.
+\end{eg}
+
+\begin{eg}{Parity}\label{eg:stress-energy-parity}
+The parity transformation is a change of coordinates that looks like this:
+\begin{align*}
+  t' &= t \\
+  x' &= -x \\
+  y' &= -y \\
+  z' &= -z
+\end{align*}
+It turns right-handed screws into left-handed ones, but leaves the arrow of time unchanged.
+Under this transformation, the tensor transformation law tells us that some of the components
+of the stress-energy tensor will flip their signs, while others will stay the same:
+\begin{equation*}
+  \begin{pmatrix}
+    \text{no flip} & \text{flip} & \text{flip} & \text{flip} \\
+    \text{flip} & \text{no flip} & \text{no flip} & \text{no flip} \\
+    \text{flip} & \text{no flip} & \text{no flip} & \text{no flip} \\
+    \text{flip} & \text{no flip} & \text{no flip} & \text{no flip} 
+  \end{pmatrix}\eqquad,
+\end{equation*}
+Everything here was based solely on the fact that $T$ was a rank-2 tensor expressed in
+Minkowski coordinates, and therefore
+the same parity properties hold for other rank-2 tensors as well; cf.~example
+\ref{eg:e-b-parity}, p.~\pageref{eg:e-b-parity}.
+\end{eg}
+
+<% end_sec('rank-two') %>
+<% begin_sec("Pressure",nil,'pressure') %>
+The stress-energy tensor carries information about pressure. For example,
+$T\indices{^x^x}$ is the flux in the $x$ direction
+of $x$-momentum. This is simply the pressure, $P$, that would be exerted on a surface with its normal
+in the $x$ direction. Negative pressure is tension, and this is the origin of the term ``tensor,''
+coined by Levi-Civita (see p.~\pageref{fig:levi-civita-portrait}).\index{Levi-Civita, Tullio}
+
+\begin{eg}{Pressure as a source of gravitational fields}
+Because the stress-energy tensor is the source of gravitational fields in general relativity,
+we can see that the gravitational field of an object should be influenced not just by its
+mass-energy but by its internal stresses. The very early universe was dominated by photons rather
+than by matter, and photons have a much higher ratio of momentum to mass-energy than matter,
+so the importance of the pressure components in the stress-energy tensor was much greater in
+that era. In the universe today, the largest pressures are those
+found inside atomic nuclei. Inside a heavy nucleus, the electromagnetic pressure can be as high
+as $10^{33}\ \zu{Pa}$! If general relativity's description of pressure as a source of gravitational
+fields were wrong, then we would see anomalous effects in the gravitational forces exerted by
+heavy elements compared to light ones. Such effects have been searched for both in the
+laboratory\footnote{Kreuzer, Phys. Rev. 169 (1968) 1007. Described in section
+3.7.3 of Will, ``The Confrontation between General Relativity
+and Experiment,'' \url{relativity.livingreviews.org/Articles/lrr-2006-3/}.} and in lunar laser ranging
+experiments,\footnote{Bartlett and van Buren, Phys. Rev. Lett. 57 (1986) 21,
+also described in Will.} with results that agreed with general relativity's predictions.
+\end{eg}
+
+<% end_sec('pressure') %>
+
+<% begin_sec("A perfect fluid",nil,'perfect-fluid') %>
+The cloud in example \ref{eg:dust-stress-energy} had a stress-energy tensor
+in its own rest frame that was isotropic, i.e., symmetric with respect to the $x$, $y$, and $z$
+directions. The tensor became anisotropic when we  switched out of this frame. If a physical system
+has a frame in which its stress-energy tensor is isotropic, i.e., of the form
+\begin{equation*}
+T\indices{^{\mu}^{\nu}} = \begin{pmatrix}
+                   \rho & 0 & 0 & 0 \\
+                   0 & P & 0 & 0 \\
+                   0 & 0 & P & 0 \\
+                   0 & 0 & 0 & P
+      \end{pmatrix}\eqquad,
+\end{equation*}
+we call it a perfect fluid in equilibrium. Although it may contain moving particles, this special frame is
+the one in which their momenta cancel out.
+In other cases, the pressure need not be isotropic, and the stress
+exerted by the fluid need not be perpendicular to the surface on which it acts. The space-space
+components of $T$ would then be the classical stress tensor, whose diagonal elements are the anisotropic
+pressure, and whose off-diagonal elements are the shear stress. This is the reason for calling $T$
+the stress-energy tensor.\index{stress-energy tensor!interpretation of}
+
+The perfect fluid form of the stress-energy tensor is extremely important and common. For example,
+cosmologists find that it is a nearly perfect description of the universe on large scales.
+
+We discussed in section \ref{subsec:abstract-index}
+the ideas of converting back and forth between vectors and their
+corresponding covectors, and of notating this as the raising and lowering indices. We can do the
+same thing with the \emph{two} indices of a rank-2 tensor, so that the stress-energy tensor
+can be expressed in four different ways: $T^{ab}$, $T_{ab}$, $T\indices{^a_b}$,
+and $T\indices{_a^b}$, but the symmetry of $T$ means that there is no interesting
+distinction between the final two of these. In special relativity, the
+distinctions among the various forms are not especially
+fascinating. We can always cover all of spacetime with Minkowski coordinates, so that the form
+of the metric is simply a diagonal matrix with elements $\pm1$ on the diagonal. As with a rank-1 tensor, 
+raising and lowering indices on a rank-2 tensor just flips some components and leaves others alone.
+The methods for raising and lowering don't need to be deduced or memorized, since they follow
+uniquely from the grammar of index notation, e.g., $T\indices{^a_b}=g_{bc}T^{ac}$.
+But there is the potential for a lot of confusion with all the signs, and in addition
+there is the fact that some people use a $+---$ signature while others use $-+++$. Since perfect
+fluids are so important, I'll demonstrate how all of this works out in that case.
+
+For a perfect fluid, we can write the stress-energy tensor in the coordinate-independent form
+\begin{equation*}
+  T^{ab}=(\rho+P)o^a o^b -(o^co_c) Pg^{ab}\eqquad,
+\end{equation*}
+where
+$\vc{o}$ represents the velocity vector of an observer in the fluid's rest frame,
+and $o^co_c=o^2=\vc{o}\cdot\vc{o}$ equals
+1 for our $+---$ signature or $-1$ for the signature $-+++$. For ease of writing,
+let's abbreviate the signature factor as $s=o^co_c$.
+
+Suppose that the metric is diagonal, but its components are varying, 
+$g_{\alpha\beta}=\operatorname{diag}(sA^2,-sB^2,\ldots)$. The properly normalized
+velocity vector of an observer at (coordinate-)rest is
+$o^\alpha=(A^{-1},0,0,0)$. Lowering the index gives $o_\alpha=(sA,0,0,0)$.
+The various forms of the stress-energy tensor then look like the following:
+\begin{align*}
+  T_{00} = A^2\rho   \quad & \quad T_{11} = B^2 P \\
+  T\indices{^0_0} = s\rho   \quad & \quad T\indices{^1_1} = - sP \\
+  T^{00} = A^{-2}\rho   \quad & \quad T^{11} = B^{-2} P\eqquad.
+\end{align*}
+Which of these forms is the ``real'' one, e.g., which form of the $00$ component
+is the one that the observer $\vc{o}$
+actually measures when she sticks a shovel in the ground, pulls out a certain volume
+of dirt, weighs it, and determines $\rho$? The answer is that the index notation is
+so slick and well designed that \emph{all} of them are equally ``real,'' and we don't
+need to memorize which actually corresponds to measurements. When she does this
+measurement with the shovel, she could say that she is measuring the quantity $T^{ab}o_a o_b$.
+But because all of the $a$'s and $b$'s are paired off, this expression is a rank-0 tensor.
+That means that $T^{ab}o_a o_b$, $T_{ab}o^a o^b$,
+and $T\indices{^a_b}o_ao^b$ are all the same number.
+If, for example, we have coordinates in which the metric is diagonal and has elements $\pm 1$,
+then in all these expressions the differing signs of the $o$'s are exactly compensated for
+by the signs of the $T$'s.
+<% end_sec('perfect-fluid') %>
+
+
+<% begin_sec("Two simple examples",nil,'simple-examples') %>
+\begin{eg}{A rope under tension}\label{eg:gliding-rope}
+As a real-world example in which the pressure is \emph{not} isotropic, consider a rope that is
+moving inertially but under tension, i.e., equal forces at its ends cancel out so that the rope
+doesn't accelerate.
+Tension is the same as negative pressure. If the rope lies along the $x$ axis and its fibers are
+only capable of supporting tension along that axis, then the rope's stress-energy tensor will be of
+the form
+\begin{equation*}
+T\indices{^{\mu}^{\nu}} = \begin{pmatrix}
+                   \rho & 0 & 0 & 0 \\
+                   0 & P & 0 & 0 \\
+                   0 & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0
+      \end{pmatrix}\eqquad,
+\end{equation*}
+where $P$ is negative and equals minus the tension per unit cross-sectional area.
+
+Conservation of energy-momentum is expressed as (eq.~\ref{eq:stress-energy-div-zero},
+p.~\pageref{eq:stress-energy-div-zero})
+\begin{equation*}
+  \frac{\partial T^{ab}}{\partial x^a} = 0\eqquad.
+\end{equation*}
+Converting the abstract indices to concrete ones, we have
+\begin{equation*}
+  \frac{\partial T^{\mu\nu}}{\partial x^\mu} = 0\eqquad,
+\end{equation*}
+where there is an implied sum over $\mu$, and the equation must hold both in the case where
+$\nu$ is a label for $t$ and the one where it refers to $x$.
+
+In the first case, we have
+\begin{equation*}
+  \frac{\partial T^{tt}}{\partial t} +   \frac{\partial T^{xt}}{\partial x} = 0\eqquad,
+\end{equation*}
+which is a statement of conservation of energy, energy being the timelike component of
+the energy-momentum.
+The first term is zero because $\rho$ is constant by virtue of our assumption that the rope
+was uniform. The second term is zero because $ T^{xt}=0$. Therefore conservation of
+energy is satisfied. This came about automatically because by writing down a time-independent
+expression for the stress-energy, we were dictating a static equilibrium.
+
+When $\nu$ stands for $x$, we get an equation that requires the $x$ component of momentum to be conserved,
+\begin{equation*}
+  \frac{\partial T^{tx}}{\partial t} +   \frac{\partial T^{xx}}{\partial x} = 0\eqquad.
+\end{equation*}
+This simply says
+\begin{equation*}
+  \frac{\partial P}{\partial x} = 0\eqquad,
+\end{equation*}
+meaning that the tension in the rope is constant along its length.
+\end{eg}
+
+\begin{eg}{A rope supporting its own weight}\label{eg:loaded-rope}
+A variation on example \ref{eg:gliding-rope} is one in which the rope is hanging and supports its
+own weight. Although gravity is involved, we can solve this problem without general relativity, by
+exploiting the equivalence principle (section \ref{sec:ep}, p.~\pageref{sec:ep}).
+As discussed in section \ref{sec:define-inertia} on p.~\pageref{sec:define-inertia}, an inertial
+frame in relativity is one that is free-falling.
+We define an inertial frame of reference $\vc{o}$, corresponding
+to an observer free-falling past the rope, and a noninertial frame $\vc{o}'$ at rest relative to the rope.
+
+Since the rope is hanging in static equilibrium, observer $\vc{o}'$ sees a stress-energy tensor that
+has no time-dependence. The off-diagonal components vanish in this frame, since there is no momentum.
+The stress-energy tensor is
+\begin{equation*}
+T\indices{^{\mu'}^{\nu'}} = \begin{pmatrix}
+                   \rho & 0 \\
+                   0 & P 
+      \end{pmatrix}\eqquad,
+\end{equation*}
+where the components involving $y$ and $z$ are zero and not shown,
+and $P$ is negative as in example \ref{eg:gliding-rope}.
+We could try to apply the conservation of energy condition to this stress-energy tensor as in
+example \ref{eg:gliding-rope}, but that would be a mistake. As discussed in 
+\ref{sec:xfn-derivatives} on p.~\pageref{sec:xfn-derivatives}, rates of change can \emph{only}
+be measured by taking partial derivatives with respect to the coordinates if the coordinates
+are Minkowski, i.e., in an inertial frame. Therefore we need to transform this stress-energy
+tensor into the inertial frame $\vc{o}$.
+
+For simplicity, we restrict ourselves to the Newtonian approximation, so that the change of
+coordinates between the two frames is
+\begin{align*}
+  t & \approx t' \\
+  x & \approx x'+\frac{1}{2}at'^2\eqquad,
+\end{align*}
+where $a>0$ if the free-falling observer falls in the negative $x$ direction, i.e., positive
+$x$ is up. That is, if a point on the rope at a fixed $x'$ is marked with a spot of paint, then
+free-falling observer $\vc{o}$ sees the spot moving up, to larger values of $x$, at $t>0$.
+Applying the tensor transformation law, we find
+\begin{equation*}
+T\indices{^{\mu}^{\nu}} = \begin{pmatrix}
+                   \rho & \rho a t \\
+                   \rho a t & P+\rho a^2t^2 
+      \end{pmatrix}\eqquad,
+\end{equation*}
+As in example \ref{eg:gliding-rope}, conservation of energy is trivially satisfied.
+Conservation of momentum gives
+\begin{equation*}
+  \frac{\partial T^{tx}}{\partial t} +   \frac{\partial T^{xx}}{\partial x} = 0\eqquad,
+\end{equation*}
+or
+\begin{equation*}
+  \rho a + \frac{\partial P}{\partial x} = 0\eqquad.
+\end{equation*}
+Integrating this with respect to $x$, we have
+\begin{equation*}
+  P = -\rho a x + \text{constant}\eqquad.
+\end{equation*}
+Let the cross-sectional area of the rope be $A$, and let $\mu=\rho A$ be the mass per unit length
+and $T=-PA$ the tension. We then find
+\begin{equation*}
+  T = \mu a x + \text{constant}\eqquad.
+\end{equation*}
+Conservation of momentum requires that the tension vary along the length of the rope,
+just as we expect from Newton's laws: a section of the rope higher up has more
+weight below it to support.
+\end{eg}
+<% end_sec('simple-examples') %>
+
+<% begin_sec("Energy conditions",nil,'energy-conditions') %>
+The result of example \ref{eg:loaded-rope} could cause something scary to happen.
+If we walk up to a clothesline under tension and give it a quick karate chop, we will
+observe wave pulses propagating away from the chop in both directions, at
+velocities $v=\pm\sqrt{T/\mu}$. But the result of the example is that this expression
+increases without limit as $x$ gets larger and larger. At some point, $v$ will exceed the
+speed of light. (Of course any real rope would break
+long before this much tension was achieved.) Two things led to the problematic result:
+(1) we assumed there was no constraint on the possible stress-energy tensor in the
+rest frame of the rope; and (2) we used a Newtonian approximation to change from this
+frame to the free-falling frame. In reality, we don't know of any material so stiff that vibrations
+propagate in it faster than $c$. In fact, all ordinary materials are made of atoms, atoms are
+bound to each other by electromagnetic forces, and therefore no material made of atoms can transmit
+vibrations faster than the speed of an electromagnetic wave, $c$.
+
+Based on these conditions, we therefore expect there to be certain constraints on the
+stress-energy tensor of any ordinary form of matter. For example, 
+we don't expect to find any rope whose stress-energy tensor looks like this:
+\begin{equation*}
+T\indices{^{\mu}^{\nu}} = \begin{pmatrix}
+                   1 & 0 & 0 & 0 \\
+                   0 & -2 & 0 & 0 \\
+                   0 & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0
+      \end{pmatrix}\eqquad,
+\end{equation*}
+because here the tensile stress $+2$ is greater than the mass density 1, which would
+lead to $|v|=\sqrt{2/1}>1$. Constraints of this kind are called energy conditions.
+Hypothetical forms of matter that violate them are referred to as exotic matter;
+if they exist, they are not made of atoms.
+This particular example violates the
+an energy condition known as the dominant energy condition, which requires $\rho>0$ and
+$|P|>\rho$. There are about five energy conditions that are commonly used, and a detailed
+discussion of them is more appropriate for a general relativity text. The common ideas that
+recur in many of them are: (1) that energy density is never negative
+in any frame of reference, and (2) that there is never a flux of energy propagating at a
+speed greater than $c$.
+
+An energy condition that is particularly simple to express 
+is the trace energy condition (TEC),\label{tec}
+\begin{equation*}
+  T\indices{^a_a} \ge 0\eqquad,
+\end{equation*}
+where we have to have one upper index and one lower index in order to obey the grammatical
+rules of index notation.
+In Minkowski coordinates $(t,x,y,z)$, this becomes $T\indices{^\mu_\mu}\ge0$, with the
+implied sum over $\mu$ expanding to give
+\begin{equation*}
+  T\indices{^t_t}+T\indices{^x_x}+T\indices{^y_y}+T\indices{^z_z} \ge 0\eqquad.
+\end{equation*}
+The left-hand side of this relation, the sum of the main-diagonal elements of a matrix, is
+called the trace of the matrix, hence the name of this energy condition.
+Since this book uses the signature $+---$ for the metric, raising the second index changes this to
+\begin{equation*}
+  T\indices{^t^t}-T\indices{^x^x}-T\indices{^y^y}-T\indices{^z^z} \ge 0\eqquad.
+\end{equation*}
+In example \ref{eg:dust-stress-energy} on p.~\pageref{eg:dust-stress-energy}, we computed the
+stress-energy tensor of a cloud of dust, in a frame moving at velocity $v$ relative to the cloud's
+rest frame. The result was
+\begin{equation*}
+T\indices{^{\mu'}^{\nu'}} = \left( \begin{matrix}
+                   \gamma^2\rho & \gamma^2 v \rho & 0 & 0 \\
+                   \gamma^2 v \rho & \gamma^2 v ^2\rho & 0 & 0 \\
+                   0 & 0 & 0 & 0 \\
+                   0 & 0 & 0 & 0    
+      \end{matrix} \right)\eqquad.
+\end{equation*}
+In this example, the trace energy condition is satisfied precisely under the condition
+$|v|\le 1$, which can be interpreted as a statement that according the TEC, the mass-energy
+of the cloud can never be transported at a speed greater than $c$ in any frame.
+<% end_sec('energy-conditions') %>
+
+
+<% end_sec('stress-energy') %>
+
+<% begin_sec("Gauss's theorem",nil,'gauss') %>\index{Gauss's theorem}
+<% begin_sec("Integral conservation laws",nil,'integrated-conservation') %>
+We've expressed conservation of charge and energy-momentum in terms of zero divergences,
+\begin{align*}
+  \frac{\partial J^a}{\partial x^a} & = 0 \\
+  \frac{\partial T^{ab}}{\partial x^a} & = 0\eqquad.
+\end{align*}
+These are expressed in terms of derivatives. The derivative of a function at a certain point
+only depends on the behavior of the function near that point, so these are local statements
+of conservation. Conservation laws can also be stated globally: the total amount
+of something remains constant. Taking charge as an example, observer $\vc{o}$ defines Minkowski
+coordinates $(t,x,y,z)$, and at a time $t_1$ says that the total
+amount of charge in some region is
+\begin{equation*}
+  q(t_1) = \int_{t_1} J^a \der S_a\eqquad,
+\end{equation*}
+where the subscript $t_1$ means that the integrand is to be evaluated over the surface of
+simultaneity $t=t_1$, and $\der S_a=(\der x\der y\der z,0,0,0)$
+is an element of 3-volume expressed as a covector (p.~\pageref{three-vol-covector}).
+The charge at some later time $t_2$ would be given by a similar integral.
+If charge is conserved, and if our region is surrounded by an empty region through which no charge
+is coming in or out, then we should have $q(t_2)=q(t_1)$.
+<% end_sec('integrated-conservation') %>
+
+<% begin_sec("A simple form of Gauss's theorem",nil,'gauss-simple') %>
+The connection between the local and global conservation laws is provided by a theorem
+called Gauss's theorem. In your course on electromagnetism, you learned Gauss's law, which
+relates the electric flux through a closed surface to the charge contained inside the surface.
+In the case where no charges are present, it says that the flux through such a surface cancels out.
+The interpretation is that since field lines only begin or end on charges, the absence of any
+charges means that the lines can't begin or end, and therefore, as in
+figure \figref{gauss-fluxes-cancel}, any field line that enters the
+surface (contributing some negative flux) must eventually come back out (creating some positive
+flux that cancels out the negative). But there is nothing about figure \figref{gauss-fluxes-cancel}
+that requires it to be interpreted as a drawing of electric field lines. It could just as easily
+be a drawing of the world-lines of some charged particles in $1+1$ dimensions. The bottom of the
+rectangle would then be the surface at $t_1$ and the top $t_2$. We have $q(t_1)=3$ and
+$q(t_2)=3$ as well.
+<% marg(30) %>
+<%
+  fig(
+    'gauss-fluxes-cancel',
+    %q{Three lines go in, and three come out. These could be field lines or world lines.}
+  )
+%>
+<% end_marg %>
+
+For simplicity, let's start with a very restricted version of Gauss's theorem.
+Let a vector field $J^a$ be defined in two dimensions.
+(We don't care whether
+the two dimensions are both spacelike or one spacelike and one timelike; that is, Gauss's
+theorem doesn't depend on the signature of the metric.) Let R be a rectangular area,
+and let S be its boundary. Define the flux of the field through S as
+\begin{equation*}
+  \Phi = \int_\text{S} J^a \der S_a\eqquad,
+\end{equation*}
+where the integral is to be taken over all four sides, and the covector $\der S_a$ points outward.
+If the field has zero divergence, $\partial J^a/\partial x^a=0$, then
+the flux is zero.
+
+Proof: Define coordinates $x$ and $y$ aligned with the rectangle. Along the top of the
+rectangle, the element of the surface, oriented outwards, is $\der\vc{S}=(0,\der x)$, so the
+contribution to the flux from the top is
+\begin{equation*}
+  \Phi_\text{top} = \int_\text{top} J^y(y_\text{top}) \der x\eqquad.
+\end{equation*}
+At the bottom, an outward orientation gives $\der\vc{S}=(0,-\der x)$, so
+\begin{equation*}
+  \Phi_\text{bottom} = -\int_\text{bottom} J^y(y_\text{bottom}) \der x\eqquad.
+\end{equation*}
+Using the fundamental theorem of calculus, the sum of these is
+\begin{equation*}
+  \Phi_\text{top}+\Phi_\text{bottom}
+         = \int_\text{R} \frac{\partial J^y}{\partial y} \der y \der x\eqquad.
+\end{equation*}
+Adding in the similar expressions for the left and right, we get
+\begin{equation*}
+  \Phi = \int_\text{R} \left( \frac{\partial J^x}{\partial x}
+                      +\frac{\partial J^y}{\partial y}\right) \der x \der y\eqquad.
+\end{equation*}
+But the integrand is the divergence, which is zero by assumption, so $\Phi=0$ as claimed.
+<% end_sec('gauss-simple') %>
+
+<% begin_sec("The general form of Gauss's theorem",nil,'gauss-general') %>
+Although the coordinates were labeled $x$ and $y$, the proof made no use of the metric,
+so the result is equally valid regardless of the signature. The rectangle could equally
+well have been a rectangle in $1+1$-dimensional spacetime. The generalization to $n$
+dimensions is also automatic, and everything also carries through without modification
+if we replace the vector $J^a$ with a tensor such as $T^{ab}$ that has more indices --- the
+extra index $b$ just comes along for the ride. Sometimes, as with Gauss's law in electromagnetism,
+we are interested in fields whose divergences are not zero. Gauss's theorem then becomes
+\begin{equation*}
+  \int_\text{S} J^a \der S_a = \int_\text{R} \frac{\partial J^a}{\partial x^a} \der v\eqquad,
+\end{equation*}
+where $\der v$ is the element of $n$-volume. In $3+1$ dimensions we could use Minkowski coordinates
+to write the element of 4-volume as
+$\der v=\der t \der x \der y \der z$, and even though this expression in written
+in terms of these specific coordinates, it is actually Lorentz invariant
+(section \ref{sec:area-is-scalar}, p.~\pageref{sec:area-is-scalar}).
+
+The generalization to a region R with an arbitrary shape, figure \figref{gauss-proof}, is less trivial.
+The basic idea is to break up the region into rectanglular boxes, 
+\subfigref{gauss-proof}{1}. Where the faces of two boxes coincide on the interior of R,
+their own outward directions are opposite. Therefore if we add up the fluxes through the surfaces
+of all the boxes, the contributions on the interior cancel, and we're left with only the exterior
+contributions. If R could be dissected exactly into boxes, then this would complete the proof,
+since the sum of exterior contributions would be the same as the flux through S, and the left-hand
+side of Gauss's theorem would be additive over the boxes, as is the right-hand side.
+<% marg(100) %>
+<%
+  fig(
+    'gauss-proof',
+    %q{Proof of Gauss's theorem for a region with an arbitrary shape.}
+  )
+%>
+<% end_marg %>
+
+The difficulty arises because
+a smooth shape typically cannot be built out of bricks, a fact that is well known to Lego enthusiasts who
+build elaborate models of the Death Star.
+We could argue on physical grounds that no real-world measurement of the flux can
+depend on the granular structure of S at arbitrarily small scales, but this feels a little unsatisfying.
+For comparison, it is \emph{not} strictly true that surface areas can be treated in this way.
+For example, if we approximate a unit 3-sphere using smaller and smaller boxes, the limit of the
+surface area is $6\pi$, which is quite a bit greater than the surface area $4\pi/3$ of the limiting surface.
+
+Instead, we explicitly consider the nonrectangular pieces at the surface, such as the one in
+\subfigref{gauss-proof}{2}. In this drawing in $n=2$ dimensions, the top of this
+piece is approximately a line,
+and in the limit we'll be considering, where its width becomes an infinitesimally small $\der x$,
+the error incurred by approximating it as a line will be negligible.
+We define vectors $\der\vc{x}$ and $\der\vc{x}^*$ as shown in the figure. 
+In more than the two dimensions shown in the figure, we would approximate the top surface as
+an $(n-1)$-dimensional parallelepiped spanned by vectors $\der\vc{x}^*$, $\der\vc{y}^*$, \ldots
+This is the point
+at which the use of the covector $S_a$ (p.~\pageref{three-vol-covector}) pays off by
+greatly simplifying the 
+proof.\label{covector-used-in-gauss-proof}\footnote{
+Here is an example of the ugly complications that occur if one doesn't have access to
+this piece of technology. In the low-tech approach, in Euclidean space, one defines an element of surface
+area $\der\vc{A}=\hat{\vc{n}}\der A$, where the unit vector $\hat{\vc{n}}$ is outward-directed
+with $\hat{\vc{n}}\cdot\hat{\vc{n}}=1$. But in a signature such as $+---$, we could have a region R such
+that over some large area of the bounding surface S, the normal direction was lightlike.
+It would therefore be impossible to scale $\hat{\vc{n}}$ so that $\hat{\vc{n}}\cdot\hat{\vc{n}}$
+was anything but zero. As an example of how much work it is to resolve such issues using
+stone-age tools, see Synge, Relativity: The Special Theory, VIII, \S 6-7, where the complete
+argument takes up 22 pages.}
+Applying this to the top of the triangle, $\der\vc{S}$ is defined 
+as the linear function that takes a vector $\vc{J}$ and gives the $n$-volume spanned by
+$\vc{J}$ along with $\der\vc{x}^*$, \ldots 
+
+Call the vertical coordinate on the diagram $t$,
+and consider the contribution to the flux from $\vc{J}$'s time component,
+$J^t$. Because the triangle's size is
+an infinitesimal of order $\der x$, we can approximate $J^t$ as being a constant throughout
+the triangle, while incurring only an error of order $\der x$. (By stating Gauss's theorem
+in terms of derivatives of $\vc{J}$, we implicitly assumed it to be differentiable,
+so it is not possible for it to jump discontinuously.)
+Since $\der\vc{S}$ depends linearly not
+just on $\vc{J}$ but on all the vectors, the difference between the flux at the top and bottom
+of the triangle equals is proportional to the area spanned by $\vc{J}$ and
+$\der \vc{x}^*-\der \vc{x}$. But the latter vector is
+is in the $t$ direction, and therefore the area it spans when taken with $J^t$ is approximately zero.
+Therefore the contribution of $J^t$ to the flux through the triangle is zero.
+To estimate the possible error due to the approximations, we have to count powers of $\der x$.
+The possible variation of $J^t$ over the triangle is of order $(\der x)^1$. The covector
+$\der\vc{S}$ is of order $(\der x)^{n-1}$, so the possible error in the flux is of order
+$(\der x)^n$.
+
+This was only an estimate of one part of the flux, the part contributed by the component $J^t$. However,
+we get the same estimate for the other parts. For example, if we refer to the two dimensions
+in figure \subfigref{gauss-proof}{2} as $t$ and $x$, then
+interchanging the roles of $t$ and $x$ in the above argument produces the same error estimate
+for the contribution from $J^x$.
+
+This is good. When we began this argument, we were motivated to be
+cautious by our observation
+that a quantity such as the surface area of R can't
+be calculated as the limit of the surface area as approximated using boxes. The reason we have
+that problem for surface area is that the error in the approximation on a small patch is of order 
+$(\der x)^{n-1}$, which is an infinitesimal of the same order as the surface area of the patch itself.
+Therefore when we scale down the boxes, the error doesn't get small compared to the total area.
+But when we consider flux, the error contibuted by each of the irregularly shaped pieces near the surface
+goes like $(\der x)^n$, which is of the order
+of the $n$-volume of the piece. This volume goes to zero in
+the limit where the boxes get small, and therefore the error goes to zero as well. This establishes
+the generalization of Gauss's theorem to a region R of arbitrary shape.
+<% end_sec('gauss-general') %>
+
+<% begin_sec("The energy-momentum vector",nil,'p-vector') %>
+Einstein's celebrated $E=mc^2$ is a special case of the statement that energy-momentum is conserved,
+transforms like a four-vector, and has a norm $m$ equal to the rest mass. Section
+\ref{sec:internal-structure} on p.~\pageref{sec:internal-structure} explored some of the problems
+with Einstein's original attempt at a proof of this statement, but only now are we prepared to
+completely resolve them. One of the problems was the definitional one of what we mean by the
+energy-momentum of a system that is not composed of pointlike particles. The answer is that for
+any phenomenon that carries energy-momentum, we must decide how it contributes to the stress-energy tensor.
+For example, the stress-energy tensor of the electric and magnetic fields is described in
+section \ref{sec:em-stress-energy} on p.~\pageref{sec:em-stress-energy}.
+
+For the reasons discussed in section \ref{sec:internal-structure} on p.~\pageref{sec:internal-structure},
+it is necessary to assume that energy-momentum is locally conserved, and also that the system being
+described is isolated. Local conservation is described by the zero-divergence property of the stress-energy
+tensor, $\partial T^{ab}/\partial x^a=0$. Once we assume local conservation, figure
+\figref{p-conservation} shows how to prove conservation of the integrated energy-momentum vector using
+Gauss's theorem. Fix a frame of reference $\vc{o}$.
+Surrounding the system, shown as a dark stream flowing through spacetime, we draw a box.
+The box is bounded on its past
+side by a surface that $\vc{o}$ considers to be a surface of simultaneity $\text{s}_\text{A}$,
+and likewise on the future side $\text{s}_\text{B}$.
+It doesn't actually matter if the sides of the box are straight or curved according to $\vc{o}$. What does
+matter is that because the system is isolated, we have enough room so that between the system and the 
+sides of the box there can be a region of vacuum, in which the stress-energy tensor vanishes.
+<% marg(30) %>
+<%
+  fig(
+    'p-conservation',
+    %q{Conservation of the integrated energy-momentum vector.}
+  )
+%>
+<% end_marg %>
+
+Observer $\vc{o}$ says that at the initial
+time corresponding to $\text{s}_\text{A}$, the total amount of energy-momentum in
+the system was
+\begin{equation*}
+  p_A^\mu = - \int_{\text{s}_\text{A}} T^{\mu\nu} \der S_\nu\eqquad,
+\end{equation*}
+where the minus sign occurs because we take $\der S_\nu$ to point outward, for compatibility with
+Gauss's theorem, and this makes it antiparallel to the velocity vector $\vc{o}$, which is
+the opposite of the orientation defined in equations \eqref{eqn:stress-energy-measurements}
+on p.~\pageref{eqn:stress-energy-measurements}. At the final time we have
+\begin{equation*}
+  p_B^\mu =  \int_{\text{s}_\text{B}} T^{\mu\nu} \der S_\nu\eqquad,
+\end{equation*}
+with a plus sign because the outward direction is now the same as the direction of $\vc{o}$.
+Because of the vacuum region, there is no flux through the sides of the box, and therefore by
+Gauss's theorem $p_B^\mu-p_A^\mu=0$. The energy-momentum vector has been globally conserved according
+to $\vc{o}$.
+<% marg(-120) %>
+<%
+  fig(
+    'p-transformation',
+    %q{Lorentz transformation of the integrated energy-momentum vector.}
+  )
+%>
+<% end_marg %>
+
+We also need to show that the integrated energy-momentum transforms properly as a four-vector.
+To prove this, we apply Gauss's theorem to the region shown in figure \figref{p-transformation},
+where $\text{s}_\text{C}$ is a surface of simultaneity according to some other observer $\vc{o}'$.
+Gauss's theorem tells us that $\vc{p}_\text{B}=\vc{p}_\text{C}$, which means that the energy-momentum
+on the two surfaces is the \emph{same} vector in the absolute sense --- but this doesn't mean that the two
+vectors have the same \emph{components} as measured by different observers. Observer $\vc{o}$
+says that $\text{s}_\text{B}$ is a surface of simultaneity, and therefore considers
+$\vc{p}_\text{B}$ to be the total energy-momentum at a certain time. She says the total mass-energy
+is $p_B^\mu o_\mu$ (eq.~\eqref{eqn:stress-energy-e-meas}, p.~\pageref{eqn:stress-energy-e-meas}),
+and similarly for the total momentum in the three spatial directions $\vc{s}_1$, $\vc{s}_2$, and $\vc{s}_3$
+(eq.~\eqref{eqn:stress-energy-p-meas}). Observer $\vc{o}'$, meanwhile, considers
+$\text{s}_\text{C}$ to be a surface of simultaneity, and has the same interpretations for
+quantities such as $p_C^\mu o'_\mu$. But this is just a way of saying that $\vc{p}_B^\mu$ and
+$\vc{p}_C^\mu$ are related to each other by a change of basis
+from $(\vc{o},\vc{s}_1,\vc{s}_2,\vc{s}_3)$ to $(\vc{o}',\vc{s}'_1,\vc{s}'_2,\vc{s}'_3)$.
+A change of basis like this is just what we mean by a Lorentz transformation,
+so the integrated energy-momentum $\vc{p}$ transforms as a four-vector.
+
+<% end_sec('p-vector') %>
+
+<% begin_sec("Angular momentum",nil,'cons-ang-mom') %>\index{angular momentum!conservation of}
+In sec.~\ref{subsec:l-tensor}, p.~\pageref{subsec:l-tensor}, we gave physical and mathematical
+plausibility arguments for defining relativistic angular momentum as $L^{ab}=r^a p^b - r^b p^a$.
+We can now show that this quantity is actually conserved. Just as the flux of energy-momentum $p^a$
+is the stress-energy tensor $T^{ab}$, we can take the angular momentum $L^{ab}$ and
+define its flux $\lambda^{abc}=r^aT^{bc}-r^bT^{ac}$. An observer with velocity vector $o^c$
+says that the density of energy-momentum is
+$T^{ac}o_c$ and the density of angular momentum is $\lambda^{abc}o_c$. If we can show that the
+divergence of $\lambda$ with respect to its third index is zero,
+then it follows that angular momentum is conserved. The divergence is
+\begin{equation*}
+  \frac{\partial \lambda^{abc}}{\partial x^c} = \frac{\partial}{\partial x^c}\left(r^aT^{bc}-r^bT^{ac}\right).
+\end{equation*}
+The product rule gives
+\begin{equation*}
+  \frac{\partial \lambda^{abc}}{\partial x^c} = \delta^a_cT^{bc}+r^a\frac{\partial}{\partial x^c}T^{bc}
+                -\delta^b_cT^{ac}-r^b\frac{\partial}{\partial x^c}T^{ac},
+\end{equation*}
+where $\delta^i_j$, called the Kronecker delta, is defined as 1 if $i=j$ and 0 if $i\ne j$.
+The divergence of the stress-energy tensor is zero, so the second and fourth terms vanish,
+and
+\begin{align*}
+  \frac{\partial \lambda^{abc}}{\partial x^c} &= \delta^a_cT^{bc} -\delta^b_cT^{ac} \\
+                                              &= T^{ba}-T^{ab},
+\end{align*}
+but this is zero because the stress-energy tensor is symmetric.
+<% end_sec('cons-ang-mom') %>
+
+<% end_sec('gauss') %>
+
+
+<% begin_sec("The covariant derivative",nil,'covariant-derivative',{'optional'=>true}) %>\index{covariant derivative}\index{derivative!covariant}\index{covariant derivative!in relativity}\index{derivative!covariant!in relativity}
+
+In this optional section we deal with the issues raised in section \ref{sec:xfn-derivatives}
+on p.~\pageref{sec:xfn-derivatives}. 
+We noted there that in non-Minkowski coordinates, one
+cannot naively use changes in the components of a vector as a measure of a change in the vector
+itself. A constant
+\emph{scalar} function remains constant when expressed in a new coordinate system, but the same is not
+true for a constant vector function, or for any tensor of higher rank. This is because the change
+of coordinates changes the units in which the vector is measured, and if the change of coordinates
+is nonlinear, the units vary from point to point. This topic doesn't logically belong in this chapter,
+but I've placed it here because it can't be discussed clearly without already having covered
+tensors of rank higher than one.
+
+Consider the one-dimensional case, in which a
+vector $v^a$ has only one component, and the metric is also a single number, so that we can omit the
+indices and simply write $v$ and $g$. (We just have to remember that $v$ is really a vector,
+even though we're leaving out the upper index.)
+If $v$ is constant, its derivative $\der v/\der x$, computed in the ordinary way without any correction term, is zero.
+If we further assume that the metric is simply the constant $g=1$, then zero is
+not just the answer but the right answer.
+
+Now suppose we transform into a new coordinate system $X$, and
+the metric $G$, expressed in this coordinate system, is not constant.
+Applying the tensor
+transformation law, we have $V =  v \der X/\der x$, and differentiation
+with respect to $X$ will not give zero, because the factor $\der X/\der x$ isn't constant. This is the wrong answer:
+$V$ isn't really varying, it just appears to vary because $G$ does.
+<% marg(300) %>
+<%
+  fig(
+    'varying-ruler-spacing',
+    %q{These three rulers represent three choices of coordinates.}
+  )
+%>
+<% end_marg %>
+
+We want to add a correction term onto the derivative operator $\der/\der X$, forming a
+new derivative operator $\nabla_X$
+that gives the right answer. $\nabla_X$ is called the covariant derivative. This correction term is easy
+to find if we consider what the result ought to be when differentiating the metric itself.
+In general, if a tensor appears to vary, it could vary either because it really does vary
+or because the metric varies. If the metric \emph{itself} varies, it could be either because
+the metric really does vary or \ldots because the metric varies. In other words, there is
+no sensible way to assign a nonzero covariant derivative to the metric itself, so we must have
+$\nabla_X G=0$. The required correction therefore consists of replacing $\der/\der X$ with
+\begin{equation*}
+ \nabla_X=\frac{\der}{\der X}-G^{-1}\frac{\der G}{\der X}\eqquad.
+\end{equation*}
+Applying this to $G$ gives zero.
+$G$ is a second-rank tensor with two lower indices. If we apply the same correction to the derivatives
+of other tensors of this type, we will get nonzero results, and they will be the right
+nonzero results. 
+
+Mathematically, the form of the derivative is $(1/y)\der y/\der x$, which is known as a logarithmic derivative,
+since it equals $\der(\ln y)/\der x$. It measures the \emph{multiplicative} rate of change of $y$. For example,
+if $y$ scales up by a factor of $k$ when $x$ increases by 1 unit, then the logarithmic derivative of $y$ is
+$\ln k$. The logarithmic derivative of $e^{cx}$ is $c$. The logarithmic nature of the correction term to 
+$\nabla_X$ is a good thing, because it lets us take changes of scale, which are multiplicative changes, and
+convert them to additive corrections to the derivative operator. The additivity of the corrections is
+necessary if the result of a covariant derivative is to be a tensor, since tensors are additive creatures.
+
+What about quantities that are not second-rank covariant tensors? Under a rescaling of 
+coordinates by a factor of $k$,
+covectors scale by $k^{-1}$, and second-rank tensors with two lower indices scale by $k^{-2}$. The
+correction term should therefore be half as much for covectors,
+\begin{equation*}
+ \nabla_X=\frac{\der}{\der X}-\frac{1}{2}G^{-1}\frac{\der G}{\der X}\eqquad.
+\end{equation*}
+and
+should have an opposite sign for vectors.
+
+Generalizing the correction term to derivatives of vectors in more than one dimension, we should have something of this form:
+\begin{align*}
+  \nabla_a v^b &= \partial_a v^b + \Gamma\indices{^b_{ac}}v^c\\
+  \nabla_a v_b &= \partial_a v_b - \Gamma\indices{^c_{ba}}v_c\eqquad,
+\end{align*}
+where $\Gamma\indices{^b_{ac}}$, called the Christoffel symbol,\index{Christoffel symbol}
+does not transform like a tensor, and involves derivatives of the metric.
+(``Christoffel'' is pronounced ``Krist-AWful,'' with the accent on the middle syllable.)
+
+An important gotcha is that when we evaluate a particular component of a covariant
+derivative such as $\nabla_2 v^3$, it is possible for the result to be nonzero
+even if the component $v^3$ vanishes identically.
+
+\begin{eg}{Christoffel symbols on the globe}\label{eg:christoffel-on-globe}
+As a qualitative example, consider the airplane trajectory shown in figure \figref{christoffel-on-globe},
+from London to Mexico City.
+This trajectory is the shortest one between these two points; such a minimum-length trajectory
+is called a geodesic.\index{geodesic}
+In physics it is customary to work with the colatitude, $\theta$, measured down from
+the north pole, rather then the latitude, measured from the equator.
+At P, over the North Atlantic, the plane's colatitude has a minimum. 
+(We can see, without having to take it on faith from the figure, that such a minimum must occur.
+The easiest way to convince oneself of this is to consider a path that goes directly over the pole,
+at $\theta=0$.)
+<% marg(20) %>
+<%
+  fig(
+    'christoffel-on-globe',
+    %q{Example \ref{eg:christoffel-on-globe}.}
+  )
+%>
+<% end_marg %>
+
+At P, the plane's
+velocity vector points directly west. At Q, over New England, its velocity has a large component to the
+south. Since the path is a geodesic and the plane has constant speed, the velocity vector is simply being
+parallel-transported; the vector's covariant derivative is zero. Since we have $v_\theta=0$ at P,
+the only way to explain the nonzero and positive value of $\partial_\phi v^\theta$ is
+that we have a nonzero and negative value of $\Gamma\indices{^\theta_{\phi\phi}}$.
+
+By symmetry, we can infer that $\Gamma\indices{^\theta_{\phi\phi}}$ must have a positive value in
+the southern hemisphere, and must vanish at the equator. 
+
+$\Gamma\indices{^\theta_{\phi\phi}}$ is computed in example \ref{eg:christoffel-on-globe-quantitative}
+on page \pageref{eg:christoffel-on-globe-quantitative}.
+
+Symmetry also requires that this Christoffel symbol be independent of $\phi$, and
+it must also be independent of the radius of the sphere.
+\end{eg}
+
+To compute the covariant derivative of a higher-rank tensor, we just add more correction terms, e.g.,
+\begin{align*}
+  \nabla_a U_{bc} = \partial_a U_{bc} - \Gamma\indices{^d_{ba}}U_{dc}-\Gamma\indices{^d_{ca}}U_{bd} \\
+\intertext{or}
+  \nabla_a U_b^c = \partial_a U_b^c - \Gamma\indices{^d_{ba}}U_d^c+\Gamma\indices{^c_{ad}}U_b^d\eqquad.
+\end{align*}
+
+With the partial derivative $\partial_\mu$, it does not make sense to use the metric to raise the index
+and form $\partial^\mu$. It \emph{does} make sense to do so with covariant derivatives, so $\nabla^a = g^{ab} \nabla_b$
+is a correct identity.
+
+<% begin_sec("Comma, semicolon, and birdtracks notation",nil,'covariant-derivative-notation') %>
+Some authors use superscripts with commas and semicolons to indicate partial and covariant derivatives. The following
+equations give equivalent notations for the same derivatives:
+\begin{align*}
+  \partial_\mu &= \frac{\partial}{\partial x^\mu}\\
+  \partial_\mu X_\nu &= X_{\nu,\mu} \\
+  \nabla_a   X_b &= X_{b;a} \\
+  \nabla^a   X_b &= X\indices{_b^{;a}} 
+\end{align*}
+Figure \figref{nabla-birdtracks} shows two examples of the corresponding
+birdtracks notation. Because birdtracks are meant to be manifestly coordinate-independent, they
+do not have a way of expressing non-covariant derivatives.
+<% marg(60) %>
+<%
+  fig(
+    'nabla-birdtracks',
+    %q{Birdtracks notation for the covariant derivative.}
+  )
+%>
+<% end_marg %>
+<% end_sec('covariant-derivative-notation') %>
+
+<% begin_sec("Finding the Christoffel symbol from the metric",nil,'christoffel-from-metric') %>
+We've already found the Christoffel symbol in terms of the metric in one dimension. Expressing it in
+tensor notation, we have
+\begin{align*}
+  \Gamma\indices{^d_{ba}} = \frac{1}{2}g^{cd}\left(\partial_? g_{??}\right)\eqquad,
+\end{align*}
+where inversion of the one-component matrix $G$ has been replaced by matrix inversion, and,
+more importantly, the question marks indicate that there would be more than one way to place
+the subscripts so that the result would be a grammatical tensor equation. The most general form
+for the Christoffel symbol would be 
+\begin{align*}
+  \Gamma\indices{^b_{ac}} = \frac{1}{2}g^{db}\left(L \partial_c g_{ab}+ M \partial_a g_{cb} + N \partial_b g_{ca}\right)\eqquad,
+\end{align*}
+where $L$, $M$, and $N$ are constants. Consistency with the one-dimensional expression requires $L+M+N=1$.
+The condition $L=M$ arises on physical, not mathematical grounds; it reflects the fact that experiments
+have not shown evidence for an effect called torsion,\index{torsion} in which vectors would rotate
+in a certain way when transported. The $L$ and $M$ terms have a different
+physical significance than the $N$ term.
+
+Suppose an observer uses coordinates such that all objects are described as lengthening over time, and
+the change of scale accumulated over one day is a factor of $k>1$.
+This is described by the derivative $\partial_t g_{xx}<1$, which affects the $M$ term.
+Since the metric is used to calculate squared distances, the
+$g_{xx}$ matrix element scales down by $1/\sqrt{k}$. To compensate for
+$\partial_t v^x<0$, so we need to add a
+positive correction term, $M>0$, to the covariant derivative.
+When the same observer measures the rate of change of a vector $v^t$ with \emph{respect} to space,
+the rate of change comes out to be too \emph{small}, because the variable she differentiates with
+respect to is too big. This requires $N<0$, and the correction is of the same size as the $M$
+correction, so $|M|=|N|$. We find $L=M=-N=1$.
+
+Self-check: Does the above argument depend on the use of space for one coordinate and time for the other?
+
+The resulting general expression for the Christoffel symbol in terms of the metric is
+\begin{equation*}
+  \Gamma\indices{^c_{ab}} = \frac{1}{2}g^{cd}\left(\partial_a g_{bd}+\partial_b g_{ad}-\partial_d g_{ab}\right)\eqquad.
+\end{equation*}
+One can go back and check that this gives $\nabla_c g_{ab}=0$.
+
+Self-check: In the case of 1 dimension, show that this reduces to
+the earlier result of $-(1/2)\der G/\der X$.
+
+$\Gamma$ is not a tensor, i.e., it doesn't transform according to the tensor transformation rules.
+Since $\Gamma$ isn't a tensor, it isn't
+obvious that the covariant derivative, which is constructed from it, \emph{is} tensorial.
+But if it isn't obvious, neither is it surprising --
+the goal of the above derivation was to get results that would be coordinate-independent.
+
+\begin{eg}{Christoffel symbols on the globe, quantitatively}\label{eg:christoffel-on-globe-quantitative}
+In example \ref{eg:christoffel-on-globe} on page \pageref{eg:christoffel-on-globe}, we inferred the following
+properties for the Christoffel symbol $\Gamma\indices{^\theta_{\phi\phi}}$ on a sphere of radius $R$: $\Gamma\indices{^\theta_{\phi\phi}}$
+is independent of $\phi$ and $R$, $\Gamma\indices{^\theta_{\phi\phi}}<0$ in the northern
+hemisphere (colatitude $\theta$ less than $\pi/2$), $\Gamma\indices{^\theta_{\phi\phi}}=0$ on the equator,
+and $\Gamma\indices{^\theta_{\phi\phi}}>0$ in the southern hemisphere.
+
+The metric on a sphere is $\der s^2=R^2\der\theta^2+R^2\sin^2\theta\der\phi^2$.
+The only nonvanishing term in the expression for $\Gamma\indices{^\theta_{\phi\phi}}$ is the one
+involving $\partial_\theta g_{\phi\phi}=2R^2\sin\theta\cos\theta$. The result is
+$\Gamma\indices{^\theta_{\phi\phi}}=-\sin\theta\cos\theta$, which can be verified to have the
+properties claimed above.
+\end{eg}
+
+<% end_sec('christoffel-from-metric') %>
+
+<% begin_sec("The geodesic equation",nil,'geodesic-equation') %>\label{sec:geodesic-equation}
+A world-line is a timelike curve in spacetime. As a special case, some such curves are actually
+not curved but straight. Physically, the ones we consider straight are those that could be
+the world-line of a test particle not acted on by any non-gravitational forces
+(sec.~\ref{sec:define-inertia}, p.~\pageref{sec:define-inertia}).
+Mathematically, we will show
+in this section how the Christoffel symbols can be used to
+find differential equations that describe such motion.
+The world-line of a test particle is called a geodesic.\index{geodesic}
+The equations also have solutions that are spacelike or lightlike, and we consider these
+to be geodesics as well.
+
+Geodesics play the same role in relativity that straight lines play in Euclidean geometry.
+In Euclidean geometry, we can specify two points and ask for the curve connecting them that has
+minimal length. The answer is a line. 
+In special relativity, a timelike geodesic \emph{maximizes} the 
+proper time (cf.~section \ref{subsec:maximal-time}, p.~\pageref{subsec:maximal-time}) between two events.
+
+In special relativity, geodesics are given by linear equations when expressed 
+in Minkowski coordinates, and the velocity vector of a test particle has constant components
+when expressed in Minkowski coordinates. In general relativity, Minkowski coordinates don't exist, and
+geodesics don't have the properties we expect based on Euclidean intuition; for example, initially
+parallel geodesics may later converge or diverge.\index{geodesic!differential equation for}
+<% marg(0) %>
+<%
+  fig(
+    'geodesic-parallel-transports-tangent',
+    %q{The geodesic, 1, preserves tangency under parallel transport. The non-geodesic curve, 2, doesn't have this property; a vector initially tangent
+                   to the curve is no longer tangent to it when parallel-transported along it.}
+  )
+%>
+<% end_marg %>
+
+<% begin_sec("Characterization of the geodesic",nil,'characterization-of-geodesic') %>
+A geodesic can be defined as a world-line that preserves tangency under parallel transport, \figref{geodesic-parallel-transports-tangent}. This is
+essentially a mathematical way of expressing the notion that we have previously expressed more informally in terms of ``staying on course'' or
+moving ``inertially.'' (For reasons discussed in more detail on p.~\pageref{subsubsec:geodesic-not-extremum},
+this definition is preferable to defining a geodesic as a curve of extremal or stationary metric length.)
+
+A curve can be specified by giving functions $x^i(\lambda)$ for its coordinates, where $\lambda$ is a real parameter. A vector lying tangent to the
+curve can then be calculated using partial derivatives, $T^i=\partial x^i/\partial\lambda$. There are three ways in which a vector
+function of $\lambda$ could change: (1) it could change for the trivial reason that the metric is changing, so that its components
+changed when expressed in the new metric; (2) it could change its components perpendicular to the curve; or (3) it could change its
+component parallel to the curve. Possibility 1 should not really be considered a change at all, and the definition of the covariant
+derivative is specifically designed to be insensitive to this kind of thing. 2 cannot apply to $T^i$, which is tangent by construction.
+It would therefore be convenient if $T^i$ happened to
+be always the same length. If so, then 3 would not happen either, and
+we could reexpress the definition of a geodesic by saying that the covariant derivative of
+$T^i$ was zero. For this reason, we will assume for the remainder of this section that the parametrization of the curve has
+this property. In a Newtonian context, we could imagine the $x^i$ to be purely spatial coordinates, and $\lambda$ to be
+a universal time coordinate. We would then interpret $T^i$ as the velocity, and the restriction would be to a parametrization
+describing motion with constant speed. In relativity, the restriction is that $\lambda$ must be an 
+affine parameter.
+For example, it could be the proper time of a particle, if the curve in question is timelike.
+<% end_sec('characterization-of-geodesic') %> % Characterization of the geodesic
+
+<% begin_sec("Covariant derivative with respect to a parameter",nil,'covar-der-wrt-param') %>
+The notation of section \ref{sec:covariant-derivative} is not quite adapted to our present purposes, since it allows us to
+express a covariant derivative with respect to one of the coordinates, but not with respect to a parameter such as $\lambda$.
+We would like to notate the covariant derivative of $T^i$ with respect to $\lambda$ as $\nabla_\lambda T^i$, even though
+$\lambda$ isn't a coordinate.
+To connect the two types of derivatives, we can use a total derivative. To make the idea clear, here is how we calculate a total derivative
+for a scalar function $f(x,y)$, without tensor notation:
+\begin{equation*}
+  \frac{\der f}{\der \lambda} = \frac{\partial f}{\partial x}\frac{\partial x}{\partial \lambda} + \frac{\partial f}{\partial y}\frac{\partial y}{\partial \lambda}\eqquad.
+\end{equation*}
+This is just the generalization of the chain rule to a function of two variables. For example, if $\lambda$ represents time and $f$ temperature,
+then this would tell us the rate of change of the temperature as a thermometer was carried through space. Applying this to
+the present problem, we express the total covariant derivative as
+\begin{align*}
+  \nabla_\lambda T^i &= (\nabla_b T^i) \frac{\der x^b}{\der\lambda} \\
+                     &= \left(\partial_b T^i + \Gamma\indices{^i_{bc}}T^c\right) \frac{\der x^b}{\der\lambda}\eqquad.
+\end{align*}
+<% end_sec('covar-der-wrt-param') %> % Covariant derivative with respect to a parameter
+
+<% begin_sec("The geodesic equation",nil,'geodesic-equation') %>\label{geodesic-diffeq}\index{geodesic equation}
+Recognizing $\partial_b T^i \der x^b/\der\lambda$ as a total non-covariant derivative, we find
+\begin{equation*}
+  \nabla_\lambda T^i = \frac{\der T^i}{\der\lambda} + \Gamma\indices{^i_{bc}}T^c \frac{\der x^b}{\der\lambda}\eqquad.
+\end{equation*}
+Substituting $\partial x^i/\partial\lambda$ for $T^i$, and setting the covariant derivative equal to zero, we obtain
+\begin{equation*}
+  \frac{\der^2 x^i}{\der\lambda^2} + \Gamma\indices{^i_{bc}} \frac{\der x^c}{\der\lambda} \frac{\der x^b}{\der\lambda} = 0 .
+\end{equation*}
+This is known as the geodesic equation.
+
+If this differential equation is satisfied for one affine
+parameter $\lambda$, then it is also satisfied for any other affine parameter $\lambda'=a\lambda+b$, where $a$ and $b$
+are constants (problem \ref{hw:geodesic-affine}, p.~\pageref{hw:geodesic-affine}).
+Recall that affine parameters are only defined along geodesics, not along arbitrary curves. We can't start by defining
+an affine parameter and then use it to find geodesics using this equation, because we can't define an affine parameter
+without \emph{first} specifying a geodesic. Likewise, we can't do the geodesic first and then the affine parameter, because
+if we already had a geodesic in hand, we wouldn't need the differential equation in order to find a geodesic. The solution
+to this chicken-and-egg conundrum is to write down the differential equations and try to find a solution, without trying to specify either
+the affine parameter or the geodesic in advance.
+<% end_sec('geodesic-equation') %> % The geodesic equation
+
+The geodesic equation is useful in establishing one of
+the necessary theoretical foundations of relativity, which is the
+uniqueness of geodesics for a given set
+of initial conditions. 
+If the geodesic were not uniquely determined, then particles
+would have no way of deciding how to move. The form of the
+geodesic equation guarantees uniqueness, because one can use it to define an algorithm
+that constructs a geodesic for a given set of initial conditions.
+
+<% begin_sec("Not characterizable as curves of stationary length",nil,'geodesic-not-extremum') %>
+
+The geodesic equation may seem cumbersome. Why not just define a
+geodesic as a curve connecting two points that maximizes or minimizes
+its own metric length? The trouble is that this doesn't generalize
+nicely to curves that are not timelike. The casual reader may wish to skip
+the remainder of this subsection, which discusses this point.
+
+For the spacelike case, we would want to define the proper metric
+length $\sigma$ of a curve as $\sigma=\int \sqrt{-g_{ij}dx^i dx^j}$, the
+minus sign being necessary because we are using a metric with
+signature $+---$, and we want the result to be real. The quantity
+$\sigma$ can be thought of as the result we would get by approximating
+the curve with a chain of short line segments, and adding their proper
+lengths. In the case where the whole curve lies within a plane of
+simultaneity for some observer, $\sigma$ is the curve's Euclidean length as
+measured by that observer. Our $\sigma$ is neither a maximum nor a minimum for a spacelike geodesic
+connecting two events.
+To see this, pick a frame in which the
+two events are simultaneous, and adopt Minkowski coordinates such that the points both lie on the $x$ axis. Deforming the
+geodesic in the $xy$ plane does what we expect according to Euclidean
+geometry: it increases the length. Deforming it in the $xt$
+plane, however, reduces the length (as becomes obvious when you
+consider the case of a large deformation that turns the geodesic into
+a curve of length zero, consisting of two lightlike line segments). 
+The result is that the geodesic is neither a minimizer nor a maximizer of $\sigma$.
+
+Maximizing or minimizing the proper length is a strong requirement. A related
+but more permissive criterion to apply to a curve connecting two fixed points
+is that if we vary the curve by some small amount, the variation in length should
+vanish to first order. For example, two points A and B on the surface of the earth determine
+a great circle, i.e., a circle whose circumference equals that of the earth.
+This great circle gives us two different paths by which we could travel from A to B.
+One of these will usually be longer than the other. Both of these are as straight as
+they can be while keeping to the surface of the earth, so in this context of spherical
+geometry they are both considered to be geodesics. One thing that the two paths have
+in common is that they are both \emph{stationary}. Stationarity is defined as follows.
+Given a certain parametrized curve $\gamma(t)$, let us fix some 
+vector $\vc{h}(t)$ at each point on the curve that is tangent to the earth's surface,
+and let $\vc{h}$ be a continuous function of $t$ that vanishes at the end-points.
+Then if $\epsilon$ is small compared to the radius of the earth, we can clearly
+define what it means to perturb $\gamma$ by $\epsilon\vc{h}$, producing another
+curve $\gamma^*$ similar to, but not the same as, $\gamma$. Stationarity means
+that the difference in length between $\gamma$ and $\gamma^*$ is of order $\epsilon^2$
+for small $\epsilon$. This is a generalization of the elementary calculus notion that
+a function has a zero derivative near an extremum or point of inflection. In our example on the surface of the
+earth, the two geodesics connecting A and B are both stationary.
+
+Spacelike geodesics in special relativity are stationary by the above definition.
+However, this assertion may be misleading. Because we construct the displacement
+as the product $\epsilon\vc{h}$, its \emph{derivative} is also guaranteed to shrink
+in proportion to $\epsilon$ for small $\epsilon$. We could loosen this requirement a little bit, and
+only require that the magnitude of the displacement be of order $\epsilon$. In this case,
+one can show that spacelike curves are not stationary. For example, any spacelike curve
+can be approximated to an arbitrary degree of precision by a chain of lightlike geodesic
+segments. Thus an arbitrarily small perturbation in the curve reduces its length to zero.
+
+The situation becomes even worse for lightlike
+geodesics.  Here we would have to define what ``length'' was. We could
+either take an absolute value, $L=\int \sqrt{|g_{ij}dx^i dx^j|}$, or
+not, $L=\int \sqrt{g_{ij}dx^i dx^j}$. If we don't take the absolute
+value, $L$ need not be real for small variations of the geodesic, and
+therefore we don't have a well-defined ordering, and can't say whether
+$L$ is a maximum, a minimum, or neither. Regardless of whether we take
+the absolute value, we have $L=0$ for a lightlike geodesic, but
+the square root function doesn't have differentiable behavior when its argument
+is zero, so we don't have stationarity.  If we do take the absolute value, then for the geodesic
+curve, the length is zero, which is the shortest possible. However,
+one can have nongeodesic curves of zero length, such as a lightlike
+helical curve about the $t$ axis. 
+
+<% end_sec('geodesic-not-extremum') %> % The geodesic equation
+
+<% end_sec('geodesic-equation') %> % The geodesic equation
+
+
+<% end_sec('covariant-derivative') %>
+
+<% begin_sec("Congruences, expansion, and rigidity",nil,'congruences-etc',{'optional'=>true}) %>
+
+This chapter has focused on fluxes of conserved quantities; we wanted to rule out
+pictures like \subfigref{congruence-vs-conservation}{1}, in which the appearance and disappearance
+of world-lines would imply nonconservation of properties such as charge and mass-energy.
+But the mathematical techniques we've developed turn out to be an elegant way to approach
+the different issues described in the other parts of figure \figref{congruence-vs-conservation}.
+<% marg(0) %>
+<%
+  fig(
+    'congruence-vs-conservation',
+    %q{1.~Nonconservation. 2.~Expansion. 3.~Rotation. 4.~Shear.}
+  )
+%>
+<% end_marg %>
+<% begin_sec("Congruences",nil,'congruences') %>
+
+In \subfigref{congruence-vs-conservation}{2}, we have \emph{expansion}. For example, the world-lines could
+represent galaxies getting farther apart because of cosmological expansion resulting from the Big Bang.
+We do \emph{not} expect rulers to expand or contract, in the sense that although a ruler may exhibit
+Lorentz contraction, it should always have the same length in its own rest frame unless it has been
+mechanically stressed or altered.
+
+If there is more than one spatial dimension, then we can have \emph{rotation}, as in
+\subfigref{congruence-vs-conservation}{3}. These world-lines could represent a constellation
+of orbiting satellites, or fixed points in a rotating laboratory.
+
+The other interesting possibility, if there is more than one spatial dimension, is \emph{shear},
+figure \subfigref{congruence-vs-conservation}{4}. Here the rectangular group of four particles contracts in
+one direction while expanding in the other so as to keep the enclosed 2-volume constant.
+
+In order to discuss these possibilities, it is convenient to define the notion of a timelike congruence,\index{congruence}
+which is a set of nonintersecting, smooth, timelike world-lines whose union constitutes all the events in
+some region of spacetime. That is,
+we ``fill in'' spacetime with an infinite number of world-lines so that there is no space between them.
+This is something like the grain in a piece of wood, or Faraday's conception of field lines filling
+space, except that one of our $n+1$ dimensions is timelike, and the lines aren't allowed to point in
+directions that lie outside the light cone. One way to specify a congruence is to give the normalized velocity
+vector that is tangent to the world-line passing through any given point.
+
+\begin{eg}{An expanding congruence}\label{eg:exponential-congruence}
+As an example of a congruence in $1+1$ dimensions, consider the set of all curves of the form
+$x=ae^{bt}$, where $a$ and $b$ are positive constants. It would look like figure
+\subfigref{congruence-vs-conservation}{2}. Letting $u=\der x/\der t=abe^{bt}$,
+the velocity vector is $v^\lambda=\gamma^{-1}(1,u)$, where the factor of $\gamma^{-1}=\sqrt{1-u^2}$
+gives the proper normalization $v^\lambda v_\lambda=1$.
+\end{eg}
+
+\begin{eg}{A boring congruence}\label{eg:boring-congruence}
+Suppose we instead let the congruence consist of the set of all curves of the form $x=c+ut$, where $c$ and $u$ are
+constants and $|u|<1$. Then as in example \ref{eg:exponential-congruence},
+$v^\lambda=\gamma^{-1}(1,u)$. The world-lines are inertial and parallel to one another.
+\end{eg}
+
+<% end_sec('congruences') %>
+<% begin_sec("Expansion and rigidity",nil,'expansion') %>
+
+For the remainder of this discussion, we restrict ourselves to the $1+1$-dimensional case, so that
+rotation and shear are impossible, and the only interesting question is whether a given congruence
+has expansion. In $1+1$ dimensions, the congruence can be specified by giving the function $u(x,t)$,
+where as in examples \ref{eg:exponential-congruence} and \ref{eg:boring-congruence},
+$u=\der x/\der t$. If $u$ is constant, then we have example \ref{eg:boring-congruence}, and
+clearly there is no expansion. Thus expansion requires either $\partial u/\partial t$ or
+$\partial u/\partial x$, or both, to be nonzero.
+
+<%
+  fig(
+    'expansion',
+   %q{1.~A congruence with $\partial u/\partial x$ equal to zero. 2.~A congruence with $\partial u/\partial t=0$. 
+      3.~A congruence without expansion.},
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+      # 'sidepos'=>'b'
+    }
+  )
+%>
+
+Figure \subfigref{expansion}{1} shows the case where
+$\partial u/\partial x=0$ and $\partial u/\partial t\ne0$. Each world-line is a copy of the others that has been
+shifted spatially, and the two velocity vectors shown as arrows are equal.
+This is precisely Bell's spaceship paradox
+(section \ref{subsec:bell-spaceship-paradox}, p.~\pageref{subsec:bell-spaceship-paradox}).
+Although the horizontal spacing between the world-lines remains constant as defined by the fixed
+frame of reference used for the diagram, an observer accelerating along with one of the particles
+would find that they had expanded away from one another, because 
+the observer's meter-sticks have Lorentz-contracted. This is a real expansion in the sense that
+if the world-lines are particles in a solid object, the object comes under increasing tension.
+
+In \subfigref{expansion}{2} we have $\partial u/\partial t=0$ and $\partial u/\partial x\ne0$. The world-lines
+are copies of one another that have been shifted temporally. 
+The two velocity vectors in the diagram are the same.
+All of the particles began accelerating
+from the same point in space, but at different times. Here there is clearly an expansion, because
+the world-lines are getting farther apart. 
+
+Suppose that we accelerate a rigid object such as a ruler. Then we must have something like
+\subfigref{expansion}{3}. To avoid the situations described in \subfigref{expansion}{1} and
+\subfigref{expansion}{2}, the velocity vector must vary with both $t$ and $x$; the three velocity
+vectors in the figure are all different. As the particles accelerate, the spacing between them
+Lorentz-contracts, so that an observer accelerating along with them sees the spacing as remaining
+constant.
+
+This notion of rigid motion in relativity is called Born rigidity.\index{Born rigidity}\index{rigidity}
+No physical substance can naturally be perfectly rigid (Born rigid),
+for if it were, then the speed at which sound
+waves traveled in it would be greater than $c$. Born rigidity can only be accomplished 
+through a set of external forces applied at all points on the object according
+to a program that has been planned in advance. A real object such as a ruler does not maintain
+its own Born-rigidity, but it will
+eventually return to its original size and shape after having undergone relativistic acceleration,
+due to its own elastic properties, provided that the acceleration has been gentle enough to
+avoid permanently damaging it. In $1+1$ dimensions, Born rigidity is equivalent to a lack of
+expansion. In $3+1$ dimensions, we also require vanishing shear.
+
+Mathematically, it is clear that the condition of vanishing expansion must be expressible
+in $1+1$ dimensions in terms of the partial derivatives $\partial u/\partial t$ and $\partial u/\partial x$,
+and since we have been able to describe the condition in a frame-independent way (by referring
+it to observations made by the comoving observer), it should also be something we can
+express as a scalar within the grammar of index gymnastics. There is only one possible way
+to express such a condition, which is
+\begin{equation*}
+  \partial_a v^a = 0\eqquad.
+\end{equation*}
+We can in fact define a scalar $\Theta$, called the expansion scalar,\index{expansion scalar}
+according to
+\begin{equation*}
+  \Theta = \partial_a v^a\eqquad.
+\end{equation*}
+This definition is valid in $n+1$ dimensions, but in $1+1$ dimensions it reduces
+to $\Theta=\partial\gamma/\partial t+\partial(u\gamma)/\partial x$.
+
+The expansion scalar
+is interpreted as the fractional rate of change in the volume of a set of particles that move
+along the world-lines defined by the congruence, where the rate of change is defined with
+respect to the proper time $\tau$ of an observer moving along with the particles.
+For example, cosmological expansion leads to a fractional
+increase in the distances between galaxies $\Delta L/L$ which,
+for a small time interval $\Delta \tau$, is equal to $H_\zu{o}\Delta \tau$, where 
+$H_\zu{o}$, called the Hubble constant, is about $2.3\times 10^{-18}\ \sunit^{-1}$.
+That is, the fractional rate of change is $(1/L)\der L/\der \tau=H_\zu{o}$. Because distances expand in all
+three spatial dimensions, the fractional rate of change of volume is
+$\Theta=(1/V)\der V/\der \tau=3H_\zu{o}$. (In this example, spacetime is not flat, so
+we would have to express $\Theta$ in terms of the covariant derivative $\nabla_a$
+defined in section \ref{sec:covariant-derivative}, not the partial derivative $\partial_a$.)
+
+\begin{eg}{A catastrophe}\label{eg:catastrophe}
+Consider the timelike congruence in $1+1$ dimensions defined by $u=x/t$. This consists of the set of all inertial
+world-lines passing through the origin. Since our definition of a congruence requires that the world-lines
+be non-intersecting, let's restrict this example to the interior of the past light cone of the origin,
+$|x|<-t$. We have a universe full of hapless particles, all heading like lemmings toward a catastrophic
+collision. The spacetime diagram looks like an optical ray diagram for the formation of a real image.
+A computation gives the unexpectedly simple result $\Theta=\gamma/t$. For $t<0$, this is negative,
+indicating a contraction, and it blows up to minus infinity as $t$ approaches $0$.
+
+\end{eg}
+<% marg(300) %>
+<%
+  fig(
+    'catastrophe',
+    %q{Example \ref{eg:catastrophe}.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'rindler-caustic',
+    %q{A caustic in the lines of simultaneity of the family of accelerated world-lines.}
+  )
+%>
+<% end_marg %>
+<% end_sec('expansion') %>
+
+<% begin_sec("Caustics",nil,'caustics') %>
+The apex of the cone in example \ref{eg:catastrophe} is a \emph{caustic.}\index{caustic}
+Given a space-filling set of straight lines, a caustic occurs where their intensity diverges to infinity.
+The word means ``burning,'' because in optics a caustic of light rays concentrates energy and can burn things.
+Example \ref{eg:catastrophe} involves a caustic of timelike world-lines, and ``straight'' is to be interpreted as meaning
+that the world-lines are inertial. 
+
+Figure \figref{rindler-caustic} shows  two caustics formed by spacelike
+lines for the accelerated coordinate system described in \ref{sec:rindler-coords}.
+Here, as is often the case, the caustics are not just points.
+
+An example from general relativity is that when a black hole forms by gravitational collapse,
+a caustic is formed at a one point by the set of lightlike world-lines that enter the event horizon
+from the outside universe at the moment when the horizon is formed.
+If a ray of light is emitted from this caustic point, it remains on the event horizon forever,
+as do all rays emitted at the horizon in the outward direction at later times. The event horizon is the
+same set of events as the union of all the lightlike world-lines that enter the horizon at the 
+caustic.\footnote{Penrose, 1968. The proof is presented in Misner, Thorne, and Wheeler, p. 924}
+<% end_sec('caustics') %>
+
+
+<% begin_sec("The Herglotz-Noether theorem in 1+1 dimensions",nil,'herglotz-noether') %>\index{Herglotz-Noether theorem}
+
+Certain Born-rigid types of motion
+are possible, and others are not, purely as a matter of kinematics. It turns out to be possible
+to accelerate a rod in a Born-rigid way along its own length (problem \ref{hw:rindler-expansion},
+p.~\pageref{hw:rindler-expansion}), but surprisingly, it is not possible, for example, for a sphere to remain
+Born-rigid while simultaneously rotating and having its center of mass accelerated.
+The possible types of motion are delineated by a theorem called the Herglotz-Noether theorem.
+Unlike the $3+1$-dimensional version of the theorem,
+the $1+1$-dimensional version is neither surprising nor difficult to state or prove.
+
+\emph{Herglotz-Noether theorem in 1+1 dimensions:} Any rigid motion in $1+1$ dimensions is uniquely
+determined by the world-line W of one point, provided that the world-line of that point is smooth and timelike.
+It is in general only possible to extend the congruence describing the motion to some neighborhood of W.
+
+Proof: To avoid technical issues, we assume that ``smooth'' means analytic, which slightly weakens the result.
+As discussed above, zero expansion is equivalent to
+$0=\partial\gamma/\partial t+\partial(u\gamma)/\partial x$, where $(t,x)$ are any set of Minkowski coordinates.
+This can be put in the form $\partial u/\partial x=f(u)\partial u/\partial t$, where $f$ is smooth for $-1<u<1$
+and $f(0)=0$.
+We need to prove that the solution
+of this partial differential equation, if it exists, is unique given W.
+We arbitrarily choose one event on W.
+By assumption, W is timelike at this point, so we are free to choose our Minkowski coordinates
+such that our point is at rest at this event at the origin. Since $f(0)=0$, it follows that
+at the origin $\partial u/\partial x=0$. We can similarly evaluate the higher derivatives
+$\partial^n u/\partial x^n$, and because $u$ is smooth we can in this calculation freely interchange the order
+of the partial derivatives $\partial_x$ and $\partial_t$. It is straightforward to  show that these higher derivatives
+$\partial^n u/\partial x^n$ are also zero. Since $u(x)$ is assumed to be analytic, it follows that $u(0,x)=0$ for
+all $x$, i.e., an observer instantaneously moving along W at $t=0$ says that all other points are at rest
+as well at that time. But because W is timelike, we can always find some neighborhood A of W such that
+every point in A is simultaneous with a unique event on W
+according to an observer at that event moving
+along with W. (Cf.~p.~\pageref{subsubsec:deja-vu-again}.) Therefore the value of $u$ is determined 
+everywhere in A, and this completes the proof that the congruence exists and is unique in A.
+
+Remarks: 
+(1) The $1+1$-dimensional version of the Herglotz-Noether theorem is not a special case of
+the $3+1$-dimensional version. The latter is usually proved for a space-filling congruence,
+and it fails when the body in question does not enclose a volume, e.g., in the case of a thin rod
+or a letter ``C.''
+
+(2) The theorem can be strengthened by relaxing the requirement of smoothness so that only
+the existence of a second derivative of the position with respect to proper time is 
+required.\footnote{Giulini, ``The Rich Structure of Minkowski Space,'' \url{arxiv.org/abs/0802.4345},
+theorems 18 and 22}
+
+(3) If the motion is accelerated, then
+the rigid motion cannot be extended to an arbitrary distance from W.
+If the proper acceleration of W can be as great as $a$, then as in
+example \ref{eg:deja-vu-again}, p.~\pageref{eg:deja-vu-again}, we expect to be able to
+extend the rigid motion to a proper distance only as big as $c^2/a$, where there will be a caustic
+similar to the one in figure \figref{rindler-caustic}.
+<% end_sec('herglotz-noether') %>
+
+<% begin_sec("Bell's spaceship paradox revisited",nil,'bell-revisited') %>\index{Bell's spaceship paradox}%
+\index{spaceship paradox}\index{paradox!Bell's spaceship}
+Bell's spaceship paradox was discussed in section \ref{subsec:bell-spaceship-paradox}
+on p.~\pageref{subsec:bell-spaceship-paradox}.
+In the paradox, two spaceships begin accelerating simultaneously and
+have equal accelerations in the frame of an external, inertial observer,
+causing a thread stretched between them breaks. We now give a more rigorous and mathematically elegant demonstration of the
+same result, suggested by P.~Allen.
+
+The motion of the thread throughout its length can be described by a timelike congruence.
+If the thread is not to come under any strain, then this must be a Born-rigid congruence.
+By the $1+1$-dimensional Herglotz-Noether theorem, the congruence is uniquely determined by
+the motion of one of its points, which we take to be the trailing rocket. This congruence
+happens to be known. It is defined by the system of accelerated coordinates
+(Rindler coordinates)  described in
+section \ref{sec:rindler-coords}, p.~\pageref{sec:rindler-coords}. The vanishing of the
+expansion scalar for this congruence is left for the reader to verify (problem
+\ref{hw:rindler-expansion}, p.~\pageref{hw:rindler-expansion}). But this congruence consists of
+world-lines whose proper accelerations are each constant and all different from one another,
+and this is inconsistent with the description given in the Bell paradox, where it is stated
+that a frame exists in which the motions of the two ships are identical except for a translation. Therefore the
+thread cannot move rigidly.
+
+This completes the resolution fo the paradox, but as an illustrative example, we present an explicit
+calculation of the expansion scalar for the congruence that one would most naturally imagine to be implied
+by the description of the paradox. This is given by
+$(x+c)^2=1+t^2$. For a given value of the parameter $c$, we get an accelerating
+world-line. (Its proper acceleration $a=1$ happens to be constant, example \ref{eg:hyperbolic-motion}, 
+p.~\pageref{eg:hyperbolic-motion}, although this is not necessary for the purposes of discussing the paradox.)
+Each world-line starts at rest at $t=0$, and each one has the same acceleration at any given $t$.
+By picking any two distinct values of $c$ as the endpoints of the thread,
+we obtain the literal situation described in the paradox.
+
+Implicit differentiation gives $u=t/\sqrt{1+t^2}$. The algebra gets a little messy now, so I used the open-source
+computer algebra system Maxima. The following program, which should be fairly readable without previous
+knowledge of Maxima's syntax, calculates the expansion tensor:
+
+\begin{listing}{1}
+u:t/sqrt(1+t^2);
+gamma:1/sqrt(1-u^2);
+theta:diff(gamma,t)+diff(u*gamma,x);
+is(equal(theta,gamma*u^2/t));
+\end{listing}
+
+The third line prints out a complicated expression for $\Theta$, which the fourth line shows can be
+simplified to $\gamma u^2/t$. This is positive for $t>0$, which shows that the thread is forced to expand.
+Note that although the calculation was carried out in a particular set of coordinates, a relativistic scalar
+such as $\Theta$ has a coordinate-independent value. Reference to a particular coordinate system or
+frame of reference occurs only in the initial definition of the congruence, which is defined in order
+to model the situation described in the paradox, which is stated in terms of a particular external observer.
+
+<% end_sec('bell-revisited') %>
+
+<% end_sec('congruences-etc') %>
+
+<% begin_sec("Units of measurement for tensors",nil,'tensor-units') %>\index{units!for tensors}
+Analyzing units, also known as dimensional analysis, is one of the
+first things we learn in freshman physics.  It's a useful way of
+checking our math, and it seems as though it ought to be
+straightforward to extend the technique to relativity. It certainly
+can be done, but it isn't quite as trivial as might be imagined. We'll
+see below that different authors prefer differing systems, and clashes
+occur between some of the notational systems in use.
+
+One of our most common jobs is to change from one set of units to
+another, but in relativity it becomes nontrivial to define what we
+mean by the notion that our units of measurement change or don't
+change. We could, e.g., appeal to an
+atomic standard, but Dicke\footnote{``Mach's principle and invariance
+under transformation of units,'' Phys Rev 125 (1962) 2163} points out
+that this could be problematic. Imagine, he says, that
+%
+\begin{quote}
+you are told by a space traveller that a
+hydrogen atom on Sirius has the same diameter as one on the earth. A
+few moments' thought will convince you that the statement is either a
+definition or else meaningless. 
+\end{quote}
+%
+(Some related ideas about the numerical value of $c$ were discussed on p.~\pageref{subsubsec:numerical-c}.)
+
+To start with, we note that abstract index notation is more convenient than concrete index notation for these purposes.
+As noted in section \ref{sec:xfn-derivatives}, p.~\pageref{sec:xfn-derivatives},
+concrete index notation assigns different units to different components of a tensor if
+we use coordinates, such as spherical coordinates $(t,r,\theta,\phi)$, that don't
+all have units of length.
+In abstract index notation, a symbol like $v^i$ stands for the whole vector, not for one of its components.
+Since abstract index notation does not even offer us a notation for components, if we want to
+apply dimensional analysis we must define a system in which units are attributed to a tensor as
+a whole. Suppose we write down the abstract-index form of the equation for proper time:
+\begin{equation*}
+  \der s^2 = g_{ab} \der x^a \der x^a
+\end{equation*}
+In abstract index notation, $\der x^a$ doesn't mean an infinitesimal change in a particular coordinate, it
+means an infinitesimal displacement vector.\footnote{For a modern and rigorous development of differential
+geometry along these lines, see Nowik and Katz, 
+\url{arxiv.org/abs/1405.0984}.} This equation
+has one quantity on the left and three factors on the right. Suppose we assign these parts of the equation units
+$[ds]=L^\sigma$, $[g_{ab}]=L^{2 \gamma}$, and $[dx^a]=[dx^b]=L^\xi$, where square brackets mean
+``the units of'' and $L$ stands for units of length. We then have $\sigma=\gamma+\xi$.
+Due to the ambiguities referred to above, we can pick any values we like for these three constants,
+as long as they obey this rule. I find $(\sigma,\gamma,\xi)=(1,0,1)$ to be natural and convenient,
+but Dicke, in the above-referenced paper, likes $(1,1,0)$, while the well known mathematician
+Terry Tao advocates $(0,\mp 1,\pm 1)$.
+
+Suppose we raise and lower indices to form a tensor with $r$ upper indices and $s$ lower indices
+We refer to this as a tensor of rank $(r,s)$.\index{tensor!rank}
+(We don't count contracted indices, e.g., $u^av_a$ is a rank-$(0,0)$ scalar.)
+ Since the metric is the tool we use for raising and
+lowering indices, and the units of the lower-index form of the metric are $L^{2 \gamma}$,
+it follows that the 
+units vary in proportion to $L^{\gamma(s-r)}$. In general, you can
+assign a physical quantity units $L^u$ that are a product of two
+factors, a ``kinematical'' or purely geometrical factor $L^k$, where
+$k=\gamma(s-r)$, and a dynamical factor $L^d\ldots$, which can
+depend on what kind of quantity it is, and where the \ldots indicates
+that if your system of units has more than just one base unit, those
+can be in there as well. Dicke uses units with $\hbar=c=1$, for
+example, so there is only one base unit, and mass has units of inverse
+length and $d_\text{mass}=-1$. In general relativity it would be more common to use units
+in which $G=c=1$, which instead give $d_\text{mass}=+1$.
+
+\begin{eg}{The units of momentum}\label{eg:units-of-momentum-fancy}
+Consider the equation
+\begin{equation*}
+  p^a = mv^a
+\end{equation*}
+for the momentum of a material particle. Suppose we use special-relativistic units
+in which $c=1$, but because gravity isn't incorporated into the theory, $G$ plays
+no special role, and it is natural to use a system of units in which there is a base
+unit of mass $M$.
+
+The kinematic units check out, because $k_p=k_m+k_v$:
+\begin{equation*}
+  \gamma(-1)=\gamma(0)+\gamma(-1)
+\end{equation*}
+This is merely a matter of counting indices, and was guaranteed to check out as long
+as the indices were written in a grammatical way on both sides of the equation.
+What this check is essentially telling us is that if we were to establish Minkowski
+coordinates in a neighborhood of some point, and do a change of coordinates
+$(t,x,y,z)\rightarrow(\alpha t,\alpha x,\alpha y,\alpha z)$, then the quantities on both sides of the equation
+would vary under the tensor transformation laws according to the same exponent of $\alpha$. For example,
+if we changed from meters to centimeters, the equation would still remain valid.
+
+For the dynamical units, suppose that we use $(\sigma,\gamma,\xi)=(1,0,1)$, so that
+an infinitesimal displacement $\der x^a$ has units of length $L$,
+as does proper time $\der s$. These two quantities are purely kinematic, so we don't
+assign them any dynamical units, and therefore
+the velocity vector $v^a=\der x^a/\der s$ also has no dynamical units.
+Our choice of a system of units gives $[m]=M$.
+We require that the equation $p^a = mv^a$ have dynamical units that check out, so:
+\begin{equation*}
+  M=1\cdot M
+\end{equation*}
+We must also assign units of mass to the momentum.
+\end{eg}
+
+A system almost identical to this one, but with different terminology, is given by
+Schouten.\footnote{Tensor Analysis for Physicists, ch.~VI}
+
+For practical purposes in checking the units of an equation, we can see from
+example \ref{eg:units-of-momentum-fancy} that worrying about the kinematic units is
+a waste of time as long as we have checked that the indices are grammatical. We can therefore
+give a simplified method that suffices for checking the units of any equation in abstract index
+notation.
+
+\begin{enumerate}\label{tensor-unit-rules}
+\item We assign a tensor the same units that one of its concrete
+    components \emph{would} have if we were to adopt (local) Minkowski coordinates,
+    in the system with $(\sigma,\gamma,\xi)=(1,0,1)$. These are the units
+    we would automatically have imputed to it after learning special relativity but before
+    learning about tensors or fancy coordinate transformations. Since $\gamma=0$, the positions
+    of the indices do not affect the result.
+\item The units of a sum are the same as the units of the terms.
+\item The units of a tensor product are the product of the units of the factors.
+\end{enumerate}
+
+<% end_sec('tensor-units') %>
+
+<% begin_sec("Notations for tensors",nil,'tensor-clashes',{'optional'=>true}) %>
+Johnny is an American grade-school kid who has had his tender mind protected from certain historical realities,
+such as the political status of slaves, women, and Native Americans in the early United States. If Johnny ever
+tries to read the U.S.~Constitution, he will be very confused by certain passages,
+such as the infamous three-fifths clause referring opaquely to ``all other persons.''
+
+This optional section is meant to expose you to some similar historical ugliness involving tensor notation,
+knowledge of which may be helpful if you learn general relativity in the future.
+As in the evolution of the U.S.~Constitution and its interpretation, we will find that not all the
+changes have been improvements. In sections
+\ref{subsec:tensor-notation-dark-ages}-\ref{subsec:tensor-notation-abstract-index} we briefly recapitulate
+some notations that have already been introduced, and then in sections
+\ref{subsec:tensor-notation-cartan}-\ref{subsec:tensor-notation-index-free} we introduce two new ones.
+
+<% begin_sec("Concrete index notation",nil,'tensor-notation-dark-ages') %>
+A displacement vector is our prototypical example of a tensor, and the original nineteenth-century
+approach was to associate this tensor with the changes in the coordinates. Tensors achieve their
+full importance in differential geometry, where space (or spacetime, in general relativity) may be
+curved, in the sense defined in section \ref{sec:flatness}, p.~\pageref{sec:flatness}. In this
+context, only infinitesimally small displacements qualify as vectors; to see this, imagine
+displacements on a sphere, which do not commute for the reasons described
+in section \ref{subsec:rot-noncommutative}, p.~\pageref{subsec:rot-noncommutative}. On small scales,
+the sphere's curvature is not apparent, which is why we need to make our displacements infinitesimal.
+Thus in this approach, the simplest example of a relativistic tensor occurs if we pick Minkowski
+coordinates to describe a region of spacetime that is small enough for the curvature to be negligible,
+and we associate a displacement vector with a 4-tuple of infinitesimal changes in the coordinates:
+\begin{equation*}
+  (\der t,\der x,\der y,\der z) 
+\end{equation*}
+Until about 1960, this carried the taint of the lack of rigor believed to be associated with Leibniz-style
+infinitesimal numbers, but this difficulty was resolved and is no longer an argument against the 
+notation.\footnote{For a thorough development of the ``back-to-the-future'' use of infinitesimals
+for this purpose, see Nowik and Katz, \url{arxiv.org/abs/1405.0984}.}
+<% end_sec('tensor-notation-dark-ages') %>
+<% begin_sec("Coordinate-independent notation",nil,'tensor-notation-abstract-index') %>
+A more valid reason for disliking the old-school notation is that,
+as described in ch.~\ref{ch:coordinates}, p.~\pageref{ch:coordinates}, it
+is desirable to avoid writing every line of mathematics in a notation that explicitly refers
+to a choice of coordinates. We might therefore prefer, as Penrose began advocating around
+1970, to notate this vector in coordinate-independent
+notation such as ``birdtracks'' (section \ref{subsec:birdtracks}, p.~\pageref{subsec:birdtracks}),
+\begin{equation*}
+  __birdvec(\der\vc{x})\eqquad,
+\end{equation*}
+or the synonymous abstract index notation (section \ref{subsec:abstract-index}, p.~\pageref{subsec:abstract-index}),
+\begin{equation*}
+  \der x^a\eqquad,
+\end{equation*}
+where the use of the Latin letter $a$ means that we're not referring to any coordinate system, $a$ doesn't
+take on values such as 1 or 2, and $\der x^a$ refers to the entire object $__birdvec(\der\vc{x})$, not
+to some real number or set of real numbers.
+
+Unfortunately for the struggling student of relativity, there are at least two more notations now in use,
+both of them incompatible in various ways with the ones we've encountered so far.
+<% end_sec('tensor-notation-abstract-index') %>
+
+<% begin_sec("Cartan notation",nil,'tensor-notation-cartan') %>
+Our notation involving upper and lower indices is descended from a similar-looking one
+invented in 1853 by Sylvester.\footnote{An easily obtainable modern description is given in
+Coxeter, \emph{Introduction to Geometry}.} In this system, 
+vectors are thought of as invariant quantities.
+We write a vector in terms of a basis $\{\vc{e}_\mu\}$ as $\vc{x}=\sum x^\mu \vc{e}_\mu$. 
+Since $\vc{x}$ is considered invariant, it follows that the components $x^\mu$ and the basis
+vectors $\vc{e}_\mu$ must transform in opposite ways. For example, if we convert from
+meters to centimeters, the $x^\mu$ get a hundred times bigger, which is compensated for by
+a corresponding shrinking of the basis vectors by $1/100$.
+
+This notation clashes with normal index notation in certain ways.
+One gotcha is that we can't infer the rank of an expression by counting indices.
+For example,
+$\vc{x}=\sum x^\mu \vc{e}_\mu$ is notated as if it were a scalar, but this is 
+actually a notation for a vector.
+
+Circa 1930, \'Elie Cartan augmented this notation with a trick that is perhaps a little
+too cute for its own good. He noted that the partial differentiation operators $\partial/\partial x^\mu$
+could be used as a basis for a vector space whose structure is the same as the space of ordinary vectors.
+In the modern context we rewrite the operator $\partial/\partial x^\mu$ as $\partial_\mu$ and
+use the Einstein summation convention, so that in the Cartan notation we express a vector in terms of its components as
+\begin{equation*}
+  \vc{x} = x^\mu \partial_\mu\eqquad.
+\end{equation*}
+
+In the Cartan notation, the symbol $\der x^\mu$ is hijacked in order to represent something
+completely different than it normally does; it's taken to mean the dual vector corresponding
+to $\partial_\mu$. The set $\{\der x^\mu\}$ is used as a  basis for notating covectors.
+
+A further problem with the Cartan notation arises when we try to use it for dimensional
+analysis (see section \ref{subsec:cartan-no-units}).
+
+<% end_sec('tensor-notation-cartan') %>
+
+<% begin_sec("Index-free notation",nil,'tensor-notation-index-free') %>
+Independently of Penrose and the physics community, mathematicians invented
+a different coordinate-free notation, one without indices. In this notation, for example,
+we would notate the magnitude of a vector not as $v_av^b$ or $g_{ab}v^av^b$ but as
+\begin{equation*}
+  g(\vc{v},\vc{v})\eqquad.
+\end{equation*}
+This notation is too clumsy for use in complicated expressions involving tensors with many indices.
+As shown in section \ref{subsec:cartan-no-units}, it is also not compatible with the way physicists are accustomed to doing
+dimensional analysis. 
+<% end_sec('tensor-notation-index-free') %>
+
+<% begin_sec("Incompatibility of Cartan and index-free notation with dimensional analysis",nil,'cartan-no-units') %>
+In section \ref{sec:tensor-units} we developed a system of dimensional analysis for use with abstract index notation.
+Here we discuss the issues that arise when we attempt to mix in other notational systems.
+
+One of the hallmarks of index-free notation is that it
+uses non-multiplicative notation for many tensor products that would have been written as multiplication
+in index notation, e.g., $g(\vc{v},\vc{v})$ rather than $v^av_a$. This makes the system clumsy to use
+for dimensional analysis, since we are accustomed to reasoning about units based on the assumption that
+the units of any term in an equation equal the product of the units of its factors.
+
+In Cartan notation we have the problem that certain notations, such as $dx^\mu$, are completely redefined.
+The remainder of this section is devoted to exploring what goes wrong when
+we attempt to extend the analysis of section \ref{sec:tensor-units} to include Cartan notation.
+Let vector $\vc{r}$ and covector $\bomega$ be duals of each other, and let $\vc{r}$ represent a displacement.
+In Cartan notation, we write these vectors in terms of their components, in some coordinate system, as
+follows:
+\begin{align}
+\vc{r}      &=r^\mu \partial_\mu \label{eq:cartan-r-in-basis} \\
+\bomega &=\omega_\mu dx^\mu \label{eq:cartan-omega-in-basis}
+\end{align}
+Suppose that the coordinates are Minkowski. Reading from left to right and from top to bottom, there are
+six quantities occurring in these equations. We attribute to them the units $L^A$, $L^B$, \ldots $L^F$.
+If we follow the rule that multiplicative notation is to imply multiplication of units, then
+\begin{align}
+  A &= B+C \qquad \text{and} \\
+  D &= E+F\eqquad.
+\end{align}
+For compatibility with the system in section \ref{sec:tensor-units}, equations 
+\ref{eq:cartan-r-in-basis}-\ref{eq:cartan-omega-in-basis} require
+\begin{align}
+  &A+D=2\sigma \qquad \text{and} \\
+  &D=2\gamma+B\eqquad.
+\end{align}
+To avoid a clash between Cartan and concrete index notation in a Minkowski coordinate system,
+it would appear that we want the following three additional conditions.
+\begin{align}
+  F&=\xi \qquad \text{units of Cartan $dx^\mu$ not to clash with units of $dx^\mu$} \\
+  C&=-\xi \qquad \text{units of Cartan $\partial_\mu$ not to clash with units of the derivative} \\
+  B&=\xi \qquad \text{units of components in Cartan notation not to clash with units of $dx^\mu$}
+\end{align}
+We have 6 unknowns and 7 constraints, so in general Cartan notation cannot be incorporated into this
+system without some constraint on the exponents $(\sigma,\gamma,\xi)$. In particular, we require $\xi=0$,
+which is not a choice that most physicists prefer.
+<% end_sec('cartan-no-units') %>
+<% end_sec('tensor-clashes') %>
+
+
+
+
+
+<% begin_hw_sec %>
+
+<% begin_hw('stress-energy-perfect-fluid-si') %>
+Rewrite the stress-energy tensor of a perfect fluid in SI units.
+For air at sea level, compare the sizes of its components.
+<% end_hw %>
+
+<% begin_hw('symmetry-preserved') %>
+Prove by direct computation that if a rank-2 tensor is
+symmetric when expressed in one Minkowski frame, the symmetry is
+preserved under a boost.
+<% end_hw %>
+
+<% begin_hw('stress-energy-time-reversal') %>
+Consider the following change of coordinates:
+\begin{align*}
+  t' &= -t \\
+  x' &= x \\
+  y' &= y \\
+  z' &= z
+\end{align*}
+This is called a time reversal. As in example \ref{eg:stress-energy-parity} on
+p.~\pageref{eg:stress-energy-parity}, find the effect on the stress-energy tensor.
+<% end_hw %>
+
+<% begin_hw('zero-christoffel-in-minkowski') %>
+Show that in Minkowski coordinates in flat spacetime, all Christoffel symbols vanish.
+<% end_hw %>
+
+<% begin_hw('geodesic-affine') %>
+Show that if the differential equation for geodesics on page \pageref{geodesic-diffeq} is satisfied for one affine
+parameter $\lambda$, then it is also satisfied for any other affine parameter $\lambda'=a\lambda+b$, where $a$ and $b$
+are constants.
+<% end_hw %>
+
+<% begin_hw('delta-g-notational-conflict') %>
+This problem investigates a notational conflict in the description of the metric tensor using index notation.
+Suppose that we have two different metrics, $g_{\mu\nu}$ and $g'_{\mu\nu}$. The difference of two rank-2
+tensors is also a rank-2 tensor, so we would like the quantity $\delta g_{\mu\nu}=g'_{\mu\nu}-g_{\mu\nu}$
+to be a well-behaved tensor both in its transformation properties and in its behavior when we manipulate its
+indices. Now we also have $g^{\mu\nu}$ and $g'^{\mu\nu}$, which are defined as the matrix inverses of their
+lower-index counterparts; this is a special property of the metric, not of rank-2 tensors in general. We can
+then define $\delta g^{\mu\nu}=g'^{\mu\nu}-g^{\mu\nu}$.
+(a) Use a simple example to show that $\delta g_{\mu\nu}$ and $\delta g^{\mu\nu}$ cannot be computed from one
+another in the usual way by raising and lowering indices.
+(b) Find the general relationship between $\delta g_{\mu\nu}$ and $\delta g^{\mu\nu}$.
+<% end_hw %>
+
+<% begin_hw('rindler-expansion') %>
+In section \ref{subsec:bell-revisited} on p.~\pageref{subsec:bell-revisited}, we analyzed the Bell spaceship paradox
+using the expansion scalar and the Herglotz-Noether theorem.
+Suppose that we carry out a similar analysis, but with the congruence defined by
+$x^2-t^2=a^{-2}$. The motivation for considering this congruence is that its world-lines have constant
+proper acceleration $a$, and each such world-line has a constant value of the coordinate $X$ in the
+system of accelerated coordinates (Rindler coordinates)  described in
+section \ref{sec:rindler-coords}, p.~\pageref{sec:rindler-coords}.
+Show that the expansion tensor vanishes. The interpretation is that it is possible to
+apply a carefully planned set of external forces to a straight rod so that
+it accelerates along its own length without any stress, i.e., while remaining Born-rigid.
+<% end_hw %>
+
+<% end_hw_sec %>
+
+<% end_chapter %>

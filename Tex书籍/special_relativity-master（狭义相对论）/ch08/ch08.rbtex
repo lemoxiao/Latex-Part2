@@ -1,0 +1,616 @@
+\addtocontents{toc}{\protect\vfill} % cosmetic
+
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '08',
+    %q{Rotation (optional)},
+    'ch:rotation'
+  )
+%>
+
+<% begin_sec("Rotating frames of reference",nil,'rotating-frames') %>
+<% begin_sec("No clock synchronization",nil,'rot-no-sync') %>
+Panels 1 and 2 of figure \figref{chain-chain-chain} recapitulate the result of example
+\ref{eg:clock-shifts} on p.~\pageref{eg:clock-shifts}. The set of three clocks fixed
+to the earth in \subfigref{chain-chain-chain}{1} have been synchronized by Einstein
+synchronization (example \ref{eg:einstein-train},
+p.~\pageref{eg:einstein-train}), i.e., by exchanging flashes of light. The
+three clocks aboard the moving train, \subfigref{chain-chain-chain}{2}, have been
+synchronized in the same way, and the events that were simultaneous according to
+frame 1 are not simultaneous in frame 2. There is a systematic shift in the times,
+which is represented by the term $t'=\ldots - v\gamma x$ in the
+Lorentz transformation (eq.~\eqref{eqn:lorentz-transformation}, p.~\pageref{eqn:lorentz-transformation}).
+
+<%
+  fig(
+    'chain-chain-chain',
+    %q{%
+      Clocks can't be synchronized in a rotating frame of reference.
+    },
+    {
+      'sidecaption'=>true,
+      'width'=>'wide'
+    }
+  )
+%>
+
+Now suppose we take the diagram of the train and wrap it around,
+\subfigref{chain-chain-chain}{3}. If we go on and close the loop, making the chain into
+a circle like a chain necklace, we have a problem. The trend in the clock times
+can continue until it wraps back around to the beginning, but then there will be
+a discrepancy.
+
+We conclude that clocks can't be synchronized in a rotating frame of reference.
+Such a frame does not admit a universal time coordinate because Einstein
+synchronization isn't transitive: synchronizing clock A with clock B, and
+B with C, does not imply that A is synchronized with C. This nontransitivity
+is one way of \emph{defining} what we mean by rotation. That is, if the
+operational definition of an inertial frame given in section \ref{sec:define-inertia},
+p.~\pageref{sec:define-inertia}, shows that our frame is noninertial, and we want to
+know more about why it's noninertial, testing for this nontransitivity is a way
+of finding out whether it's because of rotation.
+
+<% end_sec('rot-no-sync') %>
+
+<% begin_sec("Rotation is locally detectable",nil,'rot-absolute') %>
+The people
+aboard the circular train know that their attempts at synchronization fail, so they
+can tell, without reference to anything external, that they're
+going in a circle. (Cf.~example \ref{eg:machian-planets}, p.~\pageref{eg:machian-planets}.)
+
+Although this is a book on special, not general, relativity, it's interesting to note
+the following possibility. Suppose that we verify, by local experiments, that we have
+a good, nonrotating, inertial frame of reference. It is then imaginable that if we
+view distant galaxies from this frame, we will see them rotate at some angular frequency
+$\Omega$ about some axis on the celestial sphere. If this is observed, then we must infer
+that it is the universe as a whole --- not our laboratory! --- that is rotating.
+Such an effect has been searched for, and, for example, an upper limit 
+$\Omega \lesssim 10^{-7}\ \zu{radian}/\zu{year}$ was inferred by
+Clemence.\footnote{``Astronomical time,'' Rev.~Mod.~Phys.~ 29 (1957) 2.}
+General-relativistic models of such rotating cosmologies have a preferred vector
+constituting the direction of the axis about which matter rotates, but there is
+no global center of rotation. Current upper limits on $\Omega$ are good enough to
+rule out any significant effect on cosmological expansion due to centrifugal forces.
+<% end_sec('rot-absolute') %>
+
+<% begin_sec("The Sagnac effect",nil,'sagnac') %>
+Although the train scenario is obviously unrealistic, the time shift is far from
+hypothetical. This type of effect, called the Sagnac effect,
+was first observed by M.~Georges Sagnac in 1913,
+and it relates to the principle of the ring laser gyroscope (example
+\ref{eg:ring-laser-gyro}, p.~\pageref{eg:ring-laser-gyro}), used in passenger jets.
+(The name is French, and is pronounced ``sah-NYAHK.'')
+To find the Sagnac effect quantitatively, we note that in the circular train example
+(ignoring signs) the relevant
+term in the Lorentz transformation, $v\gamma x$, would accumulate, after one
+complete circuit of Einstein synchronization, a discrepancy $\delta$ equal to
+the circumference of the circle multiplied by $v\gamma$. If the circle's radius is
+$r$ and the angular velocity $\omega$, we have $\Delta t=2\pi \gamma r^2\omega$.
+This can be rewritten in terms of the circle's area $A$ as $\Delta t=2 A\omega$,
+or, reinserting factors of $c$ to accomodate SI units, $\Delta t=2 A\omega/c^2$.
+The proportionality to the enclosed area is not an accident; the product $vx$
+has the form of the integrand $\vc{F}\cdot\der\vc{s}$ occurring in Stokes' theorem.
+
+\begin{eg}{Sagnac effect in the Hafele-Keating experiment}
+A clock at the equator of the earth rotates at a frequency $\omega$ of $2\pi$ radians per sidereal day,
+suffering a Sagnac effect of 210 ns per day. 
+The traveling atomic clocks in the Hafele-Keating experiment (p.~\pageref{hafele-keating}) went around
+the world in both directions, and were compared with a third set of clocks that stayed in
+Washington, DC. Since the time required to fly around the earth was also on the order of one
+day, the differences in the values of $\omega$ for the three sets of clocks were on the
+same order of magnitude as the $\omega$ of the earth, and we therefore expect cumulative 
+differential Sagnac effects that are also on the order of a hundred nanoseconds.
+These effects exist only in the rotating frame of the earth, but the things
+being measured are proper times, and proper time is a scalar, so the experimental
+results are independent of what frame of reference is used for calculating them.
+Since the airline pilots provided Hafele and Keating with navigational data referred
+to the rotating earth, they analyzed their results in the rotating frame, in which
+there was a Sagnac effect. They could equally well have transformed their data into
+the frame of the stars, in which case the same result would have been predicted, but
+it would have been described as arising from kinematic time dilation.
+\end{eg}
+% calc -xe "r=6378 km; omega=(2pi)/(23.9344699*(3600 s)); A=pi r^2; 2A omega/c^2->ns"
+
+\begin{eg}{Ring laser gyroscope}
+The ring laser gyroscope in the photo in example
+\ref{eg:ring-laser-gyro} on p.~\pageref{eg:ring-laser-gyro} looks like it has
+an area on the order of $10^2\ \zu{cm}^2$ and uses red light. 
+For use in navigation, one wants to be able to detect a change in course of,
+say, one degree in our hour, or $\omega\sim5\times10^{-6}\ \zu{radian}/\sunit$.
+The result is a time shift $\Delta t\sim 10^{-24}\ \sunit$, which for red
+light is a phase shift of only $\Delta \phi = 4\pi A\omega/c\lambda\sim 3\times 10^{-9}\ \zu{radian}$.
+In the original nineteenth-century experiments, this phase shift would have had to be measured
+by producing interference between the two beams and measuring the change in intensity resulting
+from this change in phase. Our estimate of $\phi$ shows that this is impractical for
+a portable instrument. In a modern ring laser gyroscope, an active laser medium is inserted
+in the loop, and the result is that the loop resonates at a frequency that is shifted from the
+laser's natural frequency by $\Delta f \sim\Delta \phi c/L$, where $L$ is the circumference. The result
+is a frequency shift of a few Hz, which is easily measurable. An alternative technique, used in
+the fiber optic gyroscope, is to wrap
+$N$ turns of optical fiber around the circumference, effectively changing $A$ to $NA$.
+\end{eg}
+% calc -xe "theta=1 deg; w=theta/(3600 s); A=100 cm2; t=2Aw/c^2; lambda=633 nm; dphi=4piAw/(clambda); L=4sqrt A; df=dphi c /L"
+% Faucheux, "The ring laser gyro," http://wr.lib.tsinghua.edu.cn/sites/default/files/1095053630075.pdf
+<% end_sec('sagnac') %>
+
+<% begin_sec("A rotating coordinate system",nil,'rot-coords') %>
+The GPS system is a practical example of a case where we naturally want to employ a rotating coordinate
+system. Hikers and sailors, after all, want to know where they are relative to the earth's rotating
+surface. Since locations need to be determined to within meters, the timing of signals needs to be
+done to a precision of something like $(1\ \munit)/c$, which is a few nanoseconds. This is why
+the GPS satellites have atomic clocks aboard, and timing to this precision clearly requires that
+relativistic effects be taken into account. We therefore need not a rotating Newtonian coordinate system
+but a rotating relativistic one. Let's start with the \emph{nonrotating} frame, and define
+coordinates $(t,r,\theta,z)$, with the spatial part $(r,\theta,z)$ being ordinary cylindrical coordinates.
+For simplicity, we'll neglect the $z$ coordinate in what follows. Extending the result of
+problem \ref{hw:polar-metric} on p.~\pageref{hw:polar-metric} from $2+0$ dimensions to $2+1$,
+we have the metric
+\begin{equation}\label{eqn:nonrotating-metric}
+  \der s^2=\der t^2 - \der r^2 - r^2\der \theta^2\eqquad.
+\end{equation}
+The results of section \ref{subsec:rot-no-sync} show that we do not expect to be able to
+define a completely satisfactory time coordinate in the rotating frame, so let's start
+with the minimal change $(t,r,\theta)\rightarrow(t,r,\theta')$, where $\theta'=\theta-\omega t$.
+This is at least enough to make world-lines of constant $\theta'$ be ones that revolve around
+the origin at the appropriate frequency. Substituting $\der\theta=\der\theta'+\omega\der t$,
+we find
+\begin{equation}\label{eq:rotating-lab-metric}
+  \der s^2=(1-\omega^2 r^2)\der t^2 - \der r^2 - r^2\der \theta'^2 - 2\omega r^2\der\theta'\der t\eqquad.
+\end{equation}
+<% end_sec('rot-coords') %>
+Recognizing $\omega r$ as the velocity of one frame relative to another, and
+$(1-\omega^2 r^2)^{-1/2}$ as $\gamma$, we see that we do have a relativistic time dilation effect in the $\der t^2$ term.
+But the $\der r^2$
+and $\der \theta'^2$ terms look the same as in equation \eqref{eqn:nonrotating-metric}. Why don't we see any Lorentz contraction of the length scale
+in the azimuthal direction?
+
+The answer is that coordinates in relativity are arbitrary, and
+just because we can write down a certain set of coordinates, that doesn't mean they have any special
+physical interpretation. The coordinates $(t,r,\theta')$ do not correspond physically to the quantities
+that a rotating observer R would measure with clocks and
+meter-sticks. If R uses a ruler to measure a short arc along the circumference of the circle $r=r_0$,
+the distance is a distance being measured between events in spacetime that are simultaneous in the
+rest frame of the ruler, and these do not occur at the time value of the time coordinate $t$.
+In the Lorentz transformation, for linear motion, it is the $-v\gamma x$ term applied to the times that
+fixes this problems and makes $t'$ properly represent simultaneity in the new frame.
+In our rotational version, we could try to do something similar
+by defining a time coordinate
+$t' = t + f\theta'$, where $f$ is a function of $r$ that is engineered
+so that the $\der\theta'\der t$ cross term in the metric would go away. This can be done
+(the function $f$ that works turns out to be $\omega r^2/(1-\omega^2 r^2)$), but the problem is that
+the $t'$ coordinate is not single-valued, in the sense that $(t,r,\theta)$ and
+$(t,r,\theta+2\pi)$ would not produce the same $t'$. This is inevitable, 
+as we've seen in section \ref{subsec:rot-no-sync}, so we can't
+improve on the coordinates $(t,r,\theta')$ and the metric \eqref{eq:rotating-lab-metric}.
+
+The coordinates $(t,r,\theta')$, with the metric \eqref{eq:rotating-lab-metric}
+are the ones used in the GPS system, and in that context are called
+Earth-Centered Inertial (ECI) coordinates. (Another name is Born coordinates.)
+Their time coordinate is not the time measured by a clock in the rotating frame
+but is simply the time coordinate of the nonrotating
+frame of reference tied to the earth's center. Conceptually, we can imagine this time coordinate as one that
+is established by sending out an electromagnetic ``tick-tock'' signal from the earth's center, with each
+satellite correcting the phase of the signal based on the propagation time inferred from its own $r$. In reality,
+this is accomplished by communication with a master control station in Colorado Springs, which communicates with
+the satellites via relays at Kwajalein, Ascension Island, Diego Garcia, and Cape Canaveral.
+
+<% end_sec('rotating-frames') %>
+
+<% begin_sec("Angular momentum",nil,'ang-mom') %>\index{angular momentum}
+Nonrelativistically, the angular momentum of a particle with momentum $\vc{p}$, at a position
+$\vc{r}$ relative to some arbitrarily fixed point, is $\vc{L}=\vc{r}\times\vc{p}$. When we
+generalize this equation to relativity, we run into a number of issues. Issues due to special
+relativity:
+\begin{enumerate}
+  \item The vector cross product only makes sense in three dimensions, so it
+                     is not well defined in special relativity 
+                     (sec.~\ref{subsec:orientation}, p.~\pageref{no-rel-cross-product}).
+  \item Assuming we get around issue number 1, how do we know that this quantity is conserved?
+\end{enumerate}
+And from general relativity:
+\begin{enumerate}
+  \setcounter{enumi}{2}
+  \item In general relativity, only infinitesimally small spatial or spacetime displacements $\der\vc{r}$ can be treated
+            as vectors. Larger ones cannot. This is because spacetime can be curved, and vectors can't be used to
+            define displacements on a curved space (e.g., the surface of the earth).
+  \item If space has a nontrivial topology, then we may not be able to define an orientation
+            (sec.~\ref{subsec:orientation}, p.~\pageref{spacetime-not-orientable}).
+\end{enumerate}
+For points 3 and 4, we refer to Hawking and Ellis, p.~62.
+Number 2 is addressed in sec.~\ref{subsec:cons-ang-mom}, p.~\pageref{subsec:cons-ang-mom}.
+For number 2 we will need the stress-energy tensor, which will be described in ch.~\ref{ch:flux}.
+Lest you feel totally cheated, we will resolve issue number 1 in section \ref{subsec:l-tensor},
+p.~\pageref{subsec:l-tensor}, but before we do
+that, let's consider an interesting example that can be handled with simpler math.
+<% begin_sec("The relativistic Bohr model",nil,'rel-bohr') %>
+If we want to see an interesting real-world example of relativistic angular momentum, we need something
+that rotates at relativistic velocities. At large scales we have astrophysical examples such as neutron
+stars and the accretion disks of black holes, but these involve gravity and would therefore require
+general relativity. At microscopic scales we have systems such as hadrons, nuclei, atoms, and molecules.
+These are quantum-mechanical, and relativistic quantum mechanics is a difficult topic that is beyond the
+scope of this book, but we can sidestep that issue by using the Bohr model of the atom. In the Bohr model
+of hydrogen, we assume that the electron has a circular orbit governed by Newton's laws,
+does not radiate, and has its angular
+momentum quantized in units of $\hbar$. Let's generalize the Bohr model by applying relativity.
+
+It will be convenient to define the constant $\alpha=ke^2/\hbar$,
+known as the fine structure constant,\index{fine structure constant}
+where $k$ is the Coulomb constant and $e$ is the fundamental charge.
+The fine structure constant is unitless and is approximately 1/137. It is essentially a measure of the strength
+of the electromagnetic interaction, and in the Bohr model it also turns out to be the velocity of the electron
+(in units of $c$) in the ground state of hydrogen. Because this velocity is small compared to 1, we
+expect relativistic corrections in hydrogen to be small --- of relative size $\alpha^2$. But we have
+an interesting opportunity to get at some additional and more exciting physics if we consider
+a \emph{hydrogenlike} atom, i.e., an ion with $Z$ protons in the nucleus and only one electron.
+Raising $Z$ cranks up the energy scale and therefore increases the velocity as well.
+
+Combining the Coulomb force law with the result of example \ref{eg:force-in-circular-motion},
+p.~\pageref{eg:force-in-circular-motion}, for uniform circular motion,
+we have $kZe^2/r=m\gamma v^2$, where the factor of $\gamma$ is
+the relativistic correction. The electron's momentum is perpendicular to the radius vector, so
+we assume for the moment that (as turns out to be true), the angular momentum is
+given by $L=rp=mv\gamma r$, where again a relativistic correction factor of $\gamma$ appears.
+This is quantized, so let $L=\ell\hbar$, where $\ell$ is an integer. Solving these equations gives
+\begin{align*}
+  v &= \frac{Z\alpha}{\ell} \\
+  r &= \frac{\ell^2\hbar}{mZ\alpha\gamma}.
+\end{align*}
+These differ from the nonrelativistic versions only by the factor of $\gamma$ in the second
+equation. The electrical energy is $U=-kZe^2/r$, and the kinetic energy $K=m(\gamma-1)$ (with $c=1$).
+We will find it convenient to work with the (positive) binding energy in units of the mass of
+the electron. Call this quantity $\mathcal{E}$. After some algebra, the result is
+\begin{equation*}
+  \mathcal{E} = 1-\sqrt{1-v^2}.
+\end{equation*}
+Surprisingly, this is also the exact result given by relativistic quantum mechanics if we solve
+the Dirac equation for the ground state, or if we take a high-energy (nearly unbound) state with the maximum
+value of $\ell$, as is appropriate for a semiclassical circular orbit. So we can see that even
+though our quantum mechanics was crude, our relativity makes some sense and gives reasonable results.
+For small $Z$, a Taylor series approximation gives $\mathcal{E}=v^2/2+v^4/8+\ldots$, where the
+fourth-order term represents the relativistic correction.
+
+So far so good, but now what if we crank up the value of $Z$ to make the relativistic effects
+strong? A very disturbing thing happens when we make $Z\gtrsim 137\approx 1/\alpha$. In the
+ground state we get $v>1$ and a
+complex number for $\mathcal{E}$. Clearly something has broken down, and our results no longer make sense.
+We might be inclined to dismiss this as a consequence of our crude model, but remember, our calculations
+happened to give the same result as the Dirac equation, which has real relativistic quantum mechanics baked
+in. We should take this breakdown as evidence of a real \emph{physical} breakdown. 
+The interpretation is as follows.
+
+According to quantum mechanics, the vacuum isn't really a vacuum.
+Particle-antiparticle pairs are continually popping into
+existence in empty space and then reannihilating one another.
+Their temporary creation is a violation of the conservation of mass-energy, but only a temporary violation,
+and this is allowed by the time-energy form of the Heisenberg uncertainty principle, $\Delta E\Delta t\gtrsim h$,
+as long as $\Delta t$ is short. It's as though we steal some money, but the police don't catch us as long as we
+put it back before anyone can notice.
+Because these particles are only temporarily in our universe, we call them virtual particles,
+as opposed to real particles that have a potentially
+permanent existence and can be detected as blips on a Geiger counter.
+
+But when the vacuum contains an electric field 
+that is beyond a certain critical strength, it becomes possible to create an electron-antielectron pair,
+let the opposite charges separate and release energy, and pay off the energy debt without having to reannihilate
+the particles. This is known as ``sparking the vacuum.'' As of this writing, only nuclei with $Z$ up to about
+118 have been discovered, and in any case the critical $Z$ value of $1/\alpha\approx137$ was only a rough estimate.
+But by colliding heavy nuclei such as lead, one can at least temporarily form an unstable compound system with
+a high $Z$, and attempts are being made to search for the predicted effect in the laboratory.
+<% end_sec('rel-bohr') %>
+
+<% begin_sec("The angular momentum tensor",nil,'l-tensor') %>
+As mentioned previously, there is no such thing as a vector cross product in four dimensions, so
+the nonrelativistic definition of angular momentum as $\vc{L}=\vc{r}\times\vc{p}$ needs to be modified
+to be usable in relativity.
+
+Given a position vector $r^a$ and a momentum vector $p^b$, we expect based both on units and the correspondence
+principle that a relativistic definition of angular momentum must be some kind of a product of the vectors.
+Based on the rules of index notation, we don't have much leeway here. The only products we can form are
+$r^a p^b$, which is a rank-2 tensor, or $r^a p_a$, a scalar. Since nonrelativistic angular momentum is a three-vector,
+the correspondence principle tells us that its relativistic incarnation can't be a scalar --- there simply
+wouldn't be enough information in a scalar to tell us the things that the nonrelativistic angular momentum vector
+tells us: what axis the rotation is about, and which direction the rotation is.
+
+The tensor $r^a p^b$ also has a problem, but one that can be fixed. Suppose that in a certain frame of
+reference a particle of mass $m\ne0$ is at rest at the origin. Then its position four-vector at time $t$ is $(t,0,0,0)$,
+and its energy-momentum vector is $(m,0,0,0)$. These vectors are parallel.
+The tensor $r^a p^b$ is nonzero and nonconserved as time flows,
+but clearly we want the angular momentum of an isolated particle to be conserved.
+Another example would be if, at a certain moment in time, we had $r=(0,x,0,0)$ and $p=(E,p,0,0)$, with 
+both $x$ and $p$ positive.
+This particle's motion is directly away from the origin, so its angular momentum should be zero by symmetry,
+but $r^a p^b$ is again nonzero.
+
+The way to fix the problem is to force the product of the position and momentum vectors to be an antisymmetric
+tensor:
+\begin{equation*}
+  L^{ab} = r^a p^b - r^b p^a.
+\end{equation*}
+Antisymmetric means that $L^{ab}=-L^{ba}$, so that elements on opposite sides of the main diagonal
+are the same except for opposite signs.
+A quick check shows that this gives the expected zero result in both of the above examples.
+A component such as $L^{yz}$ measures the amount of rotation in the $y$-$z$ plane. In a nonrelativistic
+context, we would have described this as an $x$ component $L_x$ of the angular momentum three-vector,
+because a rotation of the $y$-$z$ plane about the origin
+is a rotation \emph{about} the $x$ axis --- such a rotation
+keeps the $x$ axis fixed. But in four-dimensional spacetime, a rotation in the $y$-$z$ plane keeps the entire
+$t$-$x$ plane fixed, so the notion of rotation ``about an axis'' breaks down. (Notice the pattern: in
+two dimensions we rotate about a point, in three dimensions rotation is about a line, and in four dimensions
+we rotate about a fixed plane.) In sec.~\ref{subsec:cons-ang-mom}, p.~\pageref{subsec:cons-ang-mom},
+we show that $L^{ab}$ is conserved.
+
+If we lay the angular momentum tensor out in matrix format, it looks like this:
+\begin{equation*}
+  \left( \begin{matrix}
+         0 & L^{tx} & L^{ty} & L^{tz} \\
+           & 0      & L^{xy} & L^{xz} \\
+           &        & 0      & L^{yz} \\
+           &        &        & 0
+      \end{matrix} \right).
+\end{equation*}
+The zeroes on the main diagonal are due to the antisymmetrization in the definition.
+I've left blanks below the main diagonal because although those components can be
+nonzero, they only contain a (negated) copy of the information given by the ones
+above the diagonal. We can see that there are really only 6 pieces of information
+in this $4\times 4$ matrix, and we've already physically interpreted the triangular cluster
+of three space-space components on the bottom right.
+
+Why do we have the row on the top, consisting of the time-space components, and what
+do they mean physically? A highbrow answer would be that this is something very deep
+having to do with the fact that, as described in section \ref{sec:noncommutative} below,
+rotation and linear motion are not as cleanly separated in relativity as they are in
+nonrelativistic physics. A more straightforward answer is that in most situations these
+components are actually not very interesting. Consider a cloud of particles labeled
+$i=1$ through $n$. Then for a representative component from the top row we have
+the total value
+\begin{equation*}
+  L^{tx} = \sum t_i p^x_i - \sum x_i E_i.
+\end{equation*}
+Now suppose that we fix a certain surface of simultaneity at time $t$. The sum becomes
+\begin{equation*}
+  L^{tx} = t \sum p^x_i - \sum x_i E_i.
+\end{equation*}
+There is information here, but it's not exciting information about angular momentum,
+it's boring information about the position and motion of the system's center of mass.
+If we fix a frame of reference in which the total momentum is zero, i.e., the center
+of mass frame, then we have $\sum p^x_i=0$. Let's also define the position of the
+center of mass as the average position weighted by mass-energy, rather than the mass-weighted
+average, as we would do in Newtonian mechanics. Then the sum $\sum x_i E_i$ is a constant
+relating to the position of the center of mass, and if we like we can make it equal zero
+by choosing the origin of our spatial coordinates to coincide with the center of mass.
+
+With these choices we have a much simpler angular momentum tensor:
+\begin{equation*}
+  \left( \begin{matrix}
+         0 & 0      & 0      & 0      \\
+           & 0      & L^{xy} & L^{xz} \\
+           &        & 0      & L^{yz} \\
+           &        &        & 0
+      \end{matrix} \right).
+\end{equation*}
+
+If we wish, we can sprinkle some notational sugar on top of all of this using
+the Levi-Civita tensor $\epsilon$ described in
+optional section \ref{sec:levi-civita}, p.~\pageref{sec:levi-civita}.
+Let's define a new tensor ${}^\star L$ according to
+\begin{equation*}
+  {}^\star L_{ij} = \frac{1}{2}\epsilon_{ijkl} L^{kl}.
+\end{equation*}
+Then for an observer with velocity vector $o^\mu$, the quantity
+$o_\mu{}^\star L^{\mu\nu}$ has the form $(0,L^{yz},L^{zx},L^{xy})$
+(problem \ref{hw:ang-mom-hodge}, p.~\pageref{hw:ang-mom-hodge}).\label{ang-mom-hodge}
+That is, its spatial components
+are exactly the quantities we would have expected for the nonrelativistic angular
+momentum three-vector (using the correct relativistic momentum).
+<% end_sec('l-tensor') %>
+
+<% end_sec('ang-mom') %>
+
+<% begin_sec("Boosts and rotations",4,'noncommutative') %>
+A relative of mine fell in love. She and her boyfriend bought a house in the suburbs and had a baby.
+They think they'll get married at some later point. An engineer by training, she says she
+doesn't want to get hung up on the ``order of operations.'' For some mathematical operations,
+the order doesn't matter: $5+7$ is the same as $7+5$.
+
+<%
+  fig(
+    'rotating-book',
+    %q{%
+      Performing the rotations in one order gives
+      one result, 3, while reversing the order gives a different result, 5.
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+    }
+  )
+%>
+
+<% begin_sec("Rotations",nil,'rot-noncommutative') %>
+But figure \figref{rotating-book} shows that the order of operations does matter for rotations.
+Rotating around the $x$ axis and then $y$ produces a different result than $y$ followed by $x$.
+We say that rotations are noncommutative.
+This is why, in Newtonian mechanics, we don't have an angular displacement vector $\Delta\btheta$;
+vectors are supposed to be additive, and vector addition is commutative.
+For \emph{small} rotations, however, the discrepancy caused by choosing one order of operations rather
+than the other becomes small (of order $\theta^2$), so we \emph{can} define an infinitesimal
+displacement vector $\der\btheta$, whose direction is given by the right-hand rule,
+and an angular velocity $\bomega=\der\btheta/\der t$.
+
+As an example of how this works out
+for small rotations, let's take the vector
+\begin{equation}\label{eqn:rot-orig}
+  (0,0,1)
+\end{equation}
+and apply the operations shown in figure \figref{rotating-book}, but
+with rotations of only $\theta=0.1\ \zu{radians}$
+rather than 90 degrees. Rotation by this angle about the $x$ axis is given by the transformation
+$(x,y,z)\rightarrow (x,y\cos\theta-z\sin\theta,y\sin\theta+z\cos\theta)$, and applying this to the
+original vector gives this:
+\begin{equation}
+  (0.00000,- 0.09983,0.99500)  \qquad \text{(after $x$)} \qquad\qquad
+\end{equation}
+After a further rotation by the same angle, this time about the $y$ axis, we have
+\begin{equation}\label{eqn:rot-xy}
+  (0.09933,- 0.09983,0.99003)  \qquad \text{(after $x$, then $y$)}
+\end{equation}
+Starting over from the original vector \eqref{eqn:rot-orig} and doing the operations in the opposite order gives these results:
+\begin{align}
+  &(0.09983,0.00000,0.99500) \qquad \text{(after $y$)} \\
+  &(0.09983,- 0.09933,0.99003) \qquad \text{(after $y$, then $x$)}  \label{eqn:rot-yx}
+\end{align}
+The discrepancy between \eqref{eqn:rot-xy} and \eqref{eqn:rot-yx} is a rotation by
+very nearly $.005$ radians in the $xy$ plane. As claimed, this is on the order of $\theta^2$
+(in fact, it's almost exactly $\theta^2/2$). A single example can never prove anything,
+but this is an example of the general rule that rotations along different axes don't commute,
+and for small angles the discrepancy is a rotation in the plane defined by the two axes,
+with a magnitude whose maximum size is on the order of $\theta^2$.
+<% end_sec('rot-noncommutative') %>
+
+<% begin_sec("Boosts",nil,'boosts-noncommutative') %>
+Something similar happens for boosts. In $3+1$ dimensions, we start with the vector
+\begin{equation}\label{eqn:boost-orig}
+  (0,1,0,0)\eqquad,
+\end{equation}
+pointing along the $x$ axis. A Lorentz boost with $v=0.1$ (eq.~\eqref{eqn:lorentz-transformation},
+p.~\pageref{eqn:lorentz-transformation}) in the $x$ direction gives
+\begin{equation}\label{eqn:boost-x}
+  (0.10050,1.00504,0.00000,0.00000) \qquad \text{(after $x$)} \qquad\qquad
+\end{equation}
+and a second boost, now in the $y$ direction, produces this:
+\begin{equation}\label{eqn:boost-xy}
+  (0.10101,1.00504,0.01010,0.00000) \qquad \text{(after $x$, then $y$)}
+\end{equation}
+Starting over from \eqref{eqn:boost-orig} and doing the boosts in the opposite order, we have
+\begin{align}
+  &(0.00000,1.00000,0.00000,0.00000) \qquad \text{(after $y$)} \\
+  &(0.10050,1.00504,0.00000,0.00000) \qquad \text{(after $y$, then $x$)}  \label{eqn:boost-yx}
+\end{align}
+The discrepancy between \eqref{eqn:boost-xy} and \eqref{eqn:boost-yx} is a rotation in
+the $xy$ plane by very nearly 0.01 radians. This is an example of a more general fact, which 
+is that boosts along different axes don't commute, and for small angles the discrepancy is a rotation
+in the plane defined by the two boosts, with a magnitude whose maximum size is on the order of $v^2$, in
+units of radians.
+<% end_sec('boosts-noncommutative') %>
+
+<% begin_sec("Thomas precession",nil,'thomas-precession') %>
+Figure \figref{thomas-hammers} shows the most important physical consequence of all this.
+The gyroscope is sent around the perimeter of a square, with impulses provided by hammer taps at
+the corners. Each impulse can be modeled as a Lorentz boost, notated, e.g., $L_x$ for
+a boost in the $x$ direction. The series of four operations can be written as
+$L_yL_xL_{-y}L_{-x}$, using the notational convention that the first operation applied is the
+one on the right side of the list. If boosts were commutative, we could swap the two operations
+in the middle of the list, giving $L_yL_{-y}L_xL_{-x}$. The $L_x$ would undo the $L_{-x}$, and
+the $L_y$ would undo the $L_{-y}$. But boosts aren't commutative, so the vector representing the
+orientation of the gyroscope is rotated in the $xy$ plane. This effect is called the 
+Thomas precession,\index{Thomas precession} after Llewellyn Thomas (1903-1992).\index{Thomas, Llewellyn}
+Thomas precession is a purely relativistic effect, since a Newtonian gyroscope does not change its axis of rotation
+unless subjected to a torque; if the boosts are accomplished by forces that act at the gyroscope's center,
+then there is no nonrelativistic explanation for the effect.
+<% marg(50) %>
+<%
+  fig(
+    'thomas-hammers',
+    %q{Nonrelativistically, the gyroscope should not rotate as long as the forces from the hammer are all transmitted to
+              it at its center of mass.}
+  )
+%>
+<% end_marg %>
+
+Clearly we should see the same effect if the jerky motion in figure \figref{thomas-hammers}
+was replaced by uniform circular motion, and something similar should happen in any case in
+which a spinning object experiences an external force. In the limit of low velocities,
+the general expression for the
+angular velocity of the precession is $\Omega= \vc{a}\times\vc{v}$, and in the
+case of circular motion, $\Omega=(1/2)v^2\omega$, where $\omega$ is the frequency
+of the circular motion.
+
+If we want to see this precession effect in real life, we should look for a system in which both $v$ and $a$ are large.
+An atom is such a system.
+The Bohr model,\index{Bohr model} introduced in 1913, marked the first quantitatively successful, if
+conceptually muddled, description of the atomic energy levels of hydrogen. Continuing to take $c=1$,
+the over-all scale of the energies was calculated to be proportional to $m\alpha^2$, where $m$ is the mass of the
+electron, and $\alpha$ is the fine structure constant,
+defined earlier.
+At higher resolution, each excited energy level is found to be split into several sub-levels. The transitions among
+these close-lying states are in the millimeter region of the microwave spectrum. The energy scale of this fine structure is
+$\sim m\alpha^4$. This is down by a factor of $\alpha^2$ compared to the visible-light transitions,
+hence the name of the constant. Uhlenbeck and Goudsmit\index{Uhlenbeck}\index{Goudsmit} showed in 1926 that a splitting on this order of magnitude
+was to be expected due to the magnetic
+interaction between the proton and the electron's magnetic moment, oriented along its spin. The effect they calculated,
+however, was too big by a factor of two. 
+
+The explanation of the mysterious factor of two had in fact been implicit in a 1916 calculation by
+Willem de Sitter,\index{de Sitter, Willem} one of the first applications of general relativity. De Sitter
+treated the earth-moon system as a gyroscope, and found the precession of its axis of rotation,
+which was partly due to the curvature of spacetime and partly due to the type of rotation described earlier
+in this section.
+The effect on the motion of the moon was noncumulative, and was only about one meter, which was much
+too small to be measured at the time. In 1927, however,  Thomas
+applied similar reasoning to the hydrogen atom, with the electron's spin vector playing the role of gyroscope.
+Since the electron's spin is $\hbar/2$, the energy splitting is $\pm(\hbar/2)\Omega$, depending on whether the
+electron's spin is in the same direction as its orbital motion, or in the opposite direction. This is less than the
+atom's gross energy scale $\hbar\omega$ by a factor of $v^2/2$, which is $\sim\alpha^2$. The Thomas
+precession cancels out half of the magnetic effect, bringing theory in agreement with experiment.
+<% marg(60) %>
+<%
+  fig(
+    'fine-structure',
+    %q{States in hydrogen are labeled with their $\ell$ and $s$ quantum numbers, representing their orbital and spin angular momenta in units of $\hbar$.
+            The state with $s=+1/2$ has its spin angular momentum aligned with its orbital angular momentum, while the $s=-1/2$ state
+            has the two angular momenta in opposite directions. The direction and order of magnitude of the splitting between the two
+            $\ell=1$ states is successfully explained by magnetic interactions with the proton, but the calculated effect is too big by a factor of 2.
+            The relativistic Thomas precession cancels out half of the effect.}
+  )
+%>
+<% end_marg %>
+
+Uhlenbeck later recalled: ``...when I first heard about [the Thomas precession], it seemed unbelievable that a
+relativistic effect could give a factor of 2 instead of something of order $v/c$...  Even
+the cognoscenti of relativity theory (Einstein included!) were quite surprised.''
+
+<% end_sec('thomas-precession') %>
+
+<% end_sec('noncommutative') %>
+
+<% begin_hw_sec %>
+
+<% begin_hw('michelson-gale-pearson') %>
+In the 1925 Michelson-Gale-Pearson experiment, the physicists measured the Sagnac effect
+due to the earth's rotation. They laid out a rectangle of sewer pipes
+with length $x=613\ \munit$ and width $y=339\ \munit$, and pumped out the air.
+The latitude of the site in Illinois
+was $41\degunit46'$, so that the effective area was equal to the projection of the
+rectangle into the plane perpendicular to the earth's axis.
+Light was provided by a sodium discharge with $\lambda=570\ \zu{nm}$. The light was
+sent in both directions around the rectangle and interfered, effectively doubling the area.
+Clever techniques were required in order to calibrate the apparatus, since it was not
+possible to change its orientation. Calculate the number of wavelengths by which the
+relative phase of the two beams was expected to shift due to the Sagnac effect, and
+compare with the experimentally measured result of $0.230\pm0.005$ cycles.
+<% end_hw %>
+% calc -xe "x=(2010 ft->m); y=(1113 ft->m)"
+
+<% begin_hw('rhic-ang-mom') %>
+The relativistic heavy ion collider RHIC collides counter-rotating
+beams of gold nuclei at 9 GeV/nucleon.
+If a gold nucleus is approximately a sphere with radius $6\times 10^{-15}\ \munit$,
+find the maximum angular momentum, in units of $\hbar$,
+about the center of mass for a sideswiping collision. Answer: $\sim 10^5$.
+% calc -xe "A=197; KE=(9 10^9)(e)(1 V)*A; mn=1.67 10^-27 kg; m=Amn; E=mc^2+KE; p=sqrt(E^2-m^2c^4)/c->kg.m/s; r=6 10^-15 m; 2rp/hbar"
+%     1.1851382831003*10^5
+% https://books.google.com/books?id=huWqnD0MbiIC&lpg=PA197&ots=pUg86wxBYA&dq=%22relativistic%20heavy%20ion%22%20%22angular%20momentum%22&pg=PA197#v=onepage&q=%22relativistic%20heavy%20ion%22%20%22angular%20momentum%22&f=false
+<% end_hw %>
+
+<% begin_hw('ang-mom-hodge') %>
+Show, as claimed on p.~\pageref{ang-mom-hodge}, that the time-space
+components of the tensor ${}^\star L$ equal the angular momentum three-vector.
+<% end_hw %>
+
+<% end_hw_sec %>
+
+<% end_chapter %>

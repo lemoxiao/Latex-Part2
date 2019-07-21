@@ -1,0 +1,167 @@
+\section{高效编程}
+
+
+
+\subsection{分析代码性能}
+ 通过Profiler这个工具来查看执行程序中占用时间比例,并作有针对性的优化这样可以.
+
+  \vspace{-0.8cm}
+  \begin{lstlisting}[caption = 用Profiler分析代码性能] 
+  profile on                        % 打开profile
+  plot(magic(35))                   % 要执行的代码
+  profile viewer                    % 查看分析结果
+  \end{lstlisting}
+
+分析结果包括每部分的占用时间比例,没个函数或语句的执行时间,点击链接可以进入到下一层,以此来逐层查看.
+
+\notation{也可以通过在Profiler中的Run this code输入要分析的文件名或代码,点击Start Profiling按钮开始分析.打开Profiler的方式除了执行 \mcode{profile viewer},还可以通过在HOME下的Run and Time按钮来打开.}
+
+% \subsection{数据类型}
+%  double,cell
+
+
+
+\subsection{预分配内存}
+ 为矩阵（或向量）预分配内存,并尽量避免改变矩阵的大小.为什么预分配内存呢？实际上,申请新的内存本身就是一种耗费.每当申请需要新的内存存储变量时,MATLAB 都会先查找是否有足够并且逻辑上是连续的内存空间来存储（若没有则会内存溢出,无法继续执行程序）. 对于矩阵,每次对它添加元素时,其所占内存就在改变,这种改变在地址上的本质是,它不是在原有的基础上添加,而是找到一块合适的地址之后,存储到新的空间上,并删除原来空间上的数据.
+
+\vspace{-0.8cm}
+\begin{lstlisting}[caption = 是否预分配内存效率对比]
+n = 1e+7;
+
+%% 未初始化赋值
+tic
+for i=1:n
+    a(i) = i;
+end
+toc
+
+%% 初始化后赋值
+tic
+b = zeros(1,n,'double');
+for i=1:n
+    b(i) = i;
+end
+toc
+\end{lstlisting}
+
+\vspace{-0.8cm}
+\begin{lstlisting}
+Elapsed time is 4.193847 seconds.
+Elapsed time is 0.177962 seconds.
+\end{lstlisting}
+
+
+
+\subsection{临时变量}
+ 这里所谓临时变量,是指那些并不是关键的要存储的变量,而只是临时使用.尽量少使用临时变量,或者使用少量的临时变量,毕竟申请内存是一件耗费的事情.
+
+
+
+\subsection{MATLAB 建议}
+ 根据 MATLAB 建议编写程序（有时候编程会出现黄色下划线）.但不更改也并不会影响程序的执行.这些建议包括一些函数使用的提醒,比如将来会移除这个函数,也包括联系上下文实现某一功能时的参数建议,还包括变量的使用建议.
+
+
+
+\subsection{矩阵存储方式}
+ 矩阵的存储方式以列优先存储,即我们在计算时尽量采用列优先的方式.
+
+\vspace{-0.8cm}
+\begin{lstlisting}[caption = 矩阵不同存取方式效率对比]
+n = 10000;
+A = rand(n , n);
+B = zeros(n , n);
+
+%% 以行存取
+tic
+for i = 1:n
+    B(i , :) = A(i , :);        % 以行方式赋值 
+end
+toc
+
+%% 以列存取
+tic
+for i = 1:n
+    B(: , i) = A(: , i);        % 以列方式赋值
+end
+toc
+\end{lstlisting}
+
+  \vspace{-0.8cm}
+  \begin{lstlisting}
+    Elapsed time is 24.323625 seconds.
+    Elapsed time is 0.621799 seconds.
+  \end{lstlisting}
+
+\subsection{函数类型}
+ 不同函数类型的执行效率并一样,在此仅以符号函数和匿名函数作为对比对象.
+
+  \vspace{-0.8cm}
+  \begin{lstlisting}[caption = 不同函数类型效率对比]
+    %% 符号函数
+    syms fun1(x);
+    fun1(x) = x^3 + x^2 + x +1;
+    tic
+    fun1(5);
+    toc
+
+    %% 匿名函数
+    fun2 = @(x)x^3 + x^2 + x +1;
+    tic
+    fun2(5);
+    toc
+  \end{lstlisting}
+
+  \vspace{-0.8cm}
+  \begin{lstlisting}
+    Elapsed time is 0.006139 seconds.
+    Elapsed time is 0.000074 seconds.
+  \end{lstlisting}
+
+
+
+\subsection{大数据处理}
+ 直接的描述就是提前给大数据分配内存. 过多小数据分配内存后形成的内存零碎化,这将可能在后面为大数据寻找合适的连续内存地址消耗更多时间.
+
+
+
+\subsection{并行计算}
+ 这里所指的并行计算是针对一台多核的电脑.
+ 所谓并行计算,是指让多个工作同时进行,从而节省计算时间.这里以 \mcode{parfor} 作为解释对象,要用到的是 \mcode{matlabpool}.\par
+ \mcode{parfor} 即 parallel for (并行的 \mcode{for} 语句),可以看作是把 \mcode{for} 循环执行的内容改造成了同时执行的内容. \mcode{matlabpool} 用于打开多核,默认是并没有打开的.\par
+ 实现并行计算包括两个操作,一是打开多核(或者worker),二是要保证循环计算之间并不存在关联性.
+
+  \vspace{-0.8cm}
+  \begin{lstlisting}[caption = 并行计算parfor与for效率对比]
+    matlabpool open 2               % 打开两个worker
+    M = 200; a = zeros(M,1);        % 200 次计算
+
+    %% for
+    tic  
+    for i = 1:M        
+        a(i) = max(eig(rand(M)));   % 取随机矩阵最大特征值
+    end 
+    toc
+    
+    %% parfor
+    tic  
+    parfor i = 1:M 
+        a(i) = max(eig(rand(M))); 
+    end 
+    toc
+    matlabpool close                % 关闭所有worker
+  \end{lstlisting}
+
+  \vspace{-0.8cm}
+  \begin{lstlisting}
+    Elapsed time is 11.092022 seconds.
+    Elapsed time is 6.325050 seconds.
+  \end{lstlisting}
+
+尽管通常不是用循环来实现的内容,通过转化为不相关的循环计算,就可以用并行计算来实现.
+
+\notation{在MATLAB右下角可以看到打开worker的数量.}
+
+
+
+% \subsection{混合编程}
+%  预留.....

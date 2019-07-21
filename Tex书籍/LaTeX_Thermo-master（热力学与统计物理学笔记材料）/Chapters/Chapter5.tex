@@ -1,0 +1,246 @@
+\section{微观态的经典及量子描述}
+	\subsection{单粒子的经典描述}
+		微观态的经典描述以经典力学为基础，通常采用广义坐标与广义动量的形式。
+		
+		对于一个有 $r$ 个自由度的系统，需要用 $2r$ 个变量来描述其运动状态，即 $r$ 个广义坐标和 $r$ 个广义动量：
+		\begin{equation}
+			(q_i, \, p_i) \quad (i = 1, \, 2, \, \cdots, r) \fullstop
+		\end{equation}
+		系统的Hamilton量为
+		\begin{equation}
+			H = H(q_1, \, q_2, \, \cdots, q_r; \, p_1, \, p_2, \, \cdots, p_r; \, t) \comma
+		\end{equation}
+		正则方程为
+		\begin{braceEq}
+			\dot{q_i} &= \frac{\pd H}{\pd p_i} \comma \\
+			\dot{p_i} &= -\frac{\pd H}{\pd q_i} \fullstop
+		\end{braceEq}
+		
+		坐标和动量 $(q_1, \, q_2, \, \cdots, q_r; \, p_1, \, p_2, \, \cdots, p_r)$ 张成了一个 $2r$ 维空间，称为\emphA{\itshape{μ}空间}，每一组坐标和动量描述的点称为\emphA{代表点}。
+		
+		\begin{myExample}[自由粒子]
+			对于一个 $r = 3$ 的自由粒子，有
+			\begin{braceEq}
+				p_x = m \dot{x} \comma \\
+				p_y = m \dot{y} \comma \\
+				p_z = m \dot{z} \fullstop
+			\end{braceEq}
+			其 $\m$ 空间由 $(x, \, y, \, z; \, p_x, \, p_y, \, p_z)$ 张成。Hamilton量
+			\begin{equation}
+				H = \frac{1}{2m} \left( p_x^2 + p_y^2 +p_z^2 \right) \fullstop
+			\end{equation}
+			%TODO：20160504 示意图
+		\end{myExample}
+		
+		\begin{myExample}[一维谐振子]
+			质量为 $m$ 的物体受力 $F = -A x$ 的作用做简谐运动，其角频率
+			\begin{equation}
+				\o = \sqrt{\frac{A}{m}} \comma
+			\end{equation}
+			则其Hamilton量
+			\begin{equation}
+				H = \frac{p^2}{2m} + \frac{A}{2} x^2 = \frac{p^2}{2m} + \frac{1}{2} m \o^2 x^2 \fullstop
+			\end{equation}
+			
+			若总能量一定，即 $H = E$，则
+			\begin{equation}
+				\frac{p^2}{2mE} + \frac{x^2}{2E / m \o^2} = 1 \comma
+			\end{equation}
+			这在 $\m$ 空间中表示一个椭圆（见图），其面积
+			\begin{equation} \label{EQ_ELLIPSE_OF_HARMONIC_OSCILLATOR_IN_MU_SPACE}
+				S_\text{椭圆} = \p \, a b = \p \cdot \sqrt{\frac{2E}{m \o^2}} \cdot \sqrt{2mE} = \frac{2 \p E}{\o} \fullstop
+			\end{equation}
+			
+			\begin{figure}[ht]
+				\centering
+				
+				\begin{asy}
+					pair O = (0, 0), x_axes = (8, 0), y_axes = (0, 5);
+					
+					real a = 5.5, b = 3;
+					
+					pair p1 = (0.4, 1.8), p2 = (5, 3.8);
+					pair p3 = (2, -0.4), p4 = (6, -3);
+					
+					draw(Label("$x$", EndPoint), (-x_axes)--x_axes, Arrow);
+					draw(Label("$p$", EndPoint), (0, -4.2)--y_axes, Arrow);
+					
+					draw(ellipse(O, a, b), linewidth(1) + color1);
+					
+					draw(O--(a, 0), linewidth(1.2));
+					draw(O--(0, b), linewidth(1.2));
+					
+					draw(Label("$\sqrt{2mE}$", EndPoint), p1--p2);
+					draw(Label("$\sqrt{\dfrac{\displaystyle 2E}{\displaystyle m\omega^2}}$", EndPoint), p3--p4);
+					
+					label("$O$", O, SW);
+				\end{asy}
+				\caption{$\m$ 空间中的一维谐振子}
+				\label{FIG_1D_HARMONIC_OSCILLATOR_IN_MU_SPACE}
+			\end{figure}
+		\end{myExample}
+		
+		\begin{myExample}[转子]
+			如图~\ref{FIG_ROTATOR} 所示，质量为 $m$ 的物体被轻杆连接在 $O$ 点处，可绕 $O$ 点运动。其Hamilton量为
+			\begin{equation} \label{EQ_ROTATOR_HAMILTONIAN_1}
+				H = \frac{m}{2} \left( \dot{x}^2 + \dot{y}^2 + \dot{z}^2 \right) \fullstop
+			\end{equation}
+			取球坐标系，则
+			\begin{braceEq}
+				x &= r \sin \th \cos \comma \\
+				y &= r \sin \th \sin \vf \comma \\
+				z &= r \cos \th \fullstop
+			\end{braceEq}
+			求导，则有
+			\begin{braceEq}
+				\dot{x} &= \dot{r} \sin\th \cos\vf + r \dot{\th} \cos\th \cos\vf - r \dot{\vf} \sin\th \sin\vf \\
+				\dot{y} &= \dot{r} \sin\th \sin\vf + r \dot{\th} \cos\th \sin\vf + r \dot{\vf} \sin\th \cos\vf \\
+				\dot{z} &= \dot{r} \cos\th - r \dot{\th} \sin\th \fullstop
+			\end{braceEq}
+			因此
+			\begin{align}
+				\dot{x}^2 + \dot{y}^2 + \dot{z}^2
+				&= \left[ \dot{r}^2\sin^2\th + \left(r\dot{\th}\right)^2\cos^2\th + \left(r\dot{\vf}\right)^2\sin^2\th \right] \myTag{$\dot{x}^2$、$\dot{y}^2$ 平方项} \\
+				&+ \left[ 2r\dot{r}\dot{\th}\sin\th\cos\th\cos^2\vf - 2r\dot{r}\dot{\vf}\sin^2\th\sin\vf\cos\vf - 2r^2\dot{\th}\dot{\vf}\sin\th\cos\th\sin\vf\cos\vf \right] \myTag{$\dot{x}^2$ 交叉项} \\
+				&+ \left[ 2r\dot{r}\dot{\th}\sin\th\cos\th\sin^2\vf + 2r\dot{r}\dot{\vf}\sin^2\th\sin\vf\cos\vf + 2r^2\dot{\th}\dot{\vf}\sin\th\cos\th\sin\vf\cos\vf \right] \myTag{$\dot{y}^2$ 交叉项} \\
+				&+ \left[ \dot{r}^2\cos^2\th - 2r\dot{r}\dot{\th}\sin\th\cos\th + \left(r\dot{\th}\right)^2\sin^2\th \right] \myTag{$\dot{z}^2$} \\
+				&= \dot{r}^2 + \left(r\dot{\th}\right)^2 + \left(r\dot{\vf}\right)^2\sin^2\th \fullstop
+			\end{align}
+			代入 \eqref{EQ_ROTATOR_HAMILTONIAN_1}~式，得
+			\begin{align}
+				H &= \frac{m}{2} \left( \dot{r}^2 + r^2\dot{\th}^2 + r^2\dot{\vf}^2\sin^2\th \fullstop \right)
+			\end{align}
+			由于物体已被轻杆连接在了 $O$ 点，因而 $r$ 不变，$\dot{r}=0$。
+			
+			\begin{figure}[ht]
+				\begin{asy}
+					import my3D;
+					
+					triple O = (0, 0, 0), x_axes = (3.5, 0, 0), y_axes = (0, 5, 0), z_axes = (0, 0, 5);
+					triple point_m = (2.5, 5, 6), point_n = (point_m.x, point_m.y, 0);
+					
+					pair O2 = project(O), point_m2 = project(point_m), point_n2 = project(point_n);
+					
+					draw(Label("$x$", EndPoint), O2--project(x_axes), Arrow);
+					draw(Label("$y$", EndPoint), O2--project(y_axes), Arrow);
+					draw(Label("$z$", EndPoint), O2--project(z_axes), Arrow);
+					
+					draw(Label("$\bm{r}$", MidPoint, black), O2--point_m2, linewidth(1.5) + color2);
+					draw(O2--point_n2--point_m2, dashed + color1);
+					fill(circle(point_m2, 0.2), color1);
+					
+					real angle_r = 0.7;
+					draw(Label("$\varphi$", MidPoint, Relative(E)), angleMark(O, x_axes, point_n, angle_r));
+					draw(Label("$\theta$", MidPoint, Relative((-1,-0.4))), angleMark(O, z_axes, point_m, angle_r));
+					
+					label("$O$", O2, (-1.5, 0.5));
+					label("$m$", point_m2, (2, 0.5));
+				\end{asy}
+				\caption{转子的示意图}
+				\label{FIG_ROTATOR}
+			\end{figure}
+
+			引入\emphA{共轭动量}
+			\begin{braceEq}
+				p_\th &= m r^2 \dot{\th} \comma \\
+				p_\vf &= m r^2 \dot{\vf} \sin^2 \th \comma
+			\end{braceEq}
+			则系统的Hamilton量可写为
+			\begin{equation}
+				H = \frac{1}{2I} \left( p_\th^2 + \frac{1}{\sin^2 \th} p_\vf^2 \right) \comma
+			\end{equation}
+			其中的 $I = m r^2$ 是物体对 $O$ 点的\emphA{转动惯量}。
+			
+			在本例中，$\mu$ 空间由广义坐标和广义动量 $(\th, \, \vf; \, p_\th, \, p_\vf)$ 张成，它是四维的。
+		\end{myExample}
+		
+	\subsection{单粒子的量子描述}
+		微观态的量子描述以量子力学为基础。粒子的动量 $\vecb{p}$、能量 $E$ 满足\emphA{de Broglie关系}：
+		\begin{braceEq}
+			\vecb{p} &= \hbar \vecb{k} \comma \\
+			E &= \hbar \o \comma
+		\end{braceEq}
+		其中的 $\hbar$ 称为\emphA{（约化）Planck常数}，其值为
+		\begin{equation}
+			\hbar = \frac{h}{2\p} = \SI{1.0545718e-34}{\joule\second} \fullstop
+		\end{equation}
+		式中的 $h$ 也是Planck常数。
+		
+		de Broglie关系说明微观粒子具有\emphA{波粒二象性}。这就引出了另一个重要结果——\emphA{不确定关系}\footnote{
+			更精确的表述为 $\incr p \incr q \geqslant \hbar / 2 $。
+		}：
+		\begin{equation}
+			\incr p \incr q \gtrsim h \fullstop
+		\end{equation}
+		由此，粒子的动量和坐标不可能被同时精确测量，因而其运动也就无法用经典的轨道概念描述，必须改用波函数来描述。
+		
+		粒子波函数 $\Y$ 满足的方程即\emphA{Schrödinger方程}：
+		\begin{equation}
+			\ii \frac{\pd}{\pd t} \Y = \op{H} \Y \comma
+		\end{equation}
+		式中的 $\op{H}$ 是Hamilton算符。在定态情况（即将时间变量分离后），Schrödinger方程化为
+		\begin{equation}
+			\op{H} \Y = E \Y \fullstop
+		\end{equation}
+		
+		\begin{myExample}[立方体容器内的自由粒子]
+			设粒子在边长为 $L$ 的立方体容器内运动，则其量子态（即波函数）有平面波的形式：
+			\begin{equation}
+				\Y_{n_1, \, n_2, \, n_3} (\vecb{r}) \sim \ee^{\ii \vecb{p} \cdot \vecb{r} / \hbar} \comma
+				\quad n_i = \pm 1, \, \pm 2, \, \pm 3, \, \cdots \fullstop
+			\end{equation}
+			求解Schrödinger方程，可以发现动量与能量的本征值都是量子化的：
+			\begin{braceEq}
+				\vecb{p} &= p_x \vecb{i} + p_y \vecb{j} + p_z \vecb{k}
+				= \frac{2\p\hbar}{L} n_1 \vecb{i} + n_2 \vecb{j} + n_3 \vecb{k} \comma \\
+				E &= \frac{1}{2m} \left( p_x^2+p_y^2+p_z^2 \right)
+				= \frac{\displaystyle 2\p^2 \hbar^2}{\displaystyle mL^2} \left( n_1^2+n_2^2+n_3^2 \right) \fullstop
+			\end{braceEq} %HACK：20160624 乘方位置调整
+			量子化的能量也成为\emphA{能级}。对于能级
+			\begin{equation}
+				E = \frac{\displaystyle 2\p^2 \hbar^2}{\displaystyle mL^2} \comma
+			\end{equation}
+			它对应6种量子态：
+			\begin{equation}
+				\left(\pm 1, \, 0, \, 0 \right),\,
+				\left(0, \, \pm 1, \, 0 \right),\,
+				\left(0, \, 0, \, \pm 1 \right) \fullstop
+			\end{equation}
+			这种现象称为能级\emphA{简并}。同一能级对应量子态的数目称为\emphA{简并度}。显然，这里的简并度为6。而能量更高的一个能级
+			\begin{equation}
+				E = \frac{\displaystyle 2\p^2 \hbar^2}{\displaystyle mL^2} \times 3
+				=\frac{\displaystyle 2\p^2 \hbar^2}{\displaystyle mL^2} \times (1+1+1)
+			\end{equation}
+			则对应 $2^3=8$ 个量子态，它的简并度为8。
+		\end{myExample}
+		
+		\begin{myExample}[一维谐振子]
+			频率为 $\nu$ 的谐振子，其能量为
+			\begin{equation}
+				E_n = \left( n + \frac{1}{2} \right) h \nu \comma \quad n = 0, \, 1, \, 2, \, \cdots \fullstop
+			\end{equation}
+			可见该系统的简并度 $g = 1$。
+			
+			根据式~\eqref{EQ_ELLIPSE_OF_HARMONIC_OSCILLATOR_IN_MU_SPACE}，$\mu$ 空间中的椭圆面积为
+			\begin{equation}
+				S_n = \frac{2\pi E_n}{\o} =\frac{E_n}{\nu} = \left( n + \frac{1}{2} \right) h\fullstop
+			\end{equation}
+			因此两个相轨道之间的面积为 $h$，它对应一个量子态。
+		\end{myExample}
+		
+		\begin{myExample}[转子]
+			blablabla
+		\end{myExample}%TODO：20160624 未完成
+		
+	\subsection{多粒子体系的描述}
+		对于 $N$ 个粒子组成的体系，设每个粒子的自由度为 $r$，则每个粒子可用 $2r$ 个变量 $(q_1, \, q_2, \, \cdots, q_r; \allowbreak \, p_1, \, p_2, \, \cdots, p_r)$ 来描述。此时，系统的总自由度 %FIXME：20160624 公式换行
+		\begin{equation}
+			f = Nr \comma
+		\end{equation}
+		因而系统的运动需要用 $2f$ 个变量来刻画。它们张成了一个 $2f$ 维空间，称为\emphA{\itshape{Γ}空间}，也叫\emphA{相空间}。
+%\section{}
+%\section{}
+%\section{}
+
+\raggedbottom%FIXME：20260325 交叉引用、脚注每页重新计数失效，必须加上该行
+\pagebreak

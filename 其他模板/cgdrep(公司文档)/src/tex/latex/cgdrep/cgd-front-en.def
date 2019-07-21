@@ -1,0 +1,98 @@
+% cgd-front-en.def: English front matter definitions
+% vim: ft=tex
+
+\newcommand\docattr[1]{\setkeys{docattr}{#1}}
+
+\renewcommand\maketitle{%
+\cleardoublepage\pagestyle{empty}\pagenumbering{roman}
+\noindent{\small\CGD@value@docid} \\
+\hfill \fbox{\bf\CGD@value@classification}
+\null\vspace{5.0cm}
+
+\begin{center}
+\sf\Huge~\CGD@value@title~\\
+\huge~\CGD@value@subtitle~
+\vfill
+\includegraphics[scale=0.6]{logo1.png} \\
+\sf\Large Cogenda Pte Ltd \\
+{\small~\CGD@value@date~}\\
+\vspace{2cm} \null
+\end{center}
+}
+
+\newcommand\CGD@value@fulltitle{%
+  \ifdefvoid{\CGD@value@subtitle}{\CGD@value@title}{\CGD@value@title : \CGD@value@subtitle}%
+}
+
+\newcommand\fdh[1]{\scriptsize\bf\sf #1}
+
+\OverwriteEnviron{abstract}[1][]{
+\cleardoublepage
+\begin{center}
+\normalsize
+\begin{tabularx}{\textwidth}{|X|X|}
+\thickhline
+\multicolumn{2}{|l|}{\fdh{Title}} \\
+\multicolumn{2}{|l|}{\CGD@value@fulltitle} \\
+\hline
+\fdh{Report Number}                 & \fdh{Security Classification}     \\
+\CGD@value@docid                    & \CGD@value@classification         \\
+%\hline
+%\multicolumn{2}{|l|}{\fdh{Related Documents}} \\
+%\multicolumn{2}{|l|}{\CGD@value@relatedid} \\
+\hline
+\fdh{Personal Author(s)}            & \fdh{Name of Client Organization} \\
+\CGD@value@author                   & \CGD@value@clientname             \\
+\hline
+\fdh{Author Contact Information}    & \fdh{Client Contact Information}  \\
+\CGD@value@email                    & \CGD@value@clientemail            \\
+\hline
+\fdh{Signature/Date}                & \fdh{Signature/Date}              \\
+                                    &                                   \\
+                                    &                                   \\
+\hline
+\multicolumn{2}{|c|}{\bf\sf Abstract} \\
+\multicolumn{2}{|c|}{\parbox[t]{34em}{\small\hspace{2em}\BODY}}\\
+\multicolumn{2}{|c|}{}\\
+\thickhline 
+\end{tabularx}
+\end{center}
+\null\hfill\copyright~Cogenda Pte Ltd
+}
+
+\def\CGD@opt@customHdr{customHdr}
+\NewEnviron{revisions}[1][defaultHdr]{
+  \def\argtmp{#1}
+  \null\vfill
+  \begin{center}
+    Revision History\par\vspace{1ex}
+  \ifx\argtmp\CGD@opt@customHdr
+    \BODY
+  \else
+    \small
+    \begin{tabular}{lllp{5cm}}
+    \thickhline
+    \bf Ver. &\bf Date & \bf Author & \bf Comments \\ \hline 
+    \BODY
+    \thickhline \end{tabular}
+  \fi
+  \end{center}
+}
+
+\newcommand\backcover{
+\cleartoleftpage\pagestyle{empty}\pagenumbering{roman}\setcounter{page}{0}
+\begin{flushright}
+{\small\CGD@value@docid} \\
+\fbox{\bf\CGD@value@classification} \\
+\large~\CGD@value@fulltitle
+\end{flushright}
+\vfill
+\begin{center}
+\includegraphics[scale=0.6]{logo1.png} \\
+\sf\Large Cogenda Pte Ltd \\
+\vspace{2cm} \null
+\end{center}
+}
+
+\endinput
+

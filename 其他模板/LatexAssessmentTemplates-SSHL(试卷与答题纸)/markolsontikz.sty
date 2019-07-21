@@ -1,0 +1,193 @@
+% 	Name		::  markolsontikz.sty
+%	Author		::  Mark Hendry Olson
+%	Created		::  2017-04-12
+%	Updated		::  [[Aril]] 12, 2017 at 08:26
+%	Version		::  0.1
+%	Website		::  markolson.se
+%	Twitter		::  markolsonse
+%	Instagram	::  markolsonse
+%	Github		::  markolsonse
+
+% 	License		:: 	None.
+%
+%	Description	::	This is the style file that I can use for custom tikz.
+%
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	PACKAGE OPTIONS & SETUP
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{markolsontikz}
+    [2017/04/12 A small package for TikZ customizations]
+	
+\usepackage{
+	tikz,
+	tkz-base,
+	tkz-euclide
+	}
+\usetkzobj{all}
+	
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	TIKZ LIBRARIES 
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\usetikzlibrary{
+arrows,
+backgrounds,
+fit,
+chains,
+calc,
+decorations.pathmorphing,
+decorations.text,
+matrix,
+mindmap,
+positioning,
+shapes,
+decorations,
+shadows,
+trees
+}
+
+\tikzset{ >=stealth', help lines/.style={dashed, thick}, axis/.style={<->}, important line/.style={thick}, connection/.style={thick, dotted},}
+	
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	FACTORING 
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+	
+\newcommand{\bifactor}[5]{
+\begin{tikzpicture}
+\draw[fill=\cnLightGreen] (0,0) rectangle (1,1);
+\draw[fill=\cnLightRed] (1,0) rectangle (2,1);
+% Summands of the Factors
+\draw (0,0.5) node[left]{$#1$};
+\draw (0.5,1) node[above]{$#2$};
+\draw (1.5,1) node[above]{$#3$};
+% First Summand of trinomial
+\draw (0.5,0.5) node{$\cBlue{#4}$};
+% Second Summand of trinomial
+\draw (1.5,0.5) node{$\cRed{#5}$};
+\end{tikzpicture}
+}
+
+\newcommand{\trifactor}[8]{
+\begin{tikzpicture}
+\draw[fill=\cnLightBlue] (0,1) rectangle (1,2);
+\draw[fill=\cnLightGreen] (0,0) rectangle (1,1);
+\draw[fill=\cnLightGreen] (1,1) rectangle (2,2);
+\draw[fill=\cnLightRed] (1,0) rectangle (2,1);
+% Summands of the Factors
+\draw (0,1.5) node[left]{$#1$};
+\draw (0,0.5) node[left]{$#2$};
+\draw (0.5,2) node[above]{$#3$};
+\draw (1.5,2) node[above]{$#4$};
+% First Summand of trinomial
+\draw (0.5,1.5) node{$\cBlue{#5}$};
+% Second Summand of trinomial
+\draw (0.5,0.5) node{$\cGreen{#6}$};
+% Third Summand of trinomial
+\draw (1.5,1.5) node{$\cGreen{#7}$};
+% Fourth Summand of trinomial
+\draw (1.5,0.5) node{$\cRed{#8}$};
+\end{tikzpicture}
+}
+
+% Old Factoring Organizer
+
+\tikzstyle{firstterm} = [circle, draw, fill=\cnRed!20, text centered,minimum size=1cm]
+\tikzstyle{secondterm} = [circle, draw, fill=\cnBlue!20, text centered, node distance=0.25cm,minimum size=1cm]
+\tikzstyle{terms} = [rectangle, draw, fill=\cnDarkGrey!20, text centered, node distance=0.25cm,minimum size=1cm]
+\tikzstyle{factoradd} = [rectangle, draw=none, text centered, node distance=0.25cm,minimum size=1cm]
+\tikzstyle{multiply} = [rectangle, draw, fill=\cnDarkGrey!20, text centered, minimum height=0.75cm,minimum size=1cm]
+\tikzstyle{add} = [rectangle, draw, fill=\cnGreen!20, text centered, minimum height=0.75cm,minimum size=1cm]
+\tikzstyle{line} = [draw, color=black!50, -latex']
+% Define the style for the red dotted boxes
+\tikzset{factordotted/.style={draw=\cnPurple!50!white, line width=1pt, dash pattern=on 1pt off 4pt on 6pt off 4pt, inner sep=4mm, rectangle, rounded corners}}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	WORKFLOW SETUP: SIMPLIFYING EXPRESSIONS
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\tikzstyle{operation} = [rectangle, draw, fill=\cnBlue!40, text centered]
+\tikzstyle{function} = [rectangle, draw, fill=\cnPurple!40, text centered]
+\tikzstyle{notation} = [rectangle, draw, fill=\cnGreen!40, text centered]
+\tikzstyle{notations} = [rectangle, draw, fill=\cnGreen!40, text centered,text width=2em]
+\tikzstyle{algorithm} = [rectangle, draw, fill=\cnOrange!40, text centered]
+\tikzstyle{delim} = [rectangle, draw, fill=\cnYellow!40, text centered]
+\tikzstyle{property} = [rectangle, draw, fill=\cnRed!40, text centered]
+\tikzstyle{hide} = [rectangle, draw, fill=\cnGrey, text centered]
+\tikzstyle{active} = [rectangle, draw, fill=\cnDarkGrey, text=white, text centered]
+
+\tikzset{functiondotted/.style={draw=\cnPurple!50!white, line width=1pt,
+                               dash pattern=on 1pt off 4pt on 6pt off 4pt,
+                                inner sep=4mm, rectangle}}
+
+\tikzset{productdotted/.style={draw=\cnBlue!50!white, line width=1pt,
+                               dash pattern=on 1pt off 4pt on 6pt off 4pt,
+                                inner sep=4mm, rectangle}}
+
+\tikzset{sumdotted/.style={draw=\cnRed!50!white, line width=1pt,
+                               dash pattern=on 1pt off 4pt on 6pt off 4pt,
+                                inner sep=4mm, rectangle}}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	WORKFLOW SETUP TRIGONOMETRIC EQUATIONS
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\tikzstyle{decision} = [diamond, draw, fill=\cnGreen!20,
+    text width=4.5em, text badly centered, node distance=1.2cm, inner sep=0pt]
+\tikzstyle{abscissa} = [rectangle, draw, fill=\cnBlue!20,
+    text width=8em, text centered, rounded corners, node distance=1.2cm, minimum height=2.8em]
+\tikzstyle{ordinate} = [rectangle, draw, fill=\cnRed!20,
+    text width=8em, text centered, rounded corners, node distance=1.2cm, minimum height=2.8em]
+\tikzstyle{task} = [rectangle, draw, fill=\cnPurple!20,
+   minimum width=8em, text centered, rounded corners, node distance=1.2cm, minimum height=2.8em]
+\tikzstyle{pointcircle} = [circle, draw, fill=\cnDarkGrey!20, text centered, node distance=1cm]
+% Define the style for the red dotted boxes
+  \tikzset{bluedotted/.style={draw=\cnBlue!50!white, line width=1pt,
+                               dash pattern=on 1pt off 4pt on 6pt off 4pt,
+                                inner sep=4mm, rectangle, rounded corners}}
+% Define the style for the red dotted boxes
+  \tikzset{reddotted/.style={draw=\cnRed!50!white, line width=1pt,
+                               dash pattern=on 1pt off 4pt on 6pt off 4pt,
+                                inner sep=4mm, rectangle, rounded corners}}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	WORKFLOW SETUP SINE LAW
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\tikzstyle{sldecision} = [diamond, draw, fill=\cnLightGreen,
+    text width=4.5em, text badly centered, node distance=4cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=\cnLightBlue,
+    text width=6em, text centered, rounded corners, node distance=3.5cm, minimum height=4em]
+\tikzstyle{slredblock} = [circle, draw, fill=\cnLightRed, text centered, node distance=4cm]
+\tikzstyle{sldone} = [node distance=4cm]
+\tikzstyle{slsoln} = [text centered, node distance=2cm,color=\cnRed, text width=4.5em]
+\tikzstyle{slline} = [draw, very thick, color=black!50, -latex']
+% Define the style for the grey dotted boxes
+\tikzset{slgreydotted/.style={draw=\cnDarkGrey, line width=1pt,dash pattern=on 1pt off 4pt on 6pt off 4pt, inner sep=4mm, rectangle, rounded corners}}
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	Derivative Workflow
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\tikzstyle{point} = [rectangle, draw, fill=\cnBlue!40, text centered,rounded corners]
+\tikzstyle{limit} = [rectangle, draw, fill=\cnPurple!40, text centered,rounded corners]
+\tikzstyle{class} = [rectangle, draw, fill=\cnGreen!40, text centered, rounded corners]
+\tikzstyle{intervals} = [rectangle, draw, fill=\cnOrange!40, text centered, rounded corners]
+\tikzstyle{fd} = [rectangle, draw, fill=\cnRed!40, text centered, rounded corners]
+\tikzstyle{secondderivative} = [circle, draw, fill=\cnGrey,radius=0.5, text width=1em, node distance =2.5cm]
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	General Workflow
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\tikzstyle{bluerbox} = [rectangle, draw, fill=\cnBlue!40, text centered,rounded corners]
+\tikzstyle{greyrbox} = [\cnGrey!40,rectangle, draw, fill=\cnGrey!40, text centered,rounded corners]
+\tikzstyle{purplerbox} = [rectangle, draw, fill=\cnPurple!40, text centered,rounded corners]
+\tikzstyle{greenrbox} = [rectangle, draw, fill=\cnGreen!40, text centered, rounded corners]
+\tikzstyle{orangerbox} = [rectangle, draw, fill=\cnOrange!40, text centered, rounded corners]
+\tikzstyle{redrbox} = [rectangle, draw, fill=\cnRed!40, text centered, rounded corners]
+\tikzstyle{circlenode} = [circle, draw, fill=\cnGrey,radius=0.5, text width=1em, node distance =2.5cm]
+\tikzstyle{line} = [draw, very thick, color=black!50, -latex']
+\tikzstyle{dashline} = [draw, very thick, dash pattern=on 1pt off 4pt on 6pt off 4pt,inner sep=4mm,color=black!50, -latex']
+\endinput
+%%
+%% End of file `markolsontikz.sty'.

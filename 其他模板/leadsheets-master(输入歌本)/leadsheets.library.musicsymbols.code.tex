@@ -1,0 +1,150 @@
+% --------------------------------------------------------------------------
+% the LEADSHEETS package
+% 
+%   typesetting leadsheets and songbooks
+%
+% --------------------------------------------------------------------------
+% Clemens Niederberger
+% E-Mail: contact@mychemistry.eu
+% --------------------------------------------------------------------------
+% Copyright 2014-2017 Clemens Niederberger
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Clemens Niederberger.
+% --------------------------------------------------------------------------
+\LeadsheetsLibrary{musicsymbols}{2016/02/15 musical symbols}
+\RequirePackage{etoolbox}
+
+% define a LaTeX font that uses the `musix' font from MusiXTeX:
+\DeclareFontFamily{U}{musix}{}%
+\DeclareFontShape{U}{musix}{m}{n}{%
+  <-12>   s * [1.5] musix11
+  <12-15> s * [1.5] musix13
+  <15-18> s * [1.5] musix16
+  <18-23> s * [1.5] musix20
+  <23->   s * [1.5] musix29
+}{}%
+
+% a font switch command:
+\newrobustcmd*\musix{\usefont{U}{musix}{m}{n}\selectfont}
+% a text font command:
+\DeclareTextFontCommand{\textmusix}{\musix}
+
+% the `symbol' command: raises the symnol since most symbols are too low for
+% use in normal text:
+\newrobustcmd*\musicsymbol[2][0pt]{%
+  \raisebox{\dimexpr.45ex+(#1)\relax}{\textmusix{#2}}%
+}
+
+\newrobustcmd*\leadsheets@altostrut{%
+  \vphantom{\rule[-.5\normalbaselineskip]{1pt}{1.4\normalbaselineskip}}%
+}
+\newrobustcmd*\leadsheets@treblestrut{%
+  \vphantom{\rule[-.4\normalbaselineskip]{1pt}{1.5\normalbaselineskip}}%
+}
+
+% define the symbols
+\renewrobustcmd*\sharp       {\kern.05em\musicsymbol[.2ex]{4}\kern-.05em}
+\renewrobustcmd*\flat        {\kern-.05em\musicsymbol{2}\kern-.06em}
+\renewrobustcmd*\natural     {\musicsymbol{6}\kern-.06em}
+\newrobustcmd*\doublesharp   {\kern.05em\musicsymbol{5}\kern-.05em}
+\newrobustcmd*\doubleflat    {\kern-.05em\musicsymbol{3}\kern-.06em}
+\newrobustcmd*\trebleclef    {\leadsheets@treblestrut\smash{\musicsymbol{H}}}
+\newrobustcmd*\bassclef      {\strut\smash{\musicsymbol{J}}}
+\newrobustcmd*\altoclef      {\leadsheets@altostrut\smash{\musicsymbol{K}}}
+\newrobustcmd*\allabreve     {\strut\smash{\kern-.1em\musicsymbol[.25ex]{R}\kern.05em}}
+\newrobustcmd*\meterC        {\strut\smash{\kern-.1em\musicsymbol[.25ex]{S}\kern.05em}}
+\newrobustcmd*\wholerest     {\kern.05em\musicsymbol{<}\kern.05em}
+\newrobustcmd*\halfrest      {\kern.05em\musicsymbol{=}\kern.05em}
+\newrobustcmd*\quarterrest   {\strut\smash{\musicsymbol[-1.5ex]{>}\kern.4em}}
+\newrobustcmd*\eighthrest    {\musicsymbol[-1.5ex]{?}\kern.5em}
+\newrobustcmd*\sixteenthrest {\kern.05em\musicsymbol[-1.5ex]{@}\kern.5em}
+
+\RequirePackage{amsmath}
+\newrobustcmd*\meter[2]{%
+  \ensuremath{%
+    \genfrac{}{}{0pt}{}%
+      {\text{\textbf{#1}}}%
+      {\text{\textbf{#2}}}%
+  }%
+}
+
+\newrobustcmd*\Break{\ensuremath{\perp}}
+
+\newcommand*\leadsheets@size{\f@size pt}
+\newlength\leadsheets@barheight
+
+\newrobustcmd*\genericbar[1]{%
+  \setlength\leadsheets@barheight\leadsheets@size
+  \rule[-.2\leadsheets@barheight]{#1}{\leadsheets@barheight}%
+}
+
+\newcommand*\normalbarwidth{.02em}
+\newcommand*\thickbarwidth{.15em}
+\newcommand*\interbarwidth{.1em}
+
+\newrobustcmd*\leadsheets@thickbar{%
+  \genericbar{\thickbarwidth}%
+}
+
+\newrobustcmd*\leadsheets@repeatcolon{%
+  \leavevmode
+  \setlength\leadsheets@barheight\leadsheets@size
+  \raise.1\leadsheets@barheight\hbox{\textup{:}}%
+}
+
+\newrobustcmd*\leadsheets@interbar{\kern\interbarwidth\relax}
+
+\newrobustcmd*\leadsheets@normalbar{%
+  \genericbar{\normalbarwidth}%
+}
+\newrobustcmd*\normalbar{\leadsheets@normalbar}
+
+\newrobustcmd*\leftrepeat{%
+  \leadsheets@thickbar
+  \leadsheets@interbar
+  \leadsheets@normalbar
+  \leadsheets@repeatcolon
+}
+
+\newrobustcmd*\rightrepeat{%
+  \leadsheets@repeatcolon
+  \leadsheets@normalbar
+  \leadsheets@interbar
+  \leadsheets@thickbar
+}
+
+\newrobustcmd*\leftrightrepeat{%
+  \leadsheets@repeatcolon
+  \leadsheets@thickbar
+  \leadsheets@interbar
+  \leadsheets@thickbar
+  \leadsheets@repeatcolon
+}
+
+\newrobustcmd*\doublebar{%
+  \leadsheets@normalbar
+  \leadsheets@interbar
+  \leadsheets@normalbar
+}
+
+\newrobustcmd*\stopbar{%
+  \leadsheets@normalbar
+  \leadsheets@interbar
+  \leadsheets@thickbar
+}
+
+\endinput
+
+2014/08/10 - initial release
+2015/07/13 - scale musix font by 1.5 => else the symbols are rather small!
+2016/01/15 - \Break; improvements of bars

@@ -1,0 +1,37 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize%
+\begin{tikzpicture}[%
+    value node/.style={%
+      computation node,
+    },
+  ]
+
+  % Block DAGs
+  \node [value node, opacity=0] (a) {\nVar{a}};
+  \node [computation node, position=45 degrees from a] (mul) {\nMul};
+  \node [value node, position=-45 degrees from mul, opacity=0] (b) {\nVar{b}};
+  \node [computation node, position=135 degrees from mul] (add) {\nAdd};
+  \node [value node, position=-135 degrees from add] (s1) {\nVar{s}};
+  \begin{scope}[data flow]
+    \draw (a) -- coordinate [pos=0] (below-a) (mul);
+    \draw (b) -- coordinate [pos=0] (below-b) (mul);
+    \draw (mul) -- (add);
+    \draw (s1) -- (add);
+  \end{scope}
+  \foreach \i in {a, b} {%
+    \draw [densely dashed] (below-\i) -- ++(-90:4mm);
+  }
+
+  \node [value node, left=of s1.west |- a] (zero) {\nVar{0}};
+
+  \node [value node, right=of b] (s2) {\nVar{s}};
+  \node [computation node, above=of s2] (ret) {\nRet};
+  \draw [data flow] (s2) -- (ret);
+\end{tikzpicture}%
+\endgroup%

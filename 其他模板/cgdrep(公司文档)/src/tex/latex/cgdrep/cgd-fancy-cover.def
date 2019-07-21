@@ -1,0 +1,162 @@
+\usetikzlibrary{calc,shapes.geometric}
+\newcommand\fontc{\smaller\fontspec{STIXGeneral}}
+
+\newcommand\docattr[1]{\setkeys{docattr}{#1}}
+
+\newcommand\CGD@value@fulltitle{%
+  \ifdefvoid{\CGD@value@productver}{\CGD@value@productname~:~\CGD@value@title}{\CGD@value@productname~\CGD@value@productver~:~\CGD@value@title}%
+}
+
+
+\renewcommand\maketitle{%
+\pagestyle{empty}\pagenumbering{roman}\newgeometry{margin=3cm}
+\bgdhex
+%\bgcprtline
+\null\vspace{3cm}
+\begin{flushright}
+{\fontspec{SourceSerifPro-Semibold.otf}\fontsize{1.4cm}{1em}\selectfont~\CGD@value@productname~}\\
+\vspace{0.4cm}
+{\fontspec{SourceSerifPro-Regular.otf}\fontsize{0.7cm}{1em}\selectfont~\CGD@value@productdesc~}\\
+\vspace{0.2cm}
+{\fontpn\fontsize{0.5cm}{1em}\selectfont~Version~\CGD@value@productver~}\\
+\vspace{0.6cm}
+{\fontspec{SourceSerifPro-Semibold.otf}\fontsize{0.7cm}{1em}\selectfont~\CGD@value@title~}\\
+\end{flushright}
+\vfill
+\begin{center}
+\cmplg
+%{\small~\CGD@value@date~}\\
+\end{center}
+\vspace{1.5cm}
+\null
+\restoregeometry
+
+\clearpage{}
+
+{\fontspec{SourceSerifPro-Semibold.otf}\fontsize{14pt}{1em}\selectfont\CGD@value@fulltitle}
+\input{copyright}
+
+\vfill{}
+
+\cleardoublepage\pagestyle{plain}\pagenumbering{roman}
+%Requrepackage{setspace}%{\begin{spacing}{0.2}\fontc\tableofcontents\end{spacing}}
+\renewcommand{\baselinestretch}{0.2}{\fontc\tableofcontents{}}\renewcommand{\baselinestretch}{1.0}\normalsize
+\cleardoublepage\pagestyle{heading}\pagenumbering{arabic}%\setcounter{page}{1}
+}
+
+\newcommand\backcover{
+\cleartoleftpage\pagestyle{empty}\pagenumbering{roman}\setcounter{page}{0}
+\newgeometry{margin=3cm}
+\bgdhex
+\null
+\vfill
+% {\bf\Huge \CGD@value@productname}\\ \\ {\Large\CGD@value@title}\\ \vspace{0.6cm}\\
+\begin{center}
+\normalsize\fontpn
+\begin{tabular}{l@{\hspace{5em}}l}
+
+\multicolumn{2}{c}{\includegraphics[scale=0.6] {logom.png}} \\
+\multicolumn{2}{c}{\fontspec{DejaVu Sans}\Large\company}\\
+\multicolumn{2}{c}{http://www.cogenda.com} \\
+\multicolumn{2}{c}{\CGD@value@email} \\
+\\
+Amara Corporate Tower \#16-1, & SISPARK II Room B501, \\
+100 Tras Street,         & 1355 Jinjihu Avenue, \\
+Singapore 079027.        & Suzhou, Jiangsu Province, \\
+                         & China. \\
+(Tel) +65 9830 0744 & (Tel) +86 512 6790 0636 \\
+(Fax) +65 6227 7177 & (Fax) +86 512 6790 0636 \\
+\end{tabular}
+\end{center}
+\vspace{1cm}
+\null\restoregeometry
+}
+
+\newcommand\hex{
+\begin{tikzpicture}[scale=2.5,remember picture, overlay]
+%[hexa/.style= {shape=regular polygon, regular polygon sides=6, minimum size=1cm, draw, inner sep=0,anchor=south,}]
+
+\tikzset{
+    hexa/.style={
+      regular polygon,
+      regular polygon sides=6,
+      minimum size=2.3cm,
+      inner sep=0mm,
+      outer sep=0mm,
+      rotate=0,
+%    draw
+    }
+  }
+
+\ifx\rndr\undefined\newcommand\rndr{0.3}\fi
+\ifx\fixr\undefined\newcommand\fixr{0.65}\fi
+
+\foreach \x in {0,...,16}{% 
+     \ifodd\x 
+         \foreach \y in {0,...,20}
+            {
+              \pgfmathparse{\rndr*rnd+\fixr}
+              \definecolor{rndc}{rgb}{\thmcc}
+              \node[fill=rndc,hexa] at ({\x/2+\x/4},{(\y+1/2)*sin(60)}) {};}
+    \else
+         \foreach \y in {0,...,20}
+             {
+              \pgfmathparse{\rndr*rnd+\fixr}
+              \definecolor{rndc}{rgb}{\thmcc}
+              \node[fill=rndc,hexa] at ({\x/2+\x/4},{\y*sin(60)}) {};}
+    \fi}
+
+\end{tikzpicture}
+}
+
+\newcommand\bgdhex{\AddToShipoutPicture*{\AtPageLowerLeft{\hex}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Lines below are obsolete.
+%%  For refercence only.
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand\bgcprtline{
+\AddToShipoutPicture{%
+  \AtPageLowerLeft{%
+%    \rotatebox{90}{
+      \gradientbox{thmch!30}{white}{%
+        \begin{minipage}{\paperwidth}%
+          \hspace*{ \stretch{1} }\textcopyright~2008-{\theyear\today} Cogenda Pte Ltd \hspace*{ \stretch{1} }
+        \end{minipage}%
+      }
+%    }%
+  }%
+}
+}
+
+\newcommand\rndcg{
+\begin{tikzpicture}[scale=2.6,remember picture, overlay]
+  \foreach \y in {1,0,...,-30} {
+      \foreach \x in {-1,0,...,20} {
+          \pgfmathparse{0.2*rnd+0.75}
+          \definecolor{rndc}{rgb}{\pgfmathresult,\pgfmathresult,0.9}
+          \path[fill=rndc] (\x,\y) rectangle ++(1,1); 
+      }
+  }
+%  \draw[step=1,help lines] (0,1) grid (21,-30); 
+%  \draw[->] (0,1) -- (1.2,1);
+%  \draw[->] (0,1) -- (0,-0.2);
+\end{tikzpicture}
+}
+\newcommand\bgdrndcg{\AddToShipoutPicture*{\AtPageUpperLeft{\rndcg}}}
+
+
+\newcommand\usetoc{
+  \RequirePackage{tocloft} % The problem with tocloft is that it cancels the title page of 'numberless chapter', like Bibligraphy or Index.
+  \setlength{\cftbeforesecskip}{6pt}
+  \renewcommand\contentsname{\color{myblueii}\chaptertitlefont Contents}
+  \renewcommand\cftchapfont{\fontc\normalsize}
+  \renewcommand\cftsecfont{\fontc}
+  \renewcommand\cftsubsecfont{\font}
+  \renewcommand\cftsubsubsecfont{\font}
+  \renewcommand\cftchappagefont{\fontpn}
+  \renewcommand\cftsecpagefont{\smaller\fontpn}
+  \renewcommand\cftsubsecpagefont{\smaller\fontpn}
+  \renewcommand\cftsubsubsecpagefont{\smaller\fontpn}
+}

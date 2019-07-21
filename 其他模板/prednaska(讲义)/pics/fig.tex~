@@ -1,0 +1,253 @@
+%      ********   FIG.TEX    ************************
+%      (c)  R. A. Adams and R. B. Israel
+%           Dept. of Mathematics
+%           The University of British Columbia
+%           Vancouver, B.C., Canada V6T 1Y4
+%
+%           September, 1992.      Version 1.22
+%      **********************************************
+%
+% being macros suitable for the inclusion of figures created by
+% "MG" into TeX documents.
+%
+% In vertical mode use:
+%
+% \cfig{<filename>}{<caption text>}
+%
+% to include a centred figure whose PostScript description and
+% associated TeX labels, both produced by "MG", are in the
+% files <filename>.PS and <filename>.LBL respectively.
+% The first line of the .LBL file is the MG version number.  The
+% second and third lines are the width and height of the figure
+% (in points). The macro reads them there to provide
+% enough vertical space.
+%
+% example:
+%
+% \cfig{myplot}{Figure 3}
+%
+% Similarly, two side-by-side graphs can be inserted by
+%
+% \twofigs{<filename1>}{<caption1 text>}{<filename2>}{<caption2 text>}
+%
+% A graph on the right side of some text can be produced by
+% \rfig{<text on the left>}{<filename>}{<caption text>}
+%
+%
+% Labels on figures will print in the default TeX families
+% (typically 10 point Computer Modern  or whatever families
+% are installed in your version of TeX.)
+% If you want to change this use, for example,
+%
+%      \def\setlabelsize{\ninepoint}
+%
+% within your TeX document. To reinstate the defaults use
+%
+%      \def\setlabelsize{}
+%
+% macros \ds, \ss, \ts defined below can also be used to control
+% size of labels
+%
+% \ninepoint and \eightpoint are defined hereunder for CM fonts.
+% If you want any other size or family  you will have to define
+% your own.
+%
+\font\ninerm=cmr9   \font\sixrm=cmr6   \font\eightrm=cmr8
+\font\ninei=cmmi9   \font\sixi=cmmi6   \font\eighti=cmmi8
+\font\ninesy=cmsy9  \font\sixsy=cmsy6  \font\eightsy=cmsy8
+\font\ninebf=cmbx9  \font\sixbf=cmbx6  \font\eightbf=cmbx8
+\font\nineit=cmti9                     \font\eightit=cmti8
+\font\ninesl=cmsl9                     \font\eightsl=cmsl8
+\font\ninett=cmtt9                     \font\eighttt=cmtt8
+%
+\def\ninepoint{\def\rm{\fam0\ninerm}% switch to 9-point type
+ \textfont0=\ninerm \scriptfont0=\sixrm \scriptscriptfont0=\fiverm
+ \textfont1=\ninei \scriptfont1=\sixi \scriptscriptfont1=\fivei
+ \textfont2=\ninesy \scriptfont2=\sixsy \scriptscriptfont2=\fivesy
+ \textfont3=\tenex \scriptfont3=\tenex \scriptscriptfont3=\tenex
+ \textfont\itfam=\nineit \def\it{\fam\itfam\nineit}%
+ \textfont\slfam=\ninesl \def\sl{\fam\slfam\ninesl}%
+ \textfont\ttfam=\ninett \def\tt{\fam\ttfam\ninett}%
+ \textfont\bffam=\ninebf \scriptfont\bffam=\sixbf
+ \scriptscriptfont\bffam=\fivebf \def\bf{\fam\bffam\ninebf}%
+ \normalbaselineskip=11pt
+ \setbox\strutbox=\hbox{\vrule height8pt depth3pt width0pt}%
+ \let\sc=\sevenrm \let\big=\ninebig \normalbaselines\rm}
+%
+\def\eightpoint{\def\rm{\fam0\eightrm}% switch to 8-point type
+ \textfont0=\eightrm \scriptfont0=\sixrm \scriptscriptfont0=\fiverm
+ \textfont1=\eighti \scriptfont1=\sixi \scriptscriptfont1=\fivei
+ \textfont2=\eightsy \scriptfont2=\sixsy \scriptscriptfont2=\fivesy
+ \textfont3=\tenex \scriptfont3=\tenex \scriptscriptfont3=\tenex
+ \textfont\itfam=\eightit \def\it{\fam\itfam\eightit}%
+ \textfont\slfam=\eightsl \def\sl{\fam\slfam\eightsl}%
+ \textfont\ttfam=\eighttt \def\tt{\fam\ttfam\eighttt}%
+ \textfont\bffam=\eightbf \scriptfont\bffam=\sixbf
+ \scriptscriptfont\bffam=\fivebf \def\bf{\fam\bffam\eightbf}%
+ \normalbaselineskip=9pt
+ \setbox\strutbox=\hbox{\vrule height7pt depth2pt width0pt}%
+ \let\sc=\sixrm \let\big=\eightbig \normalbaselines\rm}
+%
+% The next five \TeX\ macros can be used in labels to simplify
+% some size choices.  (If they interfere with other macros in
+% your system, comment them out.)
+%
+  \def\ds{\displaystyle}             % size of math in displays
+  \def\ss{\scriptstyle}              % size of subscripts in displays
+  \def\ts{\textstyle}                % size of math in text
+  \def\frac#1#2{\ds {#1\over#2}}     % fractions in displaystyle
+  \def\sfrac#1#2{{\ts{#1\over#2}}}   % fractions in textstyle
+%
+% use the current tex font family for labels
+\def\setlabelsize{}
+%
+% by default, boxes will not be drawn around figures
+\newif\ifboxfigures
+\boxfiguresfalse
+% you can declare \boxfigurestrue in your TeX source if you want
+% the boxes drawn
+\newdimen\boxrulewidth \newdimen\boxborderwidth
+\boxrulewidth=1pt \boxborderwidth=2pt
+% boxes drawn around figures will have rules 1 point wide
+% surrounding a 2 point wide border by default.
+% You can change these measurements by redefining \boxrulewidth
+% and \boxborderwidth in your TeX source.
+%
+% macro for drawing boxes
+%
+\def\boxit#1{\vtop{\hrule height\boxrulewidth%
+\hbox{\vrule width\boxrulewidth\kern\boxborderwidth%
+\vbox{\kern\boxborderwidth#1\kern\boxborderwidth}\kern\boxborderwidth%
+\vrule width\boxrulewidth}%
+\hrule height\boxrulewidth}}
+%
+% Now for the definitions and main macro for figure inclusion.
+%
+\newcount\mgversion
+\newcount\pswidth
+\newcount\psheight
+\newcount\justx \newcount\justy
+\global\justx=0 \global\justy=0
+\newcount\vpos \newtoks\LABEL
+\newread\labelfile \newcount\xcoord \newcount\ycoord
+\newif\ifdoit
+\newbox\labox
+%
+\def\figfiginsert#1{\par%  #1=filename
+\openin\labelfile=pics/#1.lbl
+\global\read\labelfile to\mgversion\message{#1}
+\global\read\labelfile to\pswidth
+\global\read\labelfile to\psheight
+\ifboxfigures\boxit{\fi\vbox to\psheight pt{\vfill
+%%%
+%%% NOTE: The next uncommented line transfers the PostScript file
+%%%       for the desired figure to the output file.  The version
+%%%       here is for the Arbortext DVILASER/PS driver.
+%%%
+%\special{ps: plotfile #1.ps}% version for DVIPS
+\special{PSfile =pics/#1.ps}% version for DVIPS
+%\epsfbox{#1.ps}
+%%%
+%%% If you are using Personal TeX's PTILaser/PS driver, or using
+%%% this file to incorporate MG graphs into TeX documents on a
+%%% NEXT with the NEXT DVIPS driver, comment out the \special line
+%%% above (by inserting a percent % at the left margin on that
+%%% line, and uncomment (by removing the percent % at the left
+%%% margin) the appropriate \special line below.
+%%%
+%\special{ps: #1.ps}%         version for PTILaser/PS
+%\special{psfile=#1.ps}%      version for NeXTTeX
+%%%
+%%% If you will be using this file to incorporate MG graphs
+%%% into TeX documents on a Macintosh, using Blue Sky Research's
+%%% Textures driver, instead of either of the \special commands
+%%% above, use (uncomment) the following PAIR of \specials.
+%%%
+%\special{postscript grestore newpath gsave}% two line version for
+%\special{postscriptfile #1.ps}%              the TEXTURES driver
+%%%
+%%% For other drivers you're on your own to find the right form
+%%% for the \special.  Read Section 9.1 in the MG Users Manual, and
+%%% the documentation for your driver.
+%%%
+\vskip-\psheight pt\setlabelsize%
+\hbox to\pswidth pt{\hss}%
+\parindent=0pt\offinterlineskip
+\vpos=0%
+\loop\global\read\labelfile to\xcoord
+\ifnum \xcoord < -999 \doitfalse\else\doittrue\fi
+\ifdoit \global\read\labelfile to\ycoord
+\global\read\labelfile to\justx
+\global\read\labelfile to\justy
+\global\read\labelfile
+to\LABEL\global\setbox\labox=\hbox{\LABEL\hskip-0.3em}%
+\advance\vpos by-\ycoord
+\vskip-\vpos pt \vpos=\ycoord
+\hbox to\pswidth pt{\hskip\xcoord pt%
+\hbox to 0pt{\ifnum\justx>0\hss\fi%
+\vbox to0pt{%
+\ifnum\justy<2\vss\fi%
+\copy\labox\kern0pt%
+\ifnum\justy>0\vss\fi}%
+\ifnum\justx<2\hss\fi}%
+\hss}%
+\repeat%
+\advance\vpos by-\psheight%
+\vskip-\vpos pt%
+}\ifboxfigures}\fi\closein\labelfile}
+%
+% define a font for figure captions in the following macros
+% one of the next two lines should be commented out
+%\font\figfont=psmhlvb at10pt  % e.g. Arbortext's mapped helvetica bold
+\def\figfont{\bf}              % boldface from your default family.
+%
+% You may wish to modify the following high-level figure inclusion macros
+% or create new ones of your own.
+%
+% Macro for centred figure, captioned below.
+%
+\def\cfig#1#2{\par\smallskip
+\openin\labelfile=#1.lbl
+\ifeof\labelfile\immediate\write16{Can't find #1.lbl; I quit!}\end\fi
+\closein\labelfile
+\vbox{\centerline{\figfiginsert{#1}}\smallskip
+   \centerline{\figfont#2}}\smallskip}
+%
+% Macro for text on left side of page and figure on right side.
+% Figure is captioned below.
+%
+\newdimen\textsize
+\long\def\rfig#1#2#3{\par\smallskip
+\openin\labelfile=pics/#2.lbl
+\ifeof\labelfile\immediate\write16{Can't find #2.lbl; I quit!}\end\fi
+\global\read\labelfile to\mgversion
+\global\read\labelfile to\pswidth
+\closein\labelfile
+\textsize=\hsize
+\advance\textsize by-\pswidth pt
+\advance\textsize by-1pc
+\hbox to \hsize{\vtop{\hsize=\textsize{#1}\vfil}
+\hfill\vtop{\hsize=\pswidth pt\vskip0pt
+\figfiginsert{#2}\smallskip
+\hbox to \hsize{\hfil\figfont#3\hfil}\smallskip}}}
+%
+% Macro for two side-by-side figures, captioned below.
+%
+\newcount\rightfigwidth \newcount\leftfigwidth
+\def\twofigs#1#2#3#4{\par\smallskip
+\openin\labelfile=pics/#1.lbl
+\ifeof\labelfile\immediate\write16{Can't find #1.lbl; I quit!}\end\fi
+\global\read\labelfile to\mgversion
+\global\read\labelfile to\leftfigwidth
+\closein\labelfile
+\openin\labelfile=pics/#3.lbl
+\ifeof\labelfile\immediate\write16{Can't find #3.lbl; I quit!}\end\fi
+\global\read\labelfile to\mgversion
+\global\read\labelfile to\rightfigwidth
+\closein\labelfile
+\vbox{\hbox to \hsize{\hfill\figfiginsert{#1}\hfill\hfill\figfiginsert{#3}\hfill}
+\smallskip
+\hbox to \hsize{\hfill\hbox to\leftfigwidth pt{\hfil\figfont#2\hfil}
+\hfill\hfill\hbox to\rightfigwidth pt{\hfil\figfont#4\hfil}\hfill}}\smallskip}
+%
+%

@@ -1,0 +1,960 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{Graph Covering}
+\labelAppendix{graph-covering}
+
+This appendix considers techniques based on \gls{graph covering}.
+%
+First, we introduce the principle in \refSection{gc-principle} and describe
+representations that enable this principle in \refSection{gc-representations}.
+%
+In \refSection{gc-extending-tree-covering-techniques-to-dags} we describe
+techniques that extend methods from \gls{tree covering} to \glspl{graph}.
+%
+\glsunset{PBQP}
+%
+In \refSection{gc-pbqp-based-approaches} we describe techniques that model
+\gls{instruction selection} as a \gls{PBQP}.
+%
+\glsreset{PBQP}
+%
+Other \gls{graph}-based approaches that do not fit into any of the sections
+above are discussed in \refSection{gc-other-approaches}.
+%
+Lastly, we summarize in \refSection{gc-summary}.
+
+The appendix is based on material presented in
+\cite[Chap.\thinspace5]{HjortBlindell:2016:Survey} that has been adapted for
+this dissertation.
+%
+To not disturb the flow of reading, material already presented in
+\refChapter{existing-isel-techniques-and-reps} is duplicated in this appendix.
+
+
+\section{The Principle}
+\labelSection{gc-principle}
+
+In \gls{DAG covering}-based \gls{instruction selection}, \glspl{function} can
+only be modeled one \gls{block} at a time as \glspl{cycle} are forbidden to
+appear in the \glspl{block DAG}.
+%
+Lifting this restriction results in a \glspl!{function graph}, thus capturing
+the data flow for an entire \gls{function} as a single \gls{graph}.
+%
+Depending on the representation, some \glspl{function graph} also capture the
+control flow for the \gls{function}.
+
+Selecting \glspl{instruction} for such \glspl{graph} is known as
+\gls!{global.is}[ \gls{instruction selection}] and has several advantages over
+\gls{local.is} \gls{instruction selector}.
+%
+First, with an entire \gls{function} as input, a \gls{global.is}
+\gls{instruction selector} can account for the effects of \gls{local.is}
+\gls{pattern selection} across the \gls{block} boundaries and is thereby better
+informed when making its decisions.
+%
+In addition, it enables \gls{global code motion}.
+%
+Second, to support \gls{inter-block.ic} \glspl{instruction} -- which require
+modeling of both data and control-flow information -- it is imperative that the
+\glspl{pattern} be expressible using \glspl{graph} that may contain
+\glspl{cycle}.
+%
+This makes \gls{graph covering} one of the key approaches for making use of
+fewer but more efficient \glspl{instruction}, which is becoming more and more
+crucial for modern \glspl{target machine} -- especially embedded systems --
+where both power consumption and heat emission are becoming increasingly
+important factors.
+
+However, when transitioning from \glspl{pattern DAG} to \glspl{pattern graph},
+we can no longer apply \gls{pattern matching} techniques designed for
+\glspl{tree} and \glspl{DAG}.
+%
+Instead we must resort to methods from the field of \gls{subgraph isomorphism}
+in solving this problem (see \refTable{time-complexities} for time complexity
+comparison).
+%
+\begin{table}
+  \centering%
+  \figureFont\figureFontSize%
+  \begin{tabular}{ccc}%
+    \toprule
+        \tabhead representation
+      & \tabhead pattern matching
+      & \tabhead optimal pattern selection\\
+    \midrule
+        trees  & linear      & linear     \\
+        DAGs   & NP-complete & NP-complete\\
+        graphs & NP-complete & NP-complete\\
+    \bottomrule
+  \end{tabular}
+
+  \caption[%
+            Time complexities for solving pattern matching and optimal pattern
+            selection%
+          ]%
+          {%
+            Time complexities for solving the pattern matching and optimal
+            pattern selection problems using various representations%
+          }
+  \labelTable{time-complexities}
+\end{table}
+%
+The \gls{pattern selection} problem, on the other hand, can still be solved
+using many of the techniques which were discussed in \refAppendix{dag-covering}.
+%
+Therefore, in this appendix we will only examine techniques that were originally
+designated for \gls{graph covering}.
+
+
+\section{Sea-of-Nodes IRs}
+\labelSection{gc-representations}
+
+With \glsshort{tree covering} and \gls{DAG covering}, it is sufficient to
+represent the \gls{function} on \gls{block} level.
+%
+Consequently, \glspl{function} are typically modeled as a \gls{forest} of
+\glspl{expression tree} or a set of \glspl{block DAG}.
+%
+But, as previously stated, this becomes an impediment when applied in \gls{graph
+  covering}-based techniques, forcing us to instead use a \gls{graph}-based
+\glsdesc{IR}.
+%
+We will therefore continue by looking briefly at how \glspl{function} can be
+expressed using such representations, which are colloquially referred to as
+\glspl!{sea-of-nodes IR}.
+
+In the context of \gls{instruction selection}, there are two \glspl{sea-of-nodes
+  IR} that are of interest.
+%
+The first captures the data flow for entire \glspl{function}, and the second is
+an extension of the first in order to also capture control flow.
+%
+For a comprehensive survey on \gls{function} representations,
+see~\cite{StanierWatson:2013}.
+
+
+\paragraph{Capturing Data Flow of Entire Functions}
+
+In order to simply many \gls{compiler} tasks, \textcite{CytronEtAl:1991}
+introduced a \gls{function} representation called \gls!{SSA}[ form].
+
+A \gls{program} is said to be in \gls{SSA}~form if every \gls{variable} is
+defined exactly once.
+%
+One of the main benefits of this is that the \gls{live range} of each variable
+is contiguous.
+%
+The \gls{live range} of a variable can be loosely described as the length within
+the \gls{program} where the value of that variable must not be destroyed.
+%
+This in turn means that each variable corresponds to a single value, which
+simplifies many \gls{program} optimization routines.
+
+For example, the \gls{function} shown in \refFigure{sea-of-nodes-example-2-c} is
+not in \gls{SSA}~form as \glspl{variable}~\irCode*{f} and~\irCode*{n} are
+redefined within the loop.
+%
+\begin{filecontents*}{fact.c}
+int factorial(int n) {
+  entry:
+    int f = 1;
+  head:
+    if (n <= 1) goto end;
+  body:
+    f = f * n;
+    n = n - 1;
+    goto head;
+  end:
+    return f;
+}
+\end{filecontents*}
+%
+\begin{filecontents*}{fact-ssa.c}
+int factorial(int $\irVar{n}[1]$) {
+  entry:
+    int $\irVar{f}[1]$ = 1;
+  head:
+    int $\irVar{f}[2]$ = $\mPhi$($\irVar{f}[1]$:entry, $\irVar{f}[3]$:body);
+    int $\irVar{n}[2]$ = $\mPhi$($\irVar{n}[1]$:entry, $\irVar{n}[3]$:body);
+    if ($\irVar{n}[2]$ <= 1) goto end;
+  body:
+    int $\irVar{f}[3]$ = $\irVar{f}[2]$ * $\irVar{n}[2]$;
+    int $\irVar{n}[3]$ = $\irVar{n}[2]$ - 1;
+    goto head;
+  end:
+    return $\irVar{f}[2]$;
+}
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  C implementation of factorial%
+                  \labelFigure{sea-of-nodes-example-2-c}%
+                }%
+                [50mm]%
+                {%
+                  \begin{lstpage}{45mm}%
+                    \lstinputlisting[language=c]{fact.c}%
+                  \end{lstpage}%
+                }%
+  \hfill\hfill%
+  \subcaptionbox{Code in SSA form\labelFigure{sea-of-nodes-example-2-ssa-c}}%
+                {%
+                  \begin{lstpage}{59mm}%
+                    \lstinputlisting[language=c,mathescape]{fact-ssa.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \vspace*{\betweensubfigures}
+
+  \subcaptionbox{SSA graph\labelFigure{sea-of-nodes-example-2-ssa-graph}}%
+                {%
+                  \input{figures/graph-covering/sea-of-nodes-example-ssa-graph}%
+                }
+
+  \caption{Example of an SSA graph}
+  \labelFigure{ssa-example-2}
+\end{figure}
+%
+By introducing new \glspl{variable} and connecting these using
+\glspl!{phi-function} where the value depends on control flow, the
+\gls{function} can be rewritten into \gls{SSA}~form, as shown in
+\refFigure{sea-of-nodes-example-2-ssa-c}.
+
+From an \gls{SSA}-based \gls{function}, we can construct a \gls{data-flow graph}
+called the \gls!{SSA graph}~\cite{GerlekEtAl:1995}.
+%
+Like in \glspl{data-flow graph}, each \gls{operation} in the \gls{function}
+(including the \glspl{phi-function}) is represented as a \gls{node}.
+%
+These nodes are connected using \glspl{data-flow edge}, ignoring the fact that
+the \glspl{operation} may belong to different \glspl{block}.
+%
+For the example above, this results in the \gls{SSA graph} shown in
+\refFigure{sea-of-nodes-example-2-ssa-graph}, thus giving a complete view of the
+data flow in the \gls{function}.
+
+But since the \gls{SSA graph} is devoid of any control-flow information, it is
+often used as a supplement alongside one or more other~\glspl{IR}.
+%
+Obviously this also prevents selection of \glspl{instruction} for implementing
+branches and procedure calls.
+
+
+\paragraph{Capturing Both Data And Control Flow}
+
+\textcite{ClickPaleczny:1995} introduced a \gls{sea-of-nodes IR} that captures
+both data and control flow.
+%
+The data flow is modeled exactly as in the \gls{SSA graph}, and the control flow
+is captured using \glspl{node} to represent the \glspl{block} in the
+\gls{function} and \glspl{edge} to represent jumps between \glspl{block}.
+%
+To capture dependencies between the data and control flow -- for example, when
+the target of a jump depends on a Boolean value -- such jumps flow through
+special \emph{if}~\glspl{node}.
+%
+For lack of a better name we will call this the \gls!{Click-Paleczny graph},
+and an example is shown in \refFigure{click-paleczny-graph-example-2}.
+
+\begin{figure}
+  \centering%
+  \input{figures/graph-covering/sea-of-nodes-example-click-paleczny-graph}
+
+  \caption[Example of a Click-Paleczny graph]%
+          {%
+            Example of a Click-Paleczny graph, corresponding to the program
+            shown in \refFigure{ssa-example-2}.
+            %
+            Thin-lined nodes and edges denote data operations and data flow.
+            %
+            Thick-lined nodes and edges denote control operations and control
+            flow.
+            %
+            Dashed edges indicate to which block an operation belongs%
+          }
+  \labelFigure{click-paleczny-graph-example-2}
+\end{figure}
+
+
+\section{Extending Tree Covering Techniques to Graphs}
+\labelSection{gc-extending-tree-covering-techniques-to-dags}
+
+\textcite{PalecznyEtAl:2001} introduced an approach for performing
+\gls{instruction selection} based on the \gls{Click-Paleczny graph}.
+
+Implemented in the \gls!{JHSC}, the approach first divides the \gls{function
+  graph} into a set of possibly overlapping \glspl{expression tree}.
+%
+This is done by labeling certain \glspl{node} in the \gls{function graph} as
+tree roots.
+%
+Root candidates are \glspl{node} representing \glspl{operation} whose result are
+shared or \glspl{operation} with side effects and may therefore not be
+\glsshort{node duplication}[ed].
+%
+The selection of roots is geared towards duplicating address computations and
+other expressions that can be subsumed into a single \gls{instruction}.
+%
+Once labeled, each \gls{expression tree} is covered using a variant of
+\refAlgorithm{burs-labeling-algorithm} (see \refAppendix{tree-covering} on
+\refPageOfAlgorithm{burs-labeling-algorithm}).
+%
+The \glspl{instruction} are then emitted and placed in \glspl{block} using a
+\gls{global code motion} method described in~\cite{Click:1995}.
+
+Although the \gls{function} is represented as a \gls{function graph}, the
+\glspl{instruction} must still be modeled as \glspl{pattern tree}.
+%
+Consequently, only \gls{single-output.ic} \glspl{instruction} can be selected
+using this approach.
+
+
+\section{Modeling Instruction Selection as a PBQP}
+\labelSection{gc-pbqp-based-approaches}
+
+In 2003, \textcite{EcksteinEtAl:2003} recognized that limiting \gls{instruction
+  selection} to \gls{local.is} scope can decrease code quality of \gls{assembly
+  code} generated for fixed-point arithmetic \glspl{DSP}.
+%
+For more details, see \refAppendix{dag-covering} on
+\refPageOfSection{dc-limitations}.
+
+
+\paragraph{PBQP}
+
+To overcome this problem, \citeauthor{EcksteinEtAl:2003} developed a design that
+takes \glspl{SSA graph} as input -- making this technique the first to do so --
+and transforms the \gls{pattern selection} problem into a \gls!{PBQP}.
+%
+First introduced by \textcite{ScholzEckstein:2002} to model and solve
+\gls{register allocation}, \gls{PBQP} is a variant of the \gls!{QAP}, which is a
+fundamental combinatorial optimization problem in the field of operations
+research (see \cite{LoiolaEtAl:2007} for a survey).
+%
+Although both problems are NP-complete in general, a subclass of \gls{PBQP} can
+be solved in linear time which inspired \citeauthor{ScholzEckstein:2002} in
+developing a greedy, linear-time solver.
+
+A formal definition of \gls{PBQP} is given in
+\refChapter{existing-isel-techniques-and-reps} on \refPageOfDefinition{pbqp},
+which can intuitively be explained as follows.
+%
+Assume a problem consists of $n$~decisions, each with $k$~choices.
+%
+Then $\mVector{\mVar{x}}_i$ is a \gls{decision variable} with $k$~elements,
+where \mbox{$\mVector{\mVar{x}}_i[j] = 1$} means that choice~$j$ has been
+selected for decision~\mbox{$i$\hspace{-.8pt}.}
+%
+For each \gls{variable}, the condition
+\raisebox{0pt}[\height-2pt]{$\mVector{1}^{\mTransp} \mVector{\mVar{x}}_i = 1$}
+ensures that exactly one choice is selected.
+%
+The cost of selecting a particular choice for decision~$i$ is represented
+through a cost vector~$\mVector{c}_i$, and the cost of combining two
+decisions~$i$ and~$j$ are represented through a cost matrix~$\mMatrix{C}_{ij}$.
+
+
+\paragraph{In Context of Instruction Selection}
+
+In this context, $\mVector{\mVar{x}}_i$ decides whether to select a particular
+\gls{match} to cover \gls{node}~$i$, $\mVector{c}_i$ contains the cost for each
+such \gls{match}, and $\mMatrix{C}_{ij}$ contains the cost of additional
+\glspl{instruction} that may need to be selected due to certain combinations of
+\glspl{match}.
+%
+For example, assume two nodes~$i$ and~$j$ where $j$ depends
+on~\mbox{$i$\hspace{-.8pt}.}
+%
+Assume further that the \glspl{instruction} are represented as a
+\glshyphened{normal form.g} \gls{machine grammar}, and that~$i$ and~$j$ can be
+covered using two \glspl{rule}, $r_i$ and $r_j$, with \glspl{production}
+\mbox{$\mNT{A} \rightarrow \irCode*{op}_{\mathit{i}} \; \mNT{A} \; \mNT{A}$} and
+\mbox{$\mNT{B} \rightarrow \irCode*{op}_{\mathit{j}} \; \mNT{B} \; \mNT{B}$},
+respectively.
+%
+Since the result of $r_i$ does not match the operands of $r_j$, this \gls{rule}
+combination requires a \gls{chain.r} \gls{rule} -- or a chain of these, if
+necessary -- that derives $\mNT{B}$ from $\mNT{A}$.
+%
+The $\mMatrix{C}_{ij}$ costs are calculated by computing the \gls{transitive
+  closure} for all \gls{chain.r} \glspl{rule}.
+%
+For this \citeauthor{EcksteinEtAl:2003} seem to have used the Floyd-Warshall
+algorithm~\cite{Floyd:1962}, and \textcite{SchaeferScholz:2007} later discovered
+a method that finds the optimal sequence of \gls{chain.r} \glspl{rule}.
+%
+Illegal combinations are prevented by assigning infinite cost.
+%
+An example of a \gls{PBQP} instance is shown in \refFigure{pbqp-example-2}.
+
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox%
+    {%
+      Rules.
+      %
+      For brevity, the actions are not included%
+    }%
+    [68mm]%
+    {%
+      \figureFontSize%
+      \begin{tabular}{r@{ $\rightarrow$ }lc}
+        \toprule
+        \multicolumn{2}{c}{\tabhead rules} & \tabhead cost\\
+        \midrule
+        $\mNT{Reg}$ & \irCode{var} & 0\\
+        $\mNT{Reg}$ & $\irCode{\irAddText} \; \mNT{Reg} \; \mNT{Reg}$ & 1\\
+        $\mNT{Reg}$ & $\irCode{\irLoadText} \; \mNT{Addr}$ & 3\\
+        $\mNT{Reg}$ & $\irCode{\irLoadText} \; \irAddText \; \mNT{Reg} \;
+                      \mNT{Reg}$
+                    & 5\\
+        $\mNT{Addr}$ & $\mNT{Reg}$ & 2\\
+        \bottomrule
+      \end{tabular}%
+    }%
+  \hfill%
+  \subcaptionbox{%
+                  SSA graph%
+                  \labelFigure{pbqp-example-2-ssa-graph}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    pbqp-example-ssa-graph%
+                  }%
+                }%
+  \hfill%
+  \mbox{}
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox{%
+                  PBQP instance.
+                  %
+                  The rows and columns in the cost vectors and matrices are
+                  labeled with the matches they represent.
+                  %
+                  Cost matrices for uninteresting combinations are assumed to
+                  consist of~\num{0}s%
+                  \labelFigure{pbqp-example-2-instance}%
+                }{%
+                  \figureFontSize%
+                  \apptocmd{\irFont}{\scriptsize}{}{}%
+                  \newcommand{\newlineAndSep}[1][0pt]{%
+                    % Double-newline is to enforce equal spacing between
+                    % multi-row matrices (a single newline with offset does not
+                    % do the trick, apparently)
+                    \\[-1.5mm]
+                    \multicolumn{2}{c}{} \\[#1]
+                  }%
+                  \newcommand{\mLabel}[1]{{\scriptstyle #1}}%
+                  \newcommand{\mColLabel}[1]{%
+                    \raisebox{2mm}[0pt][0pt]{\clap{$\mLabel{#1}$}}%
+                  }%
+                  \newcommand{\mRowLabel}[1]{%
+                    \raisebox{.2ex}{$\mLabel{#1}$}%
+                  }%
+                  \def\Sstackgap{0pt}%
+                  \newcolumntype{R}{r@{\;=\;}}%
+                  \newdimen\labelHeight%
+                  \settoheight{\labelHeight}{$\mLabel{m_x}$}%
+                  \begin{minipage}{22mm}%
+                    \begin{displaymath}
+                      \begin{array}{r@{\;\in\;}l}
+                          \mVector{\mVar{x}}_{\irVar{a}} & \mSet{0, 1} \\[.7ex]
+                          \mVector{\mVar{x}}_{\irVar{b}} & \mSet{0, 1} \\[.7ex]
+                          \mVector{\mVar{x}}_{\irCode{\irAddText}}
+                        & \mSet{0, 1}^{2} \\[.7ex]
+                          \mVector{\mVar{x}}_{\irCode{\irLoadText}}
+                        & \mSet{0, 1}^{2}
+                      \end{array}
+                    \end{displaymath}%
+                  \end{minipage}%
+                  \hspace{5mm}%
+                  \begin{minipage}{27mm}%
+                    \begin{displaymath}
+                      \begin{array}{Rl}
+                          \mVector{c}_{\irVar{a}}
+                        & \begin{aMatrix}{c}
+                            0
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_1}
+                          \end{array}
+                        \newlineAndSep
+                          \mVector{c}_{\irVar{b}}
+                        & \begin{aMatrix}{c}
+                            0
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_2}
+                          \end{array}
+                        \newlineAndSep
+                          \mVector{c}_{\irCode{\irAddText}}
+                        & \begin{aMatrix}{c}
+                            1 \\
+                            5
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_3} \\
+                            \mRowLabel{m_5}
+                          \end{array}
+                        \newlineAndSep
+                          \mVector{c}_{\irCode{\irLoadText}}
+                        & \begin{aMatrix}{c}
+                            3 \\
+                            5
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_4} \\
+                            \mRowLabel{m_5}
+                          \end{array}
+                      \end{array}
+                    \end{displaymath}%
+                  \end{minipage}%
+                  \hspace{5mm}%
+                  \begin{minipage}{33mm}%
+                    \begin{displaymath}
+                      \begin{array}{Rl}
+                          \mMatrix{C}_{\irVar{a} \irCode{\irAddText}}
+                        & \begin{aMatrix}{cc}
+                              \Shortstack{$\mColLabel{m_3}$ $0$}
+                            & \Shortstack{$\mColLabel{m_5}$ $0$}
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_1}
+                          \end{array}
+                        \newlineAndSep[\labelHeight]
+                          \mMatrix{C}_{\irVar{b} \irCode{\irAddText}}
+                        & \begin{aMatrix}{cc}
+                              \Shortstack{$\mColLabel{m_3}$ $0$}
+                            & \Shortstack{$\mColLabel{m_5}$ $0$}
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_2}
+                          \end{array}
+                        \newlineAndSep[\labelHeight]
+                          \mMatrix{C}_{\irCode{\irAddText} \irCode{\irLoadText}}
+                        & \begin{aMatrix}{cc}
+                              \Shortstack{$\mColLabel{m_4}$ $2$}
+                            & \Shortstack{%
+                                $\mColLabel{m_5}$
+                                $\mathclap{\phantom{0}}% The \infty char is
+                                                       % shorter than a number,
+                                                       % so we need to make it
+                                                       % as tall as a number
+                                 \infty$%
+                              } \\
+                              \infty
+                            & 0
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_3} \\
+                            \mRowLabel{m_5}
+                          \end{array}
+                      \end{array}
+                    \end{displaymath}%
+                  \end{minipage}%
+                }
+
+  \caption{Example of modeling instruction selection as a PBQP}
+  \labelFigure{pbqp-example-2}
+\end{figure}
+
+Using a prototype implementation, \citeauthor{EcksteinEtAl:2003} ran experiments
+on a selected set of fixed-point \glspl{program} exhibiting the behavior
+discussed earlier.
+%
+The results indicate that their scheme improved performance by
+\mbox{\num{40}--\SI{60}{\percent}} on average -- and at most \SI{82}{\percent}
+for one \gls{function} -- compared to traditional \gls{tree covering}-based
+\glspl{instruction selector}.
+%
+According to \citeauthor{EcksteinEtAl:2003}, this considerable gain in
+performance comes from more efficient use of value modes to which \gls{tree
+  covering}-based techniques must make premature assignments, and thus could
+have a detrimental effect on code quality.
+%
+For example, if chosen poorly, the \gls{instruction selector} may need to emit
+additional \glspl{instruction} in order to undo decisions regarding value modes,
+which obviously reduces performance and needlessly increases the code
+size.
+%
+Although the technique by \citeauthor{EcksteinEtAl:2003} clearly mitigates these
+concerns, their design also has limitations of its own.
+%
+Most importantly, their \gls{PBQP} model can only support \glspl{pattern tree}
+and consequently hinders exploitation of many common \gls{target machine}
+features, such as \gls{multi-output.ic} \glspl{instruction}.
+
+
+\subsection{Handling DAG-shaped Patterns}
+
+To handle \gls{DAG}-shaped \glspl{pattern}, the \gls{PBQP} model must be
+extended.
+%
+First assume an extended \gls{grammar} where \gls{multi-output.ic}
+\glspl{instruction} are described using \gls{complex.r} \glspl{rule} (described
+in \refAppendix{dag-covering} on
+\refPageOfSection{dc-rules-multiple-productions}, see also
+\refFigure{extended-machine-grammar-rule-anatomy}).
+%
+For each combination of \glspl{match} derived from \gls{proxy.r} \glspl{rule}
+that can be combined into an instance of a \gls{complex.r} \gls{rule}, a
+\gls!{complex.m}[ \gls{match}] is created.
+%
+Each \gls{complex.m} \gls{match}~$i$ in turn introduces a
+\gls{variable}~\raisebox{0pt}[\height-2pt]{$\mVector{\mVar{x}}_i \in \mSet{0,
+    1}^2$} to decide whether $i$ is selected.
+%
+Because of the \raisebox{0pt}[\height-2pt]{$\mVector{1}^{\mTransp}
+  \mVector{\mVar{x}}_i = 1$} condition, every such \gls{variable} has exactly
+two elements (one representing \emph{on} and the other \emph{off}).
+%
+Like with the \gls{simple.r} \glspl{rule}, the costs of selecting a
+\gls{complex.m} \gls{rule} and interactions between these -- for example, two
+\gls{complex.m} \glspl{match} are not allowed to overlap or cause cyclic data
+dependencies -- are represented through the cost vectors and matrices.
+
+In order to select a \gls{complex.r} \gls{rule}, all of its \gls{proxy.r}
+\glspl{rule} must also be selected.
+%
+This is achieved by first extending, for each node~\mbox{$i$\hspace{-.8pt},} the
+domain of its \gls{variable}~$\mVector{\mVar{x}}_i$ with \glspl{match} derived
+from \gls{proxy.r} \glspl{rule}.
+%
+Then a new set of cost matrices~$D_{ij}$ is created such that, for a node~$i$
+and \gls{complex.m} \gls{match}~$j$, the costs are \num{0} if
+\mbox{$\mVector{\mVar{x}}_j = \text{\emph{off}}$} or $\mVector{\mVar{x}}_i$ is
+set to a \gls{proxy.r} \gls{rule} associated with~\mbox{$j$\hspace{-1pt}.}
+%
+Otherwise the costs are $\infty$.
+%
+Consequently, if a \gls{complex.m} \gls{match} covering some node~$n$ is
+selected, then the only choice for $\mVector{\mVar{x}}_n$ with non-infinite cost
+is an associated \gls{proxy.r} \gls{rule}.
+%
+The \gls{PBQP} model is thus augmented with another sum
+%
+\begin{equation}
+  \sum_{\mathclap{i \,\in\, N, \: j \,\in\, M}}
+  \mVector{\mVar{x}}_i^{\mTransp} D_{ij} \, \mVector{\mVar{x}}_j
+\end{equation}
+%
+where $N$ denotes the set of \glspl{node} in the \gls{SSA graph} and $M$ denotes
+the set of \gls{complex.m} \glspl{match}.
+
+This alone, however, allows \glspl{solution} where all \gls{proxy.r}
+\glspl{rule} but none of the \gls{complex.r} \glspl{rule} are selected.
+%
+This is resolved by assigning an artificially large cost~$K$ to the selection of
+\gls{proxy.r} \glspl{rule}, which is offset when selecting the corresponding
+\gls{complex.r} \gls{rule}.
+%
+For example, if a \gls{complex.r} \gls{rule}~$r$ with cost~\num{2} consists of
+three \gls{proxy.r} \glspl{rule}, then the new cost of selecting $r$ is \mbox{$2
+  - 3K$}.
+
+
+\subsection{Using Rewrite Rules Instead of Grammar Rules}
+
+In 2010, \textcite{BuchwaldZwinkau:2010} introduced another technique based on
+\glspl{PBQP}.
+%
+But unlike \citeauthor{EcksteinEtAl:2003} and \citeauthor{EbnerEtAl:2008},
+\citeauthor{BuchwaldZwinkau:2010} approached the task of \gls{instruction
+  selection} as a formal \gls{graph} transformation problem, for which much
+previous work already exist.
+%
+Hence, in \citeauthor{BuchwaldZwinkau:2010}'s design the \glspl{instruction} are
+expressed as \gls!{rewrite.r}[ \glspl{rule}] instead of \gls{grammar}
+\glspl{rule}.
+%
+As these \gls{rewrite.r} \glspl{rule} are based on a formal foundation, the
+resulting \gls{instruction selector} can be automatically verified to handle all
+possible \glspl{program}.
+%
+If this check fails, the verification tool can also provide the necessary
+\gls{rewrite.r} \glspl{rule} that are currently missing from the
+\gls{instruction set}.
+
+The technique works as follows.
+%
+First the \gls{SSA graph} is converted into a \gls{DAG}-like form by duplicating
+each \mbox{$\phi$-\gls{node}} into two \glspl{node}, which effectively breaks
+any \glspl{cycle} appearing in the \gls{SSA graph}.
+%
+After finding all applicable \gls{rewrite.r} \glspl{rule} for this \gls{DAG}
+(this is done using traditional \gls{pattern matching}), a corresponding
+instance of the \gls{PBQP} is formulated and solved as before.
+
+\citeauthor{BuchwaldZwinkau:2010} also discovered and addressed flaws in the
+\gls{PBQP} solver by \citeauthor{EcksteinEtAl:2003}, which may fail to find
+a solution in certain situations due to inadequate propagation of information.
+%
+However, \citeauthor{BuchwaldZwinkau:2010} also cautioned that their own
+implementation does not scale well when the number of overlapping
+\glspl{pattern} grows.
+%
+In addition, since the \gls{SSA graph} is devoid of control-flow information,
+none of the \gls{PBQP}-based techniques can support \gls{inter-block.ic}
+\glspl{instruction}.
+
+
+\section{Other Graph-Based Approaches}
+\labelSection{gc-other-approaches}
+
+\subsection{More Hardware Modeling Techniques}
+
+In \refAppendix{dag-covering} we saw a technique for performing \gls{microcode
+  generation} where the entire processor of the \gls{target machine} is modeled
+as a \gls{graph} instead of by just deriving the \glspl{pattern} for the
+available \glspl{instruction}.
+%
+Here we will look at a few techniques that rely on the same modeling scheme, but
+address the more traditional problem of \gls{instruction selection}.
+
+
+\paragraph{\glsentrytext{Chess}}
+
+\textcite{LanneerEtAl:1990} developed in 1990 a design that was later adopted by
+\citeauthor{VanPraetEtAl:1994}~\cite{VanPraetEtAl:1994, VanPraetEtAl:2001} in
+their implementation of \gls!{Chess}, a well-known compiler targeting
+\glspl{DSP} and \glspl{ASIP}.
+
+Comparing \gls{Chess} to \gls{MSSQ} (see \refAppendix{dag-covering} on
+\refPageOfSection{dc-modeling-entire-target-machines}), we find two striking
+differences.
+%
+First, in \gls{MSSQ} the data paths of the processor are given by a manually
+written \gls{machine description}, whereas \gls{Chess} derives these
+automatically from a specification written in \gls{nML}~\cite{FauthEtAl:1993,
+  FauthEtAl:1995}.
+
+Second, the method of \gls{bundling} -- which is the task of scheduling
+operations for parallel execution -- is different.
+%
+The \gls{instruction selector} in \gls{MSSQ} uses techniques from \gls{DAG
+  covering} to find \glspl{pattern} in the hardware \gls{graph}, which can
+subsequently be used to cover the \glspl{expression tree}.
+%
+After \gls{pattern selection}, another routine attempts to schedule the selected
+\glspl{instruction} for parallel execution.
+%
+In contrast, \gls{Chess} takes a more incremental approach.
+%
+From the \gls{program} \gls{Chess} first constructs a \gls!{chaining graph},
+where each \gls{node} represents an operation in the \gls{program} that has been
+annotated with a set of functional units capable of executing that operation.
+%
+Since the functional units on a \gls{DSP} are commonly grouped into
+\glspl!{FBB}, the \gls{chaining graph} also contains an \gls{edge} between every
+pair of \glspl{node} that could potentially be executed on the same \gls{FBB}.
+%
+A heuristic algorithm then attempts to collapse the \glspl{node} in the
+\gls{chaining graph} by selecting an \gls{edge} and replacing the two
+\glspl{node} with a new \gls{node}.
+%
+Once replaced, the algorithm tries to remove the \glspl{edge} between
+\glspl{node} of \glspl{operation} that can no longer be executed on the same
+\gls{FBB} as the \gls{operation} of the new \gls{node}.
+%
+This process iterates until no more \glspl{node} can be collapsed, and every
+remaining \gls{node} in the \gls{chaining graph} thus constitutes a
+\gls!{bundle}.
+%
+The same authors later extended this design in~\cite{VanPraetEtAl:2001} to
+consider selection between \emph{all} possible \glspl{bundle} using
+\glshyphened{branch and bound} \gls{search}
+%
+The new design also allows some measure of code duplication by allowing the same
+operations in the \gls{function graph} to appear in multiple \glspl{bundle}.
+
+Using this incremental scheme to form the \glspl{bundle}, the design by
+\citeauthor{VanPraetEtAl:1994} is capable of \gls{bundling} operations that
+potentially reside in different \glspl{block}.
+%
+Their somewhat-\gls{integrated.cg} \gls{code generation} approach also allows
+efficient \gls{assembly code} to be generated for complex architectures, making
+it suitable for \glspl{DSP} and \glspl{ASIP} where the data paths are very
+irregular.
+%
+It may be possible to also extend the technique to support \gls{inter-block.ic}
+\glspl{instruction} as well, but \gls{interdependent.ic} \glspl{instruction} are
+most likely out of reach due to its heuristic nature.
+
+
+\paragraph{Generating Assembly Code Using Simulated Annealing}
+
+Another, albeit unusual, \gls{code generation} technique was proposed by
+\textcite{Visser:1999} in~1999.
+%
+Like \gls{MSSQ} and \gls{Chess}, \citeauthor{Visser:1999}'s approach is an
+\gls{integrated.cg} \gls{code generation} design but solves the problem using
+\gls{simulated annealing}.\!%
+%
+\footnote{%
+  \Gls!{simulated annealing} is a meta-heuristic that avoids getting stuck in a
+  local maximum when searching for optimal solutions.
+  %
+  For an overview, see for example~\cite{KirkpatrickEtAl:1983}.%
+}
+%
+In brief terms, an initial solution is found by randomly mapping each \gls{node}
+in the \gls{function graph} to a \gls{node} in the hardware \gls{graph} -- which
+models the entire processor -- and then a schedule is found using traditional
+\gls{list scheduling}.
+%
+A \gls{fitness function} is then applied to judge the effectiveness of the
+solution, but the exact details are omitted from the paper.
+%
+A proof-of-concept prototype was developed and tested on a simple \gls{program},
+but it appears no further research has been conducted on this idea.
+
+
+\subsection{Improving Code Quality with Mutation Scheduling}
+
+The last item we will discuss is a technique called \gls!{mutation
+  scheduling},\!%
+%
+\footnote{%
+  Despite its name, the idea of \gls{mutation scheduling} is completely
+  orthogonal to the theory of \glsdesc{GA}s.%
+}
+%
+which was introduced in 1994 by
+\citeauthor{NovackEtAl:2002}~\cite{NovackNicolau:1994, NovackEtAl:2002}.
+%
+\Gls{mutation scheduling} is technically a form of \gls{instruction scheduling}
+that primarily targets \gls{VLIW} architectures, but it also integrates a
+sufficient amount of \gls{instruction selection} to warrant being included in
+this dissertation.
+%
+On the other hand, the amount of \gls{instruction selection} that \emph{is}
+incorporated is in turn not really based on \gls{graph covering}.
+%
+But as with \glspl{trellis diagram} (see \refAppendixList{tree-covering,
+  dag-covering} on \refPagesOfSectionList{tc-trellis-diagrams-trees,
+  dc-trellis-diagrams-dags}, respectively), the author decided against
+discussing it in its own appendix.
+
+Broadly speaking, \gls{mutation scheduling} essentially tries to reduce the
+make span of \glspl{program} for which \gls{assembly code} have already been
+generated (hence \gls{instruction selection}, \gls{instruction scheduling}, and
+\gls{register allocation} has already been performed).\!%
+%
+\footnote{%
+  Although it is depicted here primarily as a post-step to \gls{code
+    generation}, one could just as well design a \glsshort{Davidson-Fraser
+    approach}-style \gls{compiler} (see \refAppendix{macro-expansion} on
+  \refPageOfSection{macro-expansion-with-peephole-optimization}).
+  %
+  In such a design, simple methods are applied to generate correct but naive
+  \gls{assembly code}, and then \gls{mutation scheduling} is used to improve the
+  code quality.%
+}
+%
+This is done by progressively moving the computations, one at a time, such that
+they can be executed in parallel with other \glspl{instruction} and thus finish
+sooner.
+%
+If such a move cannot be made, for example due to violation of some resource
+constraint or data dependency, then \gls{mutation scheduling} tries to alter the
+value.
+%
+This is called \gls!{value mutation}, which means that the current operation is
+replaced by other, equivalent operations that conform to the restrictions.
+%
+These operations are selected from a \gls!{mutation set}, which is conceptually
+a recursive data structure, as an expression in the \gls{mutation set} may use
+intermediate values that in turn necessitate \glspl{mutation set} of their own.
+%
+\citeauthor{NovackEtAl:2002} compute these \glspl{mutation set} by first taking
+the original operation and then applying a series of semantic-preserving
+functions that have been derived from various logical axioms, algebraic
+theorems, and the characteristics of the \gls{target machine}.
+%
+For example, if the value~$X$ is computed as \mbox{$Y + 5$}, then $Y$ can later
+be obtained by computing \mbox{$X - 5$}.
+%
+Another example is multiplication by powers of~\num{2}, which can be replaced
+with \cCode*{shift} \glspl{instruction}, provided such \glspl{instruction} are
+available.
+%
+If this is beneficial, a value can also be recomputed instead of copied from its
+current location.
+%
+This idea is known as \gls!{recomputation} (or \gls!{rematerialization}), which
+is a method for reducing \gls{register pressure}, as it allows \glspl{register}
+to be released at an earlier point in the \gls{assembly code}.
+
+In \gls{mutation scheduling}, ``shorter'' mutations are preferred over longer
+ones.
+%
+This is because a \gls{value mutation} of $v$ can lead to a cascade of new
+computations, which all will need to be scheduled before $v$ can be is computed.
+%
+Note that these computations can be scheduled such that they appear in
+\glspl{block} preceding the \gls{block} in which the computations of $v$ appear.
+%
+Hence the length of a mutation is loosely defined as the number of
+\gls{instruction} \glspl{bundle} that may need to be modified in order to
+realize the mutation.
+%
+Moreover, since the new computations of a successful mutation consume resources
+and incur dependencies of their own, the existing candidates appearing in
+\glspl{mutation set} may need to be removed or modified.
+%
+The ``best'' combination of mutations is then decided heuristically, but the
+paper is vague on how this is done exactly.
+
+\citeauthor{NovackEtAl:2002} implemented a prototype by extending an existing
+scheduler based on \gls!{GRiP}, which is another global \gls{instruction
+  scheduling} technique developed by the same authors
+(see~\cite{NicolauNovack:1992}).
+%
+Subsequent experiments using a selected set of benchmark \glspl{program}
+demonstrated that the \gls{mutation scheduling}-based design yielded a two- to
+threefold performance improvement over the \gls{GRiP}-only-based counterpart,
+partly due to its ability to apply \gls{rematerialization} in regions where
+\gls{register pressure} is high.
+%
+Unfortunately the authors neglected to say anything about the time complexity of
+\gls{mutation scheduling}, and whether it scales to larger \glspl{program}.
+
+
+\section{Summary}
+\labelSection{gc-summary}
+
+In this appendix we have considered a number of techniques that are founded, in
+one form or another, on the \gls{principle} of \gls{graph covering}.
+%
+Such techniques are among the most powerful methods of \gls{instruction
+  selection} since they perform \gls{global.is} \gls{instruction selection} as
+well as have more extensive \gls{instruction} support compared to most
+\glsshort{tree covering} and \gls{DAG covering}-based designs.
+
+Unfortunately this has not been fully exploited in existing techniques, partly
+due to limitations in the \gls{program} representations or to restrictions
+enforced by the underlying solving techniques.
+%
+Moreover, performing \gls{global.is} \gls{instruction selection} is
+computationally much harder compared to \gls{local.is} \gls{instruction
+  selection}.
+%
+Therefore, we will most likely only see these techniques applied in
+\glspl{compiler} whose users can afford very long compilation times (for example
+when targeting embedded systems with extremely high demands on performance, code
+size, power consumption, or a combination thereof).

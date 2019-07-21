@@ -1,0 +1,594 @@
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '09',
+    %q{Gravitational Waves},
+    'ch:waves'
+  )
+%>
+
+<% begin_sec("The speed of gravity") %>\label{sec:speed-of-gravity}
+
+In Newtonian gravity, gravitational effects are assumed to propagate at infinite speed, so that for example the
+lunar tides correspond at any time to the position of the moon at the same instant. This clearly can't be
+true in relativity, since simultaneity isn't something that different observers even agree on.
+Not only should the ``speed of gravity'' be finite, but 
+it seems implausible that it would be greater than $c$; in section \ref{sec:lorentz-geometry} (p. \pageref{sec:lorentz-geometry}),
+we argued based on empirically well established principles that there must be a maximum speed of cause and
+effect. Although the argument was only applicable to special relativity, i.e., to a flat spacetime,
+it seems likely to apply to general
+relativity as well, at least for low-amplitude waves on a flat background.
+As early as 1913, before Einstein had even developed the full theory of general relativity, he
+had carried out calculations in the weak-field limit showing that gravitational effects should propagate
+at $c$.\index{gravitational waves!propagation at $c$}
+We will work out an argument to this effect (using a different technique
+than Einstein's) in section \ref{subsec:gw-expected-properties}.
+This seems eminently reasonable, since (a) it is likely to be consistent with causality, and (b) $G$ and $c$ are the
+only constants with units that appear in the field equations (obscured by our choice of units, in which $G=1$ and $c=1$),
+and the only velocity-scale that can be constructed from
+these two constants is $c$ itself.\footnote{High-amplitude waves need \emph{not} propagate at $c$. For example, general relativity predicts
+that a gravitational-wave pulse propagating on a background of curved spacetime develops a trailing edge that propagates at less
+than $c$ (Misner, Thorne, and Wheeler, p. 957).
+This effect is weak when the amplitude is small or the wavelength is short compared to the scale of the background 
+curvature.\index{gravitational waves!propagation at less than $c$, for high amplitudes}}
+
+As shown by the following timeline, Einstein's prediction was surprisingly difficult to verify.
+
+\begin{tabular}{lp{90mm}}
+1913 & Einstein predicts gravitational waves traveling at $c$. \\
+1982 & Hulse-Taylor pulsar (pp.~\pageref{hulse-taylor-pulsar}, \pageref{subsec:gw-empirical-evidence})
+       seen to lose energy at the rate predicted by general relativity's prediction of gravitational radiation.\\
+2016 & Direct detection of gravitational waves from a collision of two black holes. The data suggest a velocity
+       on the same order of magnitude as $c$.
+\end{tabular}
+
+Why did this process take over a century? Naive arguments suggest that it should have been much easier.
+Workers as early as Newton and Laplace had investigated the consequences of a gravitational force that
+propagated at some finite speed. It is easy to show that, if nonrelativistic ideas about spacetime are retained,
+the predicted results are dramatic and not consistent with observation. For example, the earth and moon orbit
+about their common center of mass, which is inside the earth but offset from the earth's center.
+Suppose that we retain Newton's ideas about spacetime, but modify Newton's law of gravity to incorporate
+a time delay, with changes in the gravitational field propagating at some speed $u$. The force acting on the
+moon would then point toward the earth's location at a slightly earlier time, and this force would therefore
+have a component parallel to the moon's direction of motion. The force would do positive work on the moon and
+also exert a positive torque, the result being that the moon would spiral away. This is not consistent with the
+fact that the earth-moon system has remained fairly stable for billions of years, unless we take $u$ to be
+very large. From the stability of orbits in the solar system, Laplace estimated $u\gtrsim 10^{15}\ \munit/\sunit$,
+many orders of magnitude greater than $c$. This seemed to support the Newtonian picture, in which gravity acts
+instantaneously at a distance. A time delay in Newtonian spacetime would also have been easily detected by
+twentieth-century measurements using space probes and radio astronomy.\footnote{For an example of an erroneous
+2003 claim to have performed such a test, see Fomalont and Kopeikin, \url{http://arxiv.org/abs/astro-ph/0302294}.
+Their claims were debunked by  Samuel, \url{http://arxiv.org/abs/astro-ph/0304006},
+and Will, \url{http://arxiv.org/abs/astro-ph/0301145}.}
+
+The trouble with such arguments is that when we substitute relativistic spacetime for Newtonian spacetime,
+it is no longer expected that a time-delayed field will point toward the retarded position of the source.
+For example, if an electric charge moves inertially, and is observed in a frame in which it is moving, then
+Lorentz invariance requires that its electric field lines be straight, and converge on the charge's \emph{present}
+position in that frame.\footnote{Crowell, Special Relativity, section 10.4} The speed of gravity therefore
+turns out to be much harder to measure than Laplace had believed.
+<% end_sec %> % The speed of gravity
+
+<% begin_sec("Gravitational radiation") %>
+<% begin_sec("Empirical evidence",nil,'gw-empirical-evidence') %>\index{gravitational waves!empirical evidence for}
+The first strong empirical evidence of gravitational waves came in 1982. The Hulse-Taylor system
+(page \pageref{hulse-taylor-pulsar})
+contains two neutron stars orbiting around their common center of mass, and the period of the orbit is observed to be decreasing
+gradually over time (figure \figref{pulsar-period-decreasing}). This is interpreted as evidence that the stars are losing energy to radiation of 
+gravitational waves.\footnote{Stairs, ``Testing General Relativity with Pulsar Timing,'' \url{http://relativity.livingreviews.org/Articles/lrr-2003-5/}}
+As we'll see in section \ref{sec:rate-of-gravitational-radiation}, the rate of energy loss is in excellent agreement with the predictions
+of general relativity.
+<%
+  fig(
+    'pulsar-period-decreasing',
+    %q{%
+      The Hulse-Taylor pulsar's orbital motion is gradually losing energy due to the emission of gravitational waves.
+           The linear decrease of the period is integrated on this plot, resulting in a parabola. From
+           Weisberg and Taylor, \url{http://arxiv.org/abs/astro-ph/0211217}.
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+    }
+  )
+%>
+
+An even more dramatic, if less clearcut, piece of evidence is
+Komossa, Zhou, and Lu's observation\footnote{\url{http://arxiv.org/abs/0804.4585}} of a supermassive black hole
+that appears to be recoiling from its parent galaxy at a velocity of 2650 km/s (projected along the line of
+sight). They interpret this as evidence for the following scenario. In the early universe, galaxies form with
+supermassive black holes at their centers. When two such galaxies collide, the black holes can merge. The
+merger is a violent process in which intense gravitational waves are emitted, and these waves carry a large
+amount of momentum, causing the black holes to recoil at a velocity greater than the escape velocity of the
+merged galaxy.
+
+Although the energy loss from systems such as the Hulse-Taylor binary provide strong evidence that gravitational waves
+exist and carry energy, physicists and astronomers still wanted to detect them directly, and serious attempts to
+design and build such systems began around 1962. The design that finally achieved success used interferometers
+which detect oscillations in the lengths of their own arms.
+The first gravitational-wave event was detected, by this method, in 2016,
+by the Advanced LIGO collaboration.\footnote{\url{https://dcc.ligo.org/LIGO-P150914/public}}
+The event is believed to have been the result of the collision of two black holes.
+
+<%
+  fig(
+    'ligo-signals-overlaid',
+    %q{%
+      The gravitational waveform observed in 2016 by Advanced Ligo.
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+    }
+  )
+%>
+
+A complementary space-based system, LISA, has been proposed for launch in 2020, but its funding is uncertain.
+The two devices would operate in complementary frequency ranges (figure \figref{ligo-and-lisa-sensitivities}).
+A selling point of LISA is that if it is launched, there are a number of sources in the sky, with known properties, that
+are known to be easily within its range of sensitivity.\footnote{G. Nelemans, ``The Galactic Gravitational wave foreground,''
+\url{arxiv.org/abs/0901.1778v1}} One excellent candidate is
+HM Cancri, a pair of white dwarfs with an orbital period of 5.4 minutes, shorter than that of any 
+other known binary star.\footnote{Roelofs et al., ``Spectroscopic Evidence for a 5.4-Minute Orbital Period in HM Cancri,''
+\url{arxiv.org/abs/1003.0658v1}} 
+<%
+  fig(
+    'ligo-and-lisa-sensitivities',
+    %q{%
+      Predicted sensitivities of LISA and LIGO to gravitational waves of various frequences.
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+    }
+  )
+%>
+
+The initial detection of gravitational waves by Advanced LIGO provided two kinds of tests of
+general relativity's prediction that gravitational waves propagate at $c$. Advanced LIGO consists of
+two interferometers, separated by a distance of 3002 km, which corresponds to $T=10\ \zu{ms}$ at the speed of light.
+Let $\theta$ be the angle between the wave's direction of propagation and the line connecting the two interferometers.
+Then the difference in time between the arrival of the wave at the two instruments is
+$t=T(c/u)\cos\theta$, where $u$ is the velocity of the waves. The event detected in 2016 had $t=7\ \zu{ms}$,
+which is consistent with any value of $u$ less than about $1.4c$, and suggests $u\sim c$. Furthermore, the
+waveform detected in this event was a ``chirp'' that glided up in frequency. Since the wave was in transit
+for over a billion years, and the waveform lasted a fraction of a second, it follows that gravitational waves
+within this frequency range all travel at very nearly the same velocity, i.e., there is a very tight upper
+limit on the dispersion of gravitational waves.
+
+<% end_sec %> % Empirical evidence
+<% begin_sec("Energy content") %>\index{gravitational waves!energy content}
+Even without performing the calculations for a system like the Hulse-Taylor binary, it is easy to show that if such waves exist, they must be
+capable of carrying away energy. Consider two equal masses in highly elliptical orbits about their common center of mass, figure \figref{atlas}.\label{atlas-argument}
+The motion is nearly one-dimensional.
+As the masses recede from one another, they feel a delayed version of the gravitational force originating from a time when they were closer together
+and the force was stronger. The result is that in the near-Newtonian limit, they lose more kinetic and gravitational energy than they
+would have lost in the purely Newtonian theory. Now they come back inward in their orbits. As they approach one another, the time-delayed
+force is anomalously weak, so they gain less mechanical energy than expected. The result is that with each cycle, mechanical energy
+is lost. We expect that this energy is carried by the waves, in the same way that radio waves carry the energy lost by a transmitting antenna.\footnote{One has
+to be careful with this type of argument. In particular, one can obtain incorrect correct results by attempting to generalize this one-dimensional
+argument to motion in more than one dimension, because the effective semi-Newtonian interaction is not just a time-delayed version of Newton's
+law; it also includes velocity-dependent forces. It is easy to see why such velocity-dependence must occur in the simpler case of electromagnetism.
+Suppose that charges A and B are not at rest relative to one another. In B's frame, the electric field from A must come from the direction of the position
+that an observer comoving with B would extrapolate linearly from A's last known position and velocity, as determined by light-speed calculation.
+This follows from Lorentz invariance, since
+this is the direction that will be seen by an observer comoving with A. A full discussion is given by Carlip, \url{arxiv.org/abs/gr-qc/9909087v2}.}
+
+Not only can these waves remove mechanical energy from a system, they can also deposit energy in a detector,
+as shown by the nonmathematical ``sticky bead
+argument'' (figure \figref{sticky-bead}), which was originated by Feynman in 1957 and later popularized by Bondi.
+<% marg(80) %>
+<%
+  fig(
+    'atlas',
+    %q{As the two planets recede from one another, each feels the gravitational attraction that the other one exerted
+       in its previous position, delayed by the time it takes gravitational effects to propagate at $c$. At time $t$,
+       the right-hand planet experiences the stronger deceleration corresponding to the left-hand planet's closer position at the earlier time $t'$,
+       not its current position at $t$. Mechanical energy is not conserved, and the orbits will decay.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'sticky-bead',
+    %q{The sticky bead argument for the reality of gravitational waves. As a gravitational wave with the appropriate
+            polarization passes by, the bead vibrates back and forth on the rod. Friction creates heat. This
+            demonstrates that gravitational waves carry energy, and are thus real, observable phenomena.}
+  )
+%>
+<% end_marg %>
+
+Now strictly speaking, we have only shown that gravitational waves can extract or donate mechanical
+energy, but not that the waves themselves \emph{transmit} this energy. The distinction isn't one that
+normally occurs to us, since we are trained to believe that energy is always conserved. But we know that,
+for fundamental reasons, general relativity doesn't have global conservation laws that apply to all spacetimes
+(p.~\pageref{sec:no-conservation-laws}).
+Perhaps the energy lost by the Hulse-Taylor system is simply gone, never to reappear, and the energy
+imparted to the sticky bead is simply generated out of nowhere. On the other hand, general relativity
+does have global conservation laws for certain specific classes of spacetimes, including, for example,
+a conserved scalar mass-energy in the case of a stationary spacetime (p.~\pageref{sec:killing-conservation}).
+Spacetimes containing gravitational waves are not stationary, but perhaps there is something similar we can do
+in some appropriate special case.
+
+Suppose we want an expression for the energy of a gravitational wave in terms of its amplitude.
+This seems like it ought to be straightforward. We have such expressions in other classical field theories.
+In electromagnetism, we have energy densities $+(1/8\pi k) |\vc{E}|^2$ and $+(1/2\mu_\zu{o})  |\vc{B}|^2$
+associated with the electric and magnetic fields.
+In Newtonian gravity, we can assign an energy density
+$-(1/8\pi G)|\vc{g}|^2$ to the gravitational field $\vc{g}$; the minus sign indicates that when masses
+glom onto each other, they produce a greater field, and energy is released.
+
+In general relativity, however, the equivalence principle tells us that for any gravitational field measured
+by one observer, we can find another observer, one who is free-falling, who says that the local field is zero.
+It follows that we cannot associate an energy with the curvature of a particular region of spacetime in
+any exact way. The best we can do is to find expressions that give the energy density (1) in the limit of
+weak fields, and (2) when averaged over a region of space that is large compared to the wavelength.
+These expressions are not unique. There are a number of ways to write them in terms of the metric and
+its derivatives, and they all give the same result in the appropriate limit. The reader who is interested
+in seeing the subject developed in detail is referred to Carroll's \emph{Lecture Notes on General Relativity},
+\url{http://arxiv.org/abs/gr-qc/?9712019}. Although this sort of thing is technically messy,
+we can accomplish quite a bit simply by knowing that such results do exist, and that although they
+are non-unique in general, they are uniquely well defined in certain cases. Specifically, when one wants
+to discuss gravitational waves, it is usually possible to assume an asymptotically flat spacetime. In an
+asymptotically flat spacetime, there is a scalar mass-energy, called the ADM mass,\index{ADM mass}\index{mass!ADM}\index{mass-energy!ADM}
+that is conserved. In this restricted sense, we are assured that the books balance, and that the emission and absorption of gravitational
+waves really does mean the \emph{transmission} of a fixed amount of energy.
+<% end_sec %> % Energy content
+
+<% begin_sec("Expected properties",nil,'gw-expected-properties') %>
+To see what properties we should expect for gravitational radiation, first consider the reasoning that led to the construction of
+the Ricci and Einstein tensors. If a certain volume of space is filled with test particles, then the Ricci and Einstein
+tensors measure the tendency for this volume to ``accelerate;'' i.e., $-\der^2 V/\der t^2$ is a measure of the attraction of
+any mass lying inside the volume. A distant mass, however, will exert only tidal forces, which distort a region without
+changing its volume. This suggests that as a gravitational wave passes through a certain region of space, it should distort the shape
+of a given region, without changing its volume.
+
+When the idea of gravitational waves was first discussed, there was some skepticism about whether they represented
+an effect that was observable, even in principle. The most naive such doubt is of the same flavor as the one
+discussed in section \ref{sec:observability-of-expansion} about the observability of the universe's expansion: if
+everything distorts, then don't our meter-sticks distort as well, making it impossible to measure the effect?
+The answer is the same as before in section \ref{sec:observability-of-expansion}; systems that are gravitationally
+or electromagnetically bound do not have their scales distorted by an amount equal to the change in the elements
+of the metric.
+
+A less naive reason to be skeptical about gravitational waves is that just because a metric looks oscillatory, that
+doesn't mean its oscillatory behavior is observable. Consider the following example.
+\begin{equation*}
+  \der s^2 = \der t^2 - \left(1+\frac{1}{10}\sin x\right)\der x^2 - \der y^2 - \der z^2
+\end{equation*}
+The Christoffel symbols depend on derivatives of the form $\partial_a g_{bc}$, so here the only nonvanishing
+Christoffel symbol is $\Gamma\indices{^x_{xx}}$. It is then straightforward to check that 
+the Riemann tensor $  R\indices{^a_{bcd}} = \partial_c \Gamma\indices{^a_{db}} - \partial_d \Gamma\indices{^a_{cb}} 
+                        + \Gamma\indices{^a_{ce}}\Gamma\indices{^e_{db}}-\Gamma\indices{^a_{de}}\Gamma\indices{^e_{cb}}$
+vanishes by symmetry. Therefore this metric must really just be a flat-spacetime metric that has been subjected
+to a silly change of coordinates.
+% checked using coordinate_wave.mac that this was really flat
+
+Self-check: $R$ vanishes, but $\Gamma$ doesn't. Is there a
+reason for paying more attention to one or the other?
+<% marg(0) %>
+<%
+  fig(
+    'gravitational-wave',
+    %q{As the gravitational wave propagates in the $z$ direction, the metric oscillates in the $x$ and $y$
+            directions, preserving volume.}
+  )
+%>
+<% end_marg %>
+
+To keep the curvature from vanishing, it looks like we need a metric in which the oscillation is not
+restricted to a single variable. For example, the metric
+\begin{equation*}
+  \der s^2 = \der t^2 - \left(1+\frac{1}{10}\sin y\right)\der x^2 - \der y^2 - \der z^2
+\end{equation*}
+does have nonvanishing curvature.\index{polarization!of gravitational waves}\index{transverse polarization!of gravitational waves}\index{gravitational waves!transverse nature}\label{grav-waves-transverse}
+In other words, it seems like we should be looking for transverse waves
+rather than longitudinal ones.\footnote{A more careful treatment shows that longitudinal waves can always be
+interpreted as physically unobservable coordinate waves, in the limit of large distances from the source. On the other hand,
+it is clear that no such prohibition against longitudinal waves could apply universally, because such a constraint can only
+be Lorentz-invariant if the wave propagates at $c$ (see p.~\pageref{eg:polzn-constraints}), whereas high-amplitude waves need not propagate at $c$.
+Longitudinal
+waves near the source are referred to as Type III solutions in a classification scheme due to Petrov.\index{Petrov classification}\index{Type III solution}\index{Type N solution}
+Transverse waves, which are what we could actually observe in practical experiments, are type N.} On the other hand, this metric cannot be a solution to the vacuum field equations,
+since it doesn't preserve volume. It also stands still, whereas we expect that solutions to the field
+equations should propagate at the velocity of light, at least for small amplitudes. These conclusions are
+self-consistent, because a wave's polarization can only be constrained if it propagates at $c$ (see p.~\pageref{eg:polzn-constraints}).
+
+Based on what we've found out, the following seems like a metric that might have a fighting chance of
+representing a real gravitational wave:
+\begin{equation*}
+  \der s^2 = \der t^2 - \left(1+A\sin (z-t)\right)\der x^2 - \frac{\der y^2}{1+A\sin (z-t)} - \der z^2
+\end{equation*}
+It is transverse, it propagates at $c(=1)$, and the fact that $g_{xx}$ is the reciprocal of $g_{yy}$ makes
+it volume-conserving. The following Maxima program calculates its Einstein tensor:
+\begin{listing}{1}
+load(ctensor);
+ct_coords:[t,x,y,z];
+lg:matrix([1,0,0,0],
+          [0,-(1+A*sin(z-t)),0,0],
+          [0,0,-1/(1+A*sin(z-t)),0],
+          [0,0,0,-1]);
+cmetric();
+einstein(true);
+\end{listing}
+For a representative component of the Einstein tensor, we find
+\begin{equation*}
+  G_{tt} = -\frac{A^2\cos^2(z-t)}{2+4A\sin(z-t)+2A^2\sin^2(z-t)}
+\end{equation*}
+For small values of $A$, we have $|G_{tt}| \lesssim A^2/2$. The vacuum field equations require $G_{tt}=0$, so
+this isn't an exact solution. But all the components of $G$, not just $G_{tt}$, are of order $A^2$, so
+this \emph{is} an \emph{approximate} solution to the equations.
+
+It is also straightforward to check that propagation at approximately $c$ was a necessary feature.
+For example, if we replace the factors of $\sin(z-t)$ in the metric with $\sin(z-2t)$, we get
+a $G_{xx}$ that is of order unity, not of order $A^2$.
+
+To prove that gravitational waves are an observable effect, we would like to be able to display
+a metric that (1) is an exact solution of the vacuum field equations; (2) is not merely a coordinate wave;
+and (3) carries momentum and energy.
+As late as 1936, Einstein and Rosen published a paper claiming that gravitational waves were
+a mathematical artifact, and did not actually exist.\footnote{Some of the history is related at
+\url{http://en.wikipedia.org/wiki/Sticky_bead_argument}.}
+
+<% end_sec %> % Expected properties
+
+<% begin_sec("Some exact solutions") %>
+
+In this section we study several examples of exact solutions to the field equations.
+Each of these can readily be shown not to be a mere coordinate wave, since
+in each case the Riemann tensor has nonzero elements.
+
+\begin{eg}{An exact solution}
+We've already seen, e.g., in the derivation of the Schwarzschild metric in section \ref{sec:complete-sch},
+that once we have an approximate solution to the equations of general relativity, we may be able to
+find a series solution. Historically this approach was only used as a last resort, because the lack of
+computers made the calculations too complex to handle, and the tendency was to look for tricks that
+would make a closed-form solution possible. But today the series method has the advantage that any mere
+mortal can have some reasonable hope of success with it --- and there is nothing more boring (or demoralizing)
+than laboriously learning someone else's special trick that only works for a specific problem.
+In this example, we'll see that such an approach comes tantalizingly close to providing an exact,
+oscillatory plane wave solution to the field equations.
+
+Our best solution so far was of the form
+\begin{equation*}
+  \der s^2 = \der t^2 - \left(1+f\right)\der x^2 - \frac{\der y^2}{1+f} - \der z^2\eqquad,
+\end{equation*}
+where $f=A\sin (z-t)$. This doesn't seem likely to be an exact solution for large amplitudes, since
+the $x$ and $y$ coordinates are treated asymmetrically. In the extreme case of $|A| \ge 1$, there
+would be singularities in $g_{yy}$, but not in $g_{xx}$. Clearly the metric will have to have some
+kind of nonlinear dependence on $f$, but we just haven't found quite the right nonlinear dependence.
+Suppose we try something of this form:
+\begin{equation*}
+  \der s^2 = \der t^2 - \left(1+f+cf^2\right)\der x^2 - \left(1-f+df^2\right)\der y^2 - \der z^2
+\end{equation*}
+This approximately conserves volume, since $(1+f+\ldots)(1-f+\ldots)$ equals unity, up to terms of
+order $f^2$. The following program tests this form.
+\begin{listing}{1}
+load(ctensor);
+ct_coords:[t,x,y,z];
+f : A*exp(%i*k*(z-t)); 
+lg:matrix([1,0,0,0],
+          [0,-(1+f+c*f^2),0,0],      
+          [0,0,-(1-f+d*f^2),0],     
+          [0,0,0,-1]);
+cmetric();
+einstein(true);
+\end{listing}
+% wave_series.mac
+In line 3, the motivation for using the complex exponential rather than a sine wave in $f$ is the usual
+one of obtaining simpler expressions; as we'll see, this ends up causing problems. In lines 5 and 6, the symbols $c$ and $d$ have not
+been defined, and have not been declared as depending on other variables, so Maxima treats them
+as unknown constants. The result is $G_{tt} \sim (4 d + 4 c - 3)A^2$ for small $A$, so we can make
+the $A^2$ term disappear by an appropriate choice of $d$ and $c$. For symmetry, we choose $c=d=3/8$.
+With these values of the constants, the result for $G_{tt}$ is of order $A^4$.
+This technique can be extended to higher and higher orders of approximation, resulting in an exact series
+solution to the field equations.
+
+Unfortunately, the whole story ends up being too good to be true. The resulting metric has complex-valued
+elements. If general relativity were a linear field theory, then we could apply the usual technique of
+forming linear combinations of expressions of the form $e^{+i\ldots}$ and $e^{-i\ldots}$, so as to give
+a real result. But the field equations of general relativity are nonlinear, so the resulting
+linear combination is no longer a solution. The best we can do is to make a non-oscillatory real exponential
+solution (problem \ref{hw:real-exponential}).
+\end{eg}
+
+\begin{eg}{An exact, oscillatory, non-monochromatic solution}\label{eg:rindler-pq}
+Assume a metric of the form
+\begin{equation*}
+  \der s^2 = \der t^2 - p(z-t)^2\der x^2 - q(z-t)^2\der y^2 - \der z^2\eqquad,
+\end{equation*}
+where $p$ and $q$ are arbitrary functions. Such a metric would clearly represent
+some kind of transverse-polarized plane wave traveling at velocity $c(=1)$ in the $z$ direction.
+The following Maxima code calculates its Einstein tensor.
+\begin{listing}{1}
+load(ctensor);
+ct_coords:[t,x,y,z];
+depends(p,[z,t]);
+depends(q,[z,t]);
+lg:matrix([1,0,0,0],
+          [0,-p^2,0,0],
+          [0,0,-q^2,0],
+          [0,0,0,-1]);
+cmetric();
+einstein(true);
+\end{listing}
+The result is proportional to $\ddot{q}/q+\ddot{p}/p$, so any functions $p$ and $q$
+that satisfy the differential equation $\ddot{q}/q+\ddot{p}/p=0$ will result in
+a solution to the field equations.
+Setting $p(u)=1+A\cos u$, for example, we find that $q$ is oscillatory, but with a period longer than
+$2\pi$ (problem \ref{hw:rindler-pq}).
+\end{eg}
+
+\begin{eg}{An exact, plane, monochromatic wave}\label{eg:exact-plane}
+Any metric of the form
+\begin{equation*}
+  \der s^2 = (1-h)\der t^2 - \der x^2 - \der y^2 - (1+h)\der z^2 +2h\der z\der t\eqquad,
+\end{equation*}
+where $h=f(z-t)xy$, and $f$ is any function, is an exact solution of the field equations (problem \ref{hw:exact-plane}).
+
+Because $h$ is proportional to $xy$, this does not appear at first glance to be a uniform plane wave.
+One can verify, however, that all the components of the Riemann tensor depend only on $z-t$, not on
+$x$ or $y$. Therefore there is no measurable property of this metric that varies with $x$ and $y$.
+\end{eg}
+
+<% end_sec %> % Some exact solutions
+
+
+<% begin_sec("Rate of radiation") %>\label{sec:rate-of-gravitational-radiation}\index{gravitational waves!rate of radiation}
+How can we find the rate of gravitational radiation from a system such as the Hulse-Taylor pulsar?
+
+Let's proceed by analogy. The simplest source of sound waves is something like the cone of a stereo speaker.
+Since typical sound waves have wavelengths measured in meters, the entire speaker is generally small compared to the wavelength.
+The speaker cone is a surface of oscillating displacement $x=x_\zu{o}\sin\omega t$. 
+Idealizing such a source to a radially pulsating spherical surface, we have an oscillating monopole that radiates sound waves
+uniformly in all directions. To find the power radiated, we note that the velocity of the source-surface is
+proportional to $x_\zu{o}\omega$, so the kinetic energy of the air immediately in contact with it is proportional
+to $\omega^2 x_\zu{o}^2$. The power radiated is therefore proportional to $\omega^2 x_\zu{o}^2$.
+<% marg(50) %>
+<%
+  fig(
+    'multipoles',
+    %q{The power emitted by a multipole source of order $m$ is proportional to $\omega^{2(m+1)}$, when the size
+           of the source is small compared to the wavelength. The main reason for
+           the $\omega$ dependence is that at low frequencies, the wavelength
+           is long, so the number of wavelengths traveled to a particular
+           point in space is nearly the same from any point in the source;
+           we therefore get strong cancellation.}
+  )
+%>
+<% end_marg %>
+
+In electromagnetism, conservation of charge forbids the existence of an oscillating electric monopole.
+The simplest radiating source is therefore an oscillating electric dipole $D=D_\zu{o}\sin\omega t$. If the dipole's physical size
+is small compared to a wavelength of the radiation, then the radiation is an inefficient process; at any
+point in space, there is only a small difference in path length between the positive and negative portions of the dipole,
+so there tends to be strong cancellation of their contributions, which were emitted with opposite phases.
+The result is that the wave's electromagnetic potential four-vector (section \ref{subsec:em-four-vector}) is proportional
+to $D_\zu{o}\omega$, the fields to $D_\zu{o}\omega^2$, and the radiated power to $D_\zu{o}^2\omega^4$. The factor of
+$\omega^4$ can be broken down into $(\omega^2)(\omega^2)$, where the first factor of $\omega^2$ occurs for
+reasons similar to the ones that explain the $\omega^2$ factor for the monopole radiation of sound, while the
+second $\omega^2$ arises because the smaller $\omega$
+is, the longer the wavelength, and the greater the inefficiency in radiation caused by the small size of the source
+compared to the wavelength.
+
+\begin{eg}{AM radio}
+Commercial AM radio uses wavelengths of several hundred meters, so AM dipole antennas are usually orders of magnitude
+shorter than a wavelength. This causes severe attentuation in both transmission and reception. (There
+are theorems called reciprocity theorems that relate efficiency of transmission to efficiency of
+reception.) Receivers therefore need to use of a large amount of amplification.
+This doesn't cause problems, because the ambient sources of RF noise are attenuated by the short
+antenna just as severely as the signal.
+\end{eg}
+
+Since our universe doesn't seem to have particles with negative mass, we can't form a gravitational dipole by
+putting positive and negative masses on opposite ends of a stick --- and furthermore, such a stick will not spin freely
+about its center, because its center of mass does not lie at its center! In a more realistic system, such as the
+Hulse-Taylor pulsar, we have two unequal masses orbiting about their common center of mass. By conservation of
+momentum, the mass dipole moment of such a system is constant, so we cannot have an oscillating mass dipole.
+The simplest source of gravitational radiation is therefore an oscillating mass quadrupole, $Q=Q_\zu{o}\sin\omega t$.
+As in the case of the oscillating electric dipole, the radiation is suppressed if, as is usually the case,
+the source is small compared to the wavelength. The suppression is even stronger in the case of a quadrupole,
+and the result is that the radiated power is proportional to $Q_\zu{o}^2\omega^6$.
+
+This result has the interesting property of being invariant under a rescaling of coordinates. In geometrized units,
+mass, distance, and time all have the same units, so that $Q_\zu{o}^2$ has units of $(\text{length}^3)^2$
+while $\omega^6$ has units of $(\text{length})^{-6}$. This is exactly what is required, because in geometrized
+units, power is unitless, $\text{energy}/\text{time}=\text{length}/\text{length}=1$.
+
+We can also tie the $\omega^6$ dependence to our earlier argument, on p.~\pageref{atlas-argument}, for the
+dissipation of energy by gravitational waves. The argument was that gravitating bodies are subject to time-delayed
+gravitational forces, with the result that orbits tend to decay. This argument only works if the forces are time-varying;
+if the forces are constant over time, then the time delay has no effect. For example, in the semi-Newtonian limit the field
+of a sheet of mass is independent of distance from the sheet. (The electrical analog of this fact is easily proved using
+Gauss's law.) If two parallel sheets fall toward one another, then neither is subject to a time-varying force, so there
+will be no radiation. In general, we expect that there will be no gravitational radiation from a particle unless
+the third derivative of its position $\der^3 x/\der t^3$ is nonzero. (The same is true for electric quadrupole radiation.)
+In the special case where the position oscillates sinusoidally, the chain rule tells us that taking the third derivative
+is equivalent to bringing out a factor of $\omega^3$. Since the amplitude of gravitational waves is proportional to
+$\der^3 x/\der t^3$, their energy varies as $(\der^3 x/\der t^3)^2$, or $\omega^6$.
+
+The general pattern we have observed is that for multipole radiation of order $m$ (0=monopole, 1=dipole, 2=quadrupole),
+the radiated power depends on $\omega^{2(m+1)}$. Since gravitational radiation must always have $m=2$ or higher, we
+have the very steep $\omega^6$ dependence of power on frequency.
+This demonstrates that if
+we want to see strong gravitational radiation, we need to look at systems that are oscillating extremely rapidly.
+For a binary system with unequal masses of order $m$, with orbits having radii of order $r$, we have $Q_\zu{o}\sim mr^2$.
+Newton's laws give $\omega\sim m^{1/2} r^{-3/2}$, which is essentially Kepler's law of periods. The result is
+that the radiated power should depend on $(m/r)^5$. 
+Reinserting the proper constants to give an equation that allows practical calculation
+in SI units, we have
+\begin{equation*}
+  P = k \frac{G^4}{c^5} \left(\frac{m}{r}\right)^5\eqquad,
+\end{equation*}
+where $k$ is a unitless constant of order unity.
+
+For the Hulse-Taylor pulsar,\footnote{\url{http://arxiv.org/abs/astro-ph/0407149}}\index{Hulse-Taylor pulsar}
+we have $m \sim 3\times 10^{30}\ \kgunit$ (about one and a half solar masses)
+and $r \sim 10^9\ \munit$. The binary pulsar is made to order our purposes, since $m/r$ is
+extremely large compared to what one sees in almost any other astronomical system. The resulting estimate for the
+power is about $10^{24}$ watts.
+
+% G=6.6 10^-11 m3kg-1s-2; c=3 10^8 m/s ;  m=3* 10^30 kg ;  r=10^9 m ; G^4*c^-5(m/r)^5
+%   7.80853333333375*10^21 W
+
+The pulsar's period is observed to be steadily lengthening at a rate of $\alpha=2.418\times 10^{-12}$ seconds per second.
+To compare this with our crude theoretical estimate, we take the Newtonian energy of the system $Gm^2/r$ and multiply by
+$\omega\alpha$, giving $10^{25}$ W, which checks to within an order of magnitude.
+A full general-relativistic calculation reproduces the observed value of $\alpha$ to within the 0.1\% error bars
+of the data.
+
+
+<% end_sec %> % Rate of radiation
+
+
+<% end_sec %> % gravitational radiation
+
+\vfill
+
+<% begin_hw_sec %>
+
+<% begin_hw('why-geodesics-for-test-particles') %>\index{geodesic!as world-line of a test particle}
+(a) Starting on page \pageref{subsec:geometrical-gravity}, we have associated geodesics with the world-lines of low-mass
+objects (test particles). Use the Hulse-Taylor pulsar as an example to show that the assumption of low mass was a necessary one.
+How is this similar to the issues encountered on pp.~\pageref{sec:chiao-paradox}ff involving charged particles?\hwendpart
+(b) Show that if low-mass, uncharged particles did not follow geodesics (in a spacetime with no ambient electromagnetic
+fields), it would violate Lorentz invariance.
+Make sure that your argument explicitly invokes the low mass and the lack of charge, because otherwise your
+argument is wrong.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('real-exponential') %>
+Show that the metric $\der s^2 = \der t^2 -A\der x^2  -B\der y^2 - \der z^2$ with
+\begin{align*}
+  A &= 1-f+\frac{3}{8}f^2-\frac{25}{416}f^3+\frac{15211}{10729472}f^5 \\
+  B &= 1+f+\frac{3}{8}f^2+\frac{25}{416}f^3-\frac{15211}{10729472}f^5 \\
+  f &= A e^{k(t-z)}
+\end{align*}
+is an approximate solution to the vacuum field equations, provided that $k$ is real --- which prevents this from being
+a physically realistic, oscillating wave. Find the next nonvanishing term in each series.
+% wave_real_exponential_series.mac
+<% end_hw %>
+
+<% begin_hw('rindler-pq') %>
+Verify the claims made in example \ref{eg:rindler-pq}. Characterize the (somewhat complex) behavior of the
+function $q$ obtained when $p(u)=1+A\cos u$.
+% rindler_pq_integrate.pl
+% rindler_pq_beats.mac
+<% end_hw %>
+
+<% begin_hw('exact-plane') %>
+Verify the claims made in example \ref{eg:exact-plane} using Maxima. Although the result holds for any function $f$,
+you may find it more convenient to use some specific form of $f$, such as a sine wave, so that Maxima will be able
+to simplify the result to zero at the end. Note that when the metric is expressed in terms of the line element, there
+is a factor of 2 in the $2h\der z\der t$ term, but when expressing it as a matrix, the 2 is not present in the matrix
+elements, because there are two elements in the matrix that each contribute an equal amount.
+% wave_exact_plane.mac
+<% end_hw %>
+
+<% end_hw_sec %>
+
+<% end_chapter %>

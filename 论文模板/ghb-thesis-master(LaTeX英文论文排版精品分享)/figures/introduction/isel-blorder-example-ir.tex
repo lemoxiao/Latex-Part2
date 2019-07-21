@@ -1,0 +1,55 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize\relsize{-0.5}%
+\def\nodeDist{16pt}%
+\def\jumpOffset{8pt}%
+\pgfdeclarelayer{background}%
+\pgfsetlayers{background,main}%
+\begin{tikzpicture}[
+    every node/.style={
+      draw,
+      fill=white,
+      line width=\controlFlowLineWidth,
+      minimum size=0,
+      inner xsep=4pt,
+      inner ysep=2.5pt,
+      node distance=\nodeDist,
+    },
+  ]
+
+  \node (b1) {%
+               \begin{tabular}{@{}l@{}}
+                 \irAssign{\irVar{a}}{\irCall{g}}\\
+                 \irAssign{\irTemp{1}}{\irEQ{\irVar{a}}{\irVar{0}}}\\
+                 \irCondBr{\irTemp{1}}{b1}{b2}
+               \end{tabular}%
+             };
+  \node [below left=\nodeDist and 0 of b1.south east] (b2)
+        {%
+          \begin{tabular}{@{}l@{}}
+            \irRet{\irVar{a}}
+          \end{tabular}%
+        };
+
+  \begin{pgfonlayer}{background}
+    \begin{scope}[control flow]
+      \draw (b2 |- b1.south) -- node [control-flow label, pos=0.4] {F} (b2);
+      \draw [rounded corners=8pt]
+            ($(b1.south west) !.75! (b1.south)$)
+            |- node [control-flow label, pos=0.2, swap] {T}
+            ([xshift=-\nodeDist, yshift=-\nodeDist] b1.south west)
+            |-
+            ([yshift=-\jumpOffset] b1.north west);
+    \end{scope}
+  \end{pgfonlayer}
+
+
+  \node [block label, above right=0 and 0 of b1.north west] {b1};
+  \node [block label, left=of b2, inner xsep=2pt] {b2};
+\end{tikzpicture}%
+\endgroup%

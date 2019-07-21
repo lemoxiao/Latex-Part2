@@ -1,0 +1,695 @@
+%!TEX root = ../larxxia.tex
+
+
+\section{Use \script\ for vector computation}
+\label{sec:umovc}
+\secttoc
+
+\index{Matlab|(}
+\index{Octave|(}
+
+\begin{quoted}{\index{Babbage, Charles}Charles Babbage, 1832}
+It is the science of \emph{calculation},---which becomes continually more necessary at each step of our progress, and which must ultimately govern the whole of the applications of science to the arts of life.
+\end{quoted}
+
+Subsequent chapters invoke the computer packages \script\ to perform calculations that would be tedious and error prone when done by hand.
+This section introduces \script\ so that you can start to become familiar with it on small problems.
+You should directly compare the computed answer with your calculation by hand.
+The aim is to develop some basic confidence with \script\ before later using it to save considerable time in longer tasks.
+
+\begin{itemize}
+\item  \script[1]\ is commercial software available from Mathworks.\footnote{\url{http://mathworks.com}}
+It is also useable over the internet as \script[1]-Online or \script[1]-Mobile.
+\item \script[2]\ is free software, that for our purposes is almost identical to \script[1], and downloadable over the internet.\footnote{\url{https://www.gnu.org/software/octave/}}
+Octave is also freely useable over the internet.\footnote{\url{http://octave-online.net}} 
+\item Alternatively, your home institution may provide \script\ via a web service that is useable via smart phones, tablets and computers.
+\end{itemize}
+
+
+
+\begin{comment}
+Avoid plotting because I do not want to confuse a vector with a row vector of plot points.  Plotting is also not high priority.
+\end{comment}
+
+
+
+
+\begin{table}
+\caption{Use \script\ to help compute vector results with the following basics.  
+This and subsequent tables throughout the book summarise \script\ for our use.
+\index{Matlab@\textsc{Matlab}|textbf}\index{Octave|textbf}} \label{tbl:mtlbpre}
+\hrule
+\begin{minipage}{\linewidth}
+\begin{itemize}
+\item Real numbers are limited to being zero or of magnitude from \(10^{-323}\)  to~\(10^{+308}\), both positive and negative (called the \bfidx{floating point} numbers).
+Real numbers are computed and stored to a maximum \idx{precision} of nearly sixteen \idx{significant digits}.%
+\footnote{If desired, `\idx{computer algebra}' software provides us with an arbitrary level of precision, even exact.
+Current computer algebra software includes the free Sage, Maxima and Reduce, and the commercial Maple, Mathematica and (via Matlab) MuPad.}
+
+\item \script\ potentially uses complex numbers~(\CC), but mostly we stay within real numbers~(\RR).
+
+\item Each \script\ command is usually typed on one line by itself.
+
+\item \index{[\ldots]@\texttt{[\ldots]}}\verb|[ . ; . ; . ]| where each dot denotes a number, forms vectors in~\(\RR^3\) (or use newlines instead of the semi-colons).  
+Use \(n\)~numbers separated by semi-colons for vectors in~\(\RR^n\).
+
+\item \index{=@\texttt{=}}\verb|=| assigns the result of the expression to the right of the~\verb|=| to the variable name on the left.
+
+If the result of an expression is not explicitly assigned to a variable, then by default it is assigned to the variable~\verb|ans| (denoted by ``\index{ans@\texttt{ans}}\verb|ans =|'' in \script).
+
+\item Variable names are alphanumeric starting with a letter.
+
+\item \index{size()@\texttt{size()}}\verb|size(v)| returns the number of components of the vector (\autoref{def:vecs}): if the vector~\vv\ is in \(\RR^m\), then \verb|size(v)| returns \(\begin{bmatrix} m&1 \end{bmatrix}\).
+
+\item \index{norm()@\texttt{norm()}}\verb|norm(v)| computes the \idx{length}\slash \idx{magnitude} of the vector~\verb|v| (\autoref{def:veclen}).
+
+\item \index{+,-,*@\texttt{+,-,*}}\verb|+,-,*| is vector\slash scalar addition, subtraction, and multiplication, but only provided the sizes of the two vectors are the same.
+Parentheses \index{()@\texttt{()}}\verb|()| control the order of operations.
+
+\item \index{/@\texttt{/}}\verb|/x| divides a vector\slash scalar by a scalar~\(x\).
+However, be warned that \verb|/v| for a vector~\vv\ typically gives strange results as \script\ interprets it to mean you want to approximately solve some linear equation.
+
+\item \index{^@\texttt{\^}}\verb|x^y| for scalars~\(x\) and~\(y\) computes~\(x^y\).
+
+\item \index{dot()@\texttt{dot()}}\verb|dot(u,v)| computes the \idx{dot product} of vectors~\verb|u| and~\verb|v| (\autoref{def:dotprod})---if they have the same size.
+
+\item \index{acos()@\texttt{acos()}}\verb|acos(q)| computes the \idx{arc-cos}, the \idx{inverse cosine}, of the scalar~\verb|q| in radians.  
+To find the angle in degrees use \verb|acos(q)*180/pi|\,.
+
+\item \index{quit@\texttt{quit}}\verb|quit| terminates the \script\ session.
+\end{itemize}
+\end{minipage}
+\hrule
+\end{table}
+
+
+
+
+\begin{example} \label{eg:}
+Use the \script\ command \index{norm()@\texttt{norm()}}\verb|norm()| to compute the length\slash magnitude of the following vectors (\autoref{def:veclen}).
+\begin{enumerate}
+\item \((2,-1)\)
+\begin{solution} 
+Start \script.  After a prompt, ``\verb|>>|'' in \script[1] or ``\verb|octave:1>|'' in \script[2], type a command, followed by the Return\slash Enter key to get it executed.
+As indicated by \autoref{tbl:mtlbpre} the numbers with brackets separated by semi-colons forms a vector, and the \verb|=|~character assigns the result to variable for subsequent use.
+
+\begin{tabular}{@{}*2{p{0.45\linewidth}}@{}}\raggedright
+Assign the vector to a variable~\verb|a| by the command \verb|a=[2;-1]|.
+Then executing \verb|norm(a)| reports \verb|ans = 2.2361| as shown in the dialogue to the right.
+&\begin{verbatim}
+>> a=[2;-1]
+a =
+   2
+  -1
+>> norm(a)
+ans =  2.2361
+\end{verbatim}
+\end{tabular}
+
+This computes the answer \(|(2,-1)|=\sqrt{2^2+(-1)^2}=\sqrt5=2.2361\) (to five significant digits which we take to be practically exact).
+
+The \idx{qr-code} appearing in the margin here encodes these \script\ commands.  
+\setbox\ajrqrbox\hbox{\qrcode{% vector length
+a=[2;-1]
+norm(a)
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+You may scan such qr-codes with your favourite app\footnote{At the time of writing, qr-code scanning applications for smart-phones include \emph{WaspScan} and \emph{QRReader}---but I have no expertise to assess their quality.}, and then copy and paste the code direct into a \script\ client.
+Alternatively, if reading an electronic version of this book, then you may copy and paste the commands (although often the quote character~\verb|'| needs correcting).
+Although in this example the saving in typing is negligible, later you can save considerable typing via such qr-codes.
+\end{solution}
+
+\item \((-1,1,-5,4)\)
+\begin{solution} 
+In \script:
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign the vector to a variable with \verb|b=[-1;1;-5;4]| as shown to the right.
+Then execute \verb|norm(b)| and find that \script\ reports \verb|ans = 6.5574|
+&\begin{verbatim}
+>> b=[-1;1;-5;4]
+b =
+  -1
+   1
+  -5
+   4
+>> norm(b)
+ans =  6.5574
+\end{verbatim}
+\end{tabular}
+\setbox\ajrqrbox\hbox{\qrcode{% vector length
+b=[-1;1;-5;4]
+norm(b)
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+
+Hence \(6.5574\) is the length of~\((-1,1,-5,4)\) (to five significant digits which we take to be practically exact).
+\end{solution}
+
+\item \((-0.3,4.3,-2.5,-2.8,7,-1.9)\)
+\begin{solution} 
+In \script:
+\begin{enumerate}
+\item assign the vector with the command\\ 
+\verb|c=[-0.3;4.3;-2.5;-2.8;7;-1.9]|
+\item execute \verb|norm(c)| and find that \script\ reports \verb|ans = 9.2347|
+\end{enumerate}
+\setbox\ajrqrbox\hbox{\qrcode{% vector length
+c=[-0.3;4.3;-2.5;-2.8;7;-1.9]
+norm(c)
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+Hence the length of vector~\((-0.3,4.3,-2.5,-2.8,7,-1.9)\) is~\(9.2347\) (to five significant digits).
+\end{solution}
+
+\end{enumerate}
+\end{example}
+
+
+
+
+
+
+\begin{example} \label{eg:}
+Use \script\ operators \index{+,-,*@\texttt{+,-,*}}\verb|+,-,*| to compute the value of the expressions \(\uv+\vv\), \(\uv-\vv\), \(3\uv\) for vectors \(\uv=(-4.1,1.7,4.1)\) and \(\vv=(2.9,0.9,-2.4)\) (\autoref{def:vecops}).
+\begin{solution}  In \script\ type the commands, each followed by Return\slash Enter key.
+\setbox\ajrqrbox\hbox{\qrcode{% vector ops
+u=[-4.1;1.7;4.1]
+v=[2.9;0.9;-2.4]
+u+v
+u-v
+3*u
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}% 
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign the named vectors with the commands \verb|u=[-4.1;1.7;4.1]| and \verb|v=[2.9;0.9;-2.4]| to see the two steps in the dialogue to the right.
+&\begin{verbatim}
+>> u=[-4.1;1.7;4.1]
+u =
+  -4.1000
+   1.7000
+   4.1000
+>> v=[2.9;0.9;-2.4]
+v =
+   2.9000
+   0.9000
+  -2.4000
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Execute \verb|u+v| to find from the dialogue on the right that the sum \(\uv+\vv=(-1.2,2.6,1.7)\).
+&\begin{verbatim}
+>> u+v
+ans =
+  -1.2000
+   2.6000
+   1.7000
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Execute \verb|u-v| to find from the dialogue on the right that the difference \(\uv-\vv=(-7,0.8,6.5)\).
+&\begin{verbatim}
+>> u-v
+ans =
+  -7.0000
+   0.8000
+   6.5000
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Execute \verb|3*u| to find from the dialogue on the right that the scalar multiple \(3\uv=(-12.3,5.1,12.3)\)  (the asterisk is essential to compute multiplication).
+&\begin{verbatim}
+>> 3*u
+ans =
+  -12.3000
+    5.1000
+   12.3000
+\end{verbatim}
+\end{tabular}
+
+\end{solution}
+\end{example}
+
+
+
+
+\begin{example} \label{eg:}
+Use \script\ to confirm that \(2(2\pv-3\qv)+6(\qv-\pv)=-2\pv\) for vectors \(\pv=(1,0,2,-6)\) and \(\qv=(2,4,3,5)\).
+\begin{solution} 
+In \script\
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign the first vector with \verb|p=[1;0;2;-6]| as shown to the right.
+&\begin{verbatim}
+>> p=[1;0;2;-6]
+p =
+   1
+   0
+   2
+  -6
+\end{verbatim}
+\end{tabular}
+\setbox\ajrqrbox\hbox{\qrcode{% vector ops
+p=[1;0;2;-6]
+q=[2;4;3;5]
+2*(2*p-3*q)+6*(q-p)
+ans+2*p
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}% 
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign the other vector with \verb|q=[2;4;3;5]|.
+&\begin{verbatim}
+>> q=[2;4;3;5]
+q =
+   2
+   4
+   3
+   5
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Compute \(2(2\pv-3\qv)+6(\qv-\pv)\) with the command \verb|2*(2*p-3*q)+6*(q-p)| as shown to the right, and see the result is evidently~\(-2\pv\).
+&\begin{verbatim}
+>> 2*(2*p-3*q)+6*(q-p)
+ans =
+   -2
+    0
+   -4
+   12
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Confirm it is~\(-2\pv\) by adding~\(2\pv\) to the above result with the command \verb|ans+2*p| as shown to the right, and see the zero vector result.
+&\begin{verbatim}
+>> ans+2*p
+ans =
+   0
+   0
+   0
+   0
+\end{verbatim}
+\end{tabular}
+
+\end{solution}
+\end{example}
+
+
+
+
+\begin{example} \label{eg:}
+Use \script\ to confirm the commutative law (\autoref{thm:vecopsa}) \(\uv+\vv=\vv+\uv\) for vectors
+\(\uv=(8,-6,-4,-2)\) and \(\vv=(4,3,-1)\).
+\begin{solution} 
+In \script\
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign \(\uv=(8,-6,-4,-2)\)  with command \verb|u=[8;-6;-4;-2]| as shown to the right.
+&\begin{verbatim}
+>> u=[8;-6;-4;-2]
+u =
+   8
+  -6
+  -4
+  -2
+\end{verbatim}
+\end{tabular}
+\setbox\ajrqrbox\hbox{\qrcode{% bad vectors
+u=[8;-6;-4;-2]
+v=[4;3;-1]
+u+v
+size(u)
+size(v)
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}% 
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign \(\vv=(4,3,-1)\) with the command \verb|v=[4;3;-1]|.
+&\begin{verbatim}
+>> v=[4;3;-1]
+v =
+   4
+   3
+  -1
+\end{verbatim}
+\end{tabular}
+
+\index{Error using@\texttt{Error using}}
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Compute \(\uv+\vv\) with the command \verb|u+v| as shown to the right.
+\script[1] prints an error message because the vectors~\uv\ and~\vv\ are of different sizes and so cannot be added together.
+&\begin{verbatim}
+>> u+v
+Error using  + 
+Matrix dimensions must agree. 
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Check the sizes of the vectors in the sum using \verb|size(u)| and \verb|size(v)| to confirm \(\uv\)~is in~\(\RR^4\) whereas \(\vv\)~is in~\(\RR^3\).
+Hence the two vectors cannot be added (\autoref{def:vecops}).
+&\begin{verbatim}
+>> size(u)
+ans =
+   4   1
+>> size(v)
+ans =
+   3   1 
+\end{verbatim}
+\end{tabular}
+
+\index{error:@\texttt{error:}}
+Alternatively, \script[2] gives the following error message in which ``\idx{nonconformant arguments}'' means of wrong sizes.
+\begin{verbatim}
+error: operator +: nonconformant arguments 
+(op1 is 4x1, op2 is 3x1)
+\end{verbatim}
+\end{solution}
+\end{example}
+
+
+
+
+\begin{activity}
+You enter the two vectors into \script[1]\ by typing \verb|u=[1.1;3.7;-4.5]| and \verb|v=[1.7;0.6;-2.6]|.
+\begin{itemize}
+\item Which of the following is the result of typing the command \verb|u-v|?
+\actposs{\tt\begin{tabular}r
+   -0.6000\\
+    3.1000\\
+   -1.9000
+\end{tabular}}{\tt\begin{tabular}r
+    2.8000\\
+    4.3000\\
+   -7.1000
+\end{tabular}}{\tt\begin{tabular}{p{9em}}
+Error using  * \\
+Inner matrix dimensions must agree. 
+\end{tabular}}{\tt\begin{tabular}r
+    2.2000\\
+    7.4000\\
+   -9.0000
+\end{tabular}}
+%\begin{parts} 
+%\item \tt\begin{tabular}r
+%    2.8000\\
+%    4.3000\\
+%   -7.1000
+%\end{tabular}
+%\item\actans \tt\begin{tabular}r
+%   -0.6000\\
+%    3.1000\\
+%   -1.9000
+%\end{tabular}
+%\item \tt\begin{tabular}{p{9em}}
+%Error using  * \\
+%Inner matrix dimensions must agree. 
+%\end{tabular}
+%\item \tt\begin{tabular}r
+%    2.2000\\
+%    7.4000\\
+%   -9.0000
+%\end{tabular}
+%\end{parts}
+\item Which is the result of typing the command \verb|2*u|? %d
+\item Which is the result of typing the command \verb|u*v|? %c
+\end{itemize}
+\end{activity}
+
+
+
+
+
+
+\begin{example} \label{eg:}
+Use \script\ to compute the angles between the pair of vectors \((4,3)\) and \((5,12)\) (\autoref{thm:anglev}).
+\begin{solution} In \script
+
+\begin{tabular}{@{}p{0.34\linewidth}p{0.6\linewidth}@{}}\raggedright
+Because each vector is used twice in the formula \(\cos\theta=(\uv\cdot\vv)/(|\uv||\vv|)\), give each a name as shown to the right.
+&\begin{verbatim}
+>> u=[4;3]
+u =
+   4
+   3
+>> v=[5;12]
+v =
+    5
+   12
+\end{verbatim}
+\end{tabular}
+\setbox\ajrqrbox\hbox{\qrcode{% vector angle
+u=[4;3]
+v=[5;12]
+cost=dot(u,v)/norm(u)/norm(v)
+theta=acos(cost)*180/pi
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}% 
+
+\begin{tabular}{@{}p{0.34\linewidth}p{0.6\linewidth}@{}}\raggedright
+Then invoke \verb|dot()| to compute the dot product in the formula for the cosine of the angle.
+&\begin{verbatim}
+>> cost=dot(u,v)/norm(u)/norm(v)
+cost =  0.8615
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}p{0.34\linewidth}p{0.6\linewidth}@{}}\raggedright
+Lastly, invoke \verb|acos()| for the arc-cosine, then convert the radians to degrees to find the angle \(\theta=30.510^\circ\).
+&\begin{verbatim}
+>> theta=acos(cost)*180/pi
+theta =  30.510
+\end{verbatim}
+\end{tabular}
+
+\end{solution}
+\end{example}
+
+
+
+
+\begin{example} \label{eg:}
+Verify the distributive law for the dot product \((\uv+\vv)\cdot\wv=\uv\cdot\wv+\vv\cdot\wv\) (\autoref{thm:dotopsf}) for vectors
+\(\uv=(-0.1,-3.1,-2.9,-1.3)\), \(\vv=(-3,0.5,6.4,-0.9)\) and \(\wv=(-1.5,-0.2,0.4,-3.1)\).
+\begin{solution} 
+In \script\
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign vector \(\uv=(-0.1,-3.1,-2.9,-1.3)\)  with the command \verb|u=[-0.1;-3.1;-2.9;-1.3]| as shown to the right.
+&\begin{verbatim}
+>> u=[-0.1;-3.1;-2.9;-1.3]
+u =
+  -0.1000
+  -3.1000
+  -2.9000
+  -1.3000
+\end{verbatim}
+\end{tabular}
+\setbox\ajrqrbox\hbox{\qrcode{% dot distributive
+u=[-0.1;-3.1;-2.9;-1.3]
+v=[-3;0.5;6.4;-0.9]
+w=[-1.5;-0.2;0.4;-3.1]
+dot(u+v,w)
+dot(u,w)+dot(v,w)
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}% 
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign vector \(\vv=(-3,0.5,6.4,-0.9)\)  with the command \verb|v=[-3;0.5;6.4;-0.9]| as shown to the right.
+&\begin{verbatim}
+>> v=[-3;0.5;6.4;-0.9]
+v =
+  -3.0000
+   0.5000
+   6.4000
+  -0.9000
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Assign vector \(\wv=(-1.5,-0.2,0.4,-3.1)\)  with the command \verb|w=[-1.5;-0.2;0.4;-3.1]| as shown to the right.
+&\begin{verbatim}
+>> w=[-1.5;-0.2;0.4;-3.1]
+w =
+  -1.5000
+  -0.2000
+   0.4000
+  -3.1000
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Compute the dot product \((\uv+\vv)\cdot\wv\)  with the command \verb|dot(u+v,w)| to find the answer is~\(13.390\).
+&\begin{verbatim}
+>> dot(u+v,w)
+ans =  13.390
+\end{verbatim}
+\end{tabular}
+
+\begin{tabular}{@{}*2{p{0.47\linewidth}}@{}}\raggedright
+Compare this with the dot product expression \(\uv\cdot\wv+\vv\cdot\wv\)  via the command \verb|dot(u,w)+dot(v,w)| to find the answer is~\(13.390\).
+&\begin{verbatim}
+>> dot(u,w)+dot(v,w)
+ans =  13.390
+\end{verbatim}
+\end{tabular}
+
+That the two answers agree verifies the distributive law for dot products.
+\end{solution}
+\end{example}
+
+
+
+\begin{activity}
+Given two vectors~\uv\ and~\vv\ that have already been typed into \script,
+which of the following expressions could check the identity that \((\uv-2\vv)\cdot(\uv+\vv)=\uv\cdot\uv-\uv\cdot\vv-2\vv\cdot\vv\)\,?
+\actposs[1]{\tt dot(u-2*v,u+v)-dot(u,u)+dot(u,v)+2*dot(v,v)}
+{\tt (u-2*v)*(u+v)-u*u+u*v+2*v*v}
+{\tt dot(u-2v,u+v)-dot(u,u)+dot(u,v)+2dot(v,v)}
+{None of the others}
+%\begin{enumerate}
+%\item \verb|(u-2*v)*(u+v)-u*u+u*v+2*v*v|
+%\item\actans \verb|dot(u-2*v,u+v)-dot(u,u)+dot(u,v)+2*dot(v,v)|
+%\item \verb|dot(u-2v,u+v)-dot(u,u)+dot(u,v)+2dot(v,v)|
+%\item None of the others.
+%\end{enumerate}
+\end{activity}
+
+
+
+
+Many other books \cite[\S\S1.1--3, e.g.]{Quarteroni2006} give more details about the basics than the essentials introduced here.
+
+
+
+
+\begin{quoted}{Charles Babbage}\index{Babbage, Charles}%
+On two occasions I have been asked [by members of 
+Parliament!], ``Pray, Mr.~Babbage, if you put into the machine wrong figures, will the right answers come out?''
+
+I am not able rightly to apprehend the kind of confusion of ideas that could provoke such a question.
+\end{quoted}
+
+
+\index{Matlab|)}
+\index{Octave|)}
+
+
+\subsection{Exercises}
+
+
+\begin{exercise} \label{ex:} 
+Use \script\ to compute the length of each of the following vectors (the first five have integer lengths).
+\begin{parts}[6em]
+\item \(\begin{bmatrix} 2\\3\\6 \end{bmatrix}\)
+\answer{\(7\)}
+\item \(\begin{bmatrix} 4\\-4\\7 \end{bmatrix}\)
+\answer{\(9\)}
+\item \(\begin{bmatrix} -2\\6\\9 \end{bmatrix}\)
+\answer{\(11\)}
+\item \(\begin{bmatrix} 0.5\\0.1\\-0.5\\0.7 \end{bmatrix}\)
+\answer{\(1\)}
+\item \(\begin{bmatrix} 8\\-4\\5\\-8 \end{bmatrix}\)
+\answer{\(13\)}
+\item \(\begin{bmatrix} 1.1\\1.7\\-4.2\\-3.8\\0.9 \end{bmatrix}\)
+\answer{\(6.0819\)}
+\item \(\begin{bmatrix} 2.6\\-0.1\\3.2\\-0.6\\-0.2 \end{bmatrix}\)
+\answer{\(4.1725\)}
+\item \(\begin{bmatrix} 1.6\\-1.1\\-1.4\\2.3\\-1.6 \end{bmatrix}\)
+\answer{\(3.6851\)}
+\end{parts}
+\end{exercise}
+
+
+
+\begin{exercise} \label{ex:} 
+Use \script\ to determine which are wrong out of the following identities and relations for vectors \(\pv=(0.8,-0.3,1.1,2.6,0.1)\) and \(\qv=(1,2.8,1.2,2.3,2.3)\).
+\begin{parts}
+\item \(3(\pv-\qv)=3\pv-3\qv\)
+\item \(2(\pv-3\qv)+3(2\qv-\pv)=\pv\)
+\item \(\frac12(\pv-\qv)+\frac12(\pv+\qv)=\pv\)
+\item \(|\pv+\qv|\leq|\pv|+|\qv|\)
+\item \(|\pv-\qv|\leq|\pv|+|\qv|\)
+\item \(|\pv\cdot\qv|\leq|\pv||\qv|\)
+\end{parts}
+\end{exercise}
+
+
+
+
+
+\begin{exercise} \label{ex:} 
+Use \script\ to find the angles between pairs of vectors in each of the following groups.
+\begin{enumerate}\sloppy
+\item \(\pv=(2,3,6)\), \(\qv=(6,2,-3)\), \(\rv=(3,-6,2)\)
+\answer{They are all orthogonal.}
+
+\item \(\uv=\begin{bmatrix}-1\\-7\\-1\\-7\end{bmatrix}\), \(\vv=\begin{bmatrix}-1\\4\\4\\4\end{bmatrix}\), \(\wv=\begin{bmatrix}1\\-4\\-4\\-4\end{bmatrix}\)
+\setbox\ajrqrbox\hbox{\qrcode{%
+u=[-1;-7;-1;-7]
+v=[-1;4;4;4]
+w=[1;-4;-4;-4]}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+\answer{\(\theta_{uv}=147.44^\circ\), \(\theta_{uw}=32.56^\circ\), \(\theta_{vw}=180^\circ\)}
+
+\item \(\uv=\begin{bmatrix}5\\1\\-1\\3\end{bmatrix}\), \(\vv=\begin{bmatrix}-6\\4\\2\\-5\end{bmatrix}\), \(\wv=\begin{bmatrix}-4\\2\\1\\-2\end{bmatrix}\)
+\setbox\ajrqrbox\hbox{\qrcode{%
+u=[5;1;-1;3]
+v=[-6;4;2;-5]
+w=[-4;2;1;-2]}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+\answer{\(\theta_{uv}=142.78^\circ\), \(\theta_{uw}=146.44^\circ\), \(\theta_{vw}=12.10^\circ\)}
+
+\item \(\uv=\begin{bmatrix}-9\\-8\\4\\8\end{bmatrix}\), \(\vv=\begin{bmatrix}9\\3\\1\\-3\end{bmatrix}\), \(\wv=\begin{bmatrix}-6\\5\\-2\\-4\end{bmatrix}\)
+\setbox\ajrqrbox\hbox{\qrcode{%
+u=[-9;-8;4;8]
+v=[9;3;1;-3]
+w=[-6;5;-2;-4]}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+\answer{\(\theta_{uv}=146.44^\circ\), \(\theta_{uw}=101.10^\circ\), \(\theta_{vw}=108.80^\circ\)}
+
+\item \(\av=\begin{bmatrix}-4.1\\9.8\\0.3\\1.4\\2.7\end{bmatrix}\), \(\bv=\begin{bmatrix}-0.6\\2.6\\-1.2\\-0.2\\-0.9\end{bmatrix}\), \(\cv=\begin{bmatrix}-2.8\\-0.9\\-6.2\\-2.3\\-4.7\end{bmatrix}\), \(\dv=\begin{bmatrix}1.8\\-3.4\\-8.6\\1.4\\1.8\end{bmatrix}\)
+\setbox\ajrqrbox\hbox{\qrcode{%
+a=[-4.1;9.8;0.3;1.4;2.7]
+b=[-0.6;2.6;-1.2;-0.2;-0.9]
+c=[-2.8;-0.9;-6.2;-2.3;-4.7]
+d=[1.8;-3.4;-8.6;1.4;1.8]
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+\answer{\(\theta_{ab}=42.82^\circ\), \(\theta_{ac}=99.11^\circ\), \(\theta_{ad}=109.89^\circ\), \(\theta_{bc}=64.32^\circ\), \(\theta_{bd}=92.89^\circ\), \(\theta_{cd}=61.70^\circ\)}
+
+
+\item \(\av=\begin{bmatrix}-0.5\\2.0\\-3.4\\1.8\\0.1\end{bmatrix}\), \(\bv=\begin{bmatrix}5.4\\7.4\\0.5\\0.7\\1.3\end{bmatrix}\), \(\cv=\begin{bmatrix} -0.2\\-1.5\\-0.3\\1.1\\2.5\end{bmatrix}\), \(\dv=\begin{bmatrix}1.0\\2.0\\-1.3\\-4.4\\-2.0\end{bmatrix}\)
+\setbox\ajrqrbox\hbox{\qrcode{%
+a=[-0.5;2.0;-3.4;1.8;0.1]
+b=[5.4;7.4;0.5;0.7;1.3]
+c=[ -0.2;-1.5;-0.3;1.1;2.5]
+d=[1.0;2.0;-1.3;-4.4;-2.0]
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+\answer{\(\theta_{ab}=73.11^\circ\), \(\theta_{ac}=88.54^\circ\), \(\theta_{ad}=90.48^\circ\), \(\theta_{bc}=106.56^\circ\), \(\theta_{bd}=74.20^\circ\), \(\theta_{cd}=137.36^\circ\)}
+
+\end{enumerate}
+\end{exercise}
+
+
+
+
+
+\begin{comment}%{ED498555.pdf}
+why, what caused X?
+how did X occur?
+what-if? what-if-not?
+how does X compare with Y?
+what is the evidence for X?
+why is X important?
+\end{comment}
+
+
+

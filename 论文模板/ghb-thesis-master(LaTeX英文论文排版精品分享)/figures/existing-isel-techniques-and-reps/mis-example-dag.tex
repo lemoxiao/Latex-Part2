@@ -1,0 +1,121 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize%
+\setlength{\nodeDist}{20pt}%
+\pgfdeclarelayer{background1}%
+\pgfdeclarelayer{background2}%
+\pgfdeclarelayer{background3}%
+\pgfsetlayers{background3,background2,background1,main}%
+\begin{tikzpicture}[%
+    value node/.style={%
+      computation node,
+    },
+    outer match node/.style={%
+      match node,
+      draw=none,
+      inner sep=0,
+    },
+  ]
+
+  % Graph
+  \node [computation node] (add) {\nAdd};
+  \node [value node, position=-135 degrees from add] (a) {\nVar{a}};
+  \node [value node, position=- 45 degrees from add] (b) {\nVar{b}};
+  \node [computation node, position=135 degrees from add]
+        (mul) {\nMul};
+  \node [value node, position=45 degrees from add]
+        (load) {\nLoad};
+  \node [value node, position=-135 degrees from mul] (c) {\nVar{c}};
+  \begin{scope}[data flow]
+    \draw (a) -- (add);
+    \draw (b) -- (add);
+    \draw (add) -- (mul);
+    \draw (add) -- (load);
+    \draw (c) -- (mul);
+  \end{scope}
+
+  % Matches
+  \begin{pgfonlayer}{background1}
+    \node [match node, fill=shade2, fit=(a)] (m1) {};
+    \node [match node, fill=shade2, fit=(b)] (m2) {};
+    \node [match node, fill=shade2, fit=(c)] (m3) {};
+    \node [match node, fill=shade2, fit=(add)] (m4) {};
+    \node [match node, fill=shade2, fit=(mul)] (m5) {};
+    \node [match node, fill=shade1, fit=(load)] (m7) {};
+    % m6
+    \begin{pgfonlayer}{background2}
+      \node [outer match node, inner sep=-1pt, fit=(m5)] (m6a) {};
+      \node [outer match node, inner sep=-1pt, fit=(m4)] (m6b) {};
+      \draw [match line, bend left=45, fill=shade1]
+            (m6a.south west)
+            to
+            (m6a.north west)
+            to
+            (m6a.north east)
+            -- coordinate [pos=0] (m6)
+            (m6b.north east)
+            to
+            (m6b.south east)
+            to
+            (m6b.south west)
+            --
+            cycle;
+    \end{pgfonlayer}
+    % m8
+    \begin{pgfonlayer}{background3}
+      \node [outer match node, inner sep=-1pt, fit=(m7)] (m8a) {};
+      \node [outer match node, inner sep=1pt, fit=(m4)] (m8b) {};
+      \draw [match line, bend left=45, fill=shade3]
+            (m8a.north west)
+            to
+            (m8a.north east)
+            to
+            (m8a.south east)
+            -- coordinate [pos=.25] (m8)
+            (m8b.south east)
+            to
+            (m8b.south west)
+            to
+            (m8b.north west)
+            --
+            cycle;
+    \end{pgfonlayer}
+    % Fill in overdrawn edges of m8
+    \begin{pgfonlayer}{background2}
+      \draw [match line, bend left=45]
+            (m8a.north west)
+            to
+            (m8a.north east)
+            to
+            (m8a.south east)
+            --
+            (m8b.south east)
+            to
+            (m8b.south west)
+            to
+            (m8b.north west)
+            --
+            cycle;
+    \end{pgfonlayer}
+  \end{pgfonlayer}
+
+  % Match labels
+  \node [match label, below=of m1] (m1l) {$m_1$};
+  \node [match label, below=of m2] (m2l) {$m_2$};
+  \node [match label, below=of m3] (m3l) {$m_3$};
+  \node [match label, below=of m4] (m4l) {$m_4$};
+  \node [match label, left=of m5] (m5l) {$\strut m_5$};
+  \node [match label, position=45 degrees from m6, outer sep=-.5pt] (m6l)
+        {$m_6$};
+  \node [match label, right=of m7] (m7l) {$\strut m_7$};
+  \node [match label, position=-45 degrees from m8] (m8l) {$m_8$};
+  \foreach \i in {1, ..., 8} {
+    \draw [match attachment line] (m\i) -- (m\i l);
+  }
+\end{tikzpicture}%
+\endgroup%

@@ -1,0 +1,280 @@
+\immediate\write-1{version 2007-4-18}
+
+\exit:ifnot{amsmath,% 
+array,% 
+fontmath,% 
+latex,% 
+plain,% 
+tex4ht}
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                \ConfigureHinput{amsmath}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Configure{TITLE}{\Protect\IgnorePar\NoFonts
+      \HCode{<title>}}{\HCode{</title>\Hnewline}\EndNoFonts}
+\Configure{@TITLE}{\def\LaTeX{LaTeX}\let\fontencoding\:gobble
+	\def\i{i}
+	\def\'{}\def\v{}\def\r{}
+  \let\fontfamily\:gobble \let\fontseries\:gobble
+  \let\fontshape\:gobble  \let\usefont\:gobbleIV  }
+
+\def\fbox#1{\HCode{<mytable><tr><td>}#1\HCode{</td></tr></mytable>}}
+\Css{mytable {display: table; background:rgb(230,230,230); border:1}}
+
+\Configure{'}
+   {\let\:primes=\empty}
+   {\relax \csname SUB:prime\endcsname\sp{%
+      \global\let\SUB:prime=\:UnDef
+              \,{\HCode{\:primes}}}%
+   }
+   {\let\prime=\relax \xdef\:primes{\:primes\prime}}
+
+\Css{.head{color:red; font-variant: small-caps; }}
+
+\ConfigureEnv {definice}
+{\HCode{<table style="background-color: rgb(255, 204,204); width: 100\%;" 
+    border="4" cellpadding="10" frame="border"
+    rules="none"
+    >
+    <tbody>
+    <tr>
+    <td>}} {\HCode{</td>
+    </tr>
+    </tbody>
+    </table>}}
+{} {}
+
+\Configure{charset}{iso-8859-2} 
+
+\ConfigureEnv {veta}
+{\HCode{<table style="background-color: rgb(255, 255, 153); width: 100\%;"
+    border="4" cellpadding="10" frame="border"
+    rules="none"
+    >
+    <tbody>
+    <tr>
+    <td>}} {\HCode{</td>
+    </tr>
+    </tbody>
+    </table>}}
+{} {}
+
+\Configure{textbf}{}{}
+
+\NewConfigure{obrazek}[2]{\def\pred{#1}\def\za{#2}}
+\def\obrazek#1{{%
+    \let\Omega\oriOmega
+    \let\varphi\oriphi
+    \let\phi\oriphi
+    \let\lim\orilim 
+    \let\to\orito 
+    \let\infty\oriinfty 
+    \let\cdot\oricdot
+    \let\pm\oripm
+    \let\xi\orixi 	
+    \pred#1\za}}
+\Configure{obrazek}{\Picture+{}}{\EndPicture}
+
+\NewConfigure{blokobrazek}[2]{\def\pred{#1}\def\za{#2}}
+\def\blokobrazek#1{{%
+    \let\Omega\oriOmega
+    \let\varphi\oriphi
+    \let\phi\oriphi
+    \let\lim\orilim 
+    \let\to\orito 
+    \let\infty\oriinfty 
+    \let\cdot\oricdot
+    \let\pm\oripm
+    \let\xi\orixi 	
+    \pred\begin{minipage}{8cm}\large #1\end{minipage}\za}}
+\Configure{blokobrazek}{\Picture+{}}{\EndPicture}
+
+\Configure{crosslinks}
+{ }{ }{$\scriptstyle\Rightarrow$}
+{$\scriptstyle\Leftarrow$}
+{}{}{}{$\scriptstyle\Uparrow$} 
+
+
+\Configure{array}
+   {\HCode{\string\array\csname l:brace\endcsname\Hnewline}}
+   {\ifvmode \IgnorePar\fi \HCode{\csname r:brace\endcsname}}
+   {\ifnum \HRow> 1\HCode{\string\cr\Hnewline}\fi}
+   {}
+   {\HCode{\ifnum \HCol>1 & \fi}}
+   {}
+
+
+%%%% modified \:tempc from mathltx.4ht
+%%%% changed matrix into eqalignno
+\def\:tempcc#1#2{%
+   \ConfigureEnv{#1}
+     {\def\end:al:env{}\ifmmode\else
+       \ifvmode\else \def\end:al:env{\par\ShowPar\IgnoreIndent}\fi\fi}
+     {\end:al:env }
+     {}{}%
+   \Configure{#1}
+   {\IgnorePar
+    \ifvmode \EndP  \else \EndP  \HCode{<!--tex4ht:inline-->}\fi
+    \ifmathltx
+       \Tg<mrow>\def\end:mathalign{\Tg</mrow>}%
+    \else
+       \Configure{@math}{div}\DviMath
+       \def\end:mathalign{\EndDviMath \DisplayMathfalse}%
+       \DisplayMathtrue
+    \fi
+    \HCode{\string\eqalignno\l:brace}}
+   {\HCode{\r:brace}\end:mathalign }
+   {\ifnum \HRow> 1\HCode{\string\cr\Hnewline}\fi}  {}
+   {\HCode{\ifnum \HCol>1 \string&\fi
+  \ifnum 1<\HMultispan
+%     \string\multicolumn\l:brace\HMultispan\r:brace
+     %\string\multispan
+?span/multispan-in-jsmath?
+ \space\HMultispan\space
+  \fi}%
+%
+    \ifnum \HCol>\maxfields@  \HCode{\ifodd\HCol\space\else
+   \string\kern \space 0em\space
+\fi
+}\fi}
+   {\HCode{\ifodd\HCol\space\else
+   \string\kern \space 0em\space
+\fi
+}}}
+
+\:tempcc{align}{align}
+\:tempcc{align*}{align*}
+
+
+%%%% this puts \displaystyle into every mathematical material
+\Configure{$} 
+   {\Configure{@math}{span}\DviMath\HCode{\displaystyle\l:brace}}
+   {\HCode{\r:brace}\EndDviMath}
+   {}
+
+% \NewConfigure{in}[1]{\def\in:marik{#1}}
+% \def\in{\in:marik}
+% \Configure{in}{\HCode{\string\in }\HCode{ }}
+
+% \NewConfigure{int}[1]{\def\int:marik{#1}}
+% \def\int{\int:marik}
+% \Configure{int}{\HCode{\string\int }\HCode{ }}
+
+% \NewConfigure{leq}[1]{\def\leq:marik{#1}}
+% \def\int{\leq:marik}
+% \Configure{int}{\HCode{\string\leq }\HCode{ }}
+
+\def\R{\HCode{\string\mathbb\l:brace R\r:brace}}
+\def\N{\HCode{\string\mathbb\l:brace N\r:brace}}
+\def\Z{\HCode{\string\mathbb\l:brace Z\r:brace}}
+\def\E{\HCode{\string\mathbb\l:brace E\r:brace}}
+\def\implies{\HCode{\string\Rightarrow }\HCode{ }}
+\def\tg{\HCode{\string\tan }\HCode{ }}
+\def\arctg{\HCode{\string\arctan }\HCode{ }}
+
+\let\orilim\lim 
+\let\orito\to
+\let\orifrac\frac
+\let\oriinfty\infty
+\let\oricdot\cdot
+\let\oripm\pm
+\let\orixi\xi
+\let\oriOmega\Omega
+\let\oriphi\varphi
+
+\def\partial{\HCode{\string\partial\string\, }\HCode{ }}
+\def\pi{\HCode{\string\pi }\HCode{ }}
+\def\leq{\HCode{\string\leq }\HCode{ }}
+\def\geq{\HCode{\string\geq }\HCode{ }}
+\def\in{\HCode{\string\in }\HCode{ }}
+\def\int{\HCode{\string\int }\HCode{ }}
+\def\iint{\HCode{\string\int\string\int }\HCode{ }}
+\def\lim{\HCode{\string\lim }\HCode{ }} 
+\def\cdots{\HCode{\string\cdots }\HCode{ }}
+\def\mu{\HCode{\string\mu }\HCode{ }}
+%%%%% short form for the above commands:
+\def\:tempcc#1{\def#1{\HCode{\string#1 }\HCode{ }}}
+\:tempcc\times
+\:tempcc\subseteq
+\:tempcc\phi
+\:tempcc\varphi
+\:tempcc\sigma
+\:tempcc\xi
+\:tempcc\nu
+\:tempcc\sum
+\:tempcc\infty
+\:tempcc\pm
+\:tempcc\equiv
+\:tempcc\approx
+\:tempcc\to
+\:tempcc\cup
+\:tempcc\cdot
+\:tempcc\ln
+\:tempcc\log
+\:tempcc\sin
+\:tempcc\cos
+\:tempcc\arcsin
+\:tempcc\arccos
+\:tempcc\Longleftrightarrow
+\:tempcc\Rightarrow
+\:tempcc\Leftarrow
+\:tempcc\Uparrow
+\:tempcc\not
+\:tempcc\neq
+\:tempcc\epsilon
+\:tempcc\varepsilon
+\:tempcc\alpha
+\:tempcc\beta
+\:tempcc\Delta
+\:tempcc\Phi
+\:tempcc\Omega
+\:tempcc\setminus
+\:tempcc\rho
+
+
+
+\Configure{SUB}
+   {\Send{BACK}
+     {}\HCode{\string_\l:brace}\trap:base}
+   {\HCode{\r:brace}}
+\Configure{SUP}
+   {\Send{BACK}
+      {}\HCode{\string^\l:brace}\trap:base}
+   {\HCode{\r:brace}}
+\Configure{SUBSUP}
+   {\Send{BACK}
+      {}\HCode{\string_\l:brace}\trap:base}
+   {\HCode{\r:brace\string^\l:brace}\trap:base}
+   {\HCode{\r:brace}}
+\def\trap:base{{\HCode{}}}
+ 
+\def\:temp#1{\a:underbrace \mathop{\hbox{$\b:underbrace
+      \o:underbrace:{#1}\c:underbrace$}}\limits}
+\HLet\underbrace\:temp
+\NewConfigure{underbrace}{3}
+
+\Configure{underbrace}
+{\HCode{\string\underbrace}\Configure{mathop*}{*}{}{}
+  {\Configure{mathop}{}{}{}{}
+}%
+}
+{\let\o:underbrace:=\displaystyle}
+{}
+
+
+\Configure{jsmath}{../jsMath/jsMath.js}
+
+
+%%%% we write \phi for \varphi
+\let\phi\varphi
+\let\epsilon\varepsilon
+\let\eps\varepsilon
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+\endinput\empty\empty\empty\empty\empty\empty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+

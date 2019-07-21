@@ -1,0 +1,582 @@
+
+\section{不等式}
+\label{sec:some-important-inequation}
+
+本节叙述一些在初等数学领域非常重要的不等式\footnote{这一节主要参考了文献\cite{contest-math-course}和\cite{caculus-course}以及\cite{olympic-math}.}，这些不等式应用广泛，刻画的不等式关系非常深刻。
+
+\subsection{绝对值不等式}
+\label{sec:absolute-value-inequality}
+
+\begin{theorem}
+  对于任意两个实数$a$和$b$，成立 $|a+b| \leqslant |a| + |b|$，等号成立的充分必要条件是$ab \geqslant 0$.
+\end{theorem}
+
+证明很简单，略去。
+
+\begin{inference}
+  对于任意两个实数$a$和$b$，成立不等式$||a|-|b|| \leqslant |a+b| \leqslant |a| + |b|$，左边取等的条件是$ab \leqslant 0$，右边取等条件是$ab \geqslant 0$。
+\end{inference}
+
+\begin{proof}[证明]
+  只需证明左边，因为$|a|=|(a+b)-b| \leqslant |a+b| + |b|$，所以$|a|-|b| \leqslant |a+b|$，类似还可得到$|b|-|a| \leqslant |a+b|$，所以$||a|-|b|| \leqslant |a+b|$。
+\end{proof}
+
+\begin{example}
+  对于任意非零实数$x$，成立不等式$\left| x+\frac{1}{x} \right| \geqslant 2$.
+
+  最简单的证明就是由两项同号，有$\left| x+\frac{1}{x} \right| = |x|+\frac{1}{|x|} \geqslant 2$，这里利用了二元均值不等式。
+\end{example}
+
+\begin{inference}
+  对于任意$n$个实数$a_i(i=1,2,\ldots,n)$，成立不等式$|a_1+a_2+\cdots+a_n| \leqslant |a_1| + |a_2| + \cdots + |a_n|$。
+\end{inference}
+
+\subsection{伯努利不等式}
+\label{sec:bernoulli-inequality}
+
+伯努利不等式是几个相关联的不等式的统称。
+
+\begin{theorem}
+  \label{theorem:bernoulli-inequality-multipli-many-number}
+  设$n$个实数$x_i(i=1,2,\ldots,n)$都满足$x_i>-1$并且都具有相同的符号（可以有零），则有不等式
+  \[ (1+x_1)(1+x_2)\cdots(1+x_n) \geqslant 1+x_1+x_2+\cdots+x_n \]
+\end{theorem}
+
+\begin{proof}[证明]
+  按数学归纳法，显然$n=1$时不等式是成立的，假设它对$n$个实数也成立，那么对于$n+1$个实数的情形，有
+  \begin{eqnarray*}
+    && (1+x_1)(1+x_2)\cdots(1+x_n)(1+x_{n+1}) \\
+    &\geqslant & (1+x_1+x_2+\cdots+x_n)(1+x_{n+1}) \\
+    &= & 1+x_1+x_2+\cdots+x_n+x_{n+1} + x_{n+1}(x_1+x_2+\cdots+x_n) \\
+    &\geqslant & 1+x_1+x_2+\cdots+x_n+x_{n+1}
+  \end{eqnarray*}
+  其中最后一个大于等于是因为诸$x_i$同号而得。
+\end{proof}
+
+在上述定理中令诸$x_i$相等，就得下面定理
+\begin{theorem}
+  \label{theorem:bernoulli-inequality-power}
+  设实数$x \geqslant -1$，则对任意正整数$n$成立不等式
+  \begin{equation}
+    \label{eq:bernoulli-inequality-power}
+   (1+x)^n \geqslant 1+nx 
+ \end{equation}
+ 等号成立的充分必要条件是$x=0$或者$x=-1,n=1$.
+\end{theorem}
+
+在此给出此定理的另外一种证明
+\begin{proof}[证明]
+  在$x \geqslant 0$时，左边按二项式定理展开可以看到它是成立的，所以关键是如何证明$x<0$的情形。
+
+  在等式(它可以经由数学归纳法得出，见\autoref{example:a-power-n-b-power-n-factoring})
+  \[ a^n-b^n = (a-b)(a^{n-1}+a^{n-2}b+\cdots+ab^{n-2}+b^{n-1}) \]
+  在式中令$a=1+x$，$b=1$便得
+  \[ (1+x)^n-1=x \left[ (1+x)^{n-1}+(1+x)^{n-2}+\cdots+(1+x)+1 \right] \]
+  如果$x>0$，则右边中括号内的部分显然大于$n$，于是要证的不等式成立，而如果$-1<x<0$，则中括号内的部分小于$n$，再与负数$x$相乘，不等式反向即证出伯努利不等式。
+\end{proof}
+
+\begin{theorem}
+  \label{theorem:bernoulli-inequality-real}
+  设实数$x>-1$，$\alpha$为一个实数，则当$\alpha>1$或者$\alpha<0$时，有不等式
+  \[ (1+x)^{\alpha} \geqslant 1+\alpha x \]
+  当$0<\alpha<1$时不等式反向成立，无论哪种情况，取等号的条件都是$x=0$.
+\end{theorem}
+
+由于定理中出现了实数指数幂，初等证明仅对有理指数幂有效，所以这里采用导数的方法解决，这在本书中都是极力避免的，但此处却无法躲开。
+\begin{proof}[证明]
+  令
+  \[ f(x)=(1+x)^{\alpha}-(1+\alpha x) \]
+  则$f(0)=0$，求导得
+  \[ f'(x) = \alpha ((1+x)^{\alpha-1}-1) \]
+  易见$f'(0)=0$，再次求导得
+  \[ f''(x) = \alpha(\alpha-1)(1+x)^{\alpha-2} \]
+  作点讨论: 当$\alpha<0$或$\alpha>1$时，显然$f''(x)>0$，于是$f'(x)<0, \forall -1<x<0$并且$f'(x)>0, \forall x>0$，所以此时恒有$f(x) \geqslant 0, \forall x>-1$，当$0<\alpha<1$时，有$f''(x)<0$，于是$f'(x)>0, \forall -1<x<0$并且$f'(x)<0, \forall x>0$，故此时恒成立$f(x) \leqslant 0$.
+\end{proof}
+
+\subsection{排序不等式}
+
+\begin{theorem}[排序不等式]
+  对于任何两组按照相同的大小顺序排列好（均从小到大或者均从大到小）的两组实数$x_i(i=1,2,\ldots,n)$和$y_i(i=1,2,\ldots,n)$，有下面的不等式成立
+  \begin{eqnarray}
+    \label{eq:rearrangement inequality}
+    & x_1y_n+x_2y_{n-1}+\cdots+x_ny_1 \nonumber \\
+    \leqslant & x_1y_{r_1}+x_2y_{r_2}+\cdots+x_ny_{r_n} \nonumber \\
+    \leqslant & x_1y_1+x_2y_2+\cdots+x_ny_n
+  \end{eqnarray}
+  其中$r_i(i=1,2,\ldots,n)$是$1,2,\ldots,n$的任意一个排列。
+\end{theorem}
+不等式的通俗说法就是，反序和最小，同序和最大，乱序和居中。
+
+\begin{proof}[证明]
+  对于中间的乱序和，如果$r_1 \neq 1$，那么$y_1$就必定跟某个$x_m$搭配着，也就是$x_1y_{r_1}$和$x_my_1$这两项，我们尝试交换一下这两个搭配，看看和会怎么变化
+  \begin{equation*}
+    (x_1y_1+x_my_{r_1})-(x_1y_{r_1}+x_my_1) = (x_1-x_m)(y_1-y_{r_1}) \geqslant 0
+  \end{equation*}
+  因此这样做的结果是使得和式变大了，照此逐步调整下去，所得和式将会继续变大，直到所有$r_i=i(i=1,2,\ldots,n)$都成立时得到同序和为最大，这就证明了不等式的左边，这个方法称为 \emph{逐步调整法}。
+
+  至于不等式的右边，只要把第二组数$y_1,y_2,\ldots,y_n$换为$-y_n,-y_{n-1},\ldots,-y_1$，则它与$x_i$单调性相同，把左边不等式应用到这两组数上即可得到右边不等式。
+\end{proof}
+
+\begin{example}[Nesbitt不等式\footnote{来自于参考文献\cite{the-secret-of-inequality}。}]
+  \label{example:nesbitt-inequality-proof-by-sorted-inequality}
+  对于任意三个非负实数$a,b,c$，有下面不等式成立
+  \begin{equation}
+    \label{eq:nesbitt-inequality}
+    \frac{a}{b+c} + \frac{b}{c+a} + \frac{c}{a+b} \geqslant \frac{3}{2}
+  \end{equation}
+
+  \begin{proof}[证明]
+    由对称性，不失一般性，设$a\geqslant b \geqslant c$，则也有$a+b \geqslant c+a \geqslant b+c$，因而由排序不等式，有
+    \begin{eqnarray*}
+     \frac{a}{b+c} + \frac{b}{c+a} + \frac{c}{a+b} \geqslant \frac{a}{a+b} + \frac{b}{b+c} + \frac{c}{c+a} \\ 
+     \frac{a}{b+c} + \frac{b}{c+a} + \frac{c}{a+b} \geqslant \frac{b}{a+b} + \frac{c}{b+c} + \frac{a}{c+a}  
+    \end{eqnarray*}
+    两式相加即得证。
+  \end{proof}
+\end{example}
+
+
+\subsection{均值不等式}
+
+\begin{theorem}[均值不等式]
+  对于任意$n$个正实数$x_{i}(i=1,2,\ldots,n)$，记
+  \begin{eqnarray}
+    \label{eq:definition-of-average}
+    H_n &=& \frac{n}{\sum_{i=1}^n \frac{1}{x_i}} \\
+    G_n &=& (\prod_{i=1}^nx_{i})^{\frac{1}{n}} \\
+    A_n &=& \frac{1}{n}\sum_{i=1}^{n}x_i \\
+    Q_n &=& \sqrt{\frac{1}{n}\sum_{i=1}^nx_i^2}
+  \end{eqnarray}
+  称$H_{n}$为这$n$个正实数的 \emph{调和平均数}，而$A_{n}$为 \emph{算术平均数}，$G_n$为 \emph{几何平均数}，$Q_{n}$为 \emph{平方平均数}，则有下面不等式成立
+  \begin{equation}
+    \label{eq:mean-inequation-general}
+    H_{n} \leqslant G_{n} \leqslant A_{n} \leqslant Q_{n}
+  \end{equation}
+  其中的等号只有在$x_{i}$全部都相等时才成立。
+\end{theorem}
+
+我们在\autoref{sec:polynomial-power-theorem}中曾经利用多项式乘幂定理证明过中间的$A_n \geqslant G_n$，在\autoref{subsec:mathematical-induction}中也曾经使用倒推形式的数学归纳法证明过这个不等式，所以在这一节我们使用另外的方法。
+
+\begin{proof}[证明]
+  先来证明$A_n\geqslant G_n$.
+
+  因为$\frac{x_1+x_2}{2}-\sqrt{x_1x_2}=\frac{1}{2}(\sqrt{x_1}-\sqrt{x_2})^2 \geqslant 0$，所以不等式$A_2 \geqslant G_2$成立。
+
+  假定$A_n \geqslant G_n$，来尝试证明$A_{n+1} \geqslant G_{n+1}$，因为$A_{n+1}$是一个算术平均数，对一组数而言，如果新添加的数等于原来这些数的算术平均数，则算术平均数保持不变，于是有如下的策略
+  \begin{eqnarray*}
+    A_{n+1} &=& \frac{1}{n+1}\sum_{i=1}^{n+1}x_{i} \\
+            &=& \frac{\sum_{i=1}^nx_i+[x_{n+1}+(n-1)A_{n+1}]}{2n} \\
+            &=& \frac{1}{2} \left( \frac{x_1+\cdots+x_{n}}{n} + \frac{x_{n+1}+(n-1)A_{n+1}}{n} \right) \\
+    & \geqslant & \frac{1}{2} \left( \sqrt[n]{x_1\cdots x_n} + \sqrt[n]{x_{n+1}A_{n+1}^{n-1}} \right) \\
+            & \geqslant & \sqrt{\sqrt[n]{x_1\cdots x_n} \cdot \sqrt[n]{x_{n+1}A_{n+1}^{n-1}}} \\
+    &=& \sqrt[2n]{x_1\cdots x_{n+1}A_{n+1}^{n-1}}
+  \end{eqnarray*}
+  也就是$A_{n+1}^{2n} \geqslant G_{n+1}^{n+1}A_{n+1}^{n-1}$，整理即得$A_{n+1} \geqslant G_{n+1}$，得证，等号成立的条件也是显而易见的。
+
+  在$A_n \geqslant G_n$中，把每个数$x_i$都换成$\frac{1}{x_i}$，立即便得到$\frac{1}{H_n} \geqslant \frac{1}{G_n}$，所以$H_n \leqslant G_n$，至于$A_n \leqslant Q_n$，利用数学归纳法和基本不等式$2ab \leqslant a^2+b^2$就可以轻松获证，这里就不啰嗦了。
+
+  下面再提供$A_n \geqslant G_n$的另一证法.
+
+  这个不等式可以改写为如下形式
+  \begin{equation*}
+    \frac{x_1}{G_n} + \frac{x_2}{G_n} + \cdots + \frac{x_n}{G_n} \geqslant n
+  \end{equation*}
+  因为左边各项之积为1，所以我们只要能够证明：如果$n$个正实数$x_i(i=1,2,\ldots,n)$满足$x_1x_2\cdots x_n=1$，则$x_1+x_2+\cdots +x_n \geqslant n$ 就可以了。
+
+  对于$n=2$的情况是很容易验证的，假定对于$n$个数也成立，现在来看$n+1$个数的情况，先把$x_nx_{n+1}$绑在一起视为一个数，这样$n+1$个数就成了$n$个数，根据归纳假设可得$x_1+\cdots + x_{n-1} + x_nx_{n+1} \geqslant n$，于是我们只要证明$x_n+x_{n+1} \geqslant x_nx_{n+1}+1$就可以了，也就是要证明$(x_n-1)(x_{n+1}-1)\leqslant 0$，这个似乎不一定成立，但是乘积为1的$n+1$个正实数，必定至少有一个大于等于1，同时至少有一个小于等于1，我们可以重新排序这些正实数，使得这两个数放在最后（或者干脆一开始绑定两个数的时候就绑这两个数），于是不等式$(x_n-1)(x_{n+1}-1)\leqslant 0$就成立了，所以得证。
+\end{proof}
+
+\begin{proof}[证明三]
+  仍同证明二，只要证明辅助命题: 如果$n$个正实数$x_i(i=1,2,\ldots,n)$乘积为1，则它们的和不小于$n$就可以了。
+
+  利用排序不等式，这$n$个正实数乘积为1，则存在另外$n$个正实数$y_i(i=1,2,\dots,n)$使得$x_1=y_1/y_2,x_2=y_2/y_3,\dots,x_n=y_n/y_1$，于是对于序列$y_i$和$1/y_i$，就有(利用了乱序和大于等于反序和)
+  \begin{eqnarray*}
+    x_1+x_2+\dots+x_n & = & 
+                            \frac{y_1}{y_2}+\frac{y_2}{y_3}+\cdots+\frac{y_n}{y_1} \\
+    & \geqslant & \frac{y_1}{y_1}+\frac{y_2}{y_2}+\cdots+\frac{y_n}{y_n} = n
+  \end{eqnarray*}
+  所以辅助命题成立，从而得证。
+\end{proof}
+
+\begin{example}
+  均值不等式中的几个项都有相似的构成形式: $f^{-1}\left( \frac{1}{n}\sum_{i=1}^nf(x_i) \right)$，对于$A_n$，$f(x)=x$，对于$H_n$，$f(x)=\frac{1}{x}$，对于$G_n$，唔...$f(x)=\ln{x}$，对于$Q_n$，$f(x)=x^2$，所以这些平均数的大小关系完全取决于对应函数的性质，从几何意义上看，比算术平均数小的平均数所对应函数都是向左凸起的，而比算术平均数大的平均数所对应函数则是向右凸起的。
+\end{example}
+
+\begin{example}[匀变速直线运动中间时刻瞬时速度和中间位移瞬时速度的大小]
+  我们来考察一下匀变速直线运动中，中间时刻的瞬时速度和经过中间位移处瞬时速度的大小关系。因为加速度是恒定的，速度是时间的一次函数，所以对于起始时刻$t_1$和终止时刻$t_2$来说，中间时刻的瞬时速度是起始速度$v_1$和终止速度$v_2$的算术平均$\frac{1}{2}(v_1+v_2)$，根据速度公式$v(t)=v_1+at$和位移公式$s(t)=v_1t+\frac{1}{2}at^2$(其中$a$是加速度)可得出经过中间位移处的瞬时速度是$\sqrt{\frac{v_1^2+v_2^2}{2}}$，由均值不等式即知中间位移处的瞬时速度要大一些。
+\end{example}
+
+\begin{example}
+  \label{example:nesbitt-inequality-proof-by-am-gm-inequality}
+  我们在\autoref{example:nesbitt-inequality-proof-by-sorted-inequality}中已经证过Nesbitt不等式，那时利用的是排序不等式，现在我们用均值不等式加以证明，由AM-GM不等式得
+  \[ \frac{a+b}{b+c}+\frac{b+c}{c+a}+\frac{c+a}{a+b} \geqslant 3 \]
+以及
+\[ \frac{a+c}{b+c}+\frac{b+a}{c+a}+\frac{c+b}{a+b} \geqslant 3 \]
+两式相加即得证。
+\end{example}
+
+\begin{example}
+  在这个例子中，我们来建立一个有用的不等式。设$x_i > -1(i=1,2,\ldots,n)$，记$s=\sum_{i=1}^nx_i$，则有
+  \[ \prod_{i=1}^n(1+x_i) < 1+s+\frac{s^2}{2!}+\cdots+\frac{s^n}{n!} \]
+  并且，如果所有$x_i$的符号都相同，则还有
+  \[ \prod_{i=1}^n(1+x_i) \geqslant 1+s \]
+  \begin{proof}[证明]
+    因$1+x_i>0$，由AM-GM不等式得
+    \[ \prod_{i=1}^n(1+x_i) \leqslant \left( 1+\frac{s}{n} \right)^n = \sum_{k=0}^n \frac{n(n-1)\cdots(n-k+1)}{n^k} \frac{s^n}{k!} < \sum_{k=0}^n \frac{s^k}{k!}  \]
+    第一个不等式得证，再证第二个，如果$x_i$的符号都相同（允许有零），则按归纳法，$n=1$时显然是成立的，假定对$n$个数时也是成立的，那么对于$n+1$个数，则有
+    \[ \prod_{i=1}^n (1+x_i) \geqslant (1+x_{n+1})(1+\sum_{i=1}^nx_i) = 1+\sum_{i=1}^{n+1}x_i + x_{n+1}\sum_{i=1}^nx_i \geqslant 1+\sum_{i=1}^{n+1}x_i \]
+  \end{proof}
+\end{example}
+
+对于均值不等式中最基本的$G_n\leqslant A_n$，将每个数的权重一般化，得如下的加权形式
+\begin{theorem}[加权平均值不等式]
+  对于任意$n$个正实数$x_{i}(i=1,2,\ldots,n)$和一组权值$\alpha_i\geqslant 0(i=1,2,\ldots,n),\sum_{i=1}^n\alpha_i=1$，有如下的不等式
+  \begin{equation}
+    \label{eq:mean-inequation-with-weight}
+    \sum_{i=1}^n\alpha_ix_i \geqslant \prod_{i=1}^nx_i^{\alpha_i}
+  \end{equation}
+  等号也只有在$x_i$全部都相等时才成立.
+\end{theorem}
+\begin{proof}[证明]
+  先证$\alpha_i(i=1,2,\ldots,n)$都是有理数的情况，此时存在非负整数$p_i(i=1,2,\ldots,n)$使得$\alpha_i=\frac{p_i}{\sum_{k=1}^np_k}$，只要把$p_ix_i$看成$p_i$个$x_i$相加，就有
+  \begin{eqnarray*}
+    \sum_{i=1}^n\alpha_ix_i &=& \sum_{i=1}^n \frac{p_i}{\sum_{k=1}^np_k}x_i \\
+                            &=& \frac{1}{\sum_{i=1}^np_i} \cdot \sum_{i=1}^np_ix_i \\
+                            & \geqslant & \left (\prod_{i=1}^nx_i^{p_i} \right)^{\frac{1}{\sum_{i=1}^n p_i}} \\
+    & = & \prod_{i=1}^n x_i^{\alpha_i}
+  \end{eqnarray*}
+  所以不等式得证。
+
+  对于某个$\alpha_i$为无理数的情况，使用有理数序列去逼近它，再两边取极限即得证。
+\end{proof}
+
+\subsection{柯西(Cauchy)不等式}
+\label{sec:cauchy-schwarz-inequation}
+
+\begin{theorem}[柯西不等式]
+  对于任何两组实数$x_i(i=1,2,\ldots,n)$ 和$y_i(i=1,2,\ldots,n)$，有下面不等式成立
+  \begin{equation}
+    \label{eq:cauchy-inequation}
+    \left( \sum_{i=1}^nx_iy_i \right)^{2} \leqslant \left( \sum_{i=1}^{n}x_i^2 \right) \left( \sum_{i=1}^ny_i^{2} \right)
+  \end{equation}
+  其中等号成立的唯一场景是：存在一个共同的实数$\lambda$使得$x_i=\lambda y_{i}(i=1,2,\ldots,n)$都成立。
+\end{theorem}
+等号成立的条件，通俗的说就是两组实数成比例，如果我们约定分数中的分母可以为零，并且此时分子也必须为零，则可以把取等条件改写为
+\begin{equation*}
+  \frac{x_1}{y_1} = \frac{x_2}{y_2} = \cdots = \frac{x_n}{y_n}
+\end{equation*}
+如果记向量$\vv{a}=(x_1,x_2,\ldots,x_n), \vv{b}=(y_1,y_2,\ldots,y_n)$，则柯西不等式即表明$|\vv{a} \cdot \vv{b}| \leqslant |\vv{a}| \cdot |\vv{b}|$.
+
+证明很简单:
+\begin{equation*}
+  \left( \sum_{i=1}^nx_i^2 \right) \left( \sum_{i=1}^nx_i^2 \right) - \left( \sum_{i=1}^nx_iy_i \right)^2 = \sum_{1 \leqslant i < j \leqslant n}(x_iy_j-x_jy_i)^2 \geqslant 0
+\end{equation*}
+
+但更为流行的是下面的证明:
+
+\begin{proof}[证明]
+  构造二次函数
+  \begin{equation*}
+  f(t)=t^2\sum_{i=1}^nx_i^2+2t\sum_{i=1}^nx_iy_i+\sum_{i=1}^ny_i=\sum_{i=1}^n(x_it+y_i)^2 \geqslant 0
+  \end{equation*}
+ 既然是恒为非负的二次函数，其判别式必小于等于零，于是即得柯西不等式，等号成立的条件就是二次函数有零点$t_0$，使得$x_it_0+y_i=0(i=1,2,\ldots,n)$，也就是两组数成比例。
+\end{proof}
+
+\begin{example}
+  高中数学教材上有一类习题，是说点$P(x,y)$是椭圆$\frac{x^2}{a^2}+\frac{y^2}{b^2}=1(a>0, b>0)$上任一点，$\lambda$和$\mu$是两个固定的实数，求$\lambda x + \mu y$的最值。
+
+  这题目可以使用判别式来求解，也可以使用椭圆参数方程来求，最直接的就是使用柯西不等式:
+  \begin{equation*}
+    (\lambda x + \mu y)^2 = (a\lambda \cdot \frac{x}{a} + b\mu \cdot \frac{y}{b})^2 \leqslant (a^2\lambda^2+b^2\mu^2)(\frac{x^2}{a^2}+\frac{y^2}{b^2}) = a^2\lambda^2+b^2\mu^2
+  \end{equation*}
+  可以验证等号是可以取到的。
+\end{example}
+
+本书倾向于认为在均值不等式、柯西不等式、排序不等式中，排序不等式是最基本的不等式，因为从\ref{sec:polynomial-power-theorem}节利用多项式乘幂定理证明均值不等式的过程中可以看出，均值不等式赖以成立的基础是不等式$x^n+y^n \geqslant x^{n-1}y+xy^{n-1}(n \in N_+)$，而柯西不等式则是得益于不等式$x^2+y^2 \geqslant 2xy$，而这两个简单不等式都是排序不等式的直接推论。
+
+\subsection{切比雪夫(Chebyshev)不等式}
+
+\begin{theorem}[切比雪夫不等式]
+对于任意两组按照相同的大小顺序排列好的实数$x_i(i=1,2,\ldots,n)$和$y_i(i=1,2,\ldots,n)$，成立着下面不等式
+\begin{equation}
+  \label{eq:chebyshev-inequation}
+  \frac{1}{n}\sum_{i=1}^nx_iy_{n+1-i}
+  \leqslant \left( \frac{1}{n}\sum_{i=1}^nx_i \right) \left( \frac{1}{n}\sum_{i=1}^ny_i \right)
+  \leqslant \frac{1}{n}\sum_{i=1}^nx_iy_i
+\end{equation}
+其中的等号成立的唯一场景是：两组数中至少有一组数的值都相同。
+\end{theorem}
+
+切比雪夫不等式是排序不等式的直接推论，这从如下的证明过程即可看出。
+
+\begin{proof}[证明]
+  先证明右边不等式，由排序不等式，可得如下的$n$个等式或不等式:
+  \begin{eqnarray*}
+    x_1y_1+x_2y_2+\cdots+x_ny_n &=& x_1y_1+x_2y_2+\cdots+x_ny_n \\
+    x_1y_2+x_2y_3+\cdots+x_ny_1 & \leqslant & x_1y_1+x_2y_2+\cdots+x_ny_n \\
+    x_1y_3+x_2y_4+\cdots+x_ny_2 & \leqslant & x_1y_1+x_2y_2+\cdots+x_ny_n \\
+    \cdots & & \\
+    x_1y_n+x_2y_1+\cdots+x_ny_{n-1} & \leqslant & x_1y_1+x_2y_2+\cdots+x_ny_n 
+  \end{eqnarray*}
+  将这些等式或不等式全部相加，即得切比雪夫不等式的右边。
+
+  至于不等式的左边，只要在把序列$y_1,y_2,\ldots,y_n$替换为序列$-y_n,-y_{n-1},\ldots,-y_1$后应用不等式的右边即可得出(当然也可以使用排序不等式的左边也像刚才那样累加得出)。
+\end{proof}
+
+\subsection{琴生不等式}
+\label{sec:jenson-inequality}
+
+琴生不等式是一个与函数凸性有关的不等式。
+\begin{theorem}[琴生不等式]
+  设函数$f(x)$在区间$D$上是上凸函数，则对于该区间上任意$n$个实数$x_i(i=1,2,\ldots,n)$，有如下不等式成立:
+  \begin{equation}
+    \label{eq:jenson-inequality-some-import-inequality}
+    f \left( \frac{1}{n} \sum_{i=1}^nx_i \right) \geqslant
+    \frac{1}{n} \sum_{i=1}^n f(x_i)
+  \end{equation}
+\end{theorem}
+
+同样有加权形式的琴生不等式
+\begin{theorem}[加权形式的琴生不等式]
+  设函数$f(x)$在区间$D$上是上凸函数，则对于该区间上任意$n$个实数$x_i(i=1,2,\ldots,n)$和一组权值$\alpha_i\geqslant 0(i=1,2,\ldots,n), \sum_{i=1}^n\alpha_i=1$，有如下不等式成立:
+  \begin{equation}
+    \label{eq:jenson-inequality-with-weight}
+    f \left( \sum_{i=1}^n\alpha_ix_i \right) \geqslant
+    \sum_{i=1}^n \alpha_if(x_i)
+  \end{equation}
+\end{theorem}
+
+我们在\ref{sec:the-convexity-of-function}节已经证明过琴生不等式，所以这里就省去了。
+
+\subsection{幂平均值不等式}
+
+\begin{theorem}[幂平均值不等式]
+  对于任意$n$个正实数$x_i(i=1,2,\ldots,n)$和两个正实数$0<p<q$，成立着不等式
+  \begin{equation}
+    \label{eq:pow-mean-inequation}
+    \left( \frac{1}{n}\sum_{i=1}^nx_i^{p} \right)^{\frac{1}{p}}
+    \leqslant \left( \frac{1}{n}\sum_{i=1}^nx_i^{q} \right)^{\frac{1}{q}}
+  \end{equation}
+  等号当且仅当$x_i(i=1,2,\ldots,n)$全部相等时成立。
+\end{theorem}
+取$p=1,q=2$，便可得算术平均数小于等于平方平均数。
+
+将每个数的权重$\frac{1}{n}$一般化，得如下的加权形式
+\begin{theorem}[加权幂平均值不等式]
+  对任意$n$个正实数$x_i(i=1,2,\ldots,n)$和任意两个正实数$0<p<q$，以及一组权值$\alpha_i \geqslant 0(i=1,2,\ldots,n), \sum_{i=1}^n\alpha_i=1$，成立着下面不等式
+  \begin{equation}
+    \label{eq:pow-mean-inequation-with-weight}
+    \left( \sum_{i=1}^n\alpha_ix_i^p \right)^{\frac{1}{p}}
+    \leqslant \left( \sum_{i=1}^n\alpha_ix_i^q \right)^{\frac{1}{q}}
+  \end{equation}
+\end{theorem}
+
+\subsection{赫尔德(Holder)不等式}
+
+\begin{theorem}[赫尔德不等式]
+  设$x_i> 0, y_i> 0 (i=1,2,\ldots,n)$且$\frac{1}{p}+\frac{1}{q}=1$，那么在$p>1$时成立下面的不等式
+  \begin{equation}
+    \label{eq:holder-inequation}
+    \sum_{i=1}^nx_iy_i \leqslant \left( \sum_{i=1}^nx_i^p \right)^{\frac{1}{p}} \cdot \left( \sum_{i=1}^nx_i^q \right)^{\frac{1}{q}}
+  \end{equation}
+  在$p<1,p\neq 0$不等式反向，等号当且仅当向量$(x_1^p,\ldots,x_n^p)$和$(y_1^q,\ldots,y_n^q)$共线时成立。
+\end{theorem}
+在赫尔德不等式中，取$p=q=2$，即得柯西不等式。
+
+\subsection{闵可夫斯基(Minkowski)不等式}
+
+
+\begin{theorem}[闵可夫斯基不等式]
+  设$x_i>0, y_i>0 (i=1,2,\ldots,n)$，那么在$p>1$时成立下面的不等式
+  \begin{equation}
+    \label{eq:minkowski-inequation}
+    \left( \sum_{i=1}^n(x_i+y_i)^p \right)^{\frac{1}{p}} \leqslant \left( \sum_{i=1}^nx_i^p \right)^{\frac{1}{p}} + \left( \sum_{i=1}^ny_i^p \right)^{\frac{1}{p}}
+  \end{equation}
+  在$p<1$时不等式反向，等号当且仅当存在一个共同的实数$\lambda$使得$x_i=\lambda y_i(i=1,2,\ldots,n)$时成立。
+\end{theorem}
+在闵可夫斯基不等式中取$n=2,p=2$，便是三角形两边之和大于第三边的坐标表达。
+
+\subsection{舒尔不等式}
+\label{sec:schur-inequality}
+
+
+
+\subsection{嵌入不等式}
+\label{sec:embedding-inequality}
+
+\begin{theorem}[嵌入不等式]
+  对$\triangle ABC$和任意的实数$x,y,z$均有下面不等式成立
+  \begin{equation}
+    \label{eq:embedding-inequation}
+    x^2+y^2+z^2 \geqslant 2yz\cos{A}+2zx\cos{B}+2xy\cos{C}
+  \end{equation}
+  其中，当且仅当$x:y:z = \sin{A} : \sin{B} : \sin{C}$时等号成立。
+\end{theorem}
+
+\subsection{一些例子}
+\label{sec:some-inequality-example}
+
+\begin{example}[Nesbitt不等式的其它证法]
+  我们在\autoref{example:nesbitt-inequality-proof-by-sorted-inequality}和\autoref{example:nesbitt-inequality-proof-by-am-gm-inequality}中分别利用排序不等式和均值不等式证明了Nesbitt不等式，此处再给几个证明。
+
+  \begin{proof}[证明一]
+    由齐次性，设$a+b+c=3$，则只需证
+\[ \frac{a}{3-a}+\frac{b}{3-b}+\frac{c}{3-c} \geqslant \frac{3}{2} \]
+由取等条件$a=b=c=1$出发，上切线法，当$0<a\leqslant 3$时，有
+\[ \frac{a}{3-a} \geqslant \frac{1}{2}+\frac{3}{4}(a-1) \]
+于是
+\[ \sum_{cyc} \frac{a}{3-a} \geqslant \frac{3}{2} + \frac{3}{4}\sum_{cyc}(a-1) =\frac{3}{2} \]
+  \end{proof}
+
+  \begin{proof}[证明二]
+ 看着三个分母，想用等比定理想得痒痒的，试了一下，还真的可以:
+\[ \sum_{cyc} \frac{a}{b+c}=\sum_{cyc}\frac{a+\frac{a^2}{b+c}}{a+b+c} = 1 + \frac{1}{a+b+c}\sum_{cyc}\frac{a^2}{b+c} \]
+所以只要证明
+\[ \sum_{cyc}\frac{a^2}{b+c} \geqslant \frac{1}{2}(a+b+c) \]
+待定系数$\lambda$，由AM-GM有
+\[ \lambda^2(b+c)+\frac{a^2}{b+c} \geqslant 2\lambda a \]
+所以
+\[ 2\lambda^2(a+b+c)+\sum_{cyc}\frac{a^2}{b+c} \geqslant 2\lambda (a+b+c) \]
+即
+\[ \sum_{cyc}\frac{a^2}{b+c} \geqslant 2\lambda(1-\lambda) (a+b+c) \]
+为了照顾取等条件，取$\lambda=\frac{1}{2}$，即得
+\[ \sum_{cyc}\frac{a^2}{b+c} \geqslant \frac{1}{2}(a+b+c) \]   
+  \end{proof}
+
+  \begin{proof}[证明三]
+    （导数法）由齐次性，假设$a+b+c=1$，则只需证
+\[ \frac{a}{1-a}+ \frac{b}{1-b} + \frac{c}{1-c} \geqslant \frac{3}{2} \]
+固定$a$，让$b$和$c$变化，考虑此时的最小值，因为有$b+c=1-a$的限制，所以左端实际上是$b$的一元函数
+\[ f(b)= \frac{a}{1-a}+ \frac{b}{1-b} + \frac{1-a-b}{a+b} \]
+求导得
+\[ f'(b)=\frac{(1+a)(a-1+2b)}{(a+b)^2(1-b)^2} \]
+易见当$b=\frac{1-a}{2}$时达到最小值，所以
+\[ f(b) \geqslant f \left( \frac{1-a}{2} \right) = \frac{a}{1-a} + \frac{2(1-a)}{1+a} \]
+记上式右边为$g(a)$，再次求导得
+\[ g'(a)=-\frac{(3-a)(1-3a)}{(1-a)^2(1+a)^2} \]
+显见$g(a)$在$a=\frac{1}{3}$时取得最小值，所以
+\[ g(a) \geqslant g \left( \frac{1}{3} \right) = \frac{3}{2} \]
+  \end{proof}
+\end{example}
+
+\subsection{题选}
+\label{sec:exercise-for-inequality}
+
+
+\begin{exercise}
+  已知三个正实数$a,b,c$满足
+  \begin{equation*}
+    \frac{1}{1+a} + \frac{1}{1+b} + \frac{1}{1+c} = 1
+  \end{equation*}
+  求证
+  \begin{equation*}
+    (a-1)(b-1)(c-1) \leqslant 1
+  \end{equation*}
+\end{exercise}
+
+\begin{proof}[证明]
+  作代换
+  \begin{equation*}
+    \frac{1}{1+a} = \frac{x}{x+y+z}, \  \frac{1}{1+b} = \frac{y}{x+y+z}, \  \frac{1}{1+c} = \frac{z}{x+y+z}
+  \end{equation*}
+  其中$x,y,z$是三个正实数，于是只要证明
+  \begin{equation*}
+    (y+z-x)(z+x-y)(x+y-z) \leqslant xyz
+  \end{equation*}
+  如果左边为负，不等式显然成立，否则可再作代换
+  \begin{equation*}
+    r = y+z-x, \  s = z+x-y, \  t = x+y-z
+  \end{equation*}
+  于是只要证明
+  \begin{equation*}
+    rst \leqslant \frac{s+t}{2} \frac{t+r}{2} \frac{r+s}{2}
+  \end{equation*}
+  由均值，这显然。
+\end{proof}
+
+\begin{exercise}
+  设$a$,$b$,$c$是三个互不相等的实数，求证
+  \[ \left( \frac{a}{a-b} \right)^2 + \left( \frac{b}{b-c} \right)^2 + \left( \frac{c}{c-a} \right)^2 \geqslant 1 \]
+\end{exercise}
+
+\exerciseFrom[2008年IMO试题变形, \url{http://kuing.orzweb.net/viewthread.php?tid=4579}]
+
+\exerciseSolvedDate[2017-05-05]
+
+\begin{proof}[证明]
+  作代换
+  \[ x=\frac{a}{a-b}, \  y=\frac{b}{b-c} \  z=\frac{c}{c-a} \]
+  则只需证$x^2+y^2+z^2 \geqslant 1$，而在这代换下，易知
+  \[ \left( 1-\frac{1}{x} \right) \left( 1-\frac{1}{y} \right) \left( 1-\frac{1}{z} \right) = 1 \]
+  整理即为
+  \[ x+y+z = (xy+yz+zx)+1 \]
+  记等式左右两边的公共值为$t$，则
+    \[ x^2+y^2+z^2 = (x+y+z)^2-2(xy+yz+zx) = t^2-2(t-1)=(t-1)^2+1 \geqslant 1 \]
+  得证。
+\end{proof}
+
+\begin{exercise}\footnote{2017年德国数学奥林匹克试题.}
+  已知非负实数$x$、$y$、$z$满足$x+y+z=1$，求证:
+  \[ 1 \leqslant \frac{x}{1-yz}+\frac{y}{1-zx}+\frac{z}{1-xy} \leqslant \frac{9}{8} \]
+\end{exercise}
+
+\exerciseFrom[2017年德国数学奥林匹克试题，\url{http://kuing.orzweb.net/viewthread.php?tid=4578}]
+
+\begin{proof}[证明]
+  左边有最直接的证明，因为每个分母都小于等于1，所以有
+  \[ \frac{x}{1-yz}+\frac{y}{1-zx}+\frac{z}{1-xy} \geqslant x+y+z = 1 \]
+  此外我们还有以下的换元法证明:
+  显见$0 \leqslant x,y,z \leqslant 1$，作代换
+  \[ a=\frac{x}{1-yz}, \  b=\frac{y}{1-zx}, \  c=\frac{z}{1-xy} \]
+  只需证明$1\leqslant a+b+c \leqslant 9/8$，在这代换下有$a,b,c \geqslant 0$，并且
+  \begin{align*}
+    a = {} & x+ayz \\
+    b = {} & y+bzx \\
+    c = {} & z+cxy
+  \end{align*}
+  三式相加并利用$x+y+z=1$得
+  \[ a+b+c=1+ayz+bzx+cxy \]
+  显然右边大于等于1，所以$a+b+c\geqslant 1$，原不等式左边得证。右边待证。
+\end{proof}
+
+\begin{exercise}
+  (Sqing55) 已知实数$a,b,c>0$，且$a+b+c=1$，求证: 当$\lambda \geqslant \frac{1}{5}$时有下面不等式成立:
+  \[ \frac{a+\lambda}{a+bc} + \frac{b+\lambda}{b+ca} + \frac{c+\lambda}{c+ab} \geqslant \frac{9}{4}(1+3\lambda) \]
+  \begin{proof}[证明]
+    (在 Kuing 的提示下完成)，先分离出$\lambda$
+    \[ f(\lambda) = \left( \frac{1}{a+bc}+\frac{1}{b+ca}+\frac{1}{c+ab}-\frac{27}{4} \right) \lambda + \frac{a}{a+bc}+\frac{b}{b+ca}+\frac{c}{c+ab} \geqslant \frac{9}{4} \]
+    我们先证明$\lambda$的系数是非负的，这样就有$f(\lambda)\geqslant f\left( \frac{1}{5} \right)$，从而只要证明$f\left( \frac{1}{5} \right) \geqslant \frac{9}{4}$就可以了。
+
+    因为$a+b+c=1$，所以
+    \[ \frac{1}{a+bc} \geqslant \frac{1}{a+\left( \frac{b+c}{2} \right)^2} =
+    \frac{1}{a+\left( \frac{1-a}{2} \right)^2} = \frac{4}{(a+1)^2} \]
+  由切线法，易证
+  \[ \frac{4}{(a+1)^2} \geqslant \frac{9}{4}-\frac{27}{8}\left( a-\frac{1}{3} \right) \]
+  于是
+  \[ \sum \frac{1}{a+bc} \geqslant \frac{27}{4} \]
+  于是$f(\lambda)$是单调不减的，所以接下来证明$f\left( \frac{1}{5} \right) \geqslant \frac{9}{4}$，以下过程中$\lambda=1/5$，因为
+  \[ \sum \frac{a+\lambda}{a+bc} = \sum \frac{a+\lambda}{(a+b)(a+c)} \]
+  所以只需证明
+  \[ \sum (a+\lambda)(b+c) \geqslant \frac{9}{4}(a+b)(b+c)(c+a) \]
+  为齐次化，左边作处理
+  \[ (a+\lambda)(b+c) = (a+\lambda(a+b+c))(b+c)(a+b+c) \]
+  于是只要证明
+  \[ (a+b+c)\sum (b+c)((1+\lambda)a+b+c) \geqslant \frac{9}{4}(a+b)(b+c)(c+a) \]
+  暴力展开，整理后，即是要证
+  \[ a^3+b^3+c^3 +3abc \geqslant a^2(b+c) + b^2(c+a)+c^2(a+b) \]
+  这等价于熟知的
+  \[ abc \geqslant (b+c-a)(c+a-b)(a+b-c) \]
+  \end{proof}
+\end{exercise}
+
+\begin{exercise}
+  设正实数$a$、$b$、$c$满足$a+b+c=1$，求证
+  \[ \frac{1+a}{1-a} + \frac{1+b}{1-b} + \frac{1+c}{1-c} \leqslant 2 \left( \frac{a}{b} + \frac{b}{c} + \frac{c}{a} \right) \]
+\end{exercise}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../elementary-math-note"
+%%% End:

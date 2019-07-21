@@ -1,0 +1,22 @@
+/* For convenience, define gamma in terms of v: */
+gamma:1/sqrt(1-v*v);
+/* Define Lx as L(x-hat), Lmx as L(-x-hat), etc.: */
+Lx:matrix([gamma,   gamma*v,  0],
+         [gamma*v,  gamma,    0],
+         [0,        0,        1]);
+Ly:matrix([gamma,   0,        gamma*v],
+         [0,        1,        0],
+         [gamma*v,  0,        gamma]);
+Lmx:matrix([gamma,  -gamma*v, 0],
+         [-gamma*v, gamma,    0],
+         [0,        0,        1]);
+Lmy:matrix([gamma,  0,        -gamma*v],
+         [0,        1,        0],  
+         [-gamma*v, 0,        gamma]);
+/* Calculate the product of the four matrices: */
+T:Lx.Ly.Lmx.Lmy;
+/* Define a column vector along the x axis: */
+P:matrix([0],[1],[0]);
+/* Find the result of T acting on this vector,
+   expressed as a Taylor series to second order in v: */
+taylor(T.P,v,0,2);

@@ -1,0 +1,2452 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{DAG Covering}
+\labelAppendix{dag-covering}
+
+This appendix considers techniques based on \gls{DAG covering}.
+%
+First, we introduce the principle in \refSection{dc-principle}.
+%
+We then prove in \refSection{dc-proof} that \gls{optimal.ps} \gls{pattern
+  selection} using \glspl{DAG} is NP-complete.
+%
+We describe straightforward, greedy approaches in
+\refSection{dc-greedy-techniques}, moving on to exhaustive techniques in
+\refSection{dc-exhaustive-search-techniques}.
+%
+In \refSection{dc-extending-tree-covering-techniques-to-dags} we describe
+techniques that extend methods from \gls{tree covering} to \glspl{DAG}.
+%
+\glsunset{MIS}%
+\glsunset{MWIS}%
+%
+In \refSection{dc-mwis-based-approaches} we describe techniques that model
+\gls{instruction selection} as a \gls{MIS} or \gls{MWIS} problem.
+%
+\glsreset{MIS}%
+\glsreset{MWIS}%
+%
+In \refSection{dc-unate-binate-covering} we describe techniques that model
+\gls{instruction selection} as a \glsshort{unate covering} or \gls{binate
+  covering} problem.
+%
+In \refSectionList{dc-ip-based-approaches, dc-cp-based-approaches}, we describe
+techniques based on methods from combinatorial optimization.
+%
+Other \gls{DAG}-based approaches that do not fit into any of the sections above
+are discussed in \refSection{dc-other-approaches}.
+%
+Lastly, we discuss limitations of this principle in \refSection{dc-limitations}
+and summarize in \refSection{dc-summary}.
+
+The appendix is based on material presented in
+\cite[Chap.\thinspace4]{HjortBlindell:2016:Survey} that has been adapted for
+this dissertation.
+%
+To not disturb the flow of reading, material already presented in
+\refChapter{existing-isel-techniques-and-reps} is duplicated in this appendix.
+
+
+\section{The Principle}
+\labelSection{dc-principle}
+
+As we saw in \refAppendix{tree-covering}, the \gls{principle} of \gls{tree
+  covering} has two significant disadvantages.
+%
+The first is that common subexpressions cannot be properly expressed in
+\glspl{expression tree}, and the second is that many \glspl{instruction
+  characteristic} -- such as \gls{multi-output.ic} \glspl{instruction} -- cannot
+be modeled as \glspl{pattern tree}.
+%
+As these shortcomings are primarily due to the restricted use of \glspl{tree},
+we can achieve a more powerful approach to \gls{instruction selection} by
+operating \glspl{DAG}, thereby extending \gls{tree covering} to \gls{DAG
+  covering}.
+
+By lifting the restriction that every \gls{node} in the \gls{expression tree}
+have exactly one \gls{parent}, we attain a \gls!{block DAG}.
+%
+Because \glspl{DAG} permit \glspl{node} to have multiple \glspl{parent}, the
+intermediate values in an expression can be shared and reused within the same
+\gls{block DAG}.
+%
+This also enables \glspl!{pattern DAG} that contain multiple \gls{root}
+\glspl{node}, which signify the production of multiple output values.
+%
+Hence the \gls{instruction set} support is extended to include
+\gls{multi-output.ic} \glspl{instruction}.
+
+Since \glspl{DAG} are less restrictive compared to \glspl{tree}, transitioning
+from \gls{tree covering} to \gls{DAG covering} requires new methods for solving
+the problems of \gls{pattern matching} and \gls{pattern selection}.
+%
+\Gls{pattern matching} is typically addressed using one of the following
+methods:
+%
+\begin{itemize}
+  \item First split the \glspl{pattern DAG} into \glspl{tree}, then match these
+    individually, and then recombine the matched \glspl{pattern tree} into their
+    original \gls{DAG} form.
+    %
+    In general, matching \glspl{tree} on \glspl{DAG} is
+    NP-complete~\cite{GareyJohnson:1979}, but designs applying this technique
+    typically sacrifice completeness to retain linear time complexity.
+
+  \item Match the \glspl{pattern DAG} directly using a generic \gls{subgraph
+    isomorphism} algorithm.
+    %
+    Although such algorithms exhibit exponential worst-case time complexity, in
+    the average case they often finish in polynomial time and are therefore used
+    by several \gls{DAG covering}-based designs discussed in this appendix.
+\end{itemize}
+
+\Gls{optimal.ps} \gls{pattern selection} on \glspl{block DAG}, however, does not
+offer the same range of choices in terms of complexity.
+
+
+\section{Optimal Pattern Selection on DAGs Is NP-Complete}
+\labelSection{dc-proof}
+
+The cost of the gain in generality and modeling capabilities that \glspl{DAG}
+give us is a substantial increase in complexity.
+%
+As we saw in \refAppendix{tree-covering}, selecting an \gls{optimal.ps} set of
+\glspl{pattern} to cover a \gls{expression tree} can be done in linear time, but
+doing the same for \glspl{block DAG} is an NP-complete problem.
+%
+Proofs were given in 1976 by \textcite{BrunoSethi:1976} and
+\textcite{AhoEtAl:1976}, but these were most concerned with the optimality of
+\gls{instruction scheduling} and \gls{register allocation}.
+%
+In 1995, \textcite{Proebsting:1995:Proof} gave a very concise proof for optimal
+\gls{pattern selection}, and a longer, more detailed proof was given by
+\textcite{KoesGoldstein:2008} in~2008.
+%
+In this dissertation, we will paraphrase the longer proof.
+
+
+\subsection{The Proof}
+
+The idea behind the proof is to transform the \gls{SAT} problem into an
+\gls{optimal.ps} -- that is, \gls{least-cost.c} -- \gls{DAG covering} problem.
+%
+The \gls{SAT} problem is the task of deciding whether a Boolean formula, written
+in \gls!{CNF}, can be satisfied.
+%
+A \gls{CNF} formula is an expression consisting of conjunctions of disjunctions
+of Boolean \glspl{variable}
+%
+In other words, a formula is in \gls{CNF} if it has the following structure:
+%
+\begin{displaymath}
+  (\mVar{x}_1 \mOr \mVar{x}_2 \mOr \ldots) \mAnd
+  (\mVar{x}_{n + 1} \mOr \mVar{x}_{n + 2} \mOr \ldots) \mAnd
+  \ldots
+\end{displaymath}
+%
+where \mbox{$\mVar{x}_i \in \mSet{\text{true}, \text{false}}$} and $\mOr$ and
+$\mAnd$ denotes logical-or and logical-and, respectively.
+%
+A \gls{variable}~$\mVar{x}$ can also be negated, written as \mbox{$\mNot
+  \mVar{x}$}.
+
+Since the \gls{SAT} problem is NP-complete, all polynomial-time transformations
+from \gls{SAT} to any other problem $P$ must also render $P$ NP-complete.
+
+
+\paragraph{Modeling SAT as a Covering Problem}
+
+First, we transform an instance~$S$ of the \gls{SAT} problem into a \gls{block
+  DAG}.
+%
+The goal is then to find an exact cover for the \gls{DAG} in order to deduce the
+truth assignment for the Boolean \glspl{variable} from the set of
+selected \glspl{pattern}.
+%
+For this purpose we will use $\mOr$, $\mAnd$, $\mNot$, $v$, $\mBox$, and
+$\mStop$ as \gls{node} types, and define $\mType(n)$ as the type of a
+\gls{node}~\mbox{$n$\hspace{-.8pt}.}
+%
+\Glspl{node} of type~$\mBox$ and $\mStop$ will be referred to as \glspl!{box
+  node} and \glspl!{stop node}, respectively.
+%
+Now, for each Boolean \gls{variable}~\mbox{$x \in S$} we create two
+\glspl{node}~$n_1$ and $n_2$ such that \mbox{$\mType(n_1) = v$} and
+\mbox{$\mType(n_2) = \mBox$}, and add these to the \gls{block DAG}.
+%
+At the same time we also add an \gls{edge}~$\mEdge{n_1}{n_2}$.
+%
+The same is done for each binary Boolean operator~\mbox{$\mathit{op} \in S$} by
+creating two \glspl{node}~$n'_1$ and $n'_2$ such that \mbox{$\mType(n'_1) = op$}
+and \mbox{$\mType(n'_2) = \mBox$}, along with an
+\gls{edge}~$\mEdge{n'_1}{n'_2}$.
+
+To model the connection between the $\mathit{op}$ operation and its two input
+operands~$x$ and~\mbox{$y$\hspace{-1pt},} we add two
+\glspl{edge}~$\mEdge{n_x}{n'_1}$ and $\mEdge{n_y}{n'_1}$ such that
+\mbox{$\mType(n_x) = \mType(n_y) = \mBox$.}
+%
+For the unary operation~$\neg$ we obviously only need one such \gls{edge}, and
+since $\mOr$ and $\mAnd$ are commutative it does not matter in what order the
+\glspl{edge} are arranged with respect to the operator \gls{node}.
+%
+Hence, in the resulting \gls{block DAG}, only \glspl{box node} will have more
+than one \gls{outgoing.e} \gls{edge}.
+%
+An example of such a \gls{DAG} is shown in
+\refFigure{sat-to-dag-covering-reduction}, which can be constructed in linear
+time simply by traversing the Boolean formula.
+
+
+\paragraph{Boolean Operations as Patterns}
+
+\def\mPSat{P_{\mathsc{sat}}}
+
+To cover the \gls{block DAG}, we will use the \glspl{pattern tree} given in
+\refFigure{sat-patterns}, and we will refer to this \gls{pattern set}
+as~$\mPSat$.
+%
+\begin{figure}
+  \subcaptionbox{%
+                  The SAT patterns.
+                  %
+                  For brevity, the patterns for the $\mAnd$~operation are
+                  omitted as these can be easily inferred from the
+                  $\mOr$~patterns.
+                  %
+                  All patterns are assumed to have the same unit cost%
+                  \labelFigure{sat-patterns}%
+                }{%
+                  \begin{minipage}{87mm}%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-x-F}\\
+                      $\mVar{x} = F$
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-x-T}\\
+                      $\mVar{x} = T$
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-satisfied}\\
+                      satisfied
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-not-F}\\
+                      $\mNot T = F$
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-not-T}\\
+                      $\mNot F = T$
+                    }
+
+                    \vspace{\betweensubfigures}
+
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-or-T1}\\
+                      $T \mOr T = T$
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-or-T2}\\
+                      $T \mOr F = T$
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-or-T3}\\
+                      $F \mOr T = T$
+                    }%
+                    \hfill%
+                    \adjustbox{stack}{%
+                      \input{figures/dag-covering/sat-pattern-or-F}\\
+                      $F \mOr F = F$
+                    }%
+                  \end{minipage}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Example of a SAT problem represented as a DAG covering
+                  problem%
+                  \labelFigure{sat-instance}%
+                }%
+                [34mm]%
+                {%
+                  \adjustbox{stack}{%
+                    \input{figures/dag-covering/sat-instance}\\
+                    $(\mVar{x}_1 \mOr \mVar{x}_2) \mAnd (\mNot \mVar{x}_2)$
+                  }%
+                }
+
+  \caption[Transforming SAT into DAG covering]
+          {Transforming SAT to DAG covering~\cite{KoesGoldstein:2008}}
+  \labelFigure{sat-to-dag-covering-reduction}
+\end{figure}
+%
+Every \gls{pattern} in $\mPSat$ adheres to the following invariant:
+%
+\begin{enumerate}
+  \item If a \gls{variable}~$\mVar{x}$ is set to true ($T$), then the selected
+    \gls{pattern} covering the $\mVar{x}$~\gls{node} will also cover the
+    corresponding \gls{box node} of~$\mVar{x}$.
+  \item If the result of an operation $\mathit{op}$ evaluates to false ($F$),
+    then that \gls{pattern} will not cover the corresponding \gls{box node}
+    of~$\mathit{op}$.
+\end{enumerate}
+%
+Another way of looking at it is that an operator in a \gls{pattern}
+\emph{consumes} a \gls{box node} if its corresponding value must be set
+to~$T$\!, and \emph{produces} a \gls{box node} if the result must evaluate
+to~\mbox{$F$\hspace{-1pt}.}
+%
+Using this scheme, we can easily deduce the truth assignments to the
+\glspl{variable} by inspecting whether the \glspl{pattern} selected to cover the
+\gls{DAG} consume the \glspl{box node} of the \glspl{variable}.
+%
+Since the only \gls{pattern} to contain a \gls{stop node} also consumes a
+\gls{box node}, the entire expression will be forced to evaluate to~$T$\!.
+
+In addition to the \gls{node} types that can appear in the \gls{block DAG}, the
+\glspl{pattern} can also contain \glspl{node} of an additional type, $\mAnchor$,
+which we will refer to as \glspl!{anchor node}.
+%
+Let $\mNumChildren(n)$ denote the number of \glspl{child}
+of~\mbox{$n$\hspace{-.8pt},} and \mbox{$\mChild(i\hspace{-.8pt}, n)$} the $i$th
+\gls{child} of~\mbox{$n$\hspace{-.8pt}.}
+%
+We now say that a \gls{pattern}~\mbox{$p$\hspace{-.8pt},} with \gls{root}
+\gls{node}~$p_r$, \emph{matches} the part of a \gls{block
+  DAG}~\mbox{$\mTuple{N\hspace{-1pt}, E}$} which is rooted at a
+\gls{node}~\mbox{$n \in N$} if and only if:
+%
+\begin{enumerate}
+  \item $\mType(n) = \mType(p_r)$,
+  \item $\mNumChildren(n) = \mNumChildren(p_r)$, and
+  \item $\forall 1 \leq i \leq \mNumChildren(n) :
+    \mType(\mChild(i\hspace{-.8pt}, n)) = \mAnchor \mOr
+    \text{$\mChild(i\hspace{-.8pt}, n)$ matches $\mChild(i\hspace{-.8pt},
+      p_r)$}$.
+\end{enumerate}
+%
+In other words, the structure of the \gls{pattern tree} -- which includes the
+\gls{node} types and \glspl{edge} -- must correspond to the structure of the
+matched \gls{subgraph} (excluding \glspl{anchor node}, which can match any
+\gls{node} in the \gls{block DAG}).
+
+We introduce several new definitions.
+%
+Given a \gls{block DAG}~\mbox{$G = \mTuple{N\hspace{-1pt}, E}$}, let
+$\mMatchSet[n]$ be the set of \glspl{pattern} in $\mPSat$ that match at
+\gls{node}~\mbox{$n \in N$\hspace{-1pt}.}
+%
+Also, given a \gls{pattern}~\mbox{$\mTuple{N_p, E_p}$}, let \mbox{$\mMatched(p,
+  n_p)$} be the set of \glspl{node} in $N$ that are matched by a \gls{node}~$n_p
+\in N_p$.
+%
+Lastly, we say that $G$ is \emph{covered} by a function~\mbox{$f : N \rightarrow
+  2^{\mPSat}$}, which maps \glspl{node} in the \gls{block DAG} to a set of
+\glspl{pattern}, if and only if, for each \mbox{$n \in N$\hspace{-1pt},}
+%
+\begin{enumerate}
+  \item $\forall p \in f(n) : \text{$p$ matches $n$}$\hspace{-.8pt},
+  \item $\mType(n) = \mStop \mImp f(n) \neq \emptyset$, and
+  \item $\forall p = \mTuple{N_p, E_p} \in f(v), n_p \in N_p :
+    \mType(n_p) = \mAnchor \mImp f(\mMatched(n, n_p)) \neq
+    \emptyset$.
+\end{enumerate}
+%
+The first \gls{constraint} enforces that only valid \glspl{match} are selected.
+%
+The second \gls{constraint} enforces that some \gls{match} has been selected to
+cover the \gls{stop node}.
+%
+The third \gls{constraint} enforces that \glspl{match} have been selected to
+cover the rest of the \gls{DAG}.
+%
+An \gls{optimal.ps} cover is thus a mapping~$f$ which covers the \gls{block
+  DAG}~\mbox{$\mTuple{N\hspace{-1pt}, E}$} and also minimize
+%
+\begin{displaymath}
+  \sum_{\mathclap{n \, \in \, N}}
+  \hspace{.8em}
+  \sum_{\mathclap{p \, \in \, f(n)}}
+  \mCost(p),
+\end{displaymath}
+%
+where $\mCost(p)$ is the cost of \gls{pattern}~\mbox{$p$\hspace{-.8pt}.}
+
+
+\paragraph{Optimal Solution to DAG Covering $\Rightarrow$ Solution to SAT}
+
+We now postulate that if the \gls{optimal.ps} cover has a total cost equal to
+the number of non-\glspl{box node} in the~\gls{block DAG}, then the
+corresponding \gls{SAT} problem is satisfiable.
+%
+Since all \glspl{pattern} in $\mPSat$ cover exactly one non-\gls{box node} and
+have equal unit cost, the condition above means that every \gls{node} in the
+\gls{DAG} is covered by exactly one \gls{pattern}.
+%
+This in turn means that exactly one value will be assumed for every Boolean
+\gls{variable} and operator result, which is easy to deduce through inspection
+of the selected \glspl{match}.
+
+We have thereby shown that an instance of the \gls{SAT} problem can be solved by
+transforming it, in polynomial time, to an instance of the \gls{optimal.ps}
+\gls{DAG covering} problem.
+%
+Hence \gls{optimal.ps} \gls{DAG covering} -- and therefore also optimal
+\gls{instruction selection} based on \gls{DAG covering} -- is NP-complete.
+%
+\hfill\qedsymbol
+
+
+\section{Straightforward, Greedy Techniques}
+\labelSection{dc-greedy-techniques}
+
+Since \gls{instruction selection} on \glspl{DAG} with \gls{optimal.ps}
+\gls{pattern selection} is computationally difficult, most \glspl{instruction
+  selector} based on this \gls{principle} are suboptimal.
+%
+One of the first \glspl{code generator} to operate on \glspl{DAG} was developed
+by \textcite{AhoEtAl:1976}.
+%
+In their 1976~paper, \citeauthor{AhoEtAl:1976} introduce some simple greedy
+heuristics for producing \gls{assembly code} for a commutative
+one-\gls{register} \gls{target machine}.
+%
+However, these methods assume a \mbox{1-to-1} mapping between the \glspl{node}
+in a \gls{block DAG} and the \glspl{instruction} and thus effectively ignore the
+\gls{instruction selection} problem.
+
+
+\subsection{LLVM}
+\labelSection{llvm}
+
+A more flexible, but still greedy, heuristic is applied in the well-known
+\gls!{LLVM} \gls{compiler} infrastructure~\cite{LattnerAdve:2004}.
+%
+According to a blog entry by \textcite{Bendersky:2013} -- which at the time of
+writing provides the only documentation, except for the source code itself --
+the \gls{instruction selector} is basically a greedy
+\mbox{\gls{DAG}-to-\gls{DAG}} rewriter.\!%
+%
+\footnote{%
+  \gls{LLVM} is also equipped with a ``fast'' \gls{instruction selector}, but it
+  is implemented as a typical \gls{macro expander} and is only intended to be
+  used when compiling without extensive \gls{program} optimization.%
+}
+
+The \glspl{pattern} -- which are limited to \glspl{tree} -- are expressed in a
+\gls{machine description} that allows common features to be factored out into
+abstract \glspl{instruction}.
+%
+A tool called \gls!{TableGen} expands the abstract \glspl{instruction} into
+\glspl{pattern tree}, which are then processed by a matcher generator.
+%
+To ensure a partial order among all \glspl{pattern}, the matcher generator first
+performs a lexicographical sort on the \gls{pattern set}, in the following
+order:
+%
+\begin{inlinelist}[label=(\roman*), itemjoin={;\ }, itemjoin*={; and\ }]
+  \item by decreasing complexity, which is the sum of the \gls{pattern}'s size
+    and a constant that can be tweaked to give higher priority for particular
+    \glspl{instruction}
+  \item by increasing cost
+  \item by increasing size of the \gls{subgraph} that replaces the covered part
+    in the \gls{block DAG} (if the corresponding \gls{pattern} is selected)
+\end{inlinelist}.
+%
+Once sorted, the \glspl{pattern} are converted into small recursive
+\glspl{program} which essentially check whether the corresponding \gls{pattern}
+matches at a given \gls{node} in the \gls{block DAG}.
+%
+These \glspl{program} are then compiled into a form of byte code and assembled
+into a matcher table, arranged such that the lexicographical sort is preserved.
+%
+The \gls{instruction selector} applies this table by simply executing the byte
+code, starting with the first element.
+%
+When a \gls{match} is found, the \gls{pattern} is greedily selected and the
+matched \gls{subgraph} is replaced with the output (usually a single \gls{node})
+of the selected \gls{pattern}.
+%
+This process repeats until there are no \glspl{node} remaining in the original
+\gls{block DAG}.
+
+Although in extensive use (as of \mbox{version 3.4}), \gls{LLVM}'s
+\gls{instruction selector} has several drawbacks.
+%
+The main disadvantage is that any \gls{pattern} that is not supported by
+\gls{TableGen} has to be handled manually through custom \gls{C}~functions.
+%
+Unlike \gls{GCC} -- which applies \gls{macro expansion} combined with
+\gls{peephole optimization} (see
+\refSection{macro-expansion-with-peephole-optimization}) -- this includes all
+\gls{multi-output.ic} \glspl{instruction}, since \gls{LLVM} is restricted to
+\glspl{pattern tree} only.
+%
+In addition, the greedy scheme compromises code quality.
+
+
+\section{Techniques Based on Exhaustive Search}
+\labelSection{dc-exhaustive-search-techniques}
+
+Although \gls{optimal.ps} \gls{pattern selection} can be achieved through
+exhaustive search, in practice this is typically infeasible due to the
+exponential number of possible combinations.
+%
+Nonetheless, there do exist a few techniques that do exactly this, but they
+apply various techniques to prune the search space.
+
+
+\subsection{Extending Means-End Analysis to DAGs}
+
+Twenty years after \citeauthor{Newcomer:1975} and \citeauthor{CattellEtAl:1979}
+(see \refSection{tree-covering-first-approaches}),
+\citeauthor{YuHu:1994a}~\cite{YuHu:1994a, YuHu:1994b} rediscovered
+\gls{means-end analysis} as a method for \gls{instruction selection}.
+%
+They also made two major improvements.
+%
+First, \citeauthor{YuHu:1994a}'s design supports \glsshort{block DAG} and
+\glspl{pattern DAG} whereas those by~\citeauthor{Newcomer:1975} and
+Cattell~\etal are both limited to \glspl{tree}.
+%
+Second, it combines \gls{means-end analysis} with \gls!{hierarchical
+  planning}~\cite{Sacerdoti:1973}, which is a \gls{search} strategy that relies
+on the fact that many problems can be arranged in a hierarchical manner for
+handling larger and more complex problem instances.
+%
+Using \gls{hierarchical planning} enables exhaustive exploration of the
+\gls{search space} while at the same time avoiding the situations of dead ends
+and infinite looping that may occur in straightforward implementations of
+\gls{means-end analysis} (\citeauthor{Newcomer:1975} and Cattell~\etal both
+circumvented this problem by enforcing a cut-off when a certain depth in the
+\gls{search space} had been reached).
+
+Although this technique exhibits a worst time execution that is exponential in
+the search depth, \citeauthor{YuHu:1994a} assert that a depth of~\num{3} is
+sufficient to yield results of equal quality to that of handwritten
+\gls{assembly code}.
+%
+This claim notwithstanding, it is unclear whether it can be extended to support
+complex \glspl{instruction} such as \gls{inter-block.ic} and
+\gls{interdependent.ic} \glspl{instruction}.
+
+
+\subsection{Relying on Semantic-Preserving Transformations}
+
+In 1996, \textcite{HooverZadeck:1996} developed a system called \gls!{Toast}
+with the goal of automating the generation of entire \gls{compiler} frameworks
+-- including \gls{instruction scheduling} and \gls{register allocation} -- from
+a declarative \gls{machine description}.
+%
+In \gls{Toast} the \gls{instruction selection} is done by applying
+semantic-preserving transformations during \gls{pattern selection} to make
+better use of the \gls{instruction set}.
+%
+For example, although \mbox{$x * 2$} is semantically equivalent to \mbox{$x \ll
+  1$}, where $x$ is arithmetically shifted one bit to the right which is a
+faster computation than multiplication.
+%
+Most \glspl{instruction selector}, however, will fail to select
+\glspl{instruction} implementing the latter when the former appears in the
+\gls{block DAG} as the \glspl{pattern} are syntactically different from one
+another.
+
+Their design works as follows.
+%
+First, the \gls{frontend} emits \glspl{block DAG} consisting of \glspl{semantic
+  primitive}, a kind of \gls{IR} code also used for describing the
+\glspl{instruction}.
+%
+The \gls{block DAG} is then semantically matched using \gls{single-output.ic}
+\glspl{pattern} derived from the \glspl{instruction}.
+%
+Semantic \glspl{match} -- which \citeauthor{HooverZadeck:1996} call \glspl!{toe
+  print} -- and are found by a \gls{semantic comparator}.
+%
+The \gls!{semantic comparator} first performs syntactic matching -- that is,
+checking that the \glspl{node} are of the same type, which is done using a
+straightforward \mbox{$\mBigO(nm)$}~algorithm -- and then resorts to
+semantic-preserving transformations for when syntactic matching fails.
+%
+To bound the exhaustive search for all possible \glspl{toe print}, a
+transformation is only applied if it will lead to a syntactic \gls{match} later
+on.
+%
+Once all \glspl{toe print} have been found, they are combined into \glspl!{foot
+  print}, which correspond to the full effects of an \gls{instruction}.
+%
+A \gls{foot print} can consist of just a single \gls{toe print} (as with
+\gls{single-output.ic} \glspl{instruction}) or several (as with
+\gls{multi-output.ic} \glspl{instruction}), but the paper lacks details on how
+this is done exactly.
+%
+Lastly, all combinations of \glspl{foot print} are considered in pursuit of the
+one leading to the most effective implementation of the \gls{block DAG}.
+%
+To further prune the \gls{search space}, this process only considers
+combinations where each selected \gls{foot print} syntactically matches at least
+one \gls{semantic primitive} in the \gls{block DAG}.
+%
+In addition, only ``trivial amounts'' of the \gls{block DAG} (such as
+\glspl{node} representing constants) may be included in more than one \gls{foot
+  print}.
+
+Using a prototype implementation, \citeauthor{HooverZadeck:1996} reported that
+almost $10^{70}$~``implied \gls{instruction} \glspl{match}'' were found for one
+of the test cases, but it is unclear how many of them were actually useful.
+%
+Moreover, in its current form the design appears to be unpractical for
+generating \gls{assembly code} for all but very small \glspl{function}.
+
+
+\section{Extending Tree Covering Techniques to DAGs}
+\labelSection{dc-extending-tree-covering-techniques-to-dags}
+
+Another common approach to \gls{DAG covering} is to reuse already-known,
+linear-time methods from \gls{tree covering}.
+%
+This can be achieved either by transforming the \glspl{block DAG} into
+\glspl{tree}, or by generalizing the \gls{tree}-based algorithms for
+\gls{pattern matching} and \gls{pattern selection}.
+%
+We begin by discussing designs that apply the first technique.
+
+
+\subsection{Undagging Block DAGs}
+
+The simplest approach for reusing \gls{tree covering} techniques is to transform
+the \gls{block DAG} into several \glspl{expression tree}.
+%
+We will refer to this idea as \gls!{undagging}.
+
+As illustrated in \refFigure{undagging-example}, a \gls{block DAG} can be
+\glsshort{undagging}[ged] into \glspl{expression tree} in two ways.
+%
+\begin{figure}
+  \subcaptionbox{%
+                  Block DAG with matches%
+                  \labelFigure{undagging-example-original}%
+                }%
+                [20mm]%
+                {%
+                  \input{figures/dag-covering/undagging-example-original}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  After edge splitting%
+                  \labelFigure{undagging-example-after-splitting}%
+                }%
+                {%
+                  \input{%
+                    figures/dag-covering/undagging-example-after-splitting%
+                  }%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  After node duplication%
+                  \labelFigure{undagging-example-after-duplication}%
+                }%
+                {%
+                  \input{%
+                    figures/dag-covering/undagging-example-after-duplication%
+                  }%
+                }%
+
+  \caption{Example of undagging a block DAG}
+  \labelFigure{undagging-example}
+\end{figure}
+%
+The first approach is to split the edges involving shared \glspl{node} -- these
+are \glspl{node} where reuse occurs due to the presence of common subexpressions
+-- which results in a set of disconnected \glspl{expression tree} that can then
+be covered individually.
+%
+Not surprisingly, this approach is called \gls!{edge splitting}.
+%
+An implicit connection between the \glspl{expression tree} is maintained by
+forcing the values computed at the shared \glspl{node} to be stored and read
+from a specific location, typically in memory.
+%
+An example of such an implementation is \gls!{Dagon}, a technology binder
+developed by \textcite{Keutzer:1987}, which maps technology-independent
+descriptions onto circuits.
+%
+The second approach is to duplicate the \glspl{node} involved in computing the
+shared value, which is known as \gls!{node duplication}.
+%
+This results in a single but larger \gls{expression tree} compared to those
+produced with \gls{edge splitting}.
+
+Common for both schemes is that they compromise code quality:
+%
+\begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+  \item too aggressive \gls{edge splitting} produces many small \glspl{tree}
+    that cannot be covered using larger \glspl{pattern}, inhibiting use of more
+    efficient \glspl{instruction}
+  \item too aggressive \gls{node duplication} incurs a larger computational
+    workload where many operations are needlessly re-executed in the final
+    \gls{assembly code}
+\end{inlinelist}.
+%
+Moreover, the intermediate results of an edge-split \gls{block DAG} must be
+forcibly stored in specific locations, which can be troublesome for
+heterogeneous memory-\gls{register} architectures (this particular problem was
+studied by \textcite{AraujoEtAl:1996}).
+
+
+\paragraph{Balancing Splitting and Duplication}
+
+In 1994, \citeauthor{FauthEtAl:1994}~\cite{FauthEtAl:1994, Muller:1994}
+developed a technique that tries to mitigate the deficiencies of \gls{undagging}
+by balancing the use of \gls{node duplication} and \gls{edge splitting}.
+%
+Implemented in the \gls!{CBC}, the \gls{instruction selector} applies a
+heuristic algorithm that first favors \gls{node duplication}, and resorts to
+\gls{edge splitting} when the former is deemed too costly.
+%
+The decision about whether to duplicate or to split is taken by comparing the
+cost of the two solutions and selecting the cheapest one.
+%
+The cost is calculated as a weighted sum \mbox{$w_1 n_{\text{dup}} + w_2
+  n_{\text{split}}$}, where $n_{\text{dup}}$ is the number of \glspl{node} in
+the \gls{block DAG} (a rough estimate of code size), and $n_{\text{split}}$ is
+the expected number of \glspl{node} executed along each execution path (a rough
+estimate of execution time).
+%
+Once this is done, each resulting \gls{expression tree} is covered by an
+improved version of \gls{IBurg} (see \refAppendix{tree-covering} on
+\refPageOfSection{tc-iburg}) with extended match condition support.
+%
+However, the experimental data is too limited for us to judge how efficient this
+technique is compared to a design where the \glspl{block DAG} have been
+transformed into \glspl{expression tree} using just one method.
+
+
+\paragraph{Register-Sensitive Instruction Selection}
+
+In 2001, \textcite{SarkarEtAl:2001} developed an \gls{instruction selection}
+technique that attempts to reduce the \gls!{register pressure} -- that is, the
+number of \glspl{register} needed by the \gls{function} -- in order to
+facilitate \gls{register allocation}.\!%
+%
+\footnote{%
+  Another register-aware \gls{instruction selection} technique was developed in
+  2014 by \textcite{XieEtAl:2014}, with the aim of reducing the number of writes
+  to a nonvolatile \gls{register} file.
+  %
+  However, the \glspl{instruction} are selected using a proprietary and greedy
+  heuristic hat does not warrant in-depth discussion.%
+}
+
+The design works as follows.
+%
+The \gls{block DAG} is first augmented with additional \glspl{edge} to signify
+scheduling dependencies between memory operations, and then it is split into a
+several \glspl{expression tree} using a heuristic to decide which \glspl{edge}
+to break.
+%
+The \glspl{expression tree} are then covered individually using conventional
+methods based on \gls{tree covering}.
+%
+However, instead of being the usual number of execution cycles, the cost of each
+\gls{instruction} is set so as to reflect the amount of \gls{register pressure}
+incurred by that instruction (unfortunately, the paper lacks details on how
+these costs are computed exactly).
+%
+Once \glspl{pattern} have been selected, the \glspl{node} which are covered by
+the same \gls{pattern} are merged into \glspl{super node}.
+%
+The resulting \gls{graph} is then checked for whether it contains any
+\glspl{cycle}, which may appear due to the extra data dependencies that were
+added at the earlier stage.
+%
+If it does, it means that there exist cyclic scheduling dependencies between two
+or more memory operations, making it an illegal cover.
+%
+The splits are then reverted and the process repeats until a legal cover is
+found.
+
+\citeauthor{SarkarEtAl:2001} implemented their \gls{register}-sensitive design
+in \gls!{Jalapeno}, a \gls{register}-based \gls{Java} virtual machine developed
+by \gls{IBM}.
+%
+For a small set of problems the performance increased by about
+\SI{10}{\percent}, which \citeauthor{SarkarEtAl:2001} claim to be due to fewer
+\glspl{instruction} needed for \gls{register} \gls{spilling.r} compared to the
+default \gls{instruction selector}.
+%
+Although innovative, it is doubtful that the technique can be extended much
+further.
+
+
+\subsection{Extending the Dynamic Programming Approach to DAGs}
+
+To avoid the application of ad hoc heuristics, several \gls{DAG}-based
+\glspl{instruction selector} perform \gls{pattern selection} by applying an
+extension of the \gls{tree}-based \gls{DP}~algorithm originally developed by
+\textcite{AhoJohnson:1976}.
+%
+According to the literature, \citeauthor{LiemEtAl:1994}~\cite{LiemEtAl:1994,
+  PaulinEtAl:1994, PaulinEtAl:1995} appear to have been the first to have done
+so.
+
+In a seminal paper from~1994, \citeauthor{LiemEtAl:1994} introduce a design
+which is part of \gls!{CodeSyn}, a well-known code synthesis system, which in
+turn is part of a development environment for embedded systems called
+\gls!{FlexWare}.
+%
+For \gls{pattern matching}, \citeauthor{LiemEtAl:1994} applied the same
+technique as \textcite{Weingart:1973} (see
+\refSection{first-techniques-to-use-tree-pattern-matching}) by combining all
+available \glspl{pattern tree} into a single \gls{tree} of \glspl{pattern}.
+%
+This \gls{pattern tree} is traversed in tandem with the \gls{block DAG}, and for
+each \gls{node} an \mbox{$\mBigO(nm)$} \gls{pattern matcher} is used to find all
+\glspl{match set}.
+%
+\Gls{pattern selection} is then performed using an extended version of the
+\gls{DP}~algorithm, but the paper does not explain how this is done exactly.
+%
+Moreover, the algorithm is only applied on the data flow of the \gls{block DAG}
+-- control flow is covered separately using a simple heuristic -- and no
+guarantees are made that the \gls{pattern selection} is \gls{optimal.ps}, as
+that is an NP-complete problem.
+
+
+\paragraph{Potentially Optimal Pattern Selection}
+
+In a paper from~1999, \textcite{Ertl:1999} introduces a design which guarantees
+\gls{optimal.ps} \gls{pattern selection} on \glspl{block DAG} for certain
+\glspl{machine grammar}.
+%
+The idea is to first make a bottom-up pass over the \gls{block DAG} and compute
+the costs using the conventional \gls{DP}~algorithm as discussed in
+\refAppendix{tree-covering}.
+%
+Each \gls{node} is thus labeled with the same costs, as if the \gls{block DAG}
+had first been transformed into a \gls{tree} through \gls{node} duplication.
+%
+But \citeauthor{Ertl:1999} recognized that if several \glspl{pattern} reduce the
+same \gls{node} to the same \gls{nonterminal}, then the reduction to that
+\gls{nonterminal} can be shared between several \glspl{rule} whose
+\glspl{pattern} contain the \gls{nonterminal}.
+%
+Hence the \glspl{instruction} for implementing shared \glspl{nonterminal} only
+need to be emitted once, decreasing code size and also improving performance,
+since the amount of redundant computation is reduced.
+%
+With appropriate data structures, a linear-time implementation can be achieved.
+
+An example illustrating such a situation is given in \refFigure{ertl-example},
+where we see an addition that will have to be implemented twice, as its
+\gls{node} is covered by two separate \glspl{pattern} each of which reduces the
+\gls{subtree} to a different \gls{nonterminal}.
+%
+\begin{figure}
+  \mbox{}%
+  \hfill%
+  \adjustbox{valign=M}{%
+    \input{figures/dag-covering/ertl-example}%
+  }%
+  \hfill%
+  \adjustbox{valign=M, minipage=75mm}{%
+    \captionsetup{skip=0pt}%
+    \caption[%
+              Example of sharing reduced nonterminals between nodes in a block
+              DAG%
+            ]%
+            {%
+              A block DAG to be covered using tree patterns~\cite{Ertl:1999}.
+              %
+              The nonterminal produced by a given match is given along the edge
+              where the result is used.
+              %
+              Note that the \cVar*{a}~\gls{node} can be covered by two matches,
+              both of which reduce the node to the same nonterminal.
+              %
+              Hence only one match is needed as the result can be shared by the
+              two matches making use of that nonterminal%
+            }
+    \labelFigure{ertl-example}%
+  }
+\end{figure}
+%
+The \cVar*{reg}~\gls{node}, on the other hand, is reduced twice to the same
+\gls{nonterminal} ($\mNT{Reg}$), and can thus be shared between the \glspl{rule}
+that use this \gls{nonterminal} in the \glspl{pattern}.
+
+As said earlier, however, this technique yields \gls{optimal.ps} \gls{pattern
+  selection} only for certain \glspl{machine grammar}.
+%
+\citeauthor{Ertl:1999} therefore devised a checker, called \gls!{DBurg}, that
+detects when the \gls{grammar} does not belong into this category and thus
+cannot guarantee optimality.
+%
+The basic idea is to check whether every locally \gls{optimal.ps} decision is
+also globally \gls{optimal.ps} by performing inductive proofs over the set of
+all possible \glspl{block DAG}.
+%
+To do this efficiently, \citeauthor{Ertl:1999} implemented \gls{DBurg} using the
+ideas behind \gls{Burg} (hence the name).
+
+
+\paragraph{Combining DP and Edge Splitting}
+
+\def\overlapCost{overlap-cost\xspace}
+\def\cseCost{cse-cost\xspace}
+
+\textcite{KoesGoldstein:2008} extended \citeauthor{Ertl:1999}'s ideas by
+providing a heuristic that splits the \gls{block DAG} at points where \gls{node
+  duplication} is estimated to have a detrimental effect on code quality.
+%
+Like \citeauthor{Ertl:1999}'s algorithm, \citeauthor{KoesGoldstein:2008}'s first
+selects \glspl{pattern} optimally by performing a \gls{tree}-like, bottom-up
+\gls{DP}~pass which ignores the fact that the input is a~\gls{DAG}.
+%
+Then, at points where multiple \glspl{pattern} overlap, two costs are
+calculated:
+%
+\begin{inlinelist}[itemjoin={\ }, itemjoin*={\ and}]
+  \item an \emph{\overlapCost}
+  \item a \emph{\cseCost}
+\end{inlinelist}.
+%
+The \overlapCost is an estimate of the cost of letting the \glspl{pattern}
+overlap and thus incur duplication of operations in the final \gls{assembly
+  code}.
+%
+The \cseCost is an estimate of the cost of splitting the \glspl{edge} at such
+points.
+%
+If \cseCost is lower than \overlapCost, then the \gls{node} where overlapping
+occurs is marked as \gls!{fixed.n}.
+%
+Once all such \glspl{node} have been processed, a second bottom-up \gls{DP}~pass
+is performed on the \gls{block DAG}, but this time no \glspl{pattern} are
+allowed to span across \gls{fixed.n} \glspl{node}, which can only be matched at
+the \gls{root} of a \gls{pattern}.
+%
+Lastly, a top-down pass emits the \gls{assembly code}.
+
+For evaluation purposes \citeauthor{KoesGoldstein:2008} compared their own
+implementation, called \gls!{Noltis}, against an implementation based on
+\glsdesc{IP} -- we will discuss such techniques later in this appendix -- and
+found that \gls{Noltis} achieved \gls{optimal.ps} \gls{pattern selection} in
+\SI{99.7}{\percent} of the test cases.
+%
+More details are given in \citeauthor{Koes:2009}'s doctoral
+dissertation~\cite{Koes:2009}.
+%
+But like \citeauthor{Ertl:1999}'s design, \citeauthor{KoesGoldstein:2008}'s is
+limited to \glspl{pattern tree} and thus cannot support more complex
+\glspl{instruction} such as \gls{multi-output.ic} \glspl{instruction}.
+
+
+\paragraph{Supporting Multi-output Instructions}
+
+In most \gls{instruction selection} techniques based on \gls{DAG covering}, it
+is assumed that the outputs of a \gls{pattern DAG} always occur at the
+\gls{root}~\glspl{node}.
+%
+But in a design by \citeauthor{ArnoldCorporaal:1999}~\cite{ArnoldCorporaal:1999,
+  ArnoldCorporaal:2001} (originally introduced in a technical report by
+\textcite{Arnold:1999}), the \glspl{node} representing output can be marked
+explicitly.
+%
+The advantage of this is that it allows the \glspl{pattern DAG} to be fully
+decomposed into \glspl{tree} such that each output value receives its own
+\gls{pattern tree}, which \citeauthor{ArnoldCorporaal:1999} call
+\gls!{partial.p}[ \glspl{pattern}].
+%
+An example is given in \refFigure{arnold-example}.
+
+\begin{figure}
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{Original pattern DAG\labelFigure{arnold-example-dag}}%
+                [40mm]%
+                {%
+                  \input{figures/dag-covering/arnold-example-dag}%
+                }%
+  \hfill%
+  \subcaptionbox{Partial pattern trees\labelFigure{arnold-example-trees}}%
+                {%
+                  \adjustbox{valign=b}{%
+                    \input{figures/dag-covering/arnold-example-tree-1}%
+                  }%
+                  \hspace{1.5em}%
+                  \adjustbox{valign=b}{%
+                    \input{figures/dag-covering/arnold-example-tree-2}%
+                  }%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Example of converting a pattern DAG into partial tree patterns]%
+          {%
+            Example of converting a pattern DAG into partial pattern trees.
+            %
+            The pattern DAG represents an \instrCode*{add} instruction that also
+            sets a status flag if the result is equal to~\num{0}.
+            %
+            The black nodes indicate the output nodes%
+          }
+  \labelFigure{arnold-example}
+\end{figure}
+
+The \gls{partial.p} \glspl{pattern} are then matched over the \gls{block DAG}
+using an \mbox{$\mBigO(nm)$} algorithm.
+%
+After matching, another algorithm attempts to merge appropriate combinations of
+partial \glspl{match} into \glspl{match} of the original \gls{pattern DAG}.
+%
+This is done in a straightforward manner by maintaining, for each \gls{match},
+an array that maps the \glspl{node} in the \gls{pattern DAG} to the covered
+\glspl{node} in the \gls{block DAG}.
+%
+Then, a check is made on whether two \gls{partial.p} \glspl{pattern} belong to
+the same original \gls{pattern DAG} and have compatible mappings.
+%
+If a pair of \gls{pattern} \glspl{node} belong to different \gls{partial.p}
+\glspl{pattern} but correspond to the same \gls{node} in the original
+\gls{pattern DAG}, then both \gls{pattern} \glspl{node} must cover the same
+\gls{node} in the \gls{block DAG}.
+%
+For \gls{pattern selection}, \citeauthor{ArnoldCorporaal:1999} applied a variant
+of the \gls{DP}~scheme but combined it with a greedy heuristic in order to
+enforce that each \gls{node} is covered exactly once.
+%
+Hence code quality is compromised.
+
+
+\section{Modeling Instruction Selection as an M(W)IS Problem}
+\labelSection{dc-mwis-based-approaches}
+
+In the techniques discussed so far, the \gls{instruction selector} operates
+directly on the \gls{block DAG} when performing \gls{pattern selection}.
+%
+The same applies for most designs based on \gls{tree covering}.
+%
+But another approach is to indirectly solve the \gls{pattern selection} problem
+by first transforming it into an instance of some other problem for which there
+already exist efficient solving methods.
+%
+When that problem has been solved, the answer can be translated back into a
+solution for the original \gls{pattern selection} problem.
+
+One such problem is the \gls!{MIS}[ problem], where the task is to select the
+largest set of \glspl{node} from a \gls{graph} such that no pairs of selected
+\glspl{node} have an \gls{edge} between them.
+%
+In the general case, finding such a solution is
+NP-complete~\cite{GareyJohnson:1979}, and the \gls{pattern selection} problem is
+transformed into an \gls{MIS} problem as follows.
+%
+From the \glspl{match set} found by \gls{pattern matching}, a corresponding
+\gls!{conflict graph} -- or \gls!{interference graph}, as it is sometimes called
+-- is formed.
+%
+Each \gls{node} in the \gls{conflict graph} represents a \gls{match}, and there
+exists an \gls{edge} between two \glspl{node} if and only if the corresponding
+\glspl{match} overlap.
+%
+An example of this is given in \refFigure{mis-example-2}.
+%
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Block DAG with matches%
+                  \labelFigure{mis-example-2-dag}%
+                }{%
+                  \input{figures/dag-covering/mis-example-dag}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Interference graph%
+                  \labelFigure{mis-example-2-int-graph}%
+                }{%
+                  \input{figures/dag-covering/mis-example-int-graph}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Example of modeling instruction selection as a MIS problem]%
+          {%
+            Example of modeling instruction selection as a MIS problem.
+            %
+            Valid maximal independent sets of the interference graph are
+            \mbox{$\mSet{m_1, \ldots, m_5, m_7}$}, \mbox{$\mSet{m_1, m_2, m_3,
+                m_5, m_8}$}, and \mbox{$\mSet{m_1, m_2, m_3, m_6, m_7}$}, which
+            correspond to valid covers of the block DAG%
+          }
+  \labelFigure{mis-example-2}
+\end{figure}
+%
+By solving the \gls{MIS} problem for the \gls{conflict graph}, we obtain a
+selection of \glspl{match} such that every \gls{node} in the \gls{block DAG} is
+covered by exactly one \gls{match}.
+
+But a solution to the \gls{MIS} problem does not necessarily yield an
+\gls{optimal.ps} solution to the \gls{pattern selection} problem, as the former
+does not incorporate costs.
+%
+We address this limitation by transforming the \gls{MIS} problem into a
+\gls!{MWIS}[ problem], where the task is to find a solution to the \gls{MIS}
+problem that maximizes (or minimizes) \mbox{$\sum_{p} \mWeight{p}$}, and assign
+as weights the costs of the \glspl{pattern}.
+%
+We can get the solution with minimal total cost simply by negating the weights.
+%
+Note that although the \gls{MWIS}-based techniques discussed in this
+dissertation have all been limited to \glspl{block DAG}, the approach can just
+as well be applied in \gls{graph covering}, which will be introduced in
+\refAppendix{graph-covering}.
+
+
+\subsection{Applications}
+
+In 2007, \textcite{ScharwaechterEtAl:2007} introduced what appears to be the
+first \gls{instruction selection} technique to use the \gls{MWIS} approach for
+selecting \glspl{pattern}.
+%
+But despite this novelty, the most cited contribution of their design is its
+extensions to \glspl{machine grammar} to support \gls{multi-output.ic}
+\glspl{instruction}.
+
+
+\paragraph{Machine Grammars with Multiple Left-Hand Side Nonterminals}
+\labelSection{dc-rules-multiple-productions}
+
+\textcite{ScharwaechterEtAl:2007} appears to have pioneered the modeling of
+\gls{instruction selection} as a \gls{MWIS} problem, although the main
+contribution of their paper is the extension of \glspl{machine grammar} to
+handle \gls{multi-output.ic} \glspl{instruction}.
+%
+The idea is to model such \glspl{instruction} using \gls!{complex.r}[
+  \glspl{rule}], which each consists of multiple \glspl{production} -- one for
+every result.
+%
+In this dissertation, such \glspl{production} and their \glspl{pattern} are
+called \gls!{proxy.r}[ \glspl{rule}]%
+%
+\footnote{%
+  In the original paper, they are called \gls!{split.r}[ \glspl{rule}].%
+}
+%
+and \gls!{proxy.p}[ \glspl{pattern}], respectively, whereas \glspl{rule} with a
+single \gls{production} and their \glspl{pattern} are called \gls!{simple.r}[
+  \glspl{rule}] and \gls!{simple.p}[ \glspl{pattern}], respectively.
+%
+The \gls{rule} structure is also illustrated in
+\refFigure{extended-machine-grammar-rule-anatomy-2}.
+
+\begin{figure}
+  \centering%
+  \figureFont\figureFontSize%
+  \newcommand{\simplePatternText}{%
+    \trimbox{0 4pt 0 4pt}{%
+      \begin{tabular}{@{}c@{}}
+        simple\\[-1ex]
+        pattern
+      \end{tabular}%
+    }%
+  }
+  \newcommand{\proxyPatternText}{%
+    \trimbox{0 4pt 0 4pt}{%
+      \begin{tabular}{@{}c@{}}
+        proxy\\[-1ex]
+        pattern
+      \end{tabular}%
+    }%
+  }%
+  \begin{displaymath}
+    \underbrace{
+      \mNT{A}
+      \rightarrow
+      \overbrace{
+        \irCode{op} \ldots
+      }^{\text{\simplePatternText}}
+      \quad
+      \text{cost}
+      \quad
+      \text{action}
+    }_{\text{simple rule}}
+    \qquad
+    \underbrace{
+      \langle \mNT{A}, \mNT{B}, \ldots \rangle
+      \rightarrow
+      \overbrace{
+        \langle
+          \:
+          \overbrace{\irCode{op} \ldots}^{\text{\proxyPatternText}},
+          \:
+          \overbrace{\irCode{op} \ldots}^{\text{\proxyPatternText}},
+          \:
+          \ldots
+          \:
+        \rangle
+      }^{\text{complex pattern}}
+      \quad
+      \text{cost}
+      \quad
+      \text{action}
+    }_{\text{complex rule}}
+  \end{displaymath}
+
+  \vspace*{-\baselineskip}
+
+  \caption{Anatomy of simple and complex rules in an extended machine grammar}
+  \labelFigure{extended-machine-grammar-rule-anatomy-2}
+\end{figure}
+
+\Gls{pattern matching} is a two-step process.
+%
+First, the \glspl{match set} are found for the \gls{simple.p} and \gls{proxy.p}
+\glspl{pattern}, using conventional \gls{tree}-based \gls{pattern matching}
+techniques.
+%
+Second, the \glspl{match set} for the \gls{complex.p} \glspl{pattern} are found
+by combining the \glspl{match} of \gls{proxy.p} \glspl{pattern} into
+\glspl{match} of \gls{complex.p} \glspl{pattern} where appropriate.
+%
+The \gls{pattern selector} then checks whether it is worth applying a
+\gls{complex.p} \gls{pattern} for covering a certain set of \glspl{node}, or if
+they should be covered using the \gls{simple.p} \glspl{pattern} instead.
+%
+Since the intermediate results of \glspl{node} within \gls{complex.p}
+\glspl{pattern} cannot be reused for other \glspl{pattern}, selecting a
+\gls{complex.p} \gls{pattern} can incur an additional overhead cost as
+\glspl{node} in the \gls{block DAG} may need to be covered using multiple
+\glspl{pattern}.
+%
+Consequently, a \gls{complex.p} \gls{pattern} will only be selected if the cost
+reduced by replacing a set of \gls{simple.p} \glspl{pattern} with this
+\gls{pattern} is greater than the cost incurred by code duplication.
+
+After these decisions have been taken, the next step is to perform \gls{pattern
+  selection}.
+%
+For this, \citeauthor{ScharwaechterEtAl:2007} solve the corresponding \gls{MWIS}
+problem in order to limit solutions to those of exact covering only.
+%
+The weights are calculated as the negated sum of the \gls{proxy.p} \gls{pattern}
+costs, but the paper is ambiguous on how these costs are calculated.
+%
+Since the \gls{MWIS} problem is known to be NP-complete,
+\citeauthor{ScharwaechterEtAl:2007} employed a greedy heuristic called
+\gls!{Gwmin2} by \textcite{SakaiEtAl:2003}.
+%
+Lastly, \gls{proxy.p} \glspl{pattern} which have not been merged into
+\gls{complex.p} \glspl{pattern} are replaced by corresponding \gls{simple.p}
+\glspl{pattern} before \gls{assembly code} emission.
+
+\citeauthor{ScharwaechterEtAl:2007} implemented a prototype called \gls!{CBurg}
+as an extension of \gls{Olive} (see \refAppendix{tree-covering} on
+\refPageOfSection{tc-olive}), and then ran some experiments by targeting a
+\gls{MIPS}-like architecture.
+%
+In these experiments \gls{CBurg} generated \gls{assembly code} which improved
+performance by almost \SI{25}{\percent}, and reduced code size by nearly
+\SI{22}{\percent}, compared to \gls{assembly code} which was only allowed to
+make use of \gls{single-output.ic} \glspl{instruction}.
+%
+Measurements of \gls{CBurg} also indicate that this technique exhibits
+near-linear time complexity.
+%
+\textcite{AhnEtAl:2009} later broadened this work by including scheduling
+dependency conflicts between \gls{complex.p} \glspl{pattern}, and incorporating
+a feedback loop with the \gls{register allocator} to facilitate \gls{register
+  allocation}.
+
+A shortcoming of both designs by \citeauthor{ScharwaechterEtAl:2007} and
+\citeauthor{AhnEtAl:2009} is that \gls{complex.r} \glspl{rule} can only consist
+of disconnected \glspl{pattern tree} (hence there can be no sharing of
+\glspl{node} between the \gls{proxy.p} \glspl{pattern}).
+%
+\textcite{YounEtAl:2011} address this problem in a 2011~paper -- which is a
+revised and extended version of the original paper by
+\citeauthor{ScharwaechterEtAl:2007} -- by introducing index subscripts for the
+operand specification of the \gls{complex.r} \glspl{rule}.
+%
+However, the subscripts are restricted to the input \glspl{node} of the
+\gls{pattern}, still hindering support for completely arbitrary \glspl{pattern
+  DAG}.
+
+
+\paragraph{Targeting Machines with Echo Instructions}
+
+In 2004, \textcite{BriskEtAl:2004} introduced a technique to perform
+\gls{instruction selection} for \glspl{target machine} with special \glspl!{echo
+  instruction}, which are small markers that refer back to an earlier portion in
+the \gls{assembly code} for re-execution.
+%
+This allows the \gls{assembly code} to be compressed by basically using the same
+idea that is applied in the LZ77 algorithm~\cite{ZivLampel:1977}.\!%
+%
+\footnote{%
+  The algorithm performs string compression by replacing recurring substrings
+  that appear earlier in the string with pointers, allowing the original string
+  to be reconstructed by ``copy-pasting.''%
+}
+%
+Since \glspl{echo instruction} do not incur a branch or a procedure call, the
+\gls{assembly code} can be reduced in size without sacrificing performance.
+%
+Consequently, unlike for traditional \glspl{target machine}, the \gls{pattern
+  set} is not fixed in this case but must be determined as a precursor to
+\gls{pattern matching}.
+%
+This is known as the \gls!{ISE}[ problem], which appears when generating code
+for \glspl{ASIP} where the processor can be partially customized for executing a
+particular \gls{program}.
+
+The intuition behind this design is to use \glspl{echo instruction} where code
+duplication is most prominent.
+%
+To find these cases in a given \gls{function}, \citeauthor{BriskEtAl:2004} first
+enumerate all \glspl{subgraph} from the \glspl{block DAG}, and then match each
+\gls{subgraph} over the \glspl{block DAG}.
+%
+\Gls{pattern matching} is done using \gls{VF2}, which is a generic \gls{subgraph
+  isomorphism} algorithm (see \refChapter{existing-isel-techniques-and-reps} on
+\refPageOfSection{ex-isel-rep-vf2-algorithm}).
+%
+Summing the sizes of the resulting \glspl{match set} gives a measure of code
+duplication for each \gls{subgraph}, but this value will be an overestimation as
+the \glspl{match set} may contain overlapping \glspl{match}.
+%
+\citeauthor{BriskEtAl:2004} addressed this by first solving the \gls{MIS}
+problem on the \gls{conflict graph} for each \gls{match set}, and then adding up
+the sizes of \emph{these} sets.
+%
+After selecting the most beneficial \gls{subgraph}, the covered \glspl{node} in
+the \glspl{block DAG} are collapsed into single \glspl{node} to reflect the use
+of \glspl{echo instruction}.
+%
+This process of matching and collapsing is then repeated until no new
+\gls{subgraph} better than some user-defined value criterion can be found.
+%
+\citeauthor{BriskEtAl:2004} performed experiments on a prototype using a
+selected set of benchmark applications, which showed code size reductions of
+\SI{25}{\percent} to \SI{36}{\percent} on average.
+
+
+\section[Modeling Instruction Selection as a Unate/Binate Covering Problem]%
+        {Modeling Instruction Selection as a Unate/Binate Covering\\ Problem}
+\labelSection{dc-unate-binate-covering}
+
+Another approach to solving \gls{pattern selection} is to translate it to a
+corresponding \glsshort!{unate covering} or \gls!{binate covering}[ problem].
+%
+The concepts behind the two are identical with the exception of one detail, and
+both \glsshort{unate covering} and \gls{binate covering} can be used directly
+for covering \glspl{graph} even though the designs discussed in this
+dissertation have only been applied on \glspl{block DAG}.
+
+Although \gls{binate covering}-based techniques actually appeared first, we will
+begin with explaining \gls{unate covering}, as \gls{binate covering} is an
+extension of \gls{unate covering}.
+
+
+\paragraph{Unate Covering}
+
+The idea of \gls{unate covering} is to create a Boolean matrix~$\mMatrix{M}$,
+where each row represents a \gls{node} in the \gls{block DAG} and each column
+represents a \gls{match} covering one or more \glspl{node} in the \gls{block
+  DAG}.
+%
+If we denote $m_{ij}$ as row~$i$ and column~$j$ in~$\mMatrix{M}$, then
+\mbox{$m_{ij} = 1$} indicates that \gls{node}~$i$ is covered by
+\gls{pattern}~\mbox{$j$\hspace{-1pt}.}
+%
+Hence the \gls{pattern selection} problem is equivalent to finding a set of
+columns in $\mMatrix{M}$ such that the sum for every row is exactly~\num{1}.
+%
+An example is given in \refFigure{unate-covering-example}.
+%
+\begin{figure}
+  \subcaptionbox{%
+                  Block DAG with matches%
+                  \labelFigure{unate-covering-example-dag}%
+                }%
+                {%
+                  \input{figures/dag-covering/unate-covering-example-dag}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Boolean matrix%
+                  \labelFigure{unate-covering-example-matrix}%
+                }%
+                {%
+                  \figureFont\figureFontSize%
+                  \begin{tabular}{*{9}{c}}
+                    \toprule
+                        \tabhead node
+                      & $\mathtabhead{m_1}$
+                      & $\mathtabhead{m_2}$
+                      & $\mathtabhead{m_3}$
+                      & $\mathtabhead{m_4}$
+                      & $\mathtabhead{m_5}$
+                      & $\mathtabhead{m_6}$
+                      & $\mathtabhead{m_7}$
+                      & $\mathtabhead{m_8}$\\
+                    \midrule
+                        \tabhead \irVar{a}
+                      & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+                        \tabhead \irVar{b}
+                      & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+                        \tabhead \irVar{c}
+                      & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0\\
+                        \tabhead \irCode{\irAddText}
+                      & 0 & 0 & 0 & 1 & 0 & 1 & 0 & 1\\
+                        \tabhead \irCode{\irMulText}
+                      & 0 & 0 & 0 & 0 & 1 & 1 & 0 & 0\\
+                        \tabhead \irCode{\irLoadText}
+                      & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1\\
+                    \bottomrule
+
+                  \end{tabular}%
+                }
+
+  \caption{Example of unate covering}
+  \labelFigure{unate-covering-example}
+\end{figure}
+%
+\Gls{unate covering} is an NP-complete problem, but as with the \gls{MIS} and
+\gls{MWIS} problems there exist several efficient techniques for solving it
+heuristically (see \cite{CordoneEtAl:2000, GoldbergEtAl:2006} for an overview).
+
+\Gls{unate covering} alone, however, does not incorporate all necessary
+\glspl{constraint} of \gls{pattern selection} when some \glspl{pattern} require
+-- and prevent -- the selection of other \glspl{pattern} in order to yield
+correct \gls{assembly code}.
+%
+Using \glspl{machine grammar} this can be enforced with the appropriate use of
+\glspl{nonterminal}, but for \gls{unate covering} we have no means of expressing
+this \gls{constraint}.
+%
+We therefore turn to \gls{binate covering}, where this is possible.
+
+
+\paragraph{Binate Covering}
+
+We first rewrite the Boolean matrix from the \gls{unate covering} problem into a
+Boolean \gls{CNF} formula.
+%
+If \mbox{$\mVar{x}_i \in \mSet{0, 1}$} represents a \gls{variable} deciding
+whether \gls{match}~$m_i$ is selected, then the Boolean matrix in
+\refFigure{unate-covering-example-matrix} can be rewritten as
+%
+\begin{displaymath}
+  \mVar{x}_1 \mAnd \mVar{x}_2 \mAnd \mVar{x}_3 \mAnd (\mVar{x}_4 \mOr \mVar{x}_6
+  \mOr \mVar{x}_8) \mAnd (\mVar{x}_5 \mOr \mVar{x}_6) \mAnd (\mVar{x}_7 \mOr
+  \mVar{x}_8).
+\end{displaymath}
+
+Now, the difference between \gls{unate covering} and \gls{binate covering} is
+that all \glspl{variable} must be non-negated in the former, but may be negated
+in the latter.
+%
+Hence \gls{binate covering} is equivalent to \gls{SAT}.
+
+
+\subsection{Applications}
+
+According to \citeauthor{LiaoEtAl:1995}~\cite{LiaoEtAl:1995, LiaoEtAl:1998} and
+\textcite{CongEtAl:2004}, the pioneering use of \gls{binate covering} to solve
+\gls{DAG covering} was done by \textcite{Rudell:1989} in 1989 as a part of a
+\gls!{VLSI} synthesis design.
+%
+\citeauthor{LiaoEtAl:1995}~\cite{LiaoEtAl:1995, LiaoEtAl:1998} later adapted it
+to \gls{instruction selection} in a method that optimizes code size for
+one-\gls{register} \glspl{target machine}.
+%
+To prune the search space, \citeauthor{LiaoEtAl:1995} perform \gls{pattern
+  selection} in two iterations.
+%
+In the first iteration, \glspl{pattern} are selected such that the \gls{block
+  DAG} is covered but the costs of necessary data transfers are ignored.
+%
+After this step the \glspl{node} covered by the same \gls{pattern} are collapsed
+into single \glspl{node}, and a second \gls{binate covering} problem is
+constructed to minimize the costs of data transfers.
+%
+Although these two problems can be solved simultaneously,
+\citeauthor{LiaoEtAl:1995} chose not to do so as the number of necessary
+implication clauses would become very large.
+%
+Recently, \textcite{CongEtAl:2004} also applied \gls{binate covering} as part of
+generating application-specific \glspl{instruction} for configurable processor
+architectures.
+
+\Gls{unate covering} was applied by \textcite{ClarkEtAl:2006} in generating
+\gls{assembly code} for acyclic computation accelerators, which can be partially
+customized in order to increase performance of the currently executed
+\gls{function}.
+%
+Described in a paper from~2006, the \glspl{target machine} are presumably
+homogeneous enough that implication clauses are unnecessary.
+%
+The work by \citeauthor{ClarkEtAl:2006} was later expanded by
+\textcite{HormatiEtAl:2007} to reduce the number of interconnects as well as
+data-centered latencies in accelerator designs.
+
+\citeauthor{MartinEtAl:2009}~\cite{MartinEtAl:2009, MartinEtAl:2012} also
+applied \gls{unate covering} to solve a similar problem concerning
+reconfigurable processor extensions.
+%
+However, they combined \gls{instruction selection} with \gls{instruction
+  scheduling} and solved both in tandem using \glsdesc{CP} -- we will discuss
+this approach later in this appendix -- which they also applied for solving the
+\gls{pattern matching} problem.
+%
+Unlike in the cases of \citeauthor{ClarkEtAl:2006} and
+\citeauthor{HormatiEtAl:2007}, who solved their \gls{unate covering} problems
+using heuristics, the \gls{assembly code} generated by
+\citeauthor{MartinEtAl:2009} is potentially optimal.
+
+
+\section{Modeling Instruction Selection Using IP}
+\labelSection{dc-ip-based-approaches}
+
+It is well known that performing \gls{instruction selection}, \gls{instruction
+  scheduling}, or \gls{register allocation} in isolation will typically always
+yield suboptimal \gls{assembly code}.
+%
+But since each subproblem is already NP-complete on its own, attaining
+\gls!{integrated.cg}[ \gls{code generation}] -- where all these problems are
+solved simultaneously -- is an even more difficult problem.
+
+These challenges notwithstanding, \textcite{WilsonEtAl:1994} introduced in 1994
+what appears to be the first design that could be said to yield truly optimal
+\gls{assembly code}.
+%
+\citeauthor{WilsonEtAl:1994} accomplished this by using \gls!{IP}, which is a
+method for solving combinatorial optimization problems (sometimes \gls{IP} is
+also called \glsdesc!{ILP}).
+%
+In \gls{IP}, a problem is expressed using sets of integer \glspl{variable} and
+linear equations, and a \gls{solution} to an \gls{IP}~model is an assignment to
+all \glspl{variable} such that all equations are fulfilled (see
+\refDefinition{ip} on \refPageOfDefinition{ip} for a formal definition).
+%
+In general, solving an \gls{IP}~model is NP-complete, but extensive research in
+this field has made many problem instances tractable.
+%
+For a comprehensive overview of IP, see in~\cite{Wolsey:1998}.
+
+
+\paragraph{Modeling Pattern Selection Using Linear Inequality}
+
+In their seminal paper, \citeauthor{WilsonEtAl:1994} describe that the
+\gls{pattern selection} problem can be expressed as the following linear
+inequality:
+%
+\begin{displaymath}
+  \forall n \in N : \sum_{\mathclap{m \,\in\, M_n}} \mVar{x}_m \leq 1.
+\end{displaymath}
+%
+This reads: for every \gls{node}~$n$ in the \gls{block
+  DAG}~\mbox{$\mTuple{N\hspace{-1pt}, E}$,} at most one \gls{match}~$m$ from the
+\gls{match set} involving~$n$ (represented by $M_n$) may be selected.\!%
+%
+\footnote{%
+  The more common \gls{constraint} is that \emph{exactly one} \gls{match} must
+  be selected, but in the design by \citeauthor{WilsonEtAl:1994} \glspl{node}
+  are allowed to become inactive and thus need not be covered.%
+}
+%
+The decision is represented by a $\mVar{x}_m \in \mSet{0, 1}$~\gls{variable}.
+
+Similar linear equations can be formulated for modeling \gls{instruction
+  scheduling} and \gls{register allocation} -- which
+\citeauthor{WilsonEtAl:1994} also included in their model -- but these are out
+of scope for this dissertation.
+%
+In fact, any \gls{constraint} that can be formulated in this way can be added to
+an existing \gls{IP}~model, making this approach a suitable \gls{code
+  generation} method for targeting irregular architectures.
+%
+Furthermore, this is the first design we have seen that could potentially
+support \gls{interdependent.ic} \glspl{instruction} (although this was not the
+main focus of \citeauthor{WilsonEtAl:1994}).
+
+Solving this monolithic \gls{IP}~model, however, typically requires considerably
+more time compared to the previously discussed techniques of \gls{instruction
+  selection}.
+%
+But the trade-off for longer compilation time is better code quality;
+\citeauthor{WilsonEtAl:1994} reported that experiments showed that the generated
+\gls{assembly code} was of comparable code quality to that of manually optimized
+\gls{assembly code}.
+%
+In theory, optimal \gls{assembly code} can be generated, although this is in
+practice only feasible for small enough \glspl{function}.
+%
+Another much-valued feature is the ability to extend the model with additional
+\glspl{constraint} in order to support complicated \glspl{target machine}, which
+cannot be properly handled by the conventional designs as that typically
+violates assumptions made by the underlying heuristics.
+
+
+\subsection{Approaching Linear Solving Time with Horn Clauses}
+
+\newcommand{\mCmd}[1]{\textsf{#1}}
+
+Although \gls{IP}~models are NP-complete to solve in general, it was discovered
+that for a certain class of problem instances -- namely those based on
+\glspl{Horn clause} -- an optimal solution can be found in linear
+time~\cite{Hooker:1988}.
+%
+A \gls!{Horn clause} is a disjunctive Boolean formula which contains at most one
+non-negated term.
+%
+This can also be phrased as a logical statement that has at most one conclusion.
+%
+For example, the statement
+%
+\begin{displaymath}
+  \mCmd{if}~\mVar{x}_1~\mCmd{and}~\mVar{x}_2~\mCmd{then}~\mVar{x}_3
+\end{displaymath}
+%
+can be expressed as \mbox{$\mNot\mVar{x}_1 \mOr \mNot\mVar{x}_2 \mOr
+  \mVar{x}_3$}, which is a \gls{Horn clause}, as only $\mVar{x}_3$ is not
+negated.
+%
+This can then easily be rewritten into the linear inequality
+%
+\begin{displaymath}
+(1 - \mVar{x}_1) + (1 - \mVar{x}_2) + \mVar{x}_3 \ge 1.
+\end{displaymath}
+%
+Moreover, statements that do not yield \glspl{Horn clause} in their current form
+can often be rewritten so that they do.
+%
+For example,
+%
+\begin{displaymath}
+  \mCmd{if}~\mVar{x}_1~\mCmd{then}~\mVar{x}_2~\mCmd{and}~\mVar{x}_3
+\end{displaymath}
+%
+can be expressed as \mbox{$\mNot\mVar{a} \mOr \mVar{b} \mOr \mVar{c}$} and is
+thus not a \gls{Horn clause} because it has more than one non-negated term.
+%
+But by rewriting it into
+%
+\begin{displaymath}
+  \begin{array}{c}
+    \mCmd{if}~\mVar{x}_1~\mCmd{then}~\mVar{x}_2\\
+    \mCmd{if}~\mVar{x}_1~\mCmd{then}~\mVar{x}_3
+  \end{array}
+\end{displaymath}
+%
+the statement can now be expressed as \mbox{$\mNot\mVar{x}_1 \mOr \mVar{x}_2$}
+and \mbox{$\mNot\mVar{x}_1 \mOr \mVar{x}_3$}, which are two valid \glspl{Horn
+  clause}.
+
+\textcite{Gebotys:1997} exploited this property in 1997 by developing an
+\gls{IP}~model for \gls{TMS320C2x} -- a common \gls{DSP} at the time -- where
+many of the \glspl{constraint} imposed by the target architecture,
+\gls{instruction selection}, and \gls{register allocation}, and a part of the
+\gls{instruction scheduling} problem, are expressed as \glspl{Horn clause}.
+%
+Using only \glspl{Horn clause} may require a larger number of \glspl{constraint}
+than are otherwise needed, but \citeauthor{Gebotys:1997} claims that the number
+is still manageable.
+%
+When compared against a then-contemporary industrial \gls{DSP} \gls{compiler},
+\citeauthor{Gebotys:1997} demonstrated that an implementation based on \gls{IP}
+yielded a performance improvement mean of \SI{44}{\percent} for a select set of
+functions, while attaining reasonable compilation times.
+%
+However, the solving time increased by orders of magnitude when
+\citeauthor{Gebotys:1997} augmented the \gls{IP}~model with the complete set of
+\glspl{constraint} for \gls{instruction scheduling}, which cannot be expressed
+entirely as \glspl{Horn clause}.
+
+
+\subsection{IP-Based Designs with Multi-output Instruction Support}
+
+\citeauthor{LeupersMarwedel:1996}~\cite{LeupersMarwedel:1995,
+  LeupersMarwedel:1996} expanded the work of \citeauthor{WilsonEtAl:1994} --
+whose design is restricted to \glspl{pattern tree} -- by developing an
+\gls{IP}-based \gls{instruction selector} which also supports
+\gls{multi-output.ic} \glspl{instruction}.
+%
+In a paper from~:1996, \citeauthor{LeupersMarwedel:1996} describe a scheme where
+the \glspl{pattern DAG} of \gls{multi-output.ic} \glspl{instruction} --
+\citeauthor{LeupersMarwedel:1996} refer to these as \gls{complex.p}
+\glspl{pattern} -- are first decomposed into multiple \glspl{pattern tree}
+according to their \glspl{RT}.
+%
+\glspl{RT}~are akin to \citeauthor{Fraser:1979}'s \glspl{RTL}~\cite{Fraser:1979}
+(see \refAppendix{macro-expansion} on
+\refPageOfSection{me-register-transfer-lists}), and essentially mean that each
+observable effect gets its own \gls{pattern tree}.
+%
+Each individual \gls{RT} may in turn correspond to one or more
+\glspl{instruction}, but unlike in \citeauthor{Fraser:1979}'s design this is not
+strictly required.
+
+Assuming the \gls{block DAG} has already been \glsshort{undagging}[ged], each
+\gls{expression tree} is first optimally covered using \gls{IBurg}.
+%
+The \glspl{RT} are expressed as \glspl{rule} in an \gls{machine grammar} that
+has been automatically generated from a \gls{machine description} written in
+\glsunset{MIMOLA}\gls{MIMOLA}\glsreset{MIMOLA} (we will come back to this in
+\refSection{dc-modeling-entire-target-machines}).
+%
+Once \glspl{RT} have been selected, the \gls{expression tree} is reduced to a
+\gls{tree} of \glspl{super node}, where each \gls{super node} represents a set
+of \glspl{node} covered by some \gls{RT} that have been collapsed into a single
+\gls{node}.
+%
+Since \gls{multi-output.ic} and \gls{disjoint-output.ic} \glspl{instruction}
+implement more than one~\gls{RT}, the goal is now to cover the \gls{super node}
+\gls{graph} using the \glspl{pattern} which are formed when the
+\glspl{instruction} are modeled as~\glspl{RT}.
+%
+\citeauthor{LeupersMarwedel:1996} addressed this problem by applying a modified
+version of the \gls{IP}~model by \citeauthor{WilsonEtAl:1994}.
+
+But because the step of selecting \glspl{RT} to cover the \gls{expression tree}
+is separate from the step which implements them with \glspl{instruction}, the
+generated \gls{assembly code} is not necessarily optimal for the whole
+\gls{expression tree}.
+%
+To achieve this property, the covering of \glspl{RT} and selection of
+\glspl{instruction} must be done in tandem.
+
+
+\subsection{IP-Based Designs with Disjoint-output Instruction Support}
+
+\textcite{Leupers:2000:SIMD} later made a more direct extension of the
+\gls{IP}~model by \citeauthor{WilsonEtAl:1994} in order to support \gls{SIMD.i}
+\glspl{instruction}, which belong to the class of \gls{disjoint-output.ic}
+\glspl{instruction}.
+%
+Described in a paper from~2000, \citeauthor{Leupers:2000:SIMD}'s design assumes
+every \gls{SIMD.i} \gls{instruction} performs two operations, each of which
+takes a disjoint set of input operands.
+%
+This is collectively called a \gls!{SIMD pair}, and
+\citeauthor{Leupers:2000:SIMD} then extended the \gls{IP}~model with linear
+equations for combining \glspl{SIMD pair} into \gls{SIMD.i} \glspl{instruction}
+and defined the objective function so as to maximize the use of \gls{SIMD.i}
+\glspl{instruction}.
+
+In the paper, \citeauthor{Leupers:2000:SIMD} reports experiments where the use
+of \gls{SIMD.i} \glspl{instruction} reduced code size by up to \SI{75}{\percent}
+for the selected test cases and \glspl{target machine}.
+%
+But since this technique assumes that each individual \gls{operation} of the
+\gls{SIMD.i} \glspl{instruction} is expressed as a single \gls{node} in the
+\gls{block DAG}, it is unclear whether the method can be extended to more
+complex \gls{SIMD.i} \glspl{instruction} and whether it scales to larger
+\glspl{function}.
+%
+\textcite{TanakaEtAl:2003} later expanded \citeauthor{Leupers:2000:SIMD}'s work
+for selecting \gls{SIMD.i} \glspl{instruction} while also taking \gls{data
+  copying} into account by introducing auxiliary transfer \glspl{node} and
+transfer \glspl{pattern} into the \gls{block DAG}.
+
+
+\subsection{Modeling the Pattern Matching Problem with IP}
+
+In 2006, \textcite{BednarskiKessler:2006} developed an \gls{integrated.cg}
+\gls{code generation} design where both \gls{pattern matching} and \gls{pattern
+  selection} are solved using \glsdesc{IP}.
+%
+The scheme -- which later was applied by \textcite{ErikssonEtAl:2008}, and is
+also described in an article by \textcite{ErikssonKessler:2012} -- is an
+extension of their earlier work where \gls{instruction selection} had previously
+more or less been ignored (see~\cite{KesslerBednarski:2001,
+  KesslerBednarski:2002}).
+
+In broad outline, the \gls{IP}~model assumes that a sufficient number of
+\glspl{match} has been generated for a given \gls{block DAG}~$G$.
+%
+This is done using a \gls{pattern matching} heuristic that computes an upper
+bound.
+%
+For each \gls{match}~\mbox{$m$\hspace{-.8pt},} the \gls{IP}~model contains
+integer \glspl{variable} that:
+%
+\begin{itemize}
+  \item map a \gls{pattern} \gls{node} in $m$ to a \gls{node} in $G$;
+  \item map a \gls{pattern} \gls{edge} in $m$ to an \gls{edge} in $G$; and
+  \item decide whether $m$ is used in the solution.
+    %
+    Remember that we may have an excess of \glspl{match}, so they cannot all be
+    selected.
+\end{itemize}
+%
+Hence, in addition to the typical linear equations we have seen previously for
+enforcing coverage, this \gls{IP}~model also includes equations to ensure that
+the selected \glspl{match} are valid \glspl{match}.
+
+Implemented in a framework called \gls!{Optimist},
+\citeauthor{BednarskiKessler:2006} compared their \gls{IP}~model against another
+\gls{integrated.cg} \gls{code generation} design based on \glsdesc{DP}.
+%
+This \gls{DP} algorithm, however, which was developed by the same authors (see
+\cite{KesslerBednarski:2001}), has nothing to do with the conventional
+\gls{DP}~algorithm by \textcite{AhoEtAl:1989}).
+%
+\citeauthor{BednarskiKessler:2006} found that \gls{Optimist} substantially
+reduced compilation time while retaining code quality.
+%
+However, for several test cases -- the largest \gls{block DAG} containing only
+\num{33}~\glspl{node} -- \gls{Optimist} failed to generate any \gls{assembly
+  code} whatsoever within the set time limit.
+%
+One reasonable cause could be that the \gls{IP}~model also attempts to solve
+\gls{pattern matching} -- a problem which we have seen can be solved externally
+-- and thus further exacerbates an already computationally difficult problem.
+
+
+\section{Modeling Instruction Selection Using CP}
+\labelSection{dc-cp-based-approaches}
+
+Although \glsdesc{IP} allows auxiliary \glspl{constraint} to be included into
+the \gls{IP}~model, they may be cumbersome to express as linear equations.
+%
+This issue can be alleviated by using \gls!{CP}, which is another method for
+solving combinatorial optimization problems but has more flexible modeling
+capabilities compared to \gls{IP}.
+%
+For a brief introduction to \gls{CP}, see \refChapter{constraint-programming}.
+
+
+\paragraph{First Application}
+
+In 1990, \textcite{BashfordLeupers:1999} pioneered the use of \gls{CP} in
+\gls{code generation} by developing a \gls{constraint model} for
+\gls{integrated.cg} \gls{code generation} that targets \glspl{DSP} with highly
+irregular architectures (the work is also discussed in~\cite{Leupers:2000:SIMD,
+  LeupersBashford:2000}).
+%
+Like \citeauthor{LeupersMarwedel:1996}'s \gls{IP}-based design,
+\citeauthor{BashfordLeupers:1999}'s first breaks down the \gls{instruction set}
+of the \gls{target machine} into a set of \glspl!{RT} which are used to cover
+individual \glspl{node} in the \gls{block DAG}.
+%
+As each \gls{RT} concerns specific \glspl{register} on the \gls{target machine},
+the covering problem essentially also incorporates \gls{register allocation}.
+%
+The goal is then to minimize the cost of covering by combining multiple
+\glspl{RT} that can be executed in parallel as part of some \gls{instruction}.
+
+For each \gls{node} in the \gls{block DAG} a \gls{FRT} is introduced, which
+basically embodies all \glspl{RT} that match a particular \gls{node} and is
+formally defined as the following tuple:
+%
+\begin{displaymath}
+  \mTuple*{
+    \mathit{op},
+    \mVar{d},
+    [\mVar{u}_1, \ldots, \mVar{u}_n],
+    \mVar{f},
+    \mVar{c},
+    \mVar{t},
+    \mathit{CS}
+  }.
+\end{displaymath}
+%
+$\mathit{op}$ is the operation of the \gls{node}.
+%
+$\mVar{d}$ and \mbox{$\mVar{u}_1, \ldots, \mVar{u}_n$} are \glspl{variable}
+representing the \glspl{storage location} of the result and the respective
+inputs to the operation.
+%
+These are typically the \glspl{register} that can be used for the operation, but
+also include \gls!{virtual.sl}[ \glspl{storage location}] which convey that the
+value is produced as an intermediate result in a chain of operations (for
+example, the multiplication term in a multiply-accumulate instruction is such a
+result).
+%
+Then, for every pair of \glspl{operation} that are \gls{adjacent.n} in the
+\gls{block DAG}, a set of \glspl{constraint} is added to ensure that there
+exists a valid data transfer between the \glspl{storage location} of $\mVar{d}$
+and $\mVar{u}_i$ if these are assigned to different \glspl{register}.
+%
+In addition, if either of $\mVar{d}$ and $\mVar{u}_i$ resides in a
+\gls{virtual.sl} \gls{storage location}, then both must be identical.
+%
+$\mVar{f}$,~$\mVar{c}$, and $\mVar{t}$ are all \glspl{variable} which
+collectively represent the \gls!{ERI}.
+%
+The \gls{ERI} specifies at which functional unit the operation will be executed,
+at what cost in terms of number of execution cycles, and by which
+\gls{instruction} type.
+%
+A combination of a functional unit and an \gls{instruction} type is later mapped
+to a particular \gls{instruction}.
+%
+Multiple \glspl{RT} can be combined into the same \gls{instruction} when the
+destination of the result is a \gls{virtual.sl} \gls{storage location} by
+setting \mbox{$\mVar{c} = 0$} and letting the last \gls{node} in the operation
+chain account for the required number of execution cycles.
+%
+The last entity, $\mathit{CS}$, is the set of \glspl{constraint} for defining
+the range of values for the \glspl{variable} and the dependencies between
+$\mVar{d}$ and~$\mVar{u}_i$, as well as other auxiliary \glspl{constraint} that
+may be required for the \gls{target machine}.
+%
+For example, if the set of \glspl{RT} matching a \gls{node} consists of
+%
+\mbox{$%
+  \mSet{
+    \cVar{r}[c] = \cVar{r}[a] + \cVar{r}[b],
+    \cVar{r}[a] = \cVar{r}[c] + \cVar{r}[b]
+  }
+$}, then the corresponding \gls!{FRT} becomes
+%
+\begin{displaymath}
+  \mTuple*{
+    +,
+    \mVar{d},
+    [\mVar{u}_1, \mVar{u}_2],
+    \mVar{f},
+    \mVar{c},
+    \mVar{t},
+    \mSet*{
+      \mVar{d} \in \mSet{\cVar{r}[c], \cVar{r}[a]},
+      \mVar{u}_1 \in \mSet{\cVar{r}[a], \cVar{r}[c]},
+      \mVar{u}_2 = \cVar{r}[b],
+      \mVar{d} = \cVar{r}[c] \mImp \mVar{u}_1 = \cVar{r}[a]
+    }
+  }\!.
+\end{displaymath}
+%
+For brevity, we omit several details such as the \glspl{constraint} concerning
+the~\gls{ERI}.
+
+This \gls{constraint model} is then solved to optimality using a \gls{constraint
+  solver}.
+%
+But since \gls{optimal.ps} \gls{cover}[ing] using \glspl{FRT} is NP-complete,
+\citeauthor{BashfordLeupers:1999} applied heuristics to curb the complexity by
+splitting the \gls{block DAG} into smaller pieces along \glspl{edge} where
+intermediate results are shared.
+%
+Once split, \gls{instruction selection} is then performed on each
+\gls{expression tree} in isolation.
+
+
+\subsection{Taking Advantage of Global Constraints}
+
+So far we have discussed several techniques that apply \glsdesc{CP} for solving
+the problems of \gls{pattern matching} and \gls{pattern selection} -- namely
+those by \citeauthor{BashfordLeupers:1999} and \citeauthor{MartinEtAl:2009}.
+%
+Recently, \textcite{Beg:2013} introduced another \gls{constraint model} for
+\gls{instruction selection} as well as new methods for improving solving.
+%
+For example, in order to reduce the search space, \citeauthor{Beg:2013} applied
+conventional \gls{DP}-based techniques to compute an upper bound on the cost.
+%
+However, the \gls{constraint model} mainly deals with the problem of
+\gls{pattern matching} rather than \gls{pattern selection}.
+%
+Moreover, \citeauthor{Beg:2013} noticed only a negligible improvement (less than
+\SI{1}{\percent}) in code quality compared to \gls{LLVM}, mainly because the
+\glspl{target machine} (\gls{MIPS} and \gls{ARM}) were simple enough that greedy
+heuristics generate near-optimal \gls{assembly code}.
+%
+In addition, the \glspl{block DAG} of the benchmark \glspl{function} were fairly
+\gls{tree}-shaped~\cite{VanBeek:2014}, for which \gls{optimal.ps} code can be
+generated in linear time.
+%
+In any case, none of these designs take advantage of a key feature of
+\glsdesc{CP}, which is the use of \gls{global.c} \glspl{constraint}.
+%
+A \gls!{global.c}[ \gls{constraint}] captures relations among multiple
+\glspl{variable} and results in more \gls{search space} pruning than if it had
+been expressed using a decomposition of \glspl{constraint}.
+
+Hence, when \textcite{FlochEtAl:2010} in 2010 adapted the \gls{constraint model}
+by \citeauthor{MartinEtAl:2009} to support processors with reconfigurable cell
+fabric, they replaced the method of \gls{pattern selection} with
+\glspl{constraint} that are radically different from those incurred by
+\gls{unate covering}.
+%
+In addition, unlike in the case of \citeauthor{BashfordLeupers:1999}, the design
+by \citeauthor{FlochEtAl:2010} applies the more direct form of \gls{pattern
+  matching} instead of first breaking down the \glspl{pattern} into \glspl{RT}
+and then selecting \glspl{instruction} that combine as many \glspl{RT} as
+possible.
+
+
+\paragraph{Modeling Pattern Selection Using Global Cardinality Constraint}
+
+As described in their 2010~paper, \citeauthor{FlochEtAl:2010} use the
+\gls{global cardinality constraint} to enforce the requirement that every
+\gls{node} in the \gls{block DAG} must be covered by exactly one
+\gls{match}.\!%
+%
+\footnote{%
+  It is also possible to enforce \gls{pattern selection} through a \gls{global
+    set covering constraint} developed by \textcite{MouthuyEtAl:2007}, but
+  no implementation is known to do so.%
+}
+%
+The \gls{constraint}, referred to as $\mGCC$, constrains the number of
+\glspl{variable} assigned a particular value (which may also be a
+\gls{variable}).
+%
+Given a set \mbox{$v_1, \ldots, v_k$} of values and two sets \mbox{$\mVar{x}_1,
+  \ldots, \mVar{x}_n$} and \mbox{$\mVar{c}_1, \ldots, \mVar{c}_k$} of
+\glspl{variable}, the \gls{constraint} holds if, for each \mbox{$i = 1, \ldots,
+  k$\hspace{-.8pt},} exactly $\mVar{c}_i$ \glspl{variable} in the set
+\mbox{$\mVar{x}_1, \ldots, \mVar{x}_n$} are assigned value~$v_i$ (see also
+\refDefinition{gcc} on \refPageOfDefinition{gcc}).
+%
+For example, \mbox{$\mGCC(\mTuple{5, \mVar{c}_1 = 0} \hspace{-1pt}, \mTuple{3,
+    \mVar{c}_2 = 1} \hspace{-1pt}, \mVar{x}_1 = 2, \mVar{x}_2 =3)$} holds
+because no $\mVar{x}$~\gls{variable} is assigned value~\num{5} and exactly one
+$\mVar{x}$~\gls{variable} is assigned value~\num{3}.
+%
+Similarly, \mbox{$\mGCC(\mTuple{3, \mVar{c}_1 \in \mSet{0, 2}} \hspace{-1pt},
+  \mVar{x}_1 = 2, \mVar{x}_2 = 3)$} does not holds because either none or both
+$\mVar{x}$~\glspl{variable} must be assigned value~\num{3}.
+
+To model \gls{pattern selection} using $\mGCC$, two new sets of \glspl{variable}
+are needed.
+%
+Assume that $N$ denotes the set of \glspl{node} to be covered, $M$ denotes the
+\gls{match set}, and $\mCovers(m)$ denotes the set of \glspl{node} covered by
+\gls{match}~\mbox{$m$\hspace{-.8pt}.}
+%
+Then, \gls{variable} \mbox{$\mVar{match}_n \in \mSetBuilder{m}{m \in M, n \in
+    \mCovers(m)}$} decides which \gls{match} covers
+\gls{node}~\mbox{$n$\hspace{-.8pt},} and \gls{variable} \mbox{$\mVar{count}_m
+  \in \mSet{0, |\mCovers(m)|}$} decides how many \glspl{node} are covered by
+\gls{match}~\mbox{$m$\hspace{-.8pt}.}
+%
+Hence each match covers either no \glspl{node} or all \glspl{node} in its
+\gls{pattern}.
+%
+With these \glspl{variable}, \gls{pattern selection} can be modeled as
+%
+\begin{displaymath}
+  \mGCC(
+    \cup_{m \,\in\, M} \mTuple{m, \mVar{count}_m} \hspace{-1pt},
+    \cup_{n \,\in\, N} \, \mVar{match}_n
+  ),
+\end{displaymath}
+%
+which offers stronger \gls{propagation} than the corresponding linear inequality
+constraint and thus reduces solving time~\cite{FlochEtAl:2010}.
+
+
+\paragraph{Accommodating VLIW Architectures}
+
+The \gls{constraint model} by \citeauthor{FlochEtAl:2010} was also further
+extended by \citeauthor{ArslanKuchcinski:2013}~\cite{ArslanKuchcinski:2013,
+  ArslanKuchcinski:2014, Arslan:2016} to accommodate \gls{VLIW} architectures
+and \gls{disjoint-output.ic} \glspl{instruction}.
+%
+First, every \gls{disjoint-output.ic} \glspl{instruction} is split into multiple
+\glspl!{subinstruction}, each modeled by a disjoint \gls{pattern} which is
+mapped onto the \gls{block DAG} using a generic \gls{subgraph isomorphism}
+algorithm.
+%
+\Gls{pattern selection} is then modeled as an instance of the \gls{constraint
+  model} with the additional \glspl{constraint} to schedule the
+\glspl{subinstruction} such that they can be replaced by the original
+\gls{disjoint-output.ic} \gls{instruction}.
+%
+Consequently, unlike previous techniques that recombine \gls{partial.p}
+\glspl{match} into \gls{complex.p} \glspl{match} prior to \gls{pattern
+  selection} (see for example \textcite{ScharwaechterEtAl:2007},
+\textcite{AhnEtAl:2009}, \citeauthor{ArnoldCorporaal:1999}~\cite{Arnold:1999,
+  ArnoldCorporaal:1999, ArnoldCorporaal:2001}),
+\citeauthor{ArslanKuchcinski:2013} instead solve these two problems in tandem.
+%
+Their design is also capable of accepting multiple, disconnected \glspl{block
+  DAG} as a single input.
+
+
+\paragraph{Limitations}
+
+An inherent limitation to the \glspl{constraint model} applied by
+\citeauthor{MartinEtAl:2009}, \citeauthor{FlochEtAl:2010}, and
+\citeauthor{ArslanKuchcinski:2013} is that they do not model the necessary data
+transfers between different \glspl{register class}.
+%
+This in turn means that the cost model is only accurate for \glspl{target
+  machine} equipped with a homogeneous \gls{register} architecture, which could
+compromise code quality for more complicated \glspl{target machine}.
+
+
+\section{Other DAG-Based Approaches}
+\labelSection{dc-other-approaches}
+
+\subsection{More Genetic Algorithms}
+
+Seemingly independently from the earlier work by \textcite{ShuEtAl:1996}
+(discussed in \refAppendix{tree-covering} on
+\refPageOfSection{tc-genetic-algorithms}),
+\citeauthor{LorenzEtAl:2001}~\cite{LorenzEtAl:2001, LorenzMarwedel:2004}
+introduced in 2001 another technique where \glsdesc{GA}s are applied to
+\gls{code generation}.
+%
+But unlike the design by \citeauthor{ShuEtAl:1996}, the one by
+\citeauthor{LorenzEtAl:2001} takes \glspl{block DAG} instead of \glspl{tree} as
+input and also incorporates \gls{instruction scheduling} and \gls{register
+  allocation}.
+%
+\citeauthor{LorenzEtAl:2001} recognized that contemporary \glspl{compiler}
+struggled with generating efficient \gls{assembly code} for \glspl{DSP} equipped
+with very few \glspl{register} and typically always spill the results of common
+subexpressions to memory and reload them when needed.
+%
+Compared to optimal \gls{assembly code}, this may incur more memory accesses
+than needed.
+
+The design by \citeauthor{LorenzEtAl:2001} is basically an iterative process.
+%
+First, the operations within a \gls{block} are scheduled using \gls!{list
+  scheduling}, which is a traditional method of scheduling (see for
+example~\cite{RauFisher:1993}).
+%
+For every scheduled operation, a \gls{gene} is formulated to encode all the
+possible decisions to take in order to solve the problems of \gls{instruction
+  selection} and \gls{register allocation}.
+%
+These decisions are then taken over multiple steps using standard
+\gls{GA}~operations, where the values are selected probabilistically.
+%
+In each step the \gls{gene} is mutated and crossed over in order to produce new,
+hopefully better \glspl{gene}, and a \gls{fitness function} is applied to
+evaluate each \gls{gene} in terms of expected execution time.
+%
+After a certain number of generations, the process stops and the best \gls{gene}
+is selected.
+%
+Certain steps are also followed by a routine based on \glsdesc{CP} that prunes
+the search space for the subsequent decisions by removing values which will
+never appear in any valid \gls{gene}.
+%
+Although every \gls{gene} represents a single \gls{node} in the \gls{block DAG},
+\gls{complex.p} \glspl{pattern} can still be supported through an additional
+variable for selecting the \gls{instruction} type for the \gls{node}.
+%
+If \glspl{node} with the same \gls{instruction} type have been scheduled to be
+executed on the same cycle, then they can be implemented using the same
+\gls{instruction} during \gls{assembly code} emission.
+
+\citeauthor{LorenzEtAl:2001} originally developed this technique in order to
+reduce power usage of \gls{assembly code} generated for constrained \glspl{DSP},
+and later extended the design to also incorporate \gls{instruction compaction}
+and \gls{address generation}.
+%
+Experiments indicate that the technique for a selected set of test cases
+resulted in energy savings of \SI{18}{\percent} to \SI{36}{\percent} compared to
+a traditional \gls{tree covering}-based \gls{compiler}, and reduced execution
+time by up to \SI{51}{\percent}.
+%
+According to \citeauthor{LorenzEtAl:2001}, the major contribution to this
+reduction is due to improved usage of \glspl{register} for common subexpression
+values, which in turn leads to less use of power-hungry and long-executing
+memory operations.
+%
+But due to the probabilistic nature of \gls{GA}, optimality cannot be
+guaranteed, making it unclear how this technique would fare against other
+\gls{DAG covering}-based designs which allow a more exhaustive exploration of
+the search space.
+
+
+\subsection{Extending Trellis Diagrams to DAGs}
+\labelSection{dc-trellis-diagrams-dags}
+
+In 1998, \citeauthor{HanonoDevadas:1998}~\cite{HanonoDevadas:1998, Hanono:1999}
+proposed a technique that is similar to \citeauthor{Wess:1992}'s use of
+\glspl{trellis diagram}, which we discussed in \refAppendix{tree-covering} on
+\refPageOfSection{tc-trellis-diagrams-trees}.
+%
+Implemented in a system called \gls!{Aviv}, \citeauthor{HanonoDevadas:1998}'s
+\gls{instruction selector} takes a \gls{block DAG} as input and duplicates each
+operation \gls{node} according to the number of functional units in the
+\gls{target machine} on which that operation can run.
+%
+Special \gls!{split.n} and \gls!{transfer.n}[ \glspl{node}] are inserted before
+and after each duplicated operation \gls{node} to allows the data flow to
+diverge and then reconverge before passing to the next operation \gls{node} in
+the \gls{block DAG}.
+%
+The use of \gls{transfer.n} \glspl{node} also allow the cost of transferring
+data from one functional unit to another to be taken into account.
+%
+Similarly to the \gls{trellis diagram}, \gls{instruction selection} is thus
+transformed to finding a path from the \gls{leaf} \glspl{node} in the \gls{block
+  DAG} to its \gls{root} \gls{node}.
+%
+But differently from the \gls{optimal.ps}, \mbox{\gls{DP}-oriented} design of
+\citeauthor{Wess:1992}, \citeauthor{HanonoDevadas:1998} applied a greedy
+heuristic that starts from the \gls{root} \gls{node} and makes it way towards
+the \glspl{leaf}.
+
+Unfortunately, as in \citeauthor{Wess:1992}'s design, this technique assumes a
+\mbox{1-to-1} mapping between the \glspl{node} in the \gls{block DAG} and the
+\glspl{instruction} in order to generate efficient \gls{assembly code}.
+%
+In fact, the main purpose behind \gls{Aviv} was to generate efficient
+\gls{assembly code} for \gls{VLIW} architectures, where the focus is on
+executing as many \glspl{instruction} as possible in parallel.
+
+
+\subsection{Hardware Modeling Techniques}
+\labelSection{dc-modeling-entire-target-machines}
+
+In 1984, \textcite{Marwedel:1984} developed a retargetable system called
+\gls!{MSS} for \gls{microcode generation},\!%
+%
+\footnote{%
+  \Gls!{microcode} is essentially the hardware language that processors use
+  internally for executing \glspl{instruction}.
+  %
+  For example, \gls{microcode} controls how the \glspl{register} and program
+  counter should be updated for a given \gls{instruction}.%
+}
+%
+where a \gls{machine description} written in
+\gls!{MIMOLA}~\cite{Zimmermann:1979} is used for modeling the entire data path
+of the processor, instead of just the \gls{instruction set} as we have commonly
+seen.
+%
+This is commonly used for \glspl{DSP} where the processor is small but highly
+irregular.
+%
+Although \gls{MSS} consists of several tools, we will concentrate on the
+\gls{compiler} -- \gls!{MSSQ} -- as its purpose is most aligned with
+\gls{instruction selection}.
+%
+\gls{MSSQ} was developed by \textcite{LeupersMarwedel:1998} as a faster version
+of \gls!{MSSC}~\cite{NowakMarwedel:1989}, which in turn is an extension of the
+\gls{tree}-based \gls!{MSSV}~\cite{Marwedel:1993}.
+
+The \gls{MIMOLA} specification contains the processor \glspl{register} as well
+as all the operations that can be performed on these \glspl{register} within a
+single cycle.
+%
+From this specification, a hardware~\gls{DAG} called the \gls!{CO graph} is
+automatically derived.
+%
+An example is given in \refFigure{co-graph-example}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/dag-covering/co-graph-example}
+
+  \caption[Example of a CO graph]%
+          {%
+            Example of a CO graph for a simple
+            processor~\cite{NowakMarwedel:1989}, containing an arithmetic logic
+            unit, two data registers, a program counter, and a control store%
+          }
+  \labelFigure{co-graph-example}
+\end{figure}
+%
+A \gls{pattern matcher} then attempts to find \glspl{subgraph} within the
+\gls{CO graph} to cover the \glspl{expression tree}.
+%
+Because the \gls{CO graph} contains explicit \glspl{node} for every
+\gls{register}, a \gls{match} found on this \gls{graph} -- called a
+\gls!{version} -- is also an assignment of \gls{function} variables (and
+\glspl{temporary}) to \glspl{register}.
+%
+If a \gls{match} cannot be found (due to a lack of \glspl{register}), the
+\gls{expression tree} will be rewritten by splitting assignments and inserting
+additional \glspl{temporary}.
+%
+The process then backtracks and repeats in a recursive fashion until the entire
+\gls{expression tree} is covered.
+%
+A subsequent process then selects a specific \gls{version} from each \gls{match
+  set} and tries to schedule them so that they can be combined into
+\glspl{bundle} for parallel execution.
+
+Although \gls{microcode generation} is at a lower hardware level than
+\gls{assembly code} generation -- which is usually what we refer to with
+\gls{instruction selection} -- we see several similarities between the problems
+that must be solved in each.
+%
+For this reason it is included in this survey, and further examples
+include~\cite{BalakrishnanEtAl:1986, MahmoodEtAl:1990, LangevinCerny:1993}.
+%
+In \refAppendix{graph-covering}, we will see another design that also models the
+entire processor but applies a more powerful technique.
+
+
+\section{Limitations of DAG Covering}
+\labelSection{dc-limitations}
+
+Although \glspl{DAG covering} addresses the issue of whether to \glsshort{edge
+  splitting} or \glsshort{node duplication}[e] common subexpressions within a
+\gls{block}, the problem still remains for expressions that are spread across
+multiple \glspl{block}.
+%
+To fully address this problem, one must resort to \gls{graph covering}.
+
+This also applies to other situations where decisions made for one \gls{block}
+can inhibit subsequent decisions for other \glspl{block}, such as enforcing
+specific storage locations or value modes.
+%
+For example, \refFigure{block-dags-limit-example-2} shows a \gls{function} that
+multiplies the elements of two arrays and sums the results.
+%
+\begin{filecontents*}{block-dags-limit-example.c}
+int f(int* A, int* B, int N) {
+  int s = 0;
+  for (int i = 0; i < N; i++) {
+    s = s + A[i] * B[i];
+  }
+  return s;
+}
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \subcaptionbox{C code\labelFigure{block-dags-limit-example-2-c}}%
+                {%
+                  \begin{lstpage}{56mm}%
+                    \lstinputlisting[language=c]{block-dags-limit-example.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Block graphs involving variable~\irVar*{s}.
+                  %
+                  For brevity, the subtrees concerning \irCode*{A[i]}
+                  and \irCode*{B[i]} are not included%
+                  \labelFigure{block-dags-limit-example-2-dags}%
+                }%
+                [60mm]%
+                {%
+                  \input{figures/dag-covering/block-dags-limit-example-dags}%
+                }
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox%
+    {%
+      Rules.
+      %
+      For brevity, the actions are not included.
+      %
+      $\mNT{Null}$ is a dummy nonterminal since \irCode*{\irRetText} does not
+      return anything, yet all productions must have a result.
+      %
+      All rules are assumed to have equal cost%
+    }%
+    [\textwidth]%
+    {%
+      \figureFontSize%
+      \newcolumntype{L}{@{}l@{}}%
+      \begin{tabular}{r@{ $\rightarrow$ }l@{\hspace{3em}}r@{ $\rightarrow$ }lc}
+        \toprule
+        \multicolumn{5}{c}{\tabhead rules}\\
+        \midrule
+        $\mNT{Reg}$ & \irCode{const}
+          & $\mNT{SReg}$
+          & \multicolumn{2}{L}{%
+              $\irCode{\irMulText} \; \mNT{Reg} \; \mNT{Reg}$%
+            }\\
+        $\mNT{SReg}$ & \irCode{const}
+          & $\mNT{Null}$ & \multicolumn{2}{L}{%
+              $\irCode{\irRetText} \; \mNT{Reg}$%
+            }\\
+        $\mNT{Reg}$ & $\irCode{\irAddText} \; \mNT{Reg} \; \mNT{Reg}$
+          & $\mNT{Reg}$  & $\mNT{SReg}$ & $(r \ll 1)$\\
+        $\mNT{SReg}$ & $\irCode{\irAddText} \; \mNT{SReg} \; \mNT{SReg}$
+          & $\mNT{SReg}$ & $\mNT{Reg}$  & $(r \gg 1)$\\
+        \bottomrule
+      \end{tabular}%
+    }
+
+  \caption{Example illustrating the limitation of block DAGs}
+  \labelFigure{block-dags-limit-example-2}
+\end{figure}
+%
+Assume that the arrays consist of fixed-point values.
+%
+For efficiency, a common idiosyncrasy in many \glspl{DSP} is that multiplication
+of two fixed-point values return a value that is shifted one bit to the left.
+%
+For such \glspl{target machine}, both the value~\irCode*{0} and the accumulator
+\gls{variable}~\irVar*{s} should be in shifted mode throughout the entire
+\gls{function}, and only restored into normal mode upon return.
+%
+Otherwise the accumulated value would be needlessly shifted back and forth
+within the loop.
+%
+Achieving this, however, is difficult when limited to covering only a single
+\gls{block DAG} at a time.
+%
+Assume for example that the function had no multiplication.
+%
+In that case, deciding to load value~\irCode*{0} in shifted mode would instead
+lower code quality as the value would needlessly have to be shifted back before
+returning, which takes an extra \gls{instruction}.
+
+Lastly, most of these approaches are restricted to tree-shaped \glspl{pattern},
+meaning they only support \gls{single-output.ic} \glspl{instruction}.
+%
+Many \glspl{instruction set}, however, contain \gls{multi-output.ic}
+\glspl{instruction} and require \gls{DAG}-shaped \glspl{pattern}, which violate
+underlying assumptions made by many of the aforementioned approaches.
+
+
+\section{Summary}
+\labelSection{dc-summary}
+
+In this appendix, we have investigated several methods that rely on the
+\gls{principle} of \gls{DAG covering}, which is a more general form of \gls{tree
+  covering}.
+%
+Operating on \glspl{DAG} instead of \glspl{tree} has several advantages.
+%
+Most importantly, common subexpressions can be directly modeled, and a larger
+set of \glspl{instruction} -- including \gls{multi-output.ic} and
+\gls{disjoint-output.ic} \glspl{instruction} -- can be supported and exploited
+during \gls{instruction selection}.
+%
+This in turn leads to improved performance and reduced code size.
+%
+Consequently, techniques based on \gls{DAG covering} are today one of the most
+widely applied methods for \gls{instruction selection} in modern
+\glspl{compiler}.
+
+The ultimate cost of transitioning from \glspl{tree} to \glspl{DAG}, however, is
+that \gls{optimal.ps} \gls{pattern selection} can no longer be achieved in
+linear time as it is NP-complete.
+%
+At the same time, \glspl{DAG} are not expressive enough to allow the proper
+modeling of all aspects featured in the \glspl{function} and
+\glspl{instruction}.
+%
+For example, statements such as \mbox{for loops} incur \glspl{loop} in the
+\gls{graph} representing the \gls{function}, restricting \gls{DAG covering} to
+the scope of \glspl{block} and excluding the modeling of \gls{inter-block.ic}
+\glspl{instruction}.
+%
+Another disadvantage is that optimization opportunities for storing
+\gls{function} variables and \glspl{temporary} in different forms and at
+different locations across the \gls{function} are forfeited.
+
+In the next appendix, we will discuss the last and most general \gls{principle}
+of \gls{instruction selection}, which addresses some of the aforementioned
+deficiencies of \gls{DAG covering}.

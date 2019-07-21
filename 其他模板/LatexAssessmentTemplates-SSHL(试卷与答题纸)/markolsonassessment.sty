@@ -1,0 +1,559 @@
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%	Mark Olson Style File
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\ProvidesPackage{markolsonassessment}
+
+%-- SETUP THE MARGINS
+	\addtolength{\hoffset}{-.65in}
+	\addtolength{\textwidth}{0.8in}
+
+%-- PARAGRAPH INDENT SET TO ZERO
+	\setlength\parindent{0pt}
+
+%-- FONTS
+	\usepackage[full]{textcomp}
+	\usepackage{newpxtext} % osf for text, not math
+	\usepackage{cantarell} % sans serif
+	\usepackage[varqu,varl]{inconsolata} % sans serif typewriter
+	\usepackage[bigdelims,vvarbb]{newpxmath} % bb from STIX
+	\usepackage[cal=boondoxo]{mathalfa} % mathcal
+
+	\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+	\usepackage[utf8]{inputenc} % Required for including letters with accents
+	\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+
+%--	DEFAULT PACKAGES
+\usepackage{
+	caption,
+	color,
+	cancel,
+	datetime,
+	enumitem,
+	graphicx,
+	hyperref,
+	colortbl,
+	multicol,
+	multirow,
+	sagetex,
+	wrapfig,
+	xcolor
+}
+
+%--	DEFAULT MATH PACKAGES
+\usepackage{
+amsmath,
+amssymb,
+xspace
+}
+
+%--	DEFAULT MATH PACKAGES	MULTIPLE CHOICE ANSWERS
+\checkboxchar{$\Circle$}
+\checkedchar{$\CIRCLE$}
+
+%--	DEFAULT MATH PACKAGES SOLUTIONS
+
+\SolutionEmphasis{\color{\cnRed}}
+\unframedsolutions
+\shadedsolutions % Background Color
+\definecolor{SolutionColor}{rgb}{1,1,1} % White
+
+%--	ASSESSMENT OPTIONS
+
+\newif\if@domypquiz
+\@domypquizfalse
+\DeclareOption{mypquiz}{\@domypquiztrue}
+
+\newif\if@dogyquiz
+\@dogyquizfalse
+\DeclareOption{gyquiz}{\@dogyquiztrue}
+
+\newif\if@dogytest
+\@dogytestfalse
+\DeclareOption{gytest}{\@dogytesttrue}
+
+\newif\if@doibtest
+\@doibtestfalse
+\DeclareOption{ibtest}{\@doibtesttrue}
+
+\newif\if@domyptest
+\@domyptestfalse
+\DeclareOption{myptest}{\@domyptesttrue}
+\ProcessOptions\relax
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%  MYP QUIZ
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\if@domypquiz
+
+%--	 STUDENT NAME BOX
+\def\boxentry[#1]#2{{\setlength{\fboxsep}{-\fboxrule}\fbox{\parbox{#1}{\smash{\raise-6.5pt\hbox{~{\tiny #2}}}\vspace{2ex}\mbox{}}}}}
+
+%--	 POINTS
+\pointsinrightmargin
+\pointname{}
+
+%--	 PAGE HEADERS & FOOTERS
+\pagestyle{headandfoot}
+\header{}{\jobname}{}
+\newcommand{\nameandgrade}{
+\begin{minipage}[l]{.12\linewidth}
+\includegraphics[height=4.1em]{./0-Images/sshl}
+\vspace{1em}
+\end{minipage}
+\vspace{0.5cm}
+\begin{minipage}[l]{.88\linewidth}
+
+\cBlue{\Huge\textbf{\documenttitle}} \\
+
+\cDarkGrey{\large \textsc{\documentsubtitle}} \\
+\end{minipage}
+\begin{minipage}[l]{.35\linewidth}
+\boxentry[1\hsize]{Student Name:}\\
+
+\begin{center}
+\testdate \\
+\coursecode
+\end{center}
+\vfill
+\end{minipage}
+\begin{minipage}[l]{.05\linewidth}
+\end{minipage}
+\begin{minipage}[l]{.6\linewidth}
+\begin{flushright}
+\begin{tabular}{|l|c|}
+\cline{1-2}
+\textbf{MYP Assessment Criteria} & \textbf{Assessment Level}  \\
+\cline{1-2}
+\textit{A: Knowing and Understanding} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\textit{B: Investigating Patterns} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\textit{C: Communicating} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\textit{D: Applying Mathematics} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\end{tabular}
+\end{flushright}
+\vfill
+\end{minipage}
+\vspace{0.5cm}}
+
+%--	 RUNNING PAGE HEADER
+\runningheader {\documenttitle}{- \thepage - }{\testdate} \runningheadrule
+
+%--	 PAGE FOOTER
+\footer{}{}{}
+\runningfooter{\tiny \jobname}
+       {}
+       {\iflastpage{}{}}
+\else
+\fi
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%  GY QUIZ
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\if@dogyquiz
+
+%--	 STUDENT NAME BOX
+\def\boxentry[#1]#2{{\setlength{\fboxsep}{-\fboxrule}\fbox{\parbox{#1}{\smash{\raise-6.5pt\hbox{~{\tiny #2}}}\vspace{2ex}\mbox{}}}}}
+
+%--	 POINTS
+\pointsinrightmargin
+\pointname{}
+
+%--	 PAGE HEADERS & FOOTERS
+\pagestyle{headandfoot}
+\header{}{\jobname}{}
+\newcommand{\nameandgrade}{
+\begin{minipage}[l]{.12\linewidth}
+\includegraphics[height=4.1em]{./0-Images/sshl}
+\vspace{1em}
+\end{minipage}
+\vspace{0.5cm}
+\begin{minipage}[l]{.88\linewidth}
+
+\cBlue{\Huge\textbf{\documenttitle}} \\
+
+\cDarkGrey{\large \textsc{\documentsubtitle}} \\
+\end{minipage}
+\begin{minipage}[l]{.35\linewidth}
+\boxentry[1\hsize]{Student Name:}
+\begin{center}
+\testdate 
+\end{center}
+\end{minipage}
+\begin{minipage}[l]{.05\linewidth}
+\end{minipage}
+\begin{minipage}[l]{.6\linewidth}
+\begin{flushright}
+\begin{tabular}{c|c|c|c|c|c|} 
+\cline{2-5} 
+& E & C & A & Grade \\ \hline
+\multicolumn{1}{ |c| }{Points Available} & \epoints  & \cpoints   &  \apoints &\multirow{2}{*}{} \\ \cline{1-4}
+\multicolumn{1}{ |c| }{Total Points} & & & &\\ \hline
+\end{tabular} \end{flushright}
+\end{minipage}
+\vspace{0.5cm}}
+
+%--	 RUNNING PAGE HEADER
+\runningheader {\documenttitle}{- \thepage - }{\testdate} \runningheadrule
+
+%--	 PAGE FOOTER
+\footer{}{}{}
+\runningfooter{\tiny \jobname}
+       {}
+       {\iflastpage{}{}}
+\else
+\fi
+
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%  GY TEST
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\if@dogytest
+
+%--	 TODOLIST BOXES
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+
+%--	 POINTS
+\pointsinrightmargin
+\pointname{}
+
+%--	 PART A 
+\newcommand{\parta}{\begin{tikzpicture}
+\node[draw=\cnRed,line width=1pt,circle,fill=\cnRed!25,font=\sffamily\bfseries,inner sep=3pt,outer sep=0pt] at (0pt,0pt){\cRed{A}};\end{tikzpicture}}
+
+%--	 PART B 
+\newcommand{\partb}{\begin{tikzpicture}
+\node[draw=\cnBlue,line width=1pt,circle,fill=\cnBlue!25,font=\sffamily\bfseries,inner sep=2pt,outer sep=0pt] at (-19pt,0pt){\cBlue{B}};\end{tikzpicture}}
+
+%--	 STUDENT NAME BOX
+\def\boxentry[#1]#2{{\setlength{\fboxsep}{-\fboxrule}\fbox{\parbox{#1}{\smash{\raise-6.5pt\hbox{~{\tiny #2}}}\vspace{2ex}\mbox{}}}}}
+
+% RUNNING PAGE HEADER
+\runningheader {\documenttitle}{- \thepage - }{\documentversion} \runningheadrule
+
+% PAGE FOOTER
+
+\footer{\tiny \jobname}{}{}
+
+\runningfooter{\tiny \jobname}
+       {}
+       {\iflastpage{}{}}
+	   
+\headrule
+\header{\textbf{PART \testpart}}{\calculatorpermission.  Write your answers \writesolutions}{}
+\footer{}
+{Page \thepage\ of \numpages}
+{}
+
+%--	 COVER PAGE
+\def\makecoverpage{
+\begin{coverpages}
+
+\centering{\cDarkGrey{\Huge{Mathematics \coursecode Test \testnumber -- \cBlue{Part \testpart} }}} \\
+
+\begin{center}
+\includegraphics[height=6em]{./0-Images/sshl}	
+\end{center}
+
+\begin{center}
+\cBlue{\Large Sigtunaskolan Humanistiska Läroverket}
+
+\cDarkGrey{\large \classnumber}
+\end{center}
+\begin{center}
+\boxentry[0.5\hsize]{Student Name:}
+ 
+\vspace{.5cm}
+
+\boxentry[0.25\hsize]{Date:} \boxentry[0.15\hsize]{Pages Submitted:}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{minipage}[c]{.4\linewidth}
+\textbf{Materials:} 
+\begin{todolist}
+\materials
+\end{todolist}
+\vfill
+\end{minipage}
+\colorbox{\cnGrey}{\begin{minipage}[c]{.55\linewidth}
+\textbf{Date:} \testdate \\
+
+\textbf{Start Time:} \teststarttime \\
+
+\textbf{End Time:} \testendtime \\
+
+\vfill
+
+\textit{\testmessage}
+\end{minipage}}
+
+\vspace{0.75cm}
+
+\centering{\cRed{\textbf{DO NOT OPEN THIS TEST BOOKLET UNTIL INSTRUCTED TO DO SO}}}\\
+\centering{This test has a total of \epoints \, E points, \cpoints \,  C points and \apoints \,  A points.}
+\vspace{0.75cm}
+
+\begin{minipage}[c]{.4\linewidth}
+\begin{center}
+\textbf{Part A}
+\end{center}
+\partainstructions
+\end{minipage}
+\begin{minipage}[c]{.4\linewidth}
+\begin{center}
+\textbf{Part B}
+\end{center}
+\partbinstructions
+\end{minipage}
+\vspace{1cm}
+
+\emph{All solutions are to be neatly written as illegible work will not be graded. Solutions written on the squared paper should be presented in the same order as they appear on the test and clearly numbered.}
+
+\vspace{0.75cm}
+
+\centering{\cRed{\textbf{ALL MATERIALS LISTED MUST BE HANDED-IN WHEN FINISHED}}}
+
+\vspace{0.75cm}
+
+\textbf{WHEN YOU HAVE FINISHED THE TEST}
+
+\emph{Raise your hand and sit quietly until an invigilator collects your test.  You may leave once you have been given permission to leave.  Please exit the aulan quietly.}
+
+\vfill
+
+\end{coverpages}
+
+\newpage
+}
+
+\else
+\fi
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%  IB TEST
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\if@doibtest
+
+%--	 POINTS FORMAT
+\pointsinrightmargin
+\extrawidth{-0.5in}
+\marginpointname{ \points}
+\pointpoints{mark}{marks}
+\pointformat{\textit{[\thepoints]}}
+
+%--	 STUDENT NAME BOX
+\def\boxentry[#1]#2{{\setlength{\fboxsep}{-\fboxrule}\fbox{\parbox{#1}{\smash{\raise-6.5pt\hbox{~{\tiny #2}}}\vspace{2ex}\mbox{}}}}}
+
+%--	 PAGE HEADERS & FOOTERS
+\pagestyle{headandfoot}
+
+%--	 RUNNING PAGE HEADER
+\runningheader {\documenttitle}{- \thepage - }{\documentversion} \runningheadrule
+
+%--	 PAGE FOOTER
+
+\footer{\tiny \jobname}
+       {}
+       {\iflastpage{}{\textbf{Turn over}}}
+
+\newcommand\drawbits[1]{\tikz\draw[step=20pt] (0,0) grid (#1*20pt,20pt);}
+\newcommand\drawhbits[1]{\tikz\draw[step=20pt] (0,0) grid (#1*20pt,20pt);}
+
+%--	 COVER PAGE
+\def\makecoverpage{
+\begin{coverpages}
+
+\noindent\begin{minipage}[t][4.5cm][t]{.4\textwidth}
+\vspace{-2cm}
+\documentversion \\
+
+\vspace{1cm}
+
+\textbf{MATHEMATICS}\\
+\textbf{\uppercase{\mathlevel} LEVEL}\\
+\textbf{\assessmenttype} \\
+
+\vspace{0.25cm}
+
+\today \\
+
+\vspace{0.25cm}
+
+\timeminutes \,minutes
+\end{minipage}%
+\hfill
+\begin{minipage}[t][4.5cm][t]{.45\linewidth}
+\begin{center}\includegraphics[height=2.5cm]{./0-Images/sshl}\end{center}
+\vfill
+\begin{centering}
+Candidate session number \\
+\vspace{0.25cm}
+\drawbits{6}\drawhbits{1}\drawbits{4}
+\end{centering}
+
+\vspace{0.75cm}
+
+{\boxentry[\hsize]{Student Name:}}
+\end{minipage}
+
+\hrule
+\vspace{0.5cm}
+\textbf{Instructions to candidates}\\
+
+\begin{itemize}
+	\item Write your name on this cover sheet.
+	\item Do not open this examination paper until instructed to do so.
+	\item You are permitted to access your calculator for this paper
+	\item Answer all questions using the space provide in the booklet.
+	\item Unless otherwise stated in the questions, all numerical answers should be given exactly or correct to three significant figures.
+	\item A clean copy of the \textbf{Mathematics Standard Level} \textit{information booklet} is required for this paper
+	\item The maximum marks for this examination paper is \textbf{[\numpoints \, marks]}
+\end{itemize}
+
+\begin{center}
+  \gradetable[h][questions]
+\end{center}
+
+\vfill
+
+\numpages \, pages
+
+\newpage
+
+\end{coverpages}
+
+\newpage
+
+\firstpageinstructions
+}
+
+\else
+\fi
+
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+%  MYP TEST
+%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+\if@domyptest
+
+%--	 POINTS FORMAT
+\pointsinrightmargin
+\extrawidth{-0.5in}
+\marginpointname{ \points}
+\pointpoints{mark}{marks}
+\pointformat{\textit{[\thepoints]}}
+
+%--	 STUDENT NAME BOX
+\def\boxentry[#1]#2{{\setlength{\fboxsep}{-\fboxrule}\fbox{\parbox{#1}{\smash{\raise-6.5pt\hbox{~{\tiny #2}}}\vspace{2ex}\mbox{}}}}}
+
+%--	 PAGE HEADERS & FOOTERS
+\pagestyle{headandfoot}
+
+%--	 RUNNING PAGE HEADER
+\runningheader {\documenttitle}{- \thepage - }{\documentversion} \runningheadrule
+
+%--	 PAGE FOOTER
+
+\footer{\tiny \jobname}
+       {}
+       {\iflastpage{}{\textbf{Turn over}}}
+
+\newcommand\drawbits[1]{\tikz\draw[step=20pt] (0,0) grid (#1*20pt,20pt);}
+\newcommand\drawhbits[1]{\tikz\draw[step=20pt] (0,0) grid (#1*20pt,20pt);}
+
+%--	 COVER PAGE
+\def\makecoverpage{
+\begin{coverpages}
+
+\noindent\begin{minipage}[t][4.5cm][t]{.4\textwidth}
+\vspace{-2cm}
+\documentversion \\
+
+\vspace{1cm}
+
+\textbf{MATHEMATICS}\\
+\textbf{\uppercase{\mathlevel} LEVEL}\\
+\textbf{\assessmenttype} \\
+
+\vspace{0.25cm}
+
+\today \\
+
+\vspace{0.25cm}
+
+\timeminutes \,minutes
+\end{minipage}%
+\hfill
+\begin{minipage}[t][4.5cm][t]{.45\linewidth}
+\begin{center}\includegraphics[height=2.5cm]{./0-Images/sshl}\end{center}
+\vfill
+\begin{centering}
+Candidate session number \\
+\vspace{0.25cm}
+\drawbits{6}\drawhbits{1}\drawbits{4}
+\end{centering}
+
+\vspace{0.75cm}
+
+{\boxentry[\hsize]{Student Name:}}
+\end{minipage}
+
+\hrule
+\vspace{0.5cm}
+\textbf{Instructions to candidates}\\
+
+\begin{itemize}
+	\item Write your name on this cover sheet.
+	\item Do not open this examination paper until instructed to do so.
+	\item You are permitted to access your calculator for this paper
+	\item Unless otherwise stated in the questions, all numerical answers should be given exactly or correct to three significant figures.
+	\item A clean copy of the \textbf{Mathematics Standard Level} \textit{information booklet} is required for this paper
+	\item The maximum marks for this examination paper is \textbf{[\numpoints \, marks]}
+\end{itemize}
+
+\begin{center}
+  \gradetable[h][questions]
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|l|c|}
+\cline{1-2}
+\textbf{MYP Assessment Criteria} & \textbf{Assessment Level}  \\
+\cline{1-2}
+\textit{A: Knowing and Understanding} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\textit{B: Investigating Patterns} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\textit{C: Communicating} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\textit{D: Applying Mathematics} &  NA - 1 - 2 - 3 - 4 - 5 - 6 - 7 - 8\\
+\cline{1-2}
+\end{tabular}
+\end{center}
+\vfill
+
+\numpages \, pages
+
+\newpage
+
+\end{coverpages}
+
+\newpage
+
+\firstpageinstructions
+}
+
+\else
+\fi
+
+\endinput
+%%
+%% End of file `markolsonassessment.sty'.

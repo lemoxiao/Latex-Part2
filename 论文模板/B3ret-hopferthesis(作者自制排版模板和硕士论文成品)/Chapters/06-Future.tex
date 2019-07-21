@@ -1,0 +1,63 @@
+
+
+%************************************************
+\chapter{Conclusion}\label{chp:future}
+%************************************************
+
+\quotegraffito{I have not failed. I've just found 10,000 ways that won't work.}
+{Thomas Alva Edison (1847-1931)}
+This work was motivated by the construction of car cooling systems. At first two of the main existing engineering paths, namely expert generated resistance graphs and \ac{CFD} simulations, were explained. Afterwards, a third path combining the advantages of the former two was suggested, \emph{\ac{CFD}-derived resistance graphs}. To derive such graphs, \ac{CFD} simulation results (\emph{flow fields}) need to be simplified to meaningful flow graphs. This can be achieved by clustering similar cells of the \ac{CFD} simulation result. Furthermore it was argued that meaningful flow graphs can also aid in understanding flow fields of other domains and that they can be employed for visualization purposes.
+
+During the discussion of related work, the main shortcoming of existing point-based cluster algorithms was identified to be the inherent creation of disconnected clusters. \cauthor{McKenzie}'s adaption of variational shape approximation was identified as the best existing candidate for creating flow graphs to enable resistance graph simulation.
+
+As \cauthor{McKenzie}'s algorithm was expected to require high computational effort, a new method for partitioning flow fields was proposed. The main idea behind \emph{streamline bundling} is to densely cover the dataset with streamlines and bundle parallel and spatially close streamline segments. Afterwards the cells of the flow field are assigned to their closest streamline bundle in order to derive a complete partition.
+
+Related work for clustering streamlines was identified in the field of medical image processing (diffusion \ac{MRI}). All suggested methods cluster whole streamlines instead of streamline segments. A short discussion showed why these methods cannot be extended easily to bundle streamline segments.
+
+The actual streamline bundling algorithm consists of several steps. After \emph{preprocessing} the dataset, meaningful \emph{seed points} have to be identified. Starting from these seed points a \emph{stream tracer} generates streamlines. The actual \emph{streamline bundling} algorithm is based on repeated intersections of the dataset by a sweep plane which is moved along a prototype streamline. Streamline segments that are intersected by all of these sweep planes are combined to form a bundle.
+
+The main drawback of the proposed solution is the high number of parameters that are required for seeding, for stream tracing, for \emph{prototype selection}, to measure similarity, to resolve bundle collisions, and to define \emph{stopping criteria}. However, for specific applications, many of these parameters can be fixed to default values.
+
+For the resistance graph application, \cauthor{McKenzie}'s approach was shown to be the best overall choice, with streamline bundling having advantages only in calculation speed. Further experiments with a resistance graph simulator will be required to determine if the accuracy of the generated flow graphs is sufficient.
+
+Finally, possible visualization applications of streamline bundling and flow graphs were discussed.
+
+
+%===================================================================================
+\section{Future work}
+\label{sec:futur}
+
+\graffito{Humans would definitely place cable ties differently, wouldn't we?}
+When looking at the result figures of the bundling stage, there is clearly potential for improvements. This section briefly treats the most promising ideas for enhancements.
+
+Instead of separate seeding and stream tracing phases, a promising alternative would be a hybrid approach that combines them. The hybrid tracer could alternate between placing random seed points and tracing streamlines. By placing the seed points in the largest gaps between existing streamlines, dense coverage of the dataset could be achieved with fewer streamlines. A single parameter could be used to stop tracing if the largest gap is below a predefined threshold.
+
+Several promising improvements come to mind for streamline bundling.
+The first of these applies to bundle tracing. Currently the stopping criteria for tracing a single bundle are arbitrary and not very direct. A fast volume measure for streamline bundles could improve this. The tracing could stop, if the volume begins to decrease, which would happen if the loss of streamlines (diameter) decreases the volume more than the increase of steps (length) increases it. This would naturally lead to bundles covering the highest possible volume, without the need to artificially favor thin elongated or thick short bundles.
+
+Another improvement concerns the collision strategy. The ``overwrite existing bundles if worse'' collision strategy can lead to disconnected or degenerated bundles. The ``remove existing bundles if worse'' strategy on the other hand, makes local, binary decisions -- if two good bundles overlap at only one streamline, one of them is removed. A less local bundle collision approach that compares final bundles against each other and solves collisions globally is expected to improve the results significantly.
+
+In general, the streamline bundling idea would certainly benefit from a less local approach of generating bundles and trading them of against each other. 
+
+
+In summary, streamline bundling is not yet applicably for general purpose applications handling arbitrary flow fields. Too many parameters have to be set and the influence on the result is too indirect for most of these parameters.
+
+However, the two applications discussed in this thesis could be served by the current framework.
+Resistance graph simulators can readily be built using the implementation of \cauthor{McKenzie}'s algorithm. In well defined domains, the current state of streamline bundling already produces viable results for visualization applications, because most of the parameters can be fixed.
+
+
+%Use/Adapt Streamlineplacement algorithms (e.g. Chen 2007)
+%Hulls of streamlines for visualization (Schultz, Figure 3)
+
+%Random iterative streamline bundling is like iterative region growing from random seed!
+%
+
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+
+
+
+

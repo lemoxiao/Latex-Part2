@@ -1,0 +1,229 @@
+%   by 14级天大仁爱管理系金工唐绍东
+%   QQ 1096084877
+%\NeedsTeXFormat{LaTeX2e}
+%\ProvidesClass{CMC}[2017/09/27 v 0.2 CMC document class]
+%\documentclass{CMC} %.cls
+
+%%\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{CMC}[2017/09/27 v1.0 Non-standard LaTeX package]
+%\documentclass[11pt,twoside,space]{ctexart}
+%\usepackage{CMC} % .sty
+
+%\ProcessOptions*\relax
+%\LoadClass[11pt,twoside,space]{ctexart}
+
+%------------------------------- 大题 ----------------------------------%
+\ctexset{section = {name = {,、\hspace*{-5mm}},number = \chinese{section},format = {\zihao{5}\heiti\raggedright}}}
+\RequirePackage{titlesec}%titlesec宏包调整section与正文间距
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+%------------------------------- 大题 ----------------------------------%
+%=============================大题\dati{}{}==================================
+%2017/10/29 大题原卷风格
+%%\usepackage{placeins}%防浮动的
+%\newlength{\wot}%所有表格每列宽度
+%\settowidth{\wot}{复核人}%所有表格每列宽度初始值为"复核人"三字的宽度
+%\usepackage{array}
+\usepackage{CJKnumb}  % 中文小写数字
+%\usepackage{calc}
+\newcounter{dati}     % 大题序号计数器
+\newcommand{\datixuhao}{{\heiti\stepcounter{dati}\CJKnumber{\thedati}、}\;}%输出大题序号,为"中文小写数字、"形式
+\newcommand{\tbjifen}{\begin{tabular}{|m{3em}<{\centering}|m{3em}<{\centering}|}\hline \makebox[3em][s]{得分}&\rule{0pt}{6mm}\\\hline 
+		阅卷人& \rule{0pt}{6mm}\\\hline
+\end{tabular}}%大题前计分表格
+\newcommand{\dati}[2]{\raisebox{-3.5ex}{\begin{minipage}[b]{7.5em}\hspace*{-1.9em}\tbjifen\end{minipage}}%输出大题前计分表,下沉4个X字符高度,可调整
+	\begin{minipage}[t]{0.766\textwidth} {\hspace*{2.55em}\datixuhao #1}#2\end{minipage}}%输出大题序号,题型,大题说明,
+%===============================大题\dati{}{}================================
+
+%------------------------------ 选择题 ----------------------------------%
+\usepackage{tasks}%选择题宏包，tasks环境
+\settasks{counter-format={tsk[A].},
+	      label-offset={0.4em},
+          label-align=left,
+          column-sep={2pt},
+          item-indent={1pt},before-skip={-0.7em},after-skip={-0.7em}}
+% 选择题示例 
+%\begin{tasks}(4)
+%	\task 
+%	\task 
+%	\task 
+%	\task 
+%\end{tasks}
+%------------------------------ 选择题 ----------------------------------%
+
+\def\blank{\underline{\hspace{3cm}}}
+
+%%%----------数学类---------%%%
+%=======================================================================
+\RequirePackage{amsmath,amssymb}
+\everymath{\displaystyle}
+%\allowdisplaybreaks[4]%%%公式换页
+\def\dif{\mathop{}\!\mathrm{d}}
+\DeclareMathOperator{\rank}{rank}
+%\RequirePackage{bm}
+\RequirePackage{mathabx}%\usepackage{fourier}一个积分符号宏包
+\RequirePackage{extarrows} %长等号
+\RequirePackage[fourier]{varint}
+%%--------------------------------求和符号--------------------------------------%%
+\DeclareSymbolFont{cmlargesymbols}{OMX}{cmex}{m}{n}
+\let\sumop\relax
+\DeclareMathSymbol{\sum}{\mathop}{cmlargesymbols}{"50}
+%%--------------------------------求和符号--------------------------------------%%
+\RequirePackage{mathrsfs}
+\RequirePackage{scalerel} %\scaleobj{1.5}{} 缩放公式大小
+%%---------------------------------- 定理\引理\定义样式设置 ------------------------------------%%
+\RequirePackage{amsthm}
+\renewcommand{\proofname}{\heiti{证明}}
+%\newenvironment{proof}{\par\noindent{\heiti{证明.\,}}}{\hspace*{\fill}{$\Box$}\par}
+%\newenvironment{proof}{\par\noindent{\heiti{证明.\,}}\small}{\hfill$\Box$\quad\par}
+\newenvironment{Proof}{\par\noindent{\heiti{证明.\,}}\small}{\hfill$\Box$\quad\par}
+\newenvironment{Solution}{\par\noindent{\heiti{解.\,}}}{\hspace*{\fill}{$\Diamond$}\par}
+%-------------------------------------------------------------------------------------------
+%\RequirePackage{amsthm}
+\RequirePackage{thmtools}
+\declaretheoremstyle[
+spaceabove=-10pt, spacebelow=-10pt,
+headfont=\normalfont\bfseries,
+notefont=\mdseries, notebraces={(}{)},
+bodyfont=\normalfont,
+postheadspace=0.5em,
+headpunct={:},
+qed=$\blacktriangleleft$,
+numbered=no
+]{solstyle}
+\declaretheorem[style=solstyle,shaded={rulecolor=white,
+rulewidth=0.3pt, bgcolor={rgb}{1,1,1}},name=解]{solution}
+%-----------------------------------------------------------------------------
+%-----------------------2017/9/1更新--------------------------
+
+
+
+
+%-----------------------------------------------字体设置-----------------------------------------------------%
+%---------------------------------数学字体设置----------------------------------%
+%\usepackage{mathspec}
+%\setmainfont{Times New Roman}
+%\setmathsfont{Times New Roman}
+%\usepackage{unicode-math}
+%\setmainfont{XITS}
+%\setmathfont{XITS Math}
+%\setmathfont{Cambria Math}
+%\setmathfontface\mathitbf{xits-bolditalic.otf}
+%%--------------------------设置数学字体为新罗马字体----------------------------
+\RequirePackage[T1]{fontenc}
+\RequirePackage{mathptmx}
+%\RequirePackage{fontenc}
+%\setmainfont{Times New Roman}
+%\RequirePackage{fontspec}
+%\fontspec[BoldFont=STIX-Bold.otf,ItalicFont=STIX-Italic.otf,BoldItalicFont=STIX-BoldItalic.otf]{STIX-Regular.otf}
+%%-----------------------------------------------------------------------------
+%-------------------------------------中文字体设置------------------------------------------%
+\RequirePackage{xeCJK}
+%\setCJKmainfont{Adobe Song Std L}%中文默认字体:adobe 宋体
+\setCJKmainfont[BoldFont={FZXiaoBiaoSong-B05S}, ItalicFont={FZKai-Z03S}]
+{FZShuSong-Z01S} % 书宋、小标宋、楷体
+%\renewcommand{\heiti}{\CJKfontspec{Adobe Heiti Std R}}%adobe 黑体
+%\renewcommand{\heiti}{\CJKfontspec{Hiragino Sans GB}}%冬青黑体简体中文
+\setCJKsansfont[BoldFont={方正黑体简体}]{方正细黑一简体} % 方正细黑、黑体FZHei-B01S
+\renewcommand{\heiti}{\CJKfontspec{方正黑体简体}}%FZHei-B01S
+\def\xihei{\CJKfontspec{方正细黑一简体}}%FZXiHei I-Z08S
+\def\hwzsong{\CJKfontspec{方正中宋简体}}%STZhongsong
+\def\zhongsong{\CJKfontspec{方正中宋简体}}%方正中宋
+\def\shusong{\CJKfontspec{方正书宋简体}}%FZShuSong-Z01S
+\def\xbsong{\CJKfontspec{方正小标宋简体}}%FZXiaoBiaoSong-B05S
+%\renewcommand{\fangsong}{\CJKfontspec{Adobe Fangsong Std R}}%adobe 仿宋
+\renewcommand{\fangsong}{\CJKfontspec{方正仿宋简体}}%FZFangSong-Z02S
+%\renewcommand{\kaishu}{\CJKfontspec{Adobe Kaiti Std R}}%adobe 楷体
+\renewcommand{\kaishu}{\CJKfontspec{方正楷体简体}}%FZKai-Z03S
+\def\xingkai{\CJKfontspec{STXingkai}}%华文行楷
+%\def\xingkai{\CJKfontspec{FZXingKai-S04S}}%方正行楷
+%========================================================================================
+%\usepackage{times}
+\renewcommand{\sfdefault}{phv}
+\renewcommand{\rmdefault}{ptm}
+\renewcommand{\ttdefault}{pcr}
+\def\bfit#1{\textbf{\textit{#1}}}%粗斜体字母
+\def\bfbm#1{\textbf{\textbm{#1}}}%粗罗马体字母
+
+
+%------------------------------------------页眉页脚-%-装订线----------------------------------------%
+\newlength{\Lzdx}\setlength{\Lzdx}{10.2cm}
+\RequirePackage{tikz}
+\usetikzlibrary{circuits} %circuit handle symbol
+\RequirePackage{lastpage}
+\RequirePackage{dashrule}%使用虚线宏包
+\def\cfsxian#1{\hspace*{\fill}\raisebox{-1.1ex}{\tikz\draw[line width=1pt,dash pattern=on 1pt off 2pt on 1pt off 2pt] (0pt,0pt)--(5cm,0pt)node[right=-1mm]{(#1~分)};}\\}
+\def\dfsxian#1{\hspace*{\fill}\raisebox{-1.1ex}{\tikz\draw[line width=1pt,dash pattern=on 1pt off 2pt on 1pt off 2pt] (0pt,0pt)--(3cm,0pt)node[right=-1mm]{(#1~分)};}\\}
+\def\fsxian#1#2{\hspace*{\fill}\raisebox{-1.1ex}{\tikz\draw[line width=1pt,dash pattern=on 1pt off 2pt on 1pt off 2pt] (0pt,0pt)--(#1cm,0pt)node[right=-1mm]{(#2~分)};}\\}
+\RequirePackage{calc}%使用四则运算宏包%\usepackage{ulem}%画线的宏包
+\RequirePackage{fancyhdr}%使用页眉页脚宏包
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[CO]{\vspace*{1mm}\hspace*{1.5cm}第\,\thepage\,页 , 共 ~\pageref{LastPage} 页}
+\fancyfoot[CE]{\vspace*{1mm}第\,\thepage\,页 , 共 ~\pageref{LastPage} 页}
+\fancyhead[LO]{\hspace*{-2.5cm}\parbox{\paperheight}{\vspace*{-6.3mm}
+\begin{tikzpicture}[line width=0.8pt,circuit]
+\node (ym) [circle, draw,scale = 1.5] at (0pt,-15.5em) {};
+\draw[dash pattern=on 6pt off 6pt on 6pt off 6pt] (0,-\Lzdx-16.5em) to
+[circuit handle symbol={draw,shape=circle,pos=0.3},minimum size=5.5mm] (ym);
+\node (yx) [circle, draw,scale = 1.5] at (0pt,0pt) {};
+\draw[dash pattern=on 6pt off 6pt on 6pt off 6pt] (yx) node (a) [below=1em]{\rotatebox[origin=c]{90}{密封线\quad 答题时不要超过此线}} to
+[circuit handle symbol={draw,shape=circle,pos=0.7},minimum size=5.5mm] (0,\Lzdx+1em) ;
+\node  [scale=1] at (-1.2cm,-8.1em) {\rotatebox[origin=c]{90}{~省~市~\underline{\makebox[25mm][c]{}}\songti~学~校~\underline{\makebox[32mm][c]{}}\songti~准~考~证~号~\underline{\makebox[34mm][c]{}} \songti~姓~名~\underline{\makebox[30mm][c]{}}~考~场~号~\underline{\makebox[16mm][c]{}}~座~位~号~\underline{\makebox[20mm][c]{}}}};
+\end{tikzpicture}}}
+\renewcommand{\headrulewidth}{0pt}
+%-------------------------------------------------------------------------------------------------
+
+%%--------------- 页面设置 ---------------%%
+\RequirePackage{geometry}
+\geometry{paperwidth=19.5cm,
+                  paperheight=27cm,
+                  top=1.5cm,
+                  bottom=2cm,
+                  right=2cm}
+\oddsidemargin=1cm   %奇数页页边距
+\evensidemargin=-0.6cm %偶数页页边距
+
+
+
+
+
+\RequirePackage{graphicx} %插图
+\RequirePackage{wrapfig}
+\RequirePackage{eso-pic}
+\newcommand{\watermark}[3]{\AddToShipoutPictureBG{%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill%
+\centering%
+\tikz[remember picture, overlay]%
+\node [rotate = #1, scale = #2] at (current page.center)%
+{\textcolor{gray!80!cyan!30}{#3}};
+\vfill}}}
+%\watermark{60}{6}{14-金融工程-白兔兔}
+
+%-------------------表格-------------------%
+\RequirePackage{array}%m{3em}
+%--------------------------------------
+
+%=======================================================================
+\RequirePackage{color,xcolor}%-颜色-%
+%==============================================================================
+
+
+\RequirePackage{enumitem,enumitem}
+
+
+%\RequirePackage{indentfirst}
+
+
+%\RequirePackage{placeins}%防浮动的
+
+
+
+
+
+
+%-\raisebox{-3.2ex}{}
+
+
+\endinput
+

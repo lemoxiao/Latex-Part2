@@ -1,0 +1,39 @@
+% Try and fail to use pgfmathparse to parametrise pictures.
+% Does work but needs to be more complicated than this
+% due to typesetting negative numbers with parentheses, etc.
+% Also, to be able to use higher precision in pgfmath, need
+%\usepackage{fp}\usepgflibrary{fixedpointarithmetic}
+% They seem to define \temp which clashes with my \temp
+% At the moment, this is not done.   AJR Nov 2015
+
+\pgfkeys{/pgf/fixed point arithmetic}% higher precision
+\newcommand{\pval}[2][4]%
+  {\pgfmathparse{#2}\pgfmathprintnumber[precision=#1]{\pgfmathresult}}
+\newcommand{\mytemp}[4]{\((#1,#2)\) and \((#3,#4)\)
+\begin{solution} 
+These vectors (shown in the margin) have length \(\sqrt{#1^2+#2^2}
+=\sqrt{\pval{#1^2+#2^2}} 
+=\pval{sqrt(#1^2+#2^2)}\)
+and \(\sqrt{#3^2+#4^2}
+=\sqrt{\pval{#3^2+#4^2}}
+=\pval{sqrt(#3^2+#4^2)}\), respectively.
+Their dot product  \((#1,#2)\cdot(#3,#4)
+=\pval{#1*#3}+\pval{#2*#4}
+=\pval{#1*#3+#2*#4}\).
+Hence \(\cos\theta
+=\pval{#1*#3+#2*#4}/(\pval{sqrt(#1^2+#2^2)}\cdot\pval{sqrt(#3^2+#4^2)})
+=\pval{(#1*#3+#2*#4)/(sqrt(#1^2+#2^2)*sqrt(#3^2+#4^2))}\) and so angle \(\theta
+=\pval{pi/180*acos((#1*#3+#2*#4)/(sqrt(#1^2+#2^2)*sqrt(#3^2+#4^2)))}
+=\pval[2]{acos((#1*#3+#2*#4)/(sqrt(#1^2+#2^2)*sqrt(#3^2+#4^2)))}^\circ\).
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \node[above] at (axis cs:0,0) {$\quad\pval[0]{acos((#1*#3+#2*#4)/(sqrt(#1^2+#2^2)*sqrt(#3^2+#4^2)))}^\circ$};
+  \addplot[blue,thick,quiver={u=#1,v=#2},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:#1,#2) {$(#1,#2)$};
+  \addplot[blue,thick,quiver={u=#3,v=#4},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:#3,#4) {$(#3,#4)$};
+\end{axis}
+\end{tikzpicture}}%
+\end{solution}}%end-temp

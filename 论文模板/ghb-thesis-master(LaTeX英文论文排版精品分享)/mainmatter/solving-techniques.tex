@@ -1,0 +1,3385 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{Solving Techniques}
+\labelChapter{solving-techniques}
+
+This chapter introduces the techniques applied for improving solving of the
+\gls{constraint model} introduced in the previous chapter.
+%
+We begin in \refSectionList{st-refining-define-before-use-constraint,
+  st-refined-objective-function} with refining the \gls{constraint model} to
+strengthen \gls{propagation}.
+%
+We continue to augment the \glsshort{constraint model} in
+\refSectionList{st-impl-constraints, st-dom-breaking-constraints} by adding
+\gls{implied.c}, \gls{symmetry breaking.c}, and \gls{dominance breaking.c}
+\glspl{constraint}.
+%
+We then describe techniques for tightening the cost bounds in
+\refSection{st-cost-bounds} and describe \glspl{branching strategy} in
+\refSection{st-branching-strategies}.
+%
+In \refSection{st-presolving}, we describe \gls{presolving} techniques for
+removing \glspl{match} that, for one reason or another, can be removed before
+instantiating the \glsshort{constraint model}.
+%
+With all solving techniques in place, we then evaluate the impact of these
+techniques, both individually and as groups, in
+\refSection{st-experimental-evaluation}.
+%
+Lastly, a summary is given in \refSection{st-summary}.
+
+
+\section{Refining the Define-Before-Use Constraint}
+\labelSection{st-refining-define-before-use-constraint}
+
+In \refChapter{constraint-model} on \refPageOfEquation{naive-dom-alt}, a simple
+but naive implementation is used for implementing the \gls{constraint} that all
+\glspl{datum} must be \gls{define.d}[d] before \gls{use.d}[d]
+(\refEquation{naive-dom-alt}).
+%
+To begin with, it requires the use of set~\glspl{variable},\!%
+%
+\footnote{%
+  This is because the $\mVar{dplace}$~\glspl{variable} need to be members of the
+  $\mDom$~\gls{function}, which is implemented as an array into which the
+  $\mVar{oplace}$~\glspl{variable} are used as indices.%
+}
+%
+which are expensive to use and not necessarily supported by all
+\glspl{constraint solver}.
+%
+This is for example the case of the \gls{constraint solver} used in the
+experiments, thus preventing us from evaluating the impact of the naive
+implementation.
+%
+In addition, if we know in which \glspl{block} a \gls{datum} is \gls{use.d}[d],
+then many \gls{implied.c} \glspl{constraint} can be applied to strengthen
+\gls{propagation}.
+
+We first eliminate the set~\glspl{variable} by capturing the information in the
+$\mDom$~\gls{function} as a dominance relation matrix
+%
+\begin{equation}
+  \begin{aMatrix}{@{\:}c|c@{\:}}
+      \mTuple{b_1, b_2}
+    & b_1, b_2 \in \mBlockSet, b_1 \in \mDom(b_2)
+  \end{aMatrix}
+  \labelEquation{dominance-matrix}
+\end{equation}
+%
+where each row denotes the fact that a \gls{block}~$b_1$ is \gls{dominate.b}[d]
+by another \gls{block}~$b_2$.
+%
+Next, we introduce the \glspl{variable} needed for capturing \gls{use.d}[s] of
+\glspl{datum}.
+
+
+\paragraph{Variables}
+
+The set of \glspl{variable} \mbox{$\mVar{uplace}[p] \in \mBlockSet$} models in
+which \gls{block} the \gls{datum} connected to \gls{operand}~$p$ is used.
+%
+Note that unlike the $\mVar{dplace}$~\glspl{variable}, which are indexed using a
+\gls{datum}, the $\mVar{uplace}$~\glspl{variable} are indexed using an
+\gls{operand}.
+
+
+\paragraph{Constraints}
+
+Obviously, every \gls{use.d} of \glspl{datum} must be \gls{dominate.b}[d] by its
+definition.
+%
+This \gls{constraint} is modeled as
+%
+\begin{equation}
+  \forall p \in \mPhiOperandCompSet :
+  \mTable(
+    \mTuple{\mVar{uplace}[p], \mVar{dplace}[\mVar{alt}[p]]} \hspace{-1pt},
+    \mDomMatrix
+  ),
+  \labelEquation{refined-dom}
+\end{equation}
+%
+where \mbox{$\mPhiOperandCompSet \subseteq \mOperandSet$} denotes the set of
+\glspl{operand} not appearing in any \gls{phi-match} and $\mDomMatrix$ is the
+\glsshort{dominate.b}[ance] relation matrix computed using
+\refEquation{dominance-matrix}.
+%
+We exclude such \glspl{operand} for the same reasons \glspl{phi-match} are
+excluded in \refEquation{naive-dom}.
+
+Next, if a \gls{match}~$m$ is selected and placed in
+\gls{block}~\mbox{$b$\hspace{-1pt},} then all \gls{use.d}[s] of \glspl{datum}
+made by $m$ must also occur in~\mbox{$b$\hspace{-1pt}.}
+%
+This is modeled as
+%
+\begin{equation}
+  \forall m \in \mPhiMatchCompSet,
+  \forall o \in \mCovers(m),
+  \forall p \in \mUses(m) :
+  \mVar{sel}[m] \mImp \mVar{oplace}[o] = \mVar{uplace}[p].
+  \labelEquation{refined-dom-selected}
+\end{equation}
+%
+An example illustrating the interaction between \refEquation{refined-dom} and
+\refEquation{refined-dom-selected} is shown in \refFigure{refined-dom-example}.
+
+\begin{figure}
+  \centering%
+  \input{figures/solving-techniques/dom-example}%
+
+  \caption[Example illustrating the refined define-before-use constraint]%
+          {%
+            Example illustrating the refined define-before-use constraint.
+            %
+            The assignments on the right-hand side show how these
+            variables should be set if the two matches~$m_1$ and~$m_2$ are
+            placed in blocks~$b_1$ respectively $b_2$, where $b_1$ is assumed to
+            dominate~$b_2$%
+          }
+  \labelFigure{refined-dom-example}
+\end{figure}
+
+Due to \refEquation{refined-dom-selected}, the assignment to the
+$\mVar{uplace}$~\glspl{variable} for non-selected \glspl{match} does not matter
+as long as \refEquation{refined-dom} is satisfied.
+%
+This gives rise to symmetric \glspl{solution}.
+%
+To break these symmetries, we fix the assignments in such cases to the
+\gls{block} wherein the \gls{datum} is \gls{define.d}[d] as a \gls{block} always
+\gls{dominate.b}[s] itself.
+%
+This is modeled as
+%
+\begin{equation}
+  \forall m \in \mPhiMatchCompSet,
+  \forall p \in \mUses(m) :
+  \mNot\mVar{sel}[m] \mImp \mVar{uplace}[p] = \mVar{dplace}[\mVar{alt}[p]],
+  \labelEquation{refined-dom-not-selected}
+\end{equation}
+%
+where \mbox{$\mPhiMatchCompSet \subseteq \mMatchSet$} denotes the set of
+\glspl{match} without the \glspl{phi-match}.
+
+Since neither of the above \glspl{constraint} apply to \glspl{operand} belonging
+to \glspl{phi-match}, the assignment to their $\mVar{uplace}$~\glspl{variable}
+does not matter, again giving rise to symmetric \glspl{solution}.
+%
+We therefore fix the assignment in such cases, which is modeled as
+%
+\begin{equation}
+  \forall p \in \mPhiOperandSet :
+  \mVar{uplace}[p] = \mMin(\mBlockSet).
+  \labelEquation{refined-dom-phi-operands}
+\end{equation}
+
+
+\section{Refining the Objective Function}
+\labelSection{st-refined-objective-function}
+
+The straightforward implementation of the \gls{objective function}
+(\refEquation{naive-objective-function}) is naive because it fails to reason on
+how cost is distributed across the \glspl{operation} that need to be covered.
+%
+This in turn results in poor \gls{propagation}.
+%
+See for example \refFigure{cost-example}.
+%
+\begin{figure}
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{UF graph\labelFigure{cost-example-graph}}%
+                {%
+                  \input{figures/solving-techniques/cost-example-graph}%
+                }%
+  \hfill%
+  \subcaptionbox{Cost matrix\labelFigure{cost-example-matrix}}%
+                {%
+                  \figureFontSize%
+                  \begin{minipage}{50mm}%
+                    \centering%
+                    \def\Sstackgap{0pt}%
+                    \begin{displaymath}
+                      \begin{aMatrix}{cccr@{\;\times\;}r@{\;=\;}r}
+                          \Shortstack{%
+                            \raisebox{1mm}[0pt][0pt]{\tabhead op}
+                            $\mathclap{\phantom{b}}% Needed to horizontally
+                                                   % align labels
+                             o_1$%
+                          }
+                        & \Shortstack{%
+                            \raisebox{1mm}[0pt][0pt]{\tabhead match}
+                            $\mathclap{\phantom{b}}% Needed to horizontally
+                                                   % align labels
+                             m_1$%
+                          }
+                        & \Shortstack{%
+                            \raisebox{1mm}[0pt][0pt]{\tabhead block}
+                            $b_1$%
+                          }
+                        & 4
+                        & \Shortstack{%
+                            \raisebox{1mm}[0pt][0pt]{%
+                              \hspace{3pt}% Needed to vertically align label
+                              \clap{\tabhead opcost}%
+                            }
+                            $\mathclap{\phantom{b}}% Needed to horizontally
+                                                   % align labels
+                             10$%
+                          }
+                        & 40 \\
+                        o_1 & m_1 & b_2 & 4 &  1 &  4 \\
+                        o_1 & m_3 & b_1 & 3 & 10 & 30 \\
+                        o_1 & m_3 & b_2 & 3 &  1 &  3 \\
+                        o_2 & m_2 & b_1 & 1 & 10 & 10 \\
+                        o_2 & m_2 & b_2 & 1 &  1 &  1 \\
+                        o_2 & m_3 & b_1 & 2 & 10 & 20 \\
+                        o_2 & m_3 & b_2 & 2 &  1 &  2
+                      \end{aMatrix}
+                    \end{displaymath}
+                  \end{minipage}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Example of match costs distributed over operations]%
+          {%
+            Example of match costs distributed over operations.
+            %
+            It is assumed that matches~$m_1$, $m_2$, and~$m_3$ have
+            costs~\num{4}, \num{1}, and~\num{5}, respectively, and that they can
+            be placed in one of two blocks, $b_1$ and $b_2$, with execution
+            frequencies~\num{10} and~\num{1}, respectively.
+            %
+            The cost of $m_3$ distributed over $o_1$ and $o_2$ is~\num{3}
+            and~\num{2}, respectively%
+          }
+  \labelFigure{cost-example}
+\end{figure}
+%
+Assume that a \gls{UF graph} can be covered by three \glspl{match}~$m_1$, $m_2$,
+and~$m_3$ with costs~\num{4}, \num{1}, and~\num{5}, respectively
+(\refFigure{cost-example-graph}).
+%
+Assume further that these \glspl{match} can be placed in one of two blocks,
+$b_1$ and $b_2$, with execution frequencies~\num{10} and~\num{1}, respectively.
+%
+Because \refEquation{naive-objective-function} is modeled as a summation, it can
+only \glsshort{propagation}[e] the bounds of the \gls{cost variable}.
+%
+Consequently, any \gls{match}~$m$ for which $\mVar{sel}[m]$ is still undecided
+incurs a cost between zero (if not selected) and \mbox{$\mCost(m) \times
+  \mMax(\cup_{b \,\in\, \mBlockSet} \mFreq(b))$} (if selected and placed in the
+\gls{block} with highest execution frequency).
+%
+In the example above, this means the \gls{cost variable} is initially bounded as
+\mbox{$0 \leq \mVar{cost} \leq 100$}.
+%
+These are very weak bounds as we know that either both $m_1$ and $m_2$ are
+selected and placed in $b_2$, or $m_3$ is selected and placed in $b_2$,
+resulting in a cost of at least~\num{5}.
+%
+Also, in the worst case all selected \glspl{match} are placed in $b_1$,
+resulting in a cost of at most~\num{50}.
+
+Instead of reasoning about the cost incurred by the \glspl{match} -- which may
+or may not be selected -- a better approach is to deduce the cost incurred on
+the \glspl{operation} -- which must always be covered.
+%
+The idea is as follows.
+%
+First, for each \gls{match}~\mbox{$m$\hspace{-.8pt},} evenly divide the cost of
+$m$ over each \gls{operation}~$o$ covered by~\mbox{$m$\hspace{-.8pt}.}
+%
+If a strict partial order $<$ exists over the set of \glspl{operation}, and
+$\mCovers(m)$ returns an ordered list that can be indexed starting from~\num{1},
+then the cost can be computed as
+%
+\begin{equation}
+  \mOpCost(m \hspace{-.8pt}, o) =
+  \left\{
+  \begin{array}{ll}
+    q + 1 & \text{if $o < \mCovers(m)[r+1]$}, \\
+    q     & \text{otherwise}, \\
+  \end{array}
+  \right.
+  \labelEquation{div-mul-op-cost-function}
+\end{equation}
+%
+where \mbox{$q = \lfloor \mCost(m) / \mCard{\!\mCovers(m)} \rfloor$} and
+\mbox{$r = \mCost(m) \! \mod \mCard{\!\mCovers(m)}$}.
+%
+Consequently, for any \gls{match}~$m$, \mbox{$\mCost(m) = \sum_{o \,\in\,
+    \mCovers(m)} \mCost(m \hspace{-.8pt}, o)$}.
+%
+Then, for each \gls{block}~$b$ we multiply \mbox{$\mOpCost(m\hspace{-.8pt}, o)$}
+with the execution frequency of~\mbox{$b$\hspace{-1pt}.}
+%
+This information can be represented as a cost matrix
+%
+\begin{equation}
+  \begin{aMatrix}{@{\:}c|c@{\:}}
+      o \hspace{-1pt},
+      m \hspace{-.8pt},
+      b \hspace{-1pt},
+      \big( \! \mOpCost(m, o) \times \mFreq(b) \big)
+    & m \in \mMatchSet, o \in \mCovers(m), b \in \mBlockSet
+  \end{aMatrix}
+  \labelEquation{div-mul-cost-matrix}
+\end{equation}
+%
+where each row denotes the cost of an \gls{operation}~$o$ if covered by a
+\gls{match}~$m$ and placed in a \gls{block}~\mbox{$b$\hspace{-1pt}.}
+%
+From the cost matrix given in \refFigure{cost-example-matrix}, we can deduce
+that the cost of covering \glspl{operation}~$o_1$ and~$o_2$ is between~\num{3}
+and~\num{40} and between~\num{1} and~\num{20}, respectively.
+%
+Hence the total cost can be bounded as \mbox{$4 \leq \mVar{cost} \leq 60$},
+which is a much tighter bound compared to that achieved using the naive
+\gls{objective function}.
+
+An alternative method for computing the cost is to \emph{first} multiply the
+\gls{match} cost with the execution frequency and \emph{then} evenly divide the
+product over the covered \glspl{operation}.
+%
+We call the first method the \gls!{divide-then-multiply method}, and the second
+method the \gls!{multiply-then-divide method}.
+%
+For the latter, the cost matrix is computed as
+%
+\begin{equation}
+  \begin{aMatrix}{@{\:}c|c@{\:}}
+      \mTuple{
+        o \hspace{-1pt},
+        m \hspace{-.8pt},
+        b \hspace{-1pt},
+        \mOpCost(m \hspace{-.8pt}, o \hspace{-1pt}, b)
+      }
+    & m \in \mMatchSet, o \in \mCovers(m), b \in \mBlockSet
+  \end{aMatrix}
+  \labelEquation{mul-div-cost-matrix}
+\end{equation}
+%
+where
+%
+\begin{equation}
+  \mOpCost(m \hspace{-.8pt}, o \hspace{-1pt}, b) =
+  \left\{
+  \begin{array}{ll}
+    q + 1 & \text{if $o < \mCovers(m)[r+1]$}, \\
+    q     & \text{otherwise}, \\
+  \end{array}
+  \right.
+  \labelEquation{mul-div-op-cost-function}
+\end{equation}
+%
+where \mbox{$q = \lfloor d / \mCard{\!\mCovers(m)} \rfloor$}, \mbox{$r =
+  d \hspace{-2pt} \mod \mCard{\!\mCovers(m)}$}, and \mbox{$d = \mCost(m) \times
+  \mFreq(b)$}.
+%
+Consequently, for any \gls{match}~$m$ and \gls{block}~\mbox{$b$\hspace{-1pt},}
+\mbox{$\mCost(m\hspace{-.8pt}, o) \times \mFreq(b) = \sum_{o \,\in\,
+    \mCovers(m)} \mCost(m \hspace{-.8pt}, o \hspace{-1pt}, b)$.}
+
+At first glace this design decision would appear to make no difference, but they
+unexpectedly exhibit significantly different solving time characteristics, as
+will be seen later in the experimental evaluation.
+
+
+\paragraph{Variables}
+
+The set of \glspl{variable} \mbox{$\mVar{ocost}[o] \in \mNatNumSet$} models the
+cost incurred by covering \gls{operation}~\mbox{$o$\hspace{-.8pt}.}
+%
+It is assumed the \gls{domain} is the same as for the \gls{cost variable}.
+
+
+\paragraph{Constraints}
+
+For each \gls{operation}~\mbox{$o$\hspace{-.8pt},} the combination
+\mbox{$o\hspace{-1pt}, \mVar{omatch}[o], \mVar{oplace}[o], \mVar{ocost}[o]$}
+must appear as a row in the cost matrix.
+%
+Given a cost matrix~$\mCostMatrix$ computed using either
+\refEquation{div-mul-cost-matrix} or~\refEquation*{mul-div-cost-matrix}, this
+\gls{constraint} is modeled as
+%
+\begin{equation}
+  \forall o \in \mOpSet :
+  \mTable(
+    \mTuple{
+      o\hspace{-1pt},
+      \mVar{omatch}[o],
+      \mVar{oplace}[o],
+      \mVar{ocost}[o]
+    } \hspace{-1pt},
+    \mCostMatrix
+  ).
+  \labelEquation{omatch-oplace-ocost-connection}
+\end{equation}
+%
+The total cost is then modeled as
+%
+\begin{equation}
+  \mVar{cost} = \sum_{\mathclap{o \in \mOpSet}} \mVar{ocost}[o].
+  \labelEquation{total-cost}
+\end{equation}
+
+Note that the cost computed by \refEquation{total-cost} is exactly the same as
+that computed by \refEquation{naive-objective-function}.
+%
+The proof is as follows.
+%
+Because every \gls{operation} must be covered by exactly one selected
+\gls{match}, there is a one-to-one correspondence between a selected
+\gls{match}~$m$ and the set~$Q$ of \glspl{operation} covered
+by~\mbox{$m$\hspace{-.8pt}.}
+%
+Consequently, the total cost incurred by $m$ -- which is \mbox{$\mCost(m) \times
+  \mFreq(b)$}, where $b$ is the \gls{block} wherein $m$ is placed -- should be
+exactly the same as that incurred by the \glspl{operation} in $Q$.
+%
+Due to \refEquation{total-cost}, the total cost incurred by the
+\glspl{operation} in $Q$ is \mbox{$\sum_{o \,\in\, Q} \mVar{ocost}[o]$}.
+%
+Due to \refEquationList{div-mul-cost-matrix, omatch-oplace-ocost-connection}, we
+know that for each \mbox{$o \in Q$}, \mbox{$\mVar{ocost}[o] =
+  \mCost(m \hspace{-.8pt}, o) \times \mFreq{b}$.}
+%
+Since \mbox{$\mCost(m) = \sum_{o \,\in\, \mCovers(m)} \mCost(m \hspace{-.8pt},
+  o)$}, the total cost incurred by \glspl{operation} in $Q$ is \mbox{$\mCost(m)
+  \times \mFreq(b)$.}
+%
+\hfill\qedsymbol
+
+
+\section{Implied Constraints}
+\labelSection{st-impl-constraints}
+
+As explained in \refChapter{constraint-programming}, \gls{implied.c}
+\glspl{constraint} are \glspl{constraint} that strengthen the \gls{propagation}
+while preserving all \glspl{solution}.
+%
+Stronger \gls{propagation} leads to less \gls{search}, which in turn leads to
+shorter solving times.
+%
+In this section, we introduce such \glspl{constraint} that are relevant for the
+\glsshort{constraint model}.
+
+
+\subsection{Implied Operation and Data Placements}
+
+Due to \refEquationList{naive-dom, spanning}, if a selected \gls{match}
+\gls{define.d}[s] some \gls{datum}~$d_1$ and \gls{use.d}[s] some other
+\gls{datum}~$d_2$, then the \gls{block} wherein $d_2$ is \gls{define.d}[d] must
+\gls{dominate.b} the \gls{block} wherein $d_1$ is \gls{define.d}[d].
+%
+From this observation, we can infer that if all \glspl{match} covering a
+non-\gls{phi-node} \gls{operation}~$o$ do not \gls{span.b} any \glspl{block},
+\gls{define.d} some \gls{datum}~$d_1$, and \gls{use.d} some \gls{datum}~$d_2$,
+then the \gls{block} wherein $d_2$ is \gls{define.d}[d] must \gls{dominate.b}
+the \gls{block} wherein $d_1$ is \gls{define.d}[d].
+%
+In addition, $o$ must be placed in the same \gls{block} wherein $d_1$ is
+\gls{define.d}[d].
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall o \in
+      \mSetBuilder{o'}%
+                  {%
+                    o' \in \mOpCompSet{\mPhi},
+                    m \in \mMatchSet[o'] \hspace{-1pt}
+                    \text{ \st }
+                    \mConsumes(m) = \mEmptySet
+                  }, \\
+    \forall d_1 \in
+      \mSetBuilder{d}%
+                  {%
+                    d \in \mDataOf(o \hspace{-1pt}, \mDefines),
+                    m \in \mMatchSet[o] \hspace{-1pt},
+                    \exists p \in \mDefines(m) :
+                    \mDataSet[p] = \mSet{d}
+                  }, \\
+    \forall d_2 \in
+      \mSetBuilder{d}%
+                  {
+                    d \in \mDataOf(o \hspace{-1pt}, \mUses),
+                    m \in \mMatchSet[o] \hspace{-1pt},
+                    \exists p \in \mUses(m) :
+                    \mDataSet[p] = \mSet{d}
+                  } : \\
+    \mTable(
+      \mTuple{\mVar{dplace}[d_1], \mVar{dplace}[d_2]} \hspace{-1pt},
+      \mDomMatrix
+    )
+    \mAnd
+    \mVar{oplace}[o] = \mVar{dplace}[d_1].
+  \end{array}
+  \labelEquation{impl-cons-defs-dominate-defs}
+\end{equation}
+%
+where
+%
+\begin{equation}
+  \mDataOf(o \hspace{-1pt}, f)
+  \equiv
+  \bigcup_{
+    \mathclap{
+      \substack{
+        m \, \in \, \mMatchSet[o] \hspace{-.8pt}, \:
+        p \, \in \, f\hspace{-1pt}(m) \text{ \st} \\
+        \mCovers(m) \, = \, \mSet{o}
+      }
+    }
+  }
+  \mDataSet[p]
+  \labelEquation{data-of-function}
+\end{equation}
+
+From the same observation, we can also infer that if all \glspl{match} covering
+the same non-\gls{phi-node} \gls{operation} \gls{span.b} a set~$S$ of
+\glspl{block} and \gls{define.d} some \gls{datum}~\mbox{$d$\hspace{-1pt},} then
+$d$ must be \gls{define.d}[d] in one of the \glspl{block}
+in~\mbox{$S$\hspace{-.8pt}.}
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall S \in \mPowerset{\mBlockSet} \hspace{-2pt},
+    \forall d \in \mDataSet \!,
+    \forall o \in
+      \mSetBuilder*{o'}%
+                   {
+                     \begin{array}{@{}l@{}}
+                       o' \in \mOpCompSet{\mPhi},
+                       m \in \mMatchSet[o'] \hspace{-1pt},
+                       \exists p \in \mDefines(m) : \\
+                       \mSpans(m) = S \mAnd \mDataSet[p] = \mSet{d}
+                     \end{array}
+                   } : \\
+    \mVar{dplace}[d] \in S.
+  \end{array}
+  \labelEquation{impl-cons-defs-in-spanned-blocks}
+\end{equation}
+
+From \refEquation{preventing-control-flow-op-moves}, we can infer that if all
+non-\glspl{phi-match} covering \gls{operation}~$o$ have \gls{entry
+  block}~\mbox{$b$\hspace{-1pt},} then $o$ must for sure be placed
+in~\mbox{$b$\hspace{-1pt}.}
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall b \in \mBlockSet \hspace{-1pt},
+    \forall o \in
+      \mSetBuilder{o'}%
+                  {
+                    o' \in \mOpSet,
+                    m \in \mMatchSet[o'] \setminus \mPhiMatchSet
+                    \text{ \st }
+                    \mEntry(m) = \mSet{b}
+                  } : \\
+    \mVar{oplace}[o] = b \hspace{-1pt}.
+  \end{array}
+  \labelEquation{impl-cons-identical-entry-blocks}
+\end{equation}
+
+From the same \gls{constraint}, we can also infer that if the \glspl{match}
+covering the same non-\gls{phi-node} \gls{operation} all have identical
+\glspl{entry block}, say~\mbox{$b$\hspace{-1pt},} and make \gls{use.d} of some
+\gls{datum}~\mbox{$d$\hspace{-1pt},} then the \gls{block} wherein $d$ is
+\gls{define.d}[d] must dominate~\mbox{$b$\hspace{-1pt}.}
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall b \in \mBlockSet \hspace{-1pt},
+    \forall d \in
+      \mSetBuilder*{d'}%
+                   {%
+                     \begin{array}{@{}l@{}}
+                       o' \in \mOpCompSet{\mPhi},
+                       m \in \mMatchSet[d'] \hspace{-1pt},
+                       \exists p \in \mUses(m) : \\
+                       \mEntry(m) = \mSet{b} \mAnd \mDataSet[p] = \mSet{d}
+                     \end{array}
+                   } : \\
+    \mTable(
+      \mTuple{b \hspace{-1pt}, \mVar{dplace}[d]} \hspace{-1pt},
+      \mDomMatrix
+    ).
+  \end{array}
+  \labelEquation{impl-cons-defs-dominate-entry-blocks}
+\end{equation}
+
+From \refEquation{def-edges}, we can infer that if a \gls{datum}~$d$ appears in
+a \gls{definition edge}~$\mEdge{d}{b}$ and is \gls{define.d}[d] by
+\glspl{phi-match} only, then the \gls{operation} covered by these \glspl{match}
+must be placed~\mbox{$b$\hspace{-1pt}.}
+%
+This is modeled as
+%
+\begin{equation}
+  \forall \mEdge{d}{b} \in \mFunctionDefEdgeSet,
+  \forall o \in
+    \mSetBuilder{o'}%
+                {%
+                  \begin{array}{@{}l@{}}
+                    m \in \mMatchSet[d] \cap \mPhiMatchSet,
+                    o' \in \mCovers(m)
+                  \end{array}
+                } :
+  \mVar{oplace}[o] = b \hspace{-1pt}.
+  \labelEquation{impl-cons-place-phi-ops-same-as-def-edges}
+\end{equation}
+%
+It is assumed that the \glspl{edge} in $\mFunctionDefEdgeSet$ have been
+reoriented such that all \glspl{source} are either \glsshort{state node} or
+\glspl{value node} and all \glspl{target} are \glspl{block node}.
+
+
+\subsection{Implied Constraints Due to the Define-Before-Use Refinement}
+
+From \refEquationRange{refined-dom}{refined-dom-phi-operands}, we can infer the
+following \gls{implied.c} \glspl{constraint}.
+
+If a non-\gls{phi-match}~$m$ \gls{span.b}[ning] no \glspl{block} is selected,
+then all \glspl{datum} \gls{use.d}[d] and \gls{define.d}[d] by $m$ must take
+place in the same \gls{block}.
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall m \in
+      \mSetBuilder{m'}%
+                  {%
+                    m \in \mPhiMatchCompSet \hspace{-1pt},
+                    \mSpans(m) = \mEmptySet
+                  },
+    \forall p_1, p_2 \in \mUses(m) \text{ \st } p_1 < p_2 : \\
+    \mVar{sel}[m] \mImp \mVar{uplace}[p_1] = \mVar{uplace}[p_2],
+  \end{array}
+  \labelEquation{impl-cons-no-span-uses}
+\end{equation}
+%
+\begin{equation}
+  \begin{array}{c}
+    \forall m \in
+      \mSetBuilder{m'}%
+                  {%
+                    m \in \mPhiMatchCompSet \hspace{-1pt},
+                    \mSpans(m) = \mEmptySet
+                  },
+    \forall p_1, p_2 \in \mDefines(m) \text{ \st } p_1 < p_2 : \\
+    \mVar{sel}[m]
+    \mImp
+    \mVar{dplace}[\mVar{alt}[p_1]] = \mVar{dplace}[\mVar{alt}[p_2]],
+  \end{array}
+  \labelEquation{impl-cons-no-span-defs}
+\end{equation}
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall m \in
+      \mSetBuilder{m'}%
+                  {%
+                    m \in \mPhiMatchCompSet \hspace{-1pt},
+                    \mSpans(m) = \mEmptySet
+                  },
+    \forall p_1 \in \mUses(m) \setminus \mDefines(m), \\
+    \forall p_2 \in \mDefines(m) :
+    \mVar{sel}[m]
+    \mImp
+    \mVar{uplace}[p_1] = \mVar{dplace}[\mVar{alt}[p_2]].
+  \end{array}
+  \labelEquation{impl-cons-no-span-use-defs}
+\end{equation}
+
+In addition, if a non-\gls{phi-match} \gls{span.b}[ning] some \glspl{block} is
+selected, then all \gls{use.d}[s] of its input \glspl{datum} must occur in the
+same \gls{block}.
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall m \in
+      \mSetBuilder{m'}%
+                  {%
+                    m \in \mPhiMatchCompSet \hspace{-1pt},
+                    \mSpans(m) \neq \mEmptySet
+                  }, \\
+    \forall p_1, p_2 \in \mUses(m) \setminus \mDefines(m)
+    \text{ \st } p_1 < p_2 : \\
+    \mVar{sel}[m] \mImp \mVar{uplace}[p_1] = \mVar{uplace}[p_2].
+  \end{array}
+  \labelEquation{impl-cons-spanned-input}
+\end{equation}
+
+
+\subsection{Implied Data Locations}
+
+From \refEquation{compatible-locations}, we can infer several \gls{implied.c}
+\glspl{constraint}.
+
+If all non-\glspl{kill match} covering some \gls{operation} require some
+non-\glsshort{state node} \gls{datum}~$d$ as input, then $d$ cannot be an
+intermediate value nor be \gls{killed.d}.
+%
+Such \glspl{datum} is said to be \gls!{available.d}, meaning they cannot be
+located in either $\mIntLocation$ or $\mKilledLocation$.
+%
+If the input can be one of several values (due to \glspl{alternative value}),
+then at least one of those values must be made \gls{available.d}.
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall S \in \mPowerset{\mStateDataCompSet} \hspace{-2pt},
+    \forall o \in
+      \mSetBuilder{o'}%
+                  {
+                    o' \in \mOpSet \!,
+                    m \in \mMatchSet[o'] \hspace{-1pt},
+                    \exists p \in \mUses(m) \setminus \mDefines(m) :
+                    \mDataSet[p] = S
+                  }, \\
+    \exists d \in S :
+    \mVar{loc}[d] \notin \mSet{\mIntLocation, \mKilledLocation},
+  \end{array}
+  \labelEquation{impl-cons-used-data-must-be-available}
+\end{equation}
+%
+where \mbox{$\mStateDataCompSet \subseteq \mDataSet$} denotes the set of
+\glspl{datum} without the \glspl{state node}.
+
+If all non-\glspl{kill match} defining a non-\glsshort{state node}
+\gls{datum}~$d$ have $d$ as an \gls{exterior value}, then $d$ must be made
+\gls{available.d}.
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall d \in
+      \mSetBuilder*{d'}%
+                   {%
+                     \begin{array}{@{}l@{}}
+                       d' \in \mStateDataCompSet,
+                       m \in \mMatchSet[d'] \setminus \mKillMatchSet,
+                       \exists p \in \mDefines(m) : \\
+                       \mDataSet[p] = \mSet{d'} \mAnd \mIsExt(m, p)
+                     \end{array}
+                   } \!, \\
+    \mVar{loc}[d] \notin \mSet{\mIntLocation, \mKilledLocation},
+  \end{array}
+  \labelEquation{impl-cons-exterior-data-must-be-available}
+\end{equation}
+%
+where \mbox{$\mIsExt(m, p)$} denotes whether an \gls{operand}~$p$ in a
+\gls{match}~$m$ represents an \gls{exterior value}.
+
+We can always constrain the \glspl{location} of a non-\glsshort{state node}
+\gls{datum}~$d$ to those \glspl{location} where the definers can
+put~\mbox{$d$\hspace{-.8pt}.}
+%
+The intuition here is to take the union of all those \glspl{location}, which is
+modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall d \in \mStateDataCompSet,
+    \forall S \in
+      \mPowerset{\mLocationSet
+      \, \cup \,
+      \mSet{\mIntLocation, \mKilledLocation}} \text{ \st} \\
+    S = \mSetBuilder{l}%
+                    {%
+                      m \in \mDataSet[d] \setminus \mKillMatchSet,
+                      p \in \mDefines(m),
+                      l \in \mStores(m, p)
+                      \text{ \st }
+                      d \in \mDataSet[p]
+                    } : \\
+    \mVar{loc}[d] \in S.
+  \end{array}
+  \labelEquation{impl-cons-locs-of-uses}
+\end{equation}
+
+Likewise, we can always constrain the \glspl{location} of a non-\glsshort{state
+  node} \gls{datum}~$d$ to those \glspl{location} where the users can
+access~\mbox{$d$\hspace{-.8pt}.}
+%
+Assuming there is always at least one \gls{match} making use of $d$), this is
+similarly modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall d \in \mStateDataCompSet,
+    \forall S \in
+      \mPowerset{\mLocationSet
+      \, \cup \,
+      \mSet{\mIntLocation, \mKilledLocation}} \text{ \st} \\
+    S = \mSetBuilder{l}%
+                    {%
+                      m \in \mKillMatchCompSet,
+                      p \in \mUses(m),
+                      l \in \mStores(m, p)
+                      \text{ \st }
+                      d \in \mDataSet[p]
+                    }
+    \mAnd
+    S \neq \mEmptySet : \\
+    \mVar{loc}[d] \in S.
+  \end{array}
+  \labelEquation{impl-cons-locs-of-defs}
+\end{equation}
+
+
+\subsection{Implied Fall-Throughs}
+
+Due to \refEquation{fall-through}, if for any two \glspl{block}~$b_1$ and~$b_2$
+there exists a \gls{match} requiring $b_2$ to follow $b_1$ but there are no
+\glspl{match} requiring any other \gls{block} to follow $b_1$ nor requiring
+$b_2$ to follow any other \gls{block}, then it is always safe to force $b_2$ to
+follow $b_1$.
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall b_1, b_2 \in \mBlockSet
+    \text{ \st }
+    \mSetBuilder{\mEntry(m)}{\mPair{m}{b_2} \in \mFallThroughSet} = \mSet{b_1}
+    \mAnd \mbox{} \\
+    \mSetBuilder{b}%
+                {%
+                  \mPair{m}{b} \in \mFallThroughSet
+                  \text{ \st }
+                  \mEntry(m) = \mSet{b_1}%
+                } = \mSet{b_2} :
+    \mVar{succ}[b_1] = b_2.
+  \end{array}
+  \labelEquation{impl-cons-fix-fall-throughs}
+\end{equation}
+
+
+\section{Symmetry and Dominance Breaking Constraints}
+\labelSection{st-dom-breaking-constraints}
+
+As explained in \refChapter{constraint-programming}, \glsshort{symmetry
+  breaking.c} and \gls{dominance breaking.c} \glspl{constraint} are
+\glspl{constraint} that remove \glspl{solution} from the \gls{search space} that
+are either symmetric to one another or dominated by some other \gls{solution}.
+%
+Since this leads to a smaller \gls{search space}, the solving time is reduced.
+%
+In this section, we introduce such \glspl{constraint} that are relevant for the
+\glsshort{constraint model}.
+
+
+\subsection{Location of State Nodes}
+
+Since \glspl{datum} also includes the \glspl{state node}, a
+$\mVar{loc}$~\gls{variable} will be introduced for every \gls{state node}.
+%
+However, since \glspl{state node} are abstract entities used only to capture
+implicit dependencies between certain \gls{operation}, the assignment to these
+\glspl{variable} has no impact on code quality.
+%
+Hence many symmetric \glspl{solution} arise.
+%
+We remove these symmetries by always fixing the \gls{location} for each
+\gls{state node}, which is modeled as
+%
+\begin{equation}
+  \forall d \in \mStateDataSet :
+  \mVar{loc}[d] = \mIntLocation,
+  \labelEquation{dom-cons-locs-of-states}
+\end{equation}
+%
+where \mbox{$\mStateDataSet \subseteq \mDataSet$} denotes the set of
+\glspl{state node}.
+
+
+\subsection{Operands of Non-Selected Matches}
+
+The $\mVar{alt}$~\glspl{variable} of \glspl{match} that are not selected still
+need to be assigned a value.
+%
+Since this assignment has no impact on code quality, it gives rise to many
+symmetric \glspl{solution}.
+%
+We therefore fix the $\mVar{alt}$ assignments in such cases, which is modeled as
+%
+\begin{equation}
+  \forall m \in \mMatchSet,
+  \forall p \in \mDefines(m) \cup \mUses(m) :
+  \mNot\mVar{sel}[m] \mImp \mVar{alt}[p] = \mMin(\mDataSet[\hspace{-1pt}p]).
+  \labelEquation{dom-cons-operands-of-non-selected-matches}
+\end{equation}
+
+The \gls{symmetry breaking.c} \gls{constraint} above also implies that if an
+\gls{operand} representing input with multiple \glspl{datum} does not take its
+minimum value, then the corresponding \gls{match} must be selected.
+%
+In addition, the corresponding \gls{datum} must be made \gls{available.d}.
+%
+This is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall m \in \mMatchSet,
+    \forall p \in \mUses(m) \setminus \mDefines(m)
+    \text{ \st }
+    \mCard{\mDataSet[p]} > 1 : \\
+    \mVar{alt}[p] \neq \mMin(\mDataSet[p])
+    \mImp
+    \mVar{alt}[p] \notin \mSet{\mIntLocation, \mKilledLocation}.
+  \end{array}
+  \labelEquation{impl-cons-input-operands-not-taking-min-value}
+\end{equation}
+
+
+\subsection{Interchangeable Data}
+
+As described in \refChapter{constraint-model} on
+\refPageOfSection{modeling-value-reuse}, \glspl{datum} in the \gls{UF graph}
+that are copies of the same value are \gls{copy-related.d} and therefore
+interchangeable.
+%
+This is another source for symmetric \glspl{solution}, which is illustrated in
+\refFigure{interchangeable-data-example}.
+
+\begin{figure}
+  \begin{minipage}[b]{58mm}%
+    \centering%
+    \subcaptionbox{%
+                    UF graph, where the values \irVar*{v}[1] and \irVar*{v}[2]
+                    constitute a chain of interchangeable data%
+                    \labelFigure{interchangeable-data-example-annotated-graph}%
+                  }%
+                  [\textwidth]%
+                  {%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-annotated-graph%
+                    }%
+                  }
+
+    \vspace{\betweensubfigures}
+
+    \subcaptionbox{%
+                    Symmetries due to how data can be connected to operands%
+                    \labelFigure{interchangeable-data-example-alt-solutions}%
+                  }%
+                  [\textwidth]%
+                  {%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-alt-1%
+                    }%
+                    \hspace{8mm}%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-alt-2%
+                    }%
+                  }%
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[b]{58mm}%
+    \centering%
+    \subcaptionbox{%
+                    Symmetries due to how null-copy matches can be selected%
+                    \labelFigure{interchangeable-data-example-null-solutions}%
+                  }%
+                  [\textwidth]%
+                  {%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-null-1%
+                    }%
+                    \hspace{8mm}%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-null-2%
+                    }%
+                  }
+
+    \vspace{\betweensubfigures}
+
+    \subcaptionbox{%
+                    Symmetries due to how kill matches can be selected%
+                    \labelFigure{interchangeable-data-example-kill-solutions}%
+                  }%
+                  [\textwidth]%
+                  {%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-kill-1%
+                    }%
+                    \hspace{8mm}%
+                    \input{%
+                      figures/solving-techniques/%
+                      interchangeable-data-example-kill-2%
+                    }%
+                  }%
+  \end{minipage}
+
+  \caption[Example of interchangeable data]%
+          {%
+            Example of interchangeable data and how these give rise to
+            symmetries%
+          }
+  \labelFigure{interchangeable-data-example}
+\end{figure}
+
+Assume that a \gls{UF graph} contains two \gls{copy-related.d} values,
+\irVar*{v}[1] and~\irVar*{v}[2], which may both be connected to two
+\glspl{operand}~$p_1$ and~$p_2$
+(\refFigure{interchangeable-data-example-annotated-graph}).
+%
+We say that a set of values constitute a chain of \gls!{interchangeable.d}[
+  \glspl{datum}] if they can be swapped in a \gls{solution} without affecting
+the \gls{program} semantics.
+%
+This is the case if the values are all \gls{copy-related.d} and none are both
+\gls{define.d}[d] and \gls{use.d}[d] by some \gls{match}.
+%
+In the above example, \irVar*{v}[1] and~\irVar*{v}[2] constitute such a chain
+and can therefore be swapped for $p_1$ and~$p_2$, giving rise to unwanted
+symmetric \glspl{solution}
+(\refFigure{interchangeable-data-example-alt-solutions}).
+%
+The intuition here is to prevent \glspl{solution} containing ``cross-over''
+connections between the values in a chain and the $\mVar{alt}$~\glspl{variable}.
+%
+As a precaution, however, we exclude \glspl{operand} used by \glspl{phi-match}
+which may require such cross-over connections due to the \glspl{definition
+  edge}.
+
+If we assume that there exists a partial order $\leq$ for~$\mDataSet$, then we
+can remove these symmetries by enforcing an order of the values assigned to the
+$\mVar{alt}$~\glspl{variable}.
+%
+To this end, we use the \gls{value-precede-chain constraint} introduced in
+\refChapter{constraint-programming} on \refPageOfSection{cp-vpc}.
+%
+Let $\mInterchDataSet$ denote the set of chains of \gls{interchangeable.d}
+\glspl{datum} and \mbox{$\mOperandCompSet[\mPhi] \subseteq \mOperandSet$} denote
+the set of \glspl{operand} not used by \glspl{phi-match}.
+%
+With these definitions, this \gls{constraint} is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall c \in \mInterchDataSet,
+    \forall p_1, \ldots, p_k \in \mOperandCompSet[\mPhi]
+    \text{ \st }
+    p_1 \neq \cdots \neq p_k
+    \mAnd
+    (\forall 1 \leq i \leq k : \mDataSet[p_i] \! = c) : \\
+    \mValuePrecChain(c, \mVar{alt}[p_1], \ldots, \mVar{alt}[p_k]).
+  \end{array}
+  \labelEquation{dom-cons-interch-data-chains}
+\end{equation}
+
+Additional symmetries may appear due to \glspl{null-copy match}.
+%
+Returning to the example above, if one of the two \glspl{copy node} needs to be
+covered using a \gls{copy match} derived from actual copy \gls{instruction},
+then we are free to decide which.
+%
+Intuitively, we want to prevent \glspl{solution} where selected \glspl{null-copy
+  match} ``appear to the left'' of a non-\gls{null-copy match}.
+%
+Let $\mInterchDataSet[\mCopy]$ denote the set of chains of \glspl{datum} that
+can only be defined by \glspl{copy match}, \mbox{$\mNullCopyMatchSet \subseteq
+  \mMatchSet$} denote the set of \glspl{null-copy match}, and
+\mbox{$\mMatchSet[d] \subseteq \mMatchSet$} denote the set of \glspl{match} that
+can define a \gls{datum}~\mbox{$d$\hspace{-.8pt}.}
+%
+Assuming there exists exactly one \gls{null-copy match} to cover each \gls{copy
+  node}, this is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall c \in \mInterchDataSet[\mCopy],
+    \forall 1 \leq i < k,
+    \exists m_i \in \mMatchSet[c[i]] \cap \mNullCopyMatchSet : \\
+    \mIncreasing(\mVar{sel}[m_1], \ldots, \mVar{sel}[m_k]),
+  \end{array}
+  \labelEquation{dom-cons-null-copy-match-selection}
+\end{equation}
+%
+where
+%
+\begin{equation}
+  \mIncreasing(\mVar{x}_1, \ldots, \mVar{x}_k)
+  \equiv
+  \mBigAnd_{\mathclap{1 \,\leq\, i \,<\, k}}
+  \mVar{x}_{i} \leq \mVar{x}_{i + 1}
+  \labelEquation{increasing-function}
+\end{equation}
+
+Similarly to \glspl{null-copy match}, symmetries can also arise due to
+\glspl{kill match}.
+%
+Intuitively, we want to prevent \glspl{solution} where \gls{killed.d}
+\glspl{datum} ``appear to the right'' of non-\gls{killed.d} \glspl{datum}.
+%
+Assuming there exists exactly one \gls{kill match} to cover each \gls{copy
+  node}, this is modeled as
+%
+\begin{equation}
+  \begin{array}{@{}c@{}}
+    \forall c \in \mInterchDataSet[\mCopy],
+    \forall 1 \leq i < k,
+    \exists m_i \in \mMatchSet[c[i]] \cap \mKillMatchSet : \\
+    \mIncreasing(\mVar{sel}[m_1], \ldots, \mVar{sel}[m_k]),
+  \end{array}
+  \labelEquation{dom-cons-kill-match-selection}
+\end{equation}
+%
+where $\mKillMatchSet$ denotes the set of \glspl{kill match}.
+
+
+\section{Tightening the Cost Bounds}
+\labelSection{st-cost-bounds}
+
+As explained in \refChapter{constraint-programming}, in \gls{CP} optimization
+problems are solved using \gls{branch and bound}.
+%
+In other words, when a \gls{solution} is found a \gls{constraint} is added to
+the \glsshort{constraint model}, forcing any subsequently found \glspl{solution}
+to be strictly better.
+%
+For this to be effective, however, the cost bounds must be tight.
+%
+A tight upper bound enables the \gls{constraint solver} to prune away parts of
+the \gls{search space} that only contains inferior \glspl{solution}.
+%
+This is most useful for proving whether a particular \gls{solution} is optimal.
+%
+Likewise, a tight lower bound enables the \gls{constraint solver} to prune away
+parts of the \gls{search space} that contains no \glspl{solution}.
+%
+This is partially achieved by the refined \gls{objective function} introduced in
+\refSection{st-refined-objective-function}, but the bounds can be further
+tightened using complementary mechanisms.
+
+The upper bound can be further tightened by solving the same problem using a
+greedy but fast heuristic.
+%
+To this end, any modern \gls{compiler} can be used.
+%
+The lower bound can be further tightened by solving a relaxed -- and thereby
+simpler -- version of the \gls{constraint model}.
+%
+In this context, a relaxed version corresponds to a \glsshort{constraint model}
+that only integrates \gls{global.is} \gls{instruction selection} and \gls{block
+  ordering}.
+%
+Hence the relaxed \glsshort{constraint model} consists of only the
+$\mVar{omatch}$, $\mVar{opcosts}$, $\mVar{sel}$, $\mVar{succ}$, and
+$\mVar{cost}$ variables, \refEquation{operation-coverage}, relaxed versions of
+\refEquationList{block-order, fall-through} that allow fall-throughs via
+non-\gls{empty.b} \glspl{block}, and modified versions of
+\refEquationList{div-mul-op-cost-function, div-mul-cost-matrix, total-cost} that
+are optimistic about the execution frequencies.
+
+If $\mRelaxedCost$ and $\mHeuristicCost$ denote the cost computed from the
+relaxation and by the heuristic, respectively, then the \gls{cost variable} is
+bounded as
+%
+\begin{equation}
+  \mRelaxedCost \leq \mVar{cost} < \mHeuristicCost.
+  \labelEquation{cost-bounds}
+\end{equation}
+
+
+\section{Branching Strategies}
+\labelSection{st-branching-strategies}
+
+As explained in \refChapter{constraint-programming}, the \gls{branching
+  strategy} decides how to explore the \gls{search space}.
+%
+Following the \gls{first-fail principle} (see \refSection{cp-search} on
+\refPageOfSection{cp-search}), we first branch on the
+$\mVar{ocost}$~\glspl{variable}.
+%
+When branching on these \glspl{variable}, we select the \gls{variable}~$v$ with
+largest difference between the two smallest values in its \gls{domain} -- this
+is typically called the maximum \gls!{regret}~\cite{Sen:2010} -- and the
+smallest value in the \gls{domain} of~\mbox{$v$\hspace{-1pt}.}
+%
+The intuition here is that, because the \gls{objective function} strives to
+minimize the total cost, we wish to minimize the cost incurred per
+\gls{operation}.
+%
+Hence we try to cover the \glspl{operation} for which the cost of bad decisions
+is largest, and we try to do so at least cost.\!%
+%
+\footnote{%
+  In the field of decision theory, this is known as the \gls!{minimax
+    approach}~\cite{Savage:1951}.
+}
+%
+Note that this \gls{branching strategy} is only possible due to the refined
+\gls{objective function} introduced in
+\refSection{st-refined-objective-function}.
+%
+Remaining decisions are left to the \gls{constraint solver}['s] discretion;
+%
+in the experiments, we use \gls!{free search} which alternates between
+user-specified and activity-based \gls{search} when \gls{search} is restarted
+(set to~\num{100}).
+
+To improve solving, we make sure to arrange the \glspl{match} in order of
+increasing cost.
+%
+If there is a tie between two \glspl{match}, and either of them is a \gls{kill
+  match}, then the \gls{kill match} comes first.
+%
+Otherwise, the \gls{match} covering more \glspl{operation} comes first (hence
+mimicking the scheme of \gls{maximum munch}).
+%
+This is because the \gls{constraint solver} will most likely attempt to select
+\glspl{match} in the order given to the \glsshort{constraint model}.
+%
+In such a setting, it is generally a good approach to first try a \gls{kill
+  match} -- which incurs no cost and encourages value reuse -- and then try the
+\gls{match} incurring the least cost.
+
+
+\section{Presolving}
+\labelSection{st-presolving}
+
+As explained in \refChapter{constraint-programming}, \gls{presolving} is the
+process of applying problem-specific algorithms to reduce the number of
+\glspl{variable} or to shrink the \gls{variable} \glspl{domain} before
+solving.\!%
+%
+\footnote{%
+  In this sense, the bound tightening technique described in
+  \refSection{st-cost-bounds} is a form of \gls{presolving}.%
+}
+%
+In this section, \gls{presolving} is used to remove \glspl{match} which can be
+safely removed without compromising code quality.
+%
+This directly translates to fewer $\mVar{alt}$, $\mVar{sel}$, and
+$\mVar{uplace}$~\glspl{variable}, smaller $\mVar{dplace}$ and
+$\mVar{oplace}$~\glspl{domain}, as well as fewer \glspl{constraint} that need to
+be managed by the \gls{constraint solver}.
+
+
+\subsection{Dominated Matches}
+\labelSection{st-pre-dom-matches}
+
+If two \glspl{match} are equal in all respects except cost, then the \gls{match}
+with greater cost is \gls{dominate.m}[d] and can thus safely be removed from the
+\gls{match set}.
+%
+A \gls{match}~$m_1$ is \gls!{dominate.m}[d] if there exists another
+\gls{match}~$m_2$ such that
+%
+\begin{itemize}
+  \item $m_1$ has greater than or equal cost to $m_2$,
+  \item both cover the same \glspl{operation},
+  \item both have the same \glspl{entry block} (if any),
+  \item both \gls{span.b} the same \glspl{block} (if any),
+  \item both have the same \glspl{definition edge} (if any),
+  \item $m_1$ has at least as strong \gls{location} requirements on its
+    \glspl{datum} as $m_2$ -- that is, $\forall p_1 \in \mUses(m_1) \cup
+    \mDefines(m_1) : \exists p_2 \in \mUses(m_2) \cup \mDefines(m_2) :
+    \mDataSet[p_1] \subseteq \mDataSet[p_2] \mAnd \mStores(m_1, p_1) \subseteq
+    \mStores(m_2, p_2)$ -- and
+  \item both apply the same additional \glspl{constraint} (if any) when
+    selected.
+\end{itemize}
+%
+As a precaution, we assume that \glspl{null match}, \glspl{phi-match}, and
+\glspl{match} with \gls{fall-through} conditions can never be
+\gls{dominate.m}[d].
+
+The method above can be generalized to letting combinations of \glspl{match} to
+be jointly \gls{dominate.m}[d] by another \gls{match}.
+%
+Intuitively, if the combination of \glspl{match} can be selected, then the
+\gls{solution} can always be improved by replacing them with the single
+\gls{match}.
+%
+The idea is to combine the \glspl{match} into a single
+\gls{match}~\mbox{$m$\hspace{-.8pt},} and then check whether the above
+conditions for \glsshort{dominate.m}[ance] apply with the additional check that
+none of intermediate values of $m$ are used by other \glspl{match}.
+%
+An example is shown in \refFigure{dominated-matches-example}.
+
+\begin{figure}
+  \centering%
+  \input{figures/solving-techniques/dominated-matches-example}
+
+  \caption[Example of dominated matches]%
+          {%
+            Example where matches~$m_1$ and $m_2$ are jointly dominated by
+            match~$m_3$ and can therefore safely be removed (provided that no
+            other match uses value~\irVar*{v}[3]).
+            %
+            The table contains the location restrictions enforced by each match%
+          }
+  \labelFigure{dominated-matches-example}
+\end{figure}
+
+
+\subsection{Illegal Matches}
+
+Depending on the \gls{instruction set}, the \gls{match set} may contain
+\glspl{match} that will -- for one reason or another -- never participate in any
+\gls{solution}.
+%
+Such \glspl{match} are said to be \gls!{illegal.m}.
+
+One set of \gls{illegal.m} \glspl{match} are those which would leave some
+\gls{operation} uncoverable if selected.
+%
+In \refFigure{uncovered-operations-example}, for example, selecting
+\gls{match}~$m_1$ would leave \gls{operation}~$o_2$ uncovered since it can only
+be covered by match~$m_2$.
+%
+However, selection of $m_2$ is inhibited if $m_1$ is selected.
+%
+\begin{figure}
+  \centering%
+  \input{figures/solving-techniques/uncovered-operations-example}
+
+  \caption[Example of an illegal match]%
+          {%
+            Example of an illegal match, where selecting match~$m_1$ would leave
+            operation~$o_2$ uncovered%
+          }
+  \labelFigure{uncovered-operations-example}
+\end{figure}
+%
+Hence this set of \gls{illegal.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder{m}%
+              {
+                m \in \mMatchSet,
+                o_1, o_2 \in \mOpSet
+                \text{ \st }
+                \mMatchSet[o_1] \subset \mMatchSet[o_2]
+                \mAnd
+                m \in \mMatchSet[o_2]
+              }.
+  \labelEquation{illegal-matches-uncovered-ops}
+\end{equation}
+
+Likewise, a \gls{match} is \gls{illegal.m} if selecting it would
+leave some \gls{datum} un\gls{define.d}[d].
+%
+With similar reasoning, this set of \gls{illegal.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder{m}%
+              {
+                m \in \mMatchSet,
+                d_1, d_2 \in \mDataSet
+                \text{ \st }
+                \mMatchSet[d_1] \subset \mMatchSet[d_2]
+                \mAnd
+                m \in \mMatchSet[d_2]
+              }.
+  \labelEquation{illegal-matches-undefined-data}
+\end{equation}
+
+If a \gls{kill match}~$m$ \gls{define.d}[s] a \gls{datum}~$d$ and every
+\gls{match} using $d$ has no \glsshort{alternative value}[s]
+but~\mbox{$d$\hspace{-.8pt},} then $m$ is \gls{illegal.m} as $d$ must be
+\gls{define.d}[d] by a non-\gls{kill match}.
+%
+This set of \gls{illegal.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder*{m_1}%
+               {%
+                 \begin{array}{@{}l@{}}
+                   m_1 \in \mKillMatchSet,
+                   p_1 \in \mDefines(m_1),
+                   d \in \mDataSet[p_1], \\
+                   m_2 \in \mKillMatchCompSet,
+                   p_2 \in \mUses(m_2) \text{ \st }
+                   d \in \mDataSet[p_2] \mImp \mDataSet[p_2] = \mSet{d}
+                 \end{array}
+               }\!\!.
+  \labelEquation{illegal-matches-kills}
+\end{equation}
+
+If a \gls{match}~$m$ is not a \gls{kill match} and \gls{define.d}[s] a
+\gls{datum}~$d$ in a \gls{location} that cannot be accessed by any of the
+\glspl{match} \glsshort{use.d}[ing] of~\mbox{$d$\hspace{-.8pt},} then $m$ is
+\gls{illegal.m}.
+%
+This set of \gls{illegal.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder*{m}%
+               {%
+                 \begin{array}{@{}l@{}}
+                   m \in \mKillMatchCompSet,
+                   p \in \mDefines(m),
+                   d \in \mDataSet[p] \hspace{-1pt} \text{ \st} \\
+                   \mIsExt(m, p)
+                   \mAnd
+                   \mCupUseLocsOf(d) \neq \mEmptySet
+                   \mAnd \mbox{} \\
+                   \mStores(m, p) \cap \mCupUseLocsOf(d) = \mEmptySet
+                 \end{array}
+               }\!\!,
+  \labelEquation{illegal-matches-def-locs}
+\end{equation}
+%
+where
+%
+\begin{equation}
+  \mCupUseLocsOf(d)
+  \equiv
+  \hspace{-2.5em}
+  \bigcup_{
+    \substack{
+      m \, \in \, \mMatchSet[d] \setminus \mKillMatchSet, \\
+      p \, \in \, \mUses(m)
+      \text{ \st } d \, \in \, \mDataSet[p]
+    }
+  }
+    \hspace{-2.5em}
+    \mStores(m, p).
+  \labelEquation{cup-use-locs-of-function}
+\end{equation}
+%
+Note that if \mbox{$\mCupUseLocsOf(d) = \mEmptySet$} holds, then the
+\glspl{match} \glsshort{use.d}[ing] \gls{datum}~$d$ have themselves conflicting
+\gls{location} requirements.
+%
+In such cases, we cannot infer whether a \gls{match} \glsshort{define.d}[ing]
+$d$ is \gls{illegal.m}.
+
+Similarly, if a \gls{match}~$m$ is not a \gls{kill match} and \gls{use.d}[s] a
+\gls{datum}~$d$ from a \gls{location} that cannot be written to by any of the
+\glspl{match} \glsshort{define.d}[ing]~\mbox{$d$\hspace{-.8pt},} then $m$ can
+never be selected and is thus \gls{illegal.m}.
+%
+This set of \gls{illegal.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder*{m}%
+               {%
+                 \begin{array}{@{}l@{}}
+                   m \in \mKillMatchCompSet,
+                   p \in \mUses(m) \setminus \mDefines(m),
+                   d \in \mDataSet[p] \hspace{-1pt} \text{ \st} \\
+                   \mCupDefLocsOf(d) \neq \mEmptySet
+                   \mAnd
+                   \mStores(m, p) \cap \mCupDefLocsOf(d) = \mEmptySet
+                 \end{array}
+               }\!\!,
+  \labelEquation{illegal-matches-use-locs}
+\end{equation}
+%
+where
+%
+\begin{equation}
+  \mCupDefLocsOf(d)
+  \equiv
+  \bigcup_{
+    \mathclap{
+      \substack{
+        m \, \in \, \mMatchSet[d] \setminus \mKillMatchSet, \\
+        p \, \in \, \mDefines(m)
+        \text{ \st } d \, \in \, \mDataSet[p]
+      }
+    }
+  }
+  \mStores(m, p).
+  \labelEquation{cup-def-locs-of-function}
+\end{equation}
+
+
+\subsection{Redundant Matches}
+
+In certain circumstances a \gls{match} can safely be removed without
+compromising code quality.
+%
+Such \glspl{match} are said to be \gls!{redundant.m}.
+
+For example, if there exists a \gls{null-copy match} to cover a \gls{copy
+  node}~$c$, then the \gls{kill match} covering $c$ is \gls{redundant.m} since
+it is always safe to select the \gls{null-copy match} over the \gls{kill match}.
+%
+Consequently, all \glspl{kill match} covering \glspl{copy node} that take a
+non-constant value as input -- which can never be covered using a \gls{null-copy
+  match} -- are \gls{redundant.m}.
+%
+This makes sense as the \glspl{kill match} are added to the \gls{match set} as a
+consequence of \glspl{alternative value}, which are used to handle cases where
+loaded constants could be reused among \glspl{match}.
+%
+Hence this set of \gls{redundant.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder{m}%
+              {%
+                m \in \mKillMatchSet,
+                o \in \mCovers(m)
+                \text{ \st }
+                \mMatchSet[o] \cap \mNullCopyMatchSet \neq \mEmptySet
+              }.
+  \labelEquation{redun-kills}
+\end{equation}
+
+Another case concerns non-\glspl{null match} that cover a \gls{copy node}.
+%
+Assume a copy chain \mbox{$\mEdge{v_1}{\mEdge{c}{v_2}}$}, where $c$ is a
+\gls{copy node} and $v_1$ and $v_2$ are \glspl{value node}.
+%
+If every \gls{match} \glsshort{define.d}[ing] $v_1$ writes the value to a
+\gls{location} that can be used by all \glspl{match}
+\glsshort{use.d}[ing]~$v_2$, then all non-\glspl{null match} covering $c$ are
+\gls{redundant.m} since a \gls{null-copy match} can always be selected to cover
+$c$.
+%
+We exclude, however, \glspl{copy node} that take a constant value as input since
+such \glspl{node} can never be covered by a \gls{null-copy match}.
+%
+We also exclude \glspl{copy node} whose \gls{define.d}[d] \gls{datum} is
+\gls{use.d}[d] by some \gls{phi-match} since an actual copy may be needed to
+satisfy \refEquation{phi-match-locations}.
+%
+Let \mbox{$\mCopyMatchSet \subseteq \mMatchSet$} denote the set of \glspl{copy
+  match} and \mbox{$\mConstDataSet \subseteq \mDataSet$} denote the set of
+\glspl{datum} representing constant values.
+%
+Let also \mbox{$\mCapUseLocsOf(d) \subseteq \mLocationSet$} and
+\mbox{$\mCapDefLocsOf(d) \subseteq \mLocationSet$} denote the intersection of
+all \glspl{location} for all \gls{match} where a \gls{datum}~$d$ is
+\gls{use.d}[d] respectively \gls{define.d}[d].
+%
+Using these definitions, this set of \gls{redundant.m} \glspl{match} is computed as
+%
+\begin{equation}
+  \mSetBuilder*{m}%
+               {%
+                 \begin{array}{@{}l@{}}
+                   m \in \mCopyMatchSet \setminus \mNullMatchSet,
+                   d_1 \in \mUses(m),
+                   d_2 \in \mDefines(m) \\
+                   \text{\st }
+                   \mDataSet[d_1] \cap \mPhiMatchSet = \mEmptySet
+                   \mAnd
+                   \mDataSet[d_2] \cap \mPhiMatchSet = \mEmptySet
+                   \mAnd
+                   d_1 \notin \mConstDataSet \\
+                   \mbox{}\hspace{-2pt} \mAnd
+                   \mCapUseLocsOf(d_1) \cap \mCapDefLocsOf(d_2) \neq \mEmptySet
+                 \end{array}
+               }\!\!.
+  \labelEquation{redun-non-null-copy-matches}
+\end{equation}
+%
+As can be deduced from their name, $\mCapUseLocsOf$ and $\mCapDefLocsOf$ are
+defined similarly to $\mCupUseLocsOf$ and $\mCupDefLocsOf$ (see
+\refEquationList{cup-use-locs-of-function, cup-def-locs-of-function}), with the
+exception that \glspl{location} known to violate
+\refEquation{phi-match-locations} are removed from these sets.
+
+
+\subsection{Canonical Locations}
+\labelSection{st-canonical-locations}
+
+For most architectures, its \glspl{instruction} read from and write to the same
+set of \glspl{register}.
+%
+This gives rise to many symmetric \glspl{solution} as the exact \gls{location}
+assigned to a value often does not matter.
+%
+We can remove these symmetries by removing \glspl{location} which are considered
+symmetric to one another.
+
+The idea is to select a \gls{location} as a representative for each distinct
+intersection made by the storage requirements.
+%
+See for example \refFigure{canonical-locations-example}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/solving-techniques/canonical-locations-example}
+
+  \caption[Example of canonical locations]%
+          {%
+            Example of canonical locations for a location set with ten
+            registers%
+          }
+  \labelFigure{canonical-locations-example}
+\end{figure}
+%
+For sake of discussion, each storage requirement has been labeled with a
+\gls!{tag}.
+%
+Given the \gls{location set} and storage requirements shown in the figure, they
+give rise to five intersections with respect to the locations:
+%
+\def\mReg#1{\text{\instrFont*r$_{\text{#1}}$}}%
+%
+\mbox{$\mSet{\mReg{1}, \ldots, \mReg{4}}$} due to \glspl{tag}~\num{1}
+and~\num{2},
+%
+\mbox{$\mSet{\mReg{5}}$} due to \gls{tag}~\num{1},
+%
+$\mSet{\mReg{6}}$ due to \gls{tag}~\num{1} and~\num{3},
+%
+\mbox{$\mSet{\mReg{7}, \mReg{8}}$} due to \glspl{tag}~\num{3} and~\num{4}, and
+%
+$\mSet{\mReg{9}}$ due to \gls{tag}~\num{4}.
+%
+From each of these intersections we select a representative, and the union of
+these representative \glspl{location} constitute the set of \gls!{canonical.l}[
+  \glspl{location}].
+%
+An algorithm for computing this set based on the intuition above is shown in
+\refAlgorithm{canonical-locs-algorithm}.
+%
+\begin{algorithm}[t]
+  \DeclFunction{CanonicalizeLocs}{location set $L$, match set~$M$}%
+  {%
+    $T$ \Assign vector with $\mCard{L}$ elements initialized to $\mEmptySet$\;
+    $t$ \Assign $1$\;
+    \For(\tcp*[f]{assign tags}){$m \in M$}{%
+      \For{$p \in \mUses(m) \cup \mDefines(m)$}{%
+        \For{$l \in \mStores(m, p)$}{%
+          $T[l]$ \Assign $T[l] \cup \mSet{t}$\;
+        }
+        $t$ \Assign $t$ $+$ $1$\;
+      }
+    }
+    $G$ \Assign $\mSetBuilder{T[l]}{l \in L}$\tcp*{find all groups of tags}
+    $L_{\mathsc{c}}$ \Assign $\mEmptySet$\;
+    \For{$g \in G$}{%
+      $l_{\mathsc{c}}$ \Assign
+      $\mMin(\mSetBuilder{l}{l \in L \text{ \st } T[l] = g})$
+      \tcp*{find representative for this group of tags}
+      $L_{\mathsc{c}}$ \Assign
+      $L_{\mathsc{c}} \cup \mSet{l_{\mathsc{c}}}$\;
+    }
+    \Return $L_{\mathsc{c}}$\;
+  }
+
+  \caption[Algorithm for computing the set of canonical locations]%
+          {%
+            Computes the canonical locations from a given location set.
+            %
+            If location restrictions for some data are already enforced by
+            the function, then these are also tagged and processed accordingly%
+          }
+  \labelAlgorithm{canonical-locs-algorithm}
+\end{algorithm}
+
+Once computed, we substitute all locations appearing in the storage requirements
+with their \gls{canonical.l} representative and then replace the original
+\gls{location set} with the \gls{canonical.l} set, thus shrinking the
+\glspl{domain} of the $\mVar{loc}$~\glspl{variable}.
+
+
+\section{Experimental Evaluation}
+\labelSection{st-experimental-evaluation}
+
+Excluding the refinement described in
+\refSection{st-refining-define-before-use-constraint}, whose naive equivalence
+cannot be implemented on our experimental setup and therefore not be evaluated,
+we now evaluate the impact of the solving techniques introduced in this chapter.
+
+When filtering, we remove all \glspl{function} that have fewer than
+\num{50}~\gls{LLVM} \gls{IR} \glspl{instruction} and more than
+\num{150}~\glspl{instruction}.
+%
+Anything smaller will most likely not show the impact of the given solving
+technique, and anything larger will lead to unreasonably long experiment
+runtimes.
+%
+This leaves a pool of \num{284}~\glspl{function}, from which we then draw
+\num{20}~samples.
+
+To curb experiment runtimes, we apply a time limit of \SI{600}{\s} to the
+\gls{constraint solver}.
+%
+For any given \gls{function}, the last \gls{solution} found is considered
+optimal if and only if the \glsshort{constraint solver} has finished its
+execution within the time limit.
+%
+When using an upper cost bound, we take the cost for the \gls{solution} computed
+by \mbox{\gls{LLVM} 3.8} for the given \gls{function}.
+
+
+\subsection{Objective Function Refinements and Cost Bounding}
+
+We first evaluate the different methods for computing the cost matrix.
+%
+Based on the results, we then use the superior method to evaluate the impact
+that different implementations of the \gls{objective function}, coupled with
+cost bounding, have on solving time and code quality.
+
+
+\paragraph{Multiply-then-Divide \versus Divide-then-Multiply}
+
+We evaluate the different methods for computing the cost matrix by
+comparing the solving times exhibited by two versions of the \gls{constraint
+  model}:
+%
+\begin{modelList}
+  \item \labelModel{obj-fun-mul-div}
+    one based on the \gls{multiply-then-divide method}
+    (\refEquationList{div-mul-op-cost-function, div-mul-cost-matrix})
+  \item \labelModel{obj-fun-div-mul}
+    one based on \glspl{divide-then-multiply method}
+    (\refEquationList{mul-div-cost-matrix, mul-div-op-cost-function})
+\end{modelList}.
+%
+No hypothesis is attempted on which \glsshort{constraint model} is better.
+
+\RefFigure{new-op-cost-fun-vs-old-plot} shows the normalized solving times
+(including \gls{presolving} time) for the two \glspl{constraint model} described
+above in the first experiment, with \glsshort{constraint
+  model}~\refModel{obj-fun-mul-div} as \gls{baseline} and \glsshort{constraint
+  model}~\refModel{obj-fun-div-mul} as \gls{subject}.
+%
+\begin{figure}
+  \centering%
+  \maxsizebox{\textwidth}{!}{%
+    \trimBarchartPlot{%
+      \input{\expDir/new-op-cost-fun-vs-old-pre+solving-time-speedup.plot}%
+    }%
+  }
+
+  \caption[%
+            Plot for evaluating the operation cost function's impact on
+            solving time%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for two constraint
+            models using different operation cost functions:
+            %
+            \begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+              \item one based on the multiply-then-divide method (baseline)
+              \item one based on the divide-then-multiply method (subject)
+            \end{inlinelist}.
+            %
+            GMI:~\printGMI{%
+              \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+            },
+            CI:~\printGMICI{%
+              \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+            }{%
+              \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+            }%
+          }
+  \labelFigure{new-op-cost-fun-vs-old-plot}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupBaselinePrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupBaselinePrePlusSolvingTimeAvgMax
+}%
+%
+\footnote{%
+  The solving time given here greater than the time limit because it also
+  includes the \gls{presolving} time while the time limit is only applied on the
+  \gls{constraint solver}.%
+}
+%
+with a \gls{CV} of
+\numMaxOf{
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupBaselinePrePlusSolvingTimeCvMax
+}.
+%
+The \gls{GMI} is \printGMI{%
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+}.
+
+We see clearly that \glsshort{constraint model}~\refModel{obj-fun-div-mul}
+results in considerably shorter solving times than \glsshort{constraint
+  model}~\refModel{obj-fun-mul-div}, thus underscoring the fact that seemingly
+trivial changes to a \gls{constraint model} may have considerable impact on
+solving time.
+%
+For one \gls{function} (\cCode*{build\_ycc\_rgb\_t}) the solving time is
+improved by
+\printZCNorm{%
+  \NewOpCostFunVsOldPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}, and for no \gls{function} is solving time degraded.
+%
+Hence the \gls{divide-then-multiply method} is a better design choice over
+\gls{multiply-then-divide method} when implementing the refined \gls{objective
+  function}.
+
+One possible explanation is that they yield different bounds.
+%
+For the example given in \refFigure{cost-example} on
+\refPageOfFigure{cost-example}, the \gls{multiply-then-divide method} bounds the
+total cost as \mbox{$4 \leq \mVar{cost} \leq 65$}, whereas the
+\gls{divide-then-multiply method} bounds it to \mbox{$4 \leq \mVar{cost} \leq
+  60$}.
+%
+However, this does not always hold as the \gls{divide-then-multiply method} may
+yield a tighter bound than the \gls{multiply-then-divide method} for other
+problem instances.
+%
+Another possible explanation is that the \gls{divide-then-multiply method}
+results in \gls{operation} costs that are even multiples of the execution
+frequencies.
+%
+In comparison, the \gls{multiply-then-divide method} could potentially result in
+arbitrary cost values that in turn would lead to larger \glspl{domain} for the
+\gls{cost variable}.
+
+
+\paragraph{Impact on Solving Time}
+
+We evaluate the impact that the refined \gls{objective function} together with
+cost bounding have on solving by comparing the number of \glspl{function} that
+can be solved optimally by six versions of the \gls{constraint model}:
+%
+\begin{modelList}
+  \item \labelModel{obj-fun-naive-no-b}
+    one based on the naive implementation of the \gls{objective function}
+    (\refEquation{naive-objective-function}), without cost bounds
+  \item \labelModel{obj-fun-naive-lb-ub}
+    another naive \glsshort{constraint model} but with lower and upper bound
+  \item \labelModel{obj-fun-refined-no-b}
+    one based on the refined implementation
+    (\refEquationList{omatch-oplace-ocost-connection, total-cost}) using the
+    \gls{divide-then-multiply method}, without bounds
+  \item \labelModel{obj-fun-refined-lb}
+    another refined \glsshort{constraint model} but with lower bound
+  \item \labelModel{obj-fun-refined-ub}
+    another refined \glsshort{constraint model} but with upper bound
+  \item \labelModel{obj-fun-refined-lb-ub}
+    another refined \glsshort{constraint model} but with both bounds
+\end{modelList}.
+
+Since the refined \gls{objective function} enables tighter bounds to be derived
+for the \gls{cost variable}, we expect \glsplshort{constraint
+  model}~\refModel{obj-fun-refined-no-b}, \refModel{obj-fun-refined-lb},
+\refModel{obj-fun-refined-ub}, and~\refModel{obj-fun-refined-lb-ub}{} to find a
+greater number of optimal \glspl{solution} compared with \glsplshort{constraint
+  model}~\refModel{obj-fun-naive-no-b} and~\refModel{obj-fun-naive-lb-ub}.
+%
+Due to further tightening of the cost bounds, we expect \glsshort{constraint
+  model}~\refModel{obj-fun-naive-lb-ub} to outperform \glsshort{constraint
+  model}~\refModel{obj-fun-naive-no-b}, \glsplshort{constraint
+  model}~\refModel{obj-fun-refined-lb}, \refModel{obj-fun-refined-ub},
+and~\refModel{obj-fun-refined-lb-ub}{} to outperform \glsshort{constraint
+  model}~\refModel{obj-fun-refined-no-b}, and \glsshort{constraint
+  model}~\refModel{obj-fun-refined-lb-ub} to outperform \glsplshort{constraint
+  model}~\refModel{obj-fun-refined-lb} and~\refModel{obj-fun-refined-ub}.
+
+\RefFigure{obj-fun-refined-vs-naive-opt-proofs-over-time-plot} shows the
+percentage of optimal \glspl{solution} found over time for the five
+\glspl{constraint model} described above in the second experiment.
+%
+\begin{figure}
+  \renewcommand{\plotPercentageFont}{\large}
+  \renewcommand{\plotSecondsFont}{\large}
+  \centering%
+  \maxsizebox{.6\textwidth}{!}{%
+    \trimLinechartPlot{%
+      \input{\expDir/obj-fun-refined-vs-naive-opt-proofs-over-time.plot}%
+    }%
+  }
+
+  \caption[%
+            Plot for evaluating the different objective functions' impact on
+            finding optimal solutions%
+          ]%
+          {%
+            Percentage of optimal solutions found over time for six constraint
+            models:
+            %
+            \begin{modelList}
+              \item one based on the naive implementation of the \gls{objective
+                function} without cost bounds
+              \item another naive model but with lower and upper bound
+              \item one based on the refined implementation without bounds
+              \item another refined model but with lower bound
+              \item another refined model but with upper bound
+              \item another refined model but with both bounds
+            \end{modelList}%
+          }
+  \labelFigure{obj-fun-refined-vs-naive-opt-proofs-over-time-plot}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \ObjFunRefinedVsNaiveOptProofsOverTimeNaiveNoBoundsSolvingTimeAvgMin,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeNaiveWLbUbSolvingTimeAvgMin,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedNoBoundsSolvingTimeAvgMin,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWLbSolvingTimeAvgMin,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWUbSolvingTimeAvgMin,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWLbUbSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \ObjFunRefinedVsNaiveOptProofsOverTimeNaiveNoBoundsSolvingTimeAvgMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeNaiveWLbUbSolvingTimeAvgMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedNoBoundsSolvingTimeAvgMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWLbSolvingTimeAvgMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWUbSolvingTimeAvgMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWLbUbSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \ObjFunRefinedVsNaiveOptProofsOverTimeNaiveNoBoundsSolvingTimeCvMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeNaiveWLbUbSolvingTimeCvMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedNoBoundsSolvingTimeCvMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWLbSolvingTimeCvMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWUbSolvingTimeCvMax,
+  \ObjFunRefinedVsNaiveOptProofsOverTimeRefinedWLbUbSolvingTimeCvMax
+}.
+
+We see that \glsplshort{constraint model}~\refModel{obj-fun-refined-no-b},
+\refModel{obj-fun-refined-lb}, \refModel{obj-fun-refined-ub},
+and~\refModel{obj-fun-refined-lb-ub} clearly outperform \glsplshort{constraint
+  model}~\refModel{obj-fun-naive-no-b} and~\refModel{obj-fun-naive-lb-ub}.
+%
+We see also that applying an upper cost bound has a positive effect for both
+\glspl{objective function}, although the benefit is greater for the refined
+\gls{objective function}.
+%
+This gain is due to the fact that, for some \glspl{function}, the \gls{solution}
+computed by \gls{LLVM} is already optimal with respect to the
+\glsshort{constraint model}.
+%
+Consequently, the \glsshort{constraint solver} need only prove that there exists
+no better \gls{solution} instead of exploring the entire \gls{search space}.
+%
+Hence, in terms of solving time the refined \gls{objective function} coupled
+with an upper cost bound is a better design choice over naive \gls{objective
+  function}.
+%
+Moreover, this decision is crucial for scalability.
+
+Applying a lower cost bound, however, does not appear to be equally beneficial.
+%
+In fact, using a lower bound causes \glsplshort{constraint
+  model}~\refModel{obj-fun-refined-lb} and~\refModel{obj-fun-refined-lb-ub} to
+fail to find the optimal \gls{solution} for two \glspl{function} whereas
+\glsplshort{constraint model}~\refModel{obj-fun-refined-no-b}
+and~\refModel{obj-fun-refined-ub} manages to find the optimal \gls{solution} for
+all \glspl{function} but one.
+%
+A possible explanation is that the lower bound computed by the relaxed
+\gls{constraint model} is too weak to be lead to any \gls{propagation} and
+instead only interferes with \gls{Chuffed}'s \gls{LCG} engine (see
+\refChapter{constraint-programming} on
+\refPageOfSection{cp-lazy-clause-generation} for a description of \gls{LCG}).
+
+
+\paragraph{Impact on Code Quality}
+
+We evaluate the impact on code quality by comparing the cost of the best
+\gls{solution} found within the time limit by \glsplshort{constraint
+  model}~\refModel{obj-fun-naive-lb-ub} (naive \glsshort{constraint model} with
+bounds) and~\refModel{obj-fun-refined-lb-ub} (refined \glsshort{constraint
+  model} with bounds).
+%
+For the same reason as in the impact-on-solving-time experiment, we expect the
+\glspl{solution} produced by \glsshort{constraint
+  model}~\refModel{obj-fun-refined-lb-ub} to be of significantly better quality
+compared with those produced by \glsshort{constraint
+  model}~\refModel{obj-fun-naive-lb-ub}.
+
+\RefFigure{obj-fun-refined-vs-naive-cycles-speedup-plot} shows the normalized
+\gls{solution} costs for the two \glspl{constraint model} described above in the
+third experiment, with \glsshort{constraint
+  model}~\refModel{obj-fun-naive-lb-ub} as \gls{baseline} and
+\glsshort{constraint model}~\refModel{obj-fun-refined-ub} as \gls{subject}.
+%
+\begin{figure}
+  \centering%
+  \maxsizebox{\textwidth}{!}{%
+    \trimBarchartPlot{%
+      \input{\expDir/obj-fun-refined-vs-naive-cycles-speedup.plot}%
+    }%
+  }
+
+  \caption[%
+            Plot for evaluating the different objective functions' impact on
+            code quality%
+          ]%
+          {%
+            Normalized best solution costs for two constraint models:
+            %
+            \begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+              \item one implementing the naive objective function (baseline)
+              \item one implementing the refined objective function (subject)
+            \end{inlinelist}.
+            %
+            GMI:~\printGMI{%
+              \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesRegularSpeedupGmean%
+            },
+            CI:~\printGMICI[round-precision=4]{%
+              \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesRegularSpeedupCiMin%
+            }{%
+              \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesRegularSpeedupCiMax%
+            }.
+            %
+            Both models use lower and upper cost bounds.
+            %
+            \Glspl{function} marked with \barNormValueNoBaselineSolution{} are
+            those for which the naive objective function fails to produce any
+            solution, and \glspl{function} marked with \barNormValueNoSolution{}
+            are those where the solution produced by \gls{LLVM} is already
+            optimal \wrt the model%
+          }
+  \labelFigure{obj-fun-refined-vs-naive-cycles-speedup-plot}
+\end{figure}
+%
+The costs range from
+\printMinCycles{
+  \ObjFunRefinedVsNaiveCyclesSpeedupNaiveWLbUbCyclesAvgMin,
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedWLbUbCyclesAvgMin
+} to
+\printMaxCycles{
+  \ObjFunRefinedVsNaiveCyclesSpeedupNaiveWLbUbCyclesAvgMax,
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedWLbUbCyclesAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \ObjFunRefinedVsNaiveCyclesSpeedupNaiveWLbUbCyclesCvMax,
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedWLbUbCyclesCvMax
+}.
+%
+The \gls{GMI} is \printGMI{%
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI[round-precision=4]{%
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesRegularSpeedupCiMin%
+}{%
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesRegularSpeedupCiMax%
+}.
+
+We see clearly that the \glsplshort{constraint model} based on the refined
+\gls{objective function} yield better code quality than those based on the naive
+\gls{objective function}.
+%
+For one \gls{function} (\cCode*{gpk\_open}), the code quality is improved by
+\printZCNorm{%
+  \ObjFunRefinedVsNaiveCyclesSpeedupRefinedVsNaiveWLbUbCyclesZeroCenteredSpeedupMax%
+}, and for no \gls{function} is code quality degraded.
+%
+Hence, in terms of code quality the refined \gls{objective function} coupled
+with an upper cost bound is a better design choice over naive \gls{objective
+  function}.
+
+
+\paragraph{Conclusions}
+
+From the results for these experiments, we conclude:
+%
+\begin{enumerate*}[label=(\roman*), itemjoin={;\ }, itemjoin*={; and\ }]
+  \item that the \gls{divide-then-multiply method} is superior to the
+    \gls{multiply-then-divide method}
+  \item that the refined implementation of the \gls{objective function} is
+    superior to the naive implementation
+  \item that using the refined \gls{objective function} together with an upper
+    cost bound is crucial for scalability
+\end{enumerate*}.
+
+
+\subsection{Implied Constraints}
+\labelSection{st-exp-evaluation-implied-constraints}
+
+\NewDocumentCommand{\insertSpeedupPlot}{mm}{%
+  \maxsizebox{#2\textwidth}{!}{%
+    \trimBarchartPlot{\input{#1}}%
+  }%
+}
+
+\NewDocumentCommand{\insertSolvTechSpeedupPlot}{O{disable}mm}{%
+  \insertSpeedupPlot{%
+    \expDir/solv-tech-#1-#2-pre+solving-time-speedup.plot%
+  }{#3}
+}
+
+\newsavebox{\solvTechPlot}
+\newlength{\solvTechPlotW}
+\newlength{\solvTechSubfigW}
+\NewDocumentCommand{\mkSolvTechSubfigure}{O{disable}moomO{}O{}O{}}{%
+  \IfStrEq{#1}{disable}{\def\argUC{Disable}}{}%
+  \IfStrEq{#1}{enable}{\def\argUC{Enable}}{}%
+  \IfStrEq{#1}{best}{\def\argUC{Best}}{}%
+  \edef\statsPartName{%
+    SolvTech%
+    \argUC%
+    #5%
+    PrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedup%
+  }%
+  \edef\gmi{\csname\statsPartName Gmean\endcsname}%
+  \edef\cimin{\csname\statsPartName CiMin\endcsname}%
+  \edef\cimax{\csname\statsPartName CiMax\endcsname}%
+  \savebox{\solvTechPlot}{\insertSolvTechSpeedupPlot[#1]{#2}{.49}}%
+  \settowidth{\solvTechPlotW}{\usebox{\solvTechPlot}}%
+  \IfValueTF{#4}
+            {%
+              \pgfmathsetlength{\solvTechSubfigW}%
+                               {max(\solvTechPlotW, #4)}%
+            }%
+            {\setlength{\solvTechSubfigW}{\solvTechPlotW}}%
+  \begin{minipage}[t]{\solvTechSubfigW}%
+    \captionsetup[sub]{justification=centerlast}%
+    \IfValueTF{#4}{\captionsetup[sub]{width=#4}}{}%
+    \centering%
+    \usebox{\solvTechPlot}
+    \subcaption{%
+                 \IfValueTF{#3}{#3}{\refEquation{#2}}.
+                 %
+                 GMI:~\printGMI[#6]{\gmi},
+                 CI:~\printGMICI[#7]{\cimin}[#8]{\cimax}%
+                 \labelFigure{solv-tech-#1-#2}%
+                }%
+    \vspace{0pt}% Force \belowcaptionspace to be applied
+  \end{minipage}%
+}
+
+We first evaluate the \gls{implied.c} \glspl{constraint} individually.
+%
+Based on the results, we then arrange them into groups to find the best
+combination of \gls{implied.c} \glspl{constraint}.
+%
+To curb experiment runtimes, we include all other solving techniques in the
+\glsplshort{constraint model} because, without them, a very long time limit
+would have to be applied to discover the impact on solving time.
+
+
+\paragraph{Impact of a Single Constraint}
+
+We evaluate the impact of each \gls{implied.c} \gls{constraint}
+(\refEquationRange{impl-cons-defs-dominate-defs}{impl-cons-fix-fall-throughs})
+by comparing the solving times exhibited by two versions of the \gls{constraint
+  model}:
+%
+\begin{modelList}
+  \item \labelModel{impl-ex-wo-single-con}
+    one without a particular \gls{implied.c} \gls{constraint}
+  \item \labelModel{impl-ex-w-single-con}
+    one with all \glspl{constraint}
+\end{modelList}.
+
+Because the \gls{pattern set} used in these experiments contains only
+\glspl{pattern} that do not \gls{span.b} any \glspl{block}, we expect
+\refEquationList{impl-cons-defs-in-spanned-blocks, impl-cons-spanned-input} to
+have no impact on solving time.
+%
+For the rest, we expect some \glspl{constraint} to lead to an overall solving
+time improvement while others may degrade solving time.
+%
+As described in \refChapter{constraint-programming}, this is because some
+\glspl{constraint} may be too expensive to execute compared with the amount of
+\gls{propagation} they provide.
+
+\RefFigure{single-impl-con-vs-no-con-solving-time-plots} shows the normalized
+solving times (including \gls{presolving} time) for the two \glspl{constraint
+  model} described above in the first experiment, with \glsshort{constraint
+  model}~\refModel{impl-ex-wo-single-con} as \gls{baseline} and
+\glsshort{constraint model}~\refModel{impl-ex-w-single-con} as \gls{subject}.
+%
+\NewDocumentCommand{\mkFigureCaption}{s}{%
+  \def\capToCText{%
+    Set of plots for evaluating each implied constraint's impact on solving
+    time%
+  }%
+  \def\capText{%
+    Normalized solving times (incl.\ presolving time) for two constraint models:
+    %
+    \begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+      \item one without a particular implied constraint (baseline)
+      \item one with all constraints (subject)
+    \end{inlinelist}%
+  }%
+  \IfBooleanTF{#1}{%
+    \caption*{\capText}%
+  }{%
+    \caption[\capToCText]{\capText}%
+  }%
+}
+%
+\begin{figure}
+  \centering
+
+  \mkSolvTechSubfigure{impl-cons-defs-dominate-defs}%
+                      {ImplConsDefsDominateDefs}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-defs-in-spanned-blocks}%
+                      {ImplConsDefsInSpannedBlocks}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{impl-cons-identical-entry-blocks}%
+                      {ImplConsIdenticalEntryBlocks}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-defs-dominate-entry-blocks}%
+                      {ImplConsDefsDominateEntryBlocks}%
+                      []%
+                      [round-precision=3]
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{impl-cons-place-phi-ops-same-as-def-edges}%
+                      {ImplConsPlacePhiOpsSameAsDefEdges}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-no-span-uses}%
+                      {ImplConsNoSpanUses}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{impl-cons-no-span-defs}%
+                      {ImplConsNoSpanDefs}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-no-span-use-defs}%
+                      {ImplConsNoSpanUseDefs}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{impl-cons-spanned-input}%
+                      {ImplConsSpannedInput}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-used-data-must-be-available}%
+                      {ImplConsUsedDataMustBeAvailable}
+
+  \mkFigureCaption
+  \labelFigure{single-impl-con-vs-no-con-solving-time-plots}
+\end{figure}
+%
+\let\oldthefigure\thefigure
+\renewcommand{\thefigure}{\oldthefigure{} (cont.)}
+%
+\begin{figure}
+  \ContinuedFloat
+  \centering
+
+  \mkSolvTechSubfigure{impl-cons-exterior-data-must-be-available}%
+                      {ImplConsExteriorDataMustBeAvailable}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-locs-of-uses}%
+                      {ImplConsLocsOfUses}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{impl-cons-locs-of-defs}%
+                      {ImplConsLocsOfDefs}%
+  \hfill%
+  \mkSolvTechSubfigure{impl-cons-fix-fall-throughs}%
+                      {ImplConsFixFallThroughs}
+
+  \mkFigureCaption*
+\end{figure}
+%
+\renewcommand{\thefigure}{\oldthefigure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechDisableImplConsDefsDominateDefsPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsDefsDominateDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsDefsInSpannedBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsIdenticalEntryBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsDefsDominateEntryBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsPlacePhiOpsSameAsDefEdgesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsNoSpanUsesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsNoSpanDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsNoSpanUseDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsSpannedInputPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsUsedDataMustBeAvailablePrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsExteriorDataMustBeAvailablePrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsLocsOfUsesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsLocsOfDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsFixFallThroughsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechDisableImplConsDefsDominateDefsPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsDefsDominateDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsDefsInSpannedBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsIdenticalEntryBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsDefsDominateEntryBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsPlacePhiOpsSameAsDefEdgesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsNoSpanUsesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsNoSpanDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsNoSpanUseDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsSpannedInputPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsUsedDataMustBeAvailablePrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsExteriorDataMustBeAvailablePrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsLocsOfUsesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsLocsOfDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsFixFallThroughsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechDisableImplConsDefsDominateDefsPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsDefsDominateDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsDefsInSpannedBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsIdenticalEntryBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsDefsDominateEntryBlocksPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsPlacePhiOpsSameAsDefEdgesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsNoSpanUsesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsNoSpanDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsNoSpanUseDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsSpannedInputPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsUsedDataMustBeAvailablePrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsExteriorDataMustBeAvailablePrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsLocsOfUsesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsLocsOfDefsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsFixFallThroughsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+%
+The \glspl{GMI} and \glspl{CI} are given in
+\refFigure{single-impl-con-vs-no-con-solving-time-plots}.
+
+We see that \refEquationList{impl-cons-defs-dominate-defs,
+  impl-cons-defs-dominate-entry-blocks} lead to an overall solving time
+improvement, and that \refEquationList{impl-cons-defs-in-spanned-blocks,
+  impl-cons-place-phi-ops-same-as-def-edges, impl-cons-spanned-input} have no
+impact on solving time.
+%
+For \refEquationList{impl-cons-identical-entry-blocks, impl-cons-no-span-uses,
+  impl-cons-no-span-defs, impl-cons-no-span-use-defs,
+  impl-cons-used-data-must-be-available,
+  impl-cons-exterior-data-must-be-available, impl-cons-locs-of-uses,
+  impl-cons-locs-of-defs, impl-cons-fix-fall-throughs}, the results are
+inconclusive.
+
+
+\paragraph{Impact of Groups of Constraints}
+
+We find the best combination of \gls{implied.c} \glspl{constraint} by arranging
+them into groups and evaluating the impact of each such group.
+%
+Because a full evaluation would require us to test every combination of
+\glspl{constraint} -- which would result in an unreasonably large number of
+experiments -- we limit ourselves to only comparing the solving times exhibited
+by three versions of the \glsshort{constraint model}:
+%
+\begin{modelList}
+  \item \labelModel{impl-ex-no-cons}
+    one with no \gls{implied.c} \glspl{constraint}
+  \item \labelModel{impl-ex-only-good-cons}
+    one with only those who individually lead to an overall solving time
+    improvement
+  \item \labelModel{impl-ex-all-cons}
+    one with all \glspl{constraint}
+\end{modelList}.
+%
+We expect \glsplshort{constraint model}~\refModel{impl-ex-only-good-cons}
+and~\refModel{impl-ex-all-cons} to all perform better than
+\glsshort{constraint model}~\refModel{impl-ex-no-cons}.
+%
+No hypothesis is attempted regarding the relative performance between
+\glsplshort{constraint model}~\refModel{impl-ex-only-good-cons}
+and~\refModel{impl-ex-all-cons}.
+
+\RefFigure{diff-impl-cons-comb-solving-time-plot} shows the normalized solving
+times (including \gls{presolving} time) for three of the \glspl{constraint
+  model} described above, with \glsshort{constraint
+  model}~\refModel{impl-ex-no-cons} as \gls{baseline} and \glsplshort{constraint
+  model}~\refModel{impl-ex-only-good-cons} and~\refModel{impl-ex-all-cons} as
+\glspl{subject}.
+%
+\begin{figure}
+  \centering%
+
+  \mkSolvTechSubfigure[enable]%
+                      {only-good-implied-cons}%
+                      [%
+                        Model \refModel{impl-ex-no-cons} \versus
+                        \refModel{impl-ex-only-good-cons}%
+                      ]%
+                      {OnlyGoodImpliedCons}%
+  \hfill%
+  \mkSolvTechSubfigure{all-implied-cons}%
+                      [%
+                        Model \refModel{impl-ex-no-cons} \versus
+                        \refModel{impl-ex-all-cons}%
+                      ]%
+                      {AllImpliedCons}
+
+  \caption[%
+            Plot for evaluating the impact on solving time made by different
+            combinations of implied constraints%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for three
+            constraint models:
+            %
+            \begin{modelList}
+              \item one with no implied constraints (baseline)
+              \item one with only those who individually lead to an overall
+                solving time improvement
+                (\refEquationList{impl-cons-defs-dominate-defs,
+                  impl-cons-defs-dominate-entry-blocks}; subject)
+              \item one with all \glspl{constraint} (subject)
+            \end{modelList}%
+          }
+  \labelFigure{diff-impl-cons-comb-solving-time-plot}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMin,
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMax,
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeCvMax,
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+
+To begin with, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{impl-ex-only-good-cons} over \glsshort{constraint
+  model}~\refModel{impl-ex-no-cons} is \printGMI{%
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-enable-only-good-implied-cons}).
+%
+Hence combining \refEquationList{impl-cons-defs-dominate-defs,
+  impl-cons-defs-dominate-entry-blocks} yields a greater overall solving time
+improvement than when picked individually (up
+to~\printZCNorm{%
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}).
+%
+However, we note that this combination yields a non-negligible solving time
+degradation for one \gls{function} (down
+to~\printZCNorm{%
+  \SolvTechEnableOnlyGoodImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin%
+}).
+
+In comparison, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{impl-ex-all-cons} over \glsshort{constraint
+  model}~\refModel{impl-ex-no-cons} is \printGMI{%
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-disable-all-implied-cons}), which is a greater
+improvement compared to \glsshort{constraint
+  model}~\refModel{impl-ex-only-good-cons}.
+%
+Although the maximum improvement is less than for \glsshort{constraint
+  model}~\refModel{impl-ex-only-good-cons} (up to
+\printZCNorm{%
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}), this combination yields no considerable degradation for any \gls{function}
+(down to at
+most~\printZCNorm{%
+  \SolvTechDisableAllImpliedConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin%
+}).
+%
+Hence it is most beneficial to include all \gls{implied.c} \glspl{constraint} in
+the \glsshort{constraint model}.
+
+
+\paragraph{Conclusions}
+
+From the results for these experiments, we conclude:
+%
+\begin{enumerate*}[label=(\roman*), itemjoin={;\ }, itemjoin*={; but\ }]
+  \item that some of the \gls{implied.c} \glspl{constraint} have individually a
+    positive impact on solving time
+  \item it is most beneficial to include all \gls{implied.c} \glspl{constraint}
+    in the \glsshort{constraint model}
+\end{enumerate*}.
+
+
+\subsection{Symmetry and Dominance Breaking Constraints}
+\labelSection{st-exp-evaluation-dom-constraints}
+
+Like in \refSection{st-exp-evaluation-implied-constraints}, we first evaluate
+the \glsshort{symmetry breaking.c} and \gls{dominance breaking.c}
+\glspl{constraint} individually.
+%
+Based on the results, we then arrange them into groups to find the best
+combination of \glsshort{symmetry breaking.c} and \gls{dominance breaking.c}
+\glspl{constraint}.
+%
+To curb experiment runtimes, we include all other solving techniques in the
+\glsplshort{constraint model} because, without them, a very long time limit
+would have to be applied to discover the impact on solving time.
+
+
+\paragraph{Impact of a Single Constraint}
+
+We evaluate the impact of each \glsshort{symmetry breaking.c} and \gls{dominance
+  breaking.c} \gls{constraint}
+(\refEquationRange{dom-cons-locs-of-states}{dom-cons-kill-match-selection}) by
+comparing the solving times exhibited by two versions of the \gls{constraint
+  model}:
+%
+\begin{modelList}
+  \item \labelModel{dom-ex-wo-single-con}
+    one without a particular \glsshort{symmetry breaking.c} or \gls{dominance
+      breaking.c} \gls{constraint}
+  \item \labelModel{dom-ex-w-single-con}
+    one with all \glspl{constraint}
+\end{modelList}.
+%
+For the same reason as with the \gls{implied.c} \glspl{constraint}, we expect
+some \glspl{constraint} to lead to an overall solving time improvement while
+others may degrade solving time.
+
+\RefFigure{single-dom-con-vs-no-con-solving-time-plots} shows the normalized
+solving times (including \gls{presolving} time) for two \glspl{constraint model}
+described above in the first experiment, with \glsshort{constraint
+  model}~\refModel{dom-ex-wo-single-con} as \gls{baseline} and
+\glsshort{constraint model}~\refModel{dom-ex-w-single-con} as \gls{subject}.
+%
+\begin{figure}
+  \centering
+
+  \mkSolvTechSubfigure{dom-cons-locs-of-states}%
+                      {DomConsLocsOfStates}%
+  \hfill%
+  \mkSolvTechSubfigure{dom-cons-operands-of-non-selected-matches}%
+                      {DomConsOperandsOfNonSelectedMatches}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{impl-cons-input-operands-not-taking-min-value}%
+                      {ImplConsInputOperandsNotTakingMinValue}%
+  \hfill%
+  \mkSolvTechSubfigure{dom-cons-interch-data-chains}%
+                      {DomConsInterchDataChains}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{dom-cons-null-copy-match-selection}%
+                      {DomConsNullCopyMatchSelection}%
+  \hfill%
+  \mkSolvTechSubfigure{dom-cons-kill-match-selection}%
+                      {DomConsKillMatchSelection}
+
+  \caption[%
+            Set of plots for evaluating each symmetry or dominance breaking
+            constraint's impact on solving time%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for two
+            constraint models:
+            \begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+              \item one without a particular symmetry or dominance breaking
+                constraint (baseline)
+              \item one with all constraints (subject)
+            \end{inlinelist}%
+          }
+  \labelFigure{single-dom-con-vs-no-con-solving-time-plots}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechDisableDomConsLocsOfStatesPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableDomConsLocsOfStatesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableDomConsOperandsOfNonSelectedMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableImplConsInputOperandsNotTakingMinValuePrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableDomConsInterchDataChainsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableDomConsNullCopyMatchSelectionPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableDomConsKillMatchSelectionPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechDisableDomConsLocsOfStatesPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableDomConsLocsOfStatesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableDomConsOperandsOfNonSelectedMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableImplConsInputOperandsNotTakingMinValuePrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableDomConsInterchDataChainsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableDomConsNullCopyMatchSelectionPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableDomConsKillMatchSelectionPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechDisableDomConsLocsOfStatesPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeCvMax,
+  \SolvTechDisableDomConsLocsOfStatesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableDomConsOperandsOfNonSelectedMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableImplConsInputOperandsNotTakingMinValuePrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableDomConsInterchDataChainsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableDomConsNullCopyMatchSelectionPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableDomConsKillMatchSelectionPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+%
+The \glspl{GMI} and \glspl{CI} are given in
+\refFigure{single-dom-con-vs-no-con-solving-time-plots}.
+
+We observe that \refEquation{dom-cons-interch-data-chains} leads to an overall
+solving time improvement and that
+\refEquation{impl-cons-input-operands-not-taking-min-value} has no impact on
+solving time.
+%
+For \refEquationList{dom-cons-locs-of-states,
+  dom-cons-operands-of-non-selected-matches, dom-cons-null-copy-match-selection,
+  dom-cons-kill-match-selection}, the results are inconclusive.
+
+
+\paragraph{Impact of Groups of Constraints}
+
+We find the best combination of \glsshort{symmetry breaking.c} and
+\gls{dominance breaking.c} \glspl{constraint} by arranging them into groups and
+evaluating the impact of each such group.
+%
+Again, for practicality we limit ourselves to only comparing the solving times
+exhibited by three versions of the \glsshort{constraint model}:
+%
+\begin{modelList}
+  \item \labelModel{dom-ex-no-cons}
+    one with no \glsshort{symmetry breaking.c} or \gls{dominance breaking.c}
+    \glspl{constraint}
+  \item \labelModel{dom-ex-only-good-cons}
+    one with only those who individually lead to an overall solving time
+    improvement
+  \item \labelModel{dom-ex-all-cons}
+    one with all \glspl{constraint}
+\end{modelList}.
+%
+We expect \glsplshort{constraint model}~\refModel{dom-ex-only-good-cons}
+and~\refModel{dom-ex-all-cons} to all perform better than \glsshort{constraint
+  model}~\refModel{dom-ex-no-cons}.
+%
+No hypothesis is attempted regarding the relative performance between
+\glsplshort{constraint model}~\refModel{dom-ex-only-good-cons}
+and~\refModel{dom-ex-all-cons}.
+
+\RefFigure{diff-dom-cons-comb-solving-time-plot} shows the normalized solving
+times (including \gls{presolving} time) for the three \glspl{constraint model}
+described, with \glsshort{constraint model}~\refModel{dom-ex-no-cons} as
+\gls{baseline} and \glsplshort{constraint
+  model}~\refModel{dom-ex-only-good-cons} and~\refModel{dom-ex-all-cons} as
+\glspl{subject}.
+%
+\begin{figure}
+  \centering%
+
+  \mkSolvTechSubfigure[enable]%
+                      {only-good-dom-cons}%
+                      [%
+                        Model \refModel{dom-ex-no-cons} \versus
+                        \refModel{dom-ex-only-good-cons}%
+                      ]%
+                      {OnlyGoodDomCons}%
+  \hfill%
+  \mkSolvTechSubfigure{all-dom-cons}%
+                      [%
+                        Model \refModel{dom-ex-no-cons} \versus
+                        \refModel{dom-ex-all-cons}%
+                      ]%
+                      {AllDomCons}
+
+  \caption[%
+            Plot for evaluating the impact on solving time made by different
+            combinations of symmetry and dominance breaking constraints%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for three
+            constraint models:
+            %
+            \begin{modelList}
+              \item one with no symmetry or dominance breaking constraints
+                (baseline)
+              \item one with only those who individually lead to an overall
+                solving time improvement
+                (\refEquation{dom-cons-interch-data-chains}; subject)
+              \item one with all \glspl{constraint} (subject)
+            \end{modelList}%
+          }
+  \labelFigure{diff-dom-cons-comb-solving-time-plot}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMin,
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMax,
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeCvMax,
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+
+To begin with, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{dom-ex-only-good-cons} over \glsshort{constraint
+  model}~\refModel{dom-ex-no-cons} is \printGMI{%
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-enable-only-good-dom-cons}).
+%
+This means that combining only the \glsshort{symmetry breaking.c} or
+\gls{dominance breaking.c} \glspl{constraint} that individually have a positive
+impact on solving time is not sufficient.
+%
+Although solving time is improved considerably for one \gls{function} (up to
+\printZCNorm{%
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}), this combination also degrades solving time for several \glspl{function}
+(down
+to~\printZCNorm{%
+  \SolvTechEnableOnlyGoodDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin%
+}).
+
+In comparison, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{dom-ex-all-cons} over \glsshort{constraint
+  model}~\refModel{dom-ex-no-cons} is \printGMI{%
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-disable-all-dom-cons}), which is a statistically
+significant, positive impact.
+%
+In addition, the maximum improvement is greater than for \glsshort{constraint
+  model}~\refModel{dom-ex-only-good-cons} (up to
+\printZCNorm{%
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}), and this combination yields no considerable degradation for any
+\gls{function} (down to at
+most~\printZCNorm{%
+  \SolvTechDisableAllDomConsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin%
+}).
+%
+Hence it is most beneficial to include all such \glspl{constraint} in the
+\glsshort{constraint model}.
+
+
+\paragraph{Conclusions}
+
+From the results for these experiments, we conclude:
+%
+\begin{enumerate*}[label=(\roman*), itemjoin={;\ }, itemjoin*={; but\ }]
+  \item that some of the \glsshort{symmetry breaking.c} and \gls{dominance
+    breaking.c} \glspl{constraint} have individually a positive impact on
+    solving time
+  \item it is most beneficial to include all \glsshort{symmetry breaking.c} and
+    \gls{dominance breaking.c} \glspl{constraint} in the \glsshort{constraint
+      model}
+\end{enumerate*}.
+
+
+\subsection{Presolving}
+
+Like in \refSectionList{st-exp-evaluation-implied-constraints,
+  st-exp-evaluation-dom-constraints}, we first evaluate the \gls{presolving}
+techniques individually.
+%
+Based on the results, we then arrange them into groups to find the best
+combination of \gls{presolving} techniques.
+%
+To curb experiment runtimes, we include all other solving techniques in the
+\glsplshort{constraint model} because, without them, a very long time limit
+would have to be applied to discover the impact on solving time.
+
+
+\paragraph{Impact of a Single Technique}
+
+We evaluate the impact of each \gls{presolving} technique
+(\refSection{st-pre-dom-matches},
+\refEquationRange{illegal-matches-uncovered-ops}{redun-non-null-copy-matches},
+and \refSection{st-canonical-locations}) by comparing the solving times
+exhibited by two versions of the \gls{constraint model}:
+%
+\begin{modelList}
+  \item \labelModel{pre-ex-wo-single-tech}
+    one without a particular \gls{presolving} technique
+  \item \labelModel{pre-ex-w-single-tech}
+    one with all techniques
+\end{modelList}.
+%
+For the same reason as with the \gls{implied.c}, \gls{symmetry breaking.c},
+\gls{dominance breaking.c} \glspl{constraint}, we expect some techniques to lead
+to an overall solving time improvement while others may degrade solving time.
+
+\RefFigure{single-presolving-vs-no-presolving-solving-time-plots} shows the
+normalized solving times (including \gls{presolving} time) for the two
+\glspl{constraint model} described above in the first experiment, with
+\glsshort{constraint model}~\refModel{pre-ex-wo-single-tech} as \gls{baseline}
+and \glsshort{constraint model}~\refModel{pre-ex-w-single-tech} as
+\gls{subject}.
+%
+\begin{figure}
+  \centering
+
+  \mkSolvTechSubfigure{dom-matches}%
+                      [Dominated matches]%
+                      [3.65cm]%
+                      {DomMatches}%
+  \hfill%
+  \mkSolvTechSubfigure{illegal-matches-uncovered-ops}%
+                      {IllegalMatchesUncoveredOps}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{illegal-matches-undefined-data}%
+                      {IllegalMatchesUndefinedData}%
+  \hfill%
+  \mkSolvTechSubfigure{illegal-matches-kills}%
+                      {IllegalMatchesKills}%
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{illegal-matches-def-locs}%
+                      {IllegalMatchesDefLocs}%
+  \hfill%
+  \mkSolvTechSubfigure{illegal-matches-use-locs}%
+                      {IllegalMatchesUseLocs}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{redun-kills}%
+                      {RedunKills}%
+  \hfill%
+  \mkSolvTechSubfigure{redun-non-null-copy-matches}%
+                      {RedunNonNullCopyMatches}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{canonical-locs}%
+                      [Canonical locations]%
+                      [\linewidth]%
+                      {CanonicalLocs}
+
+  \caption[%
+            Set of plots for evaluating each presolving technique's impact on
+            solving time%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for two
+            constraint models:
+            %
+            \begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+              \item one without a particular presolving technique (baseline)
+              \item one with all techniques (subject)
+            \end{inlinelist}%
+          }
+  \labelFigure{single-presolving-vs-no-presolving-solving-time-plots}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechDisableDomMatchesPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableDomMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableIllegalMatchesUncoveredOpsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableIllegalMatchesUndefinedDataPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableIllegalMatchesKillsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableIllegalMatchesDefLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableIllegalMatchesUseLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableRedunKillsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableRedunNonNullCopyMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableCanonicalLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechDisableDomMatchesPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableDomMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableIllegalMatchesUncoveredOpsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableIllegalMatchesUndefinedDataPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableIllegalMatchesKillsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableIllegalMatchesDefLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableIllegalMatchesUseLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableRedunKillsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableRedunNonNullCopyMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableCanonicalLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechDisableDomMatchesPrePlusSolvingTimeSpeedupAllPrePlusSolvingTimeCvMax,
+  \SolvTechDisableDomMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableIllegalMatchesUncoveredOpsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableIllegalMatchesUndefinedDataPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableIllegalMatchesKillsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableIllegalMatchesDefLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableIllegalMatchesUseLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableRedunKillsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableRedunNonNullCopyMatchesPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableCanonicalLocsPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+%
+The \glspl{GMI} and \glspl{CI} are given in
+\refFigure{single-presolving-vs-no-presolving-solving-time-plots}.
+
+We observe that \refEquationList{redun-kills, redun-non-null-copy-matches}, and
+\gls{canonical.l} \glspl{location} lead to an overall solving time improvement,
+that \refEquationList{illegal-matches-def-locs, illegal-matches-use-locs} lead
+to an overall solving time degradation, and that
+\refEquation{illegal-matches-uncovered-ops} has no impact on solving time.
+%
+For \gls{dominate.m}[d] \glspl{match} and
+\refEquationList{illegal-matches-undefined-data, illegal-matches-kills}, the
+results are inconclusive.
+
+\RefEquationList{illegal-matches-def-locs, illegal-matches-use-locs} degrade
+solving time in this experiment because they are expensive to compute and only
+identify \gls{redundant.m} \glspl{match} that appear for \glspl{target machine}
+with irregular \glspl{instruction set} (meaning the \glspl{instruction} access
+different sets of \glspl{register}).
+%
+Since \gls{Hexagon} has a regular \gls{instruction set}, these \gls{presolving}
+techniques identify too few \gls{redundant.m} \glspl{match} to offset the cost
+in finding them.
+
+
+\paragraph{Impact of Groups of Techniques}
+
+We find the best combination of \gls{presolving} techniques by arranging them
+into groups and evaluating the impact of each such group.
+%
+Again, for practicality we limit ourselves to only comparing the solving times
+exhibited by four versions of the \glsshort{constraint model}:
+%
+\begin{modelList}
+  \item \labelModel{pre-ex-no-techs}
+    one with no \gls{presolving} techniques
+\gls{implied.c} \glspl{constraint}
+  \item \labelModel{pre-ex-only-good-techs}
+    one with only those who individually lead to an overall solving time
+    improvement
+  \item \labelModel{pre-ex-no-bad-techs}
+    one without those who individually lead to an overall solving time
+    degradation
+  \item \labelModel{pre-ex-all-techs}
+    one with all techniques
+\end{modelList}.
+%
+We expect \glsplshort{constraint model}~\refModel{pre-ex-only-good-techs},
+\refModel{pre-ex-no-bad-techs}, and~\refModel{pre-ex-all-techs} to all perform
+better than \glsshort{constraint model}~\refModel{pre-ex-no-techs}.
+%
+This is because many of these \gls{presolving} techniques require computations
+that are expensive to execute but whose result can be shared among the
+techniques, allowing this cost to be amortized when the techniques are executed
+in unison.
+%
+No hypothesis is attempted regarding the relative performance between
+\glsplshort{constraint model}~\refModel{pre-ex-only-good-techs},
+\refModel{pre-ex-no-bad-techs}, and~\refModel{pre-ex-all-techs}.
+
+\RefFigure{diff-presolving-comb-solving-time-plot} shows the normalized solving
+times (including \gls{presolving} time) for the four \glspl{constraint model}
+described above in the second experiment, with \glsshort{constraint
+  model}~\refModel{pre-ex-no-techs} as \gls{baseline} and \glsplshort{constraint
+  model}~\refModel{pre-ex-only-good-techs}, \refModel{pre-ex-no-bad-techs},
+and~\refModel{pre-ex-all-techs} as \glspl{subject}.
+%
+\begin{figure}
+  \centering%
+
+  \mkSolvTechSubfigure[enable]%
+                      {only-good-presolving}%
+                      [%
+                        Model \refModel{pre-ex-no-techs} \versus
+                        \refModel{pre-ex-only-good-techs}%
+                      ]%
+                      {OnlyGoodPresolving}%
+  \hfill%
+  \mkSolvTechSubfigure{bad-presolving}%
+                      [%
+                        Model \refModel{pre-ex-no-techs} \versus
+                        \refModel{pre-ex-no-bad-techs}%
+                      ]%
+                      {BadPresolving}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{all-presolving}%
+                      [%
+                        Model \refModel{pre-ex-no-techs} \versus
+                        \refModel{pre-ex-all-techs}%
+                      ]%
+                      {AllPresolving}
+
+  \caption[%
+            Plot for evaluating the impact on solving time made by different
+            combinations of presolving techniques%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for four
+            constraint models:
+            %
+            \begin{modelList}
+              \item one with no presolving techniques (baseline)
+              \item one with only those who individually lead to an overall
+                solving time improvement (\refEquationList{redun-kills,
+                  redun-non-null-copy-matches}, and \gls{canonical.l}
+                \glspl{location}; subject)
+              \item one without those who individually lead to an overall
+                solving time degradation
+                (\refEquationList{illegal-matches-def-locs,
+                  illegal-matches-use-locs}; subject)
+              \item one with all techniques (subject)
+            \end{modelList}%
+          }
+  \labelFigure{diff-presolving-comb-solving-time-plot}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMin,
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMax,
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeCvMax,
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+
+To begin with, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{pre-ex-only-good-techs} over \glsshort{constraint
+  model}~\refModel{pre-ex-no-techs} is \printGMI{%
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-enable-only-good-presolving}), which is a statistically
+significant, positive impact.
+%
+But although the improvement is considerable for some \glspl{function} (up to
+\printZCNorm{%
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}), we note that this combination yields a considerable degradation for others
+(down
+to~\printZCNorm{%
+  \SolvTechEnableOnlyGoodPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin%
+}).
+
+In comparison, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{pre-ex-no-bad-techs} over \glsshort{constraint
+  model}~\refModel{pre-ex-no-techs} is \printGMI{%
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-disable-bad-presolving}), which is a greater solving
+time improvement compared to \glsshort{constraint
+  model}~\refModel{pre-ex-only-good-techs}.
+%
+In addition, the maximum improvement is greater than for \glsshort{constraint
+  model}~\refModel{pre-ex-only-good-techs} (up to
+\printZCNorm{%
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}), and this combination yields no considerable degradation for any
+\gls{function} (down to at
+most~\printZCNorm{%
+  \SolvTechDisableBadPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin%
+}).
+
+Lastly, we observe that the \gls{GMI} for \glsshort{constraint
+  model}~\refModel{pre-ex-all-techs} over \glsshort{constraint
+  model}~\refModel{pre-ex-no-techs} is \printGMI{%
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+} (\refFigure{solv-tech-disable-all-presolving}), which is still better than
+\glsshort{constraint model}~\refModel{pre-ex-only-good-techs} but worse than
+\glsshort{constraint model}~\refModel{pre-ex-no-bad-techs}.
+%
+In addition, the maximum improvement is less than for \glsshort{constraint
+  model}~\refModel{pre-ex-no-bad-techs} (up to at
+most~\printZCNorm{%
+  \SolvTechDisableAllPresolvingPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+}).
+%
+Hence, in this experiment it is most beneficial to exclude
+\refEquationList{illegal-matches-def-locs, illegal-matches-use-locs} from the
+\glsshort{constraint model}.
+%
+However, for \glspl{target machine} with irregular \glspl{instruction set} it
+may be beneficial to keep them in the \glsshort{constraint model}.
+
+
+\paragraph{Conclusions}
+
+From the results for these experiments, we conclude:
+%
+\begin{enumerate*}[label=(\roman*), itemjoin={;\ }, itemjoin*={; and\ }]
+  \item that some of the \gls{presolving} techniques have a positive impact on
+    solving time while others have a negative impact
+  \item that it is most beneficial to exclude the techniques that have a
+    negative impact from the \glsshort{constraint model}
+\end{enumerate*}.
+
+
+\subsection{Impact of All Solving Techniques}
+
+We now evaluate the solving-time impact made by different collections of
+solving techniques by comparing the solving times exhibited by four versions of
+the \gls{constraint model}:
+%
+\begin{modelList}
+  \item \labelModel{st-ex-no-techs}
+    one with no solving techniques
+  \item \labelModel{st-ex-only-good-techs}
+    one with only those who individually lead to an overall solving time
+    improvement
+  \item \labelModel{st-ex-no-bad-techs}
+    one with only those who individually lead to an overall solving time
+    degradation
+  \item \labelModel{st-ex-all-techs}
+    one with all techniques
+\end{modelList}.
+%
+We expect \glsplshort{constraint model}~\refModel{st-ex-only-good-techs},
+\refModel{st-ex-no-bad-techs}, and~\refModel{st-ex-all-techs} to all perform
+better than \glsshort{constraint model}~\refModel{st-ex-no-techs}.
+%
+No hypothesis is attempted regarding the relative performance between
+\glsplshort{constraint model}~\refModel{st-ex-only-good-techs},
+\refModel{st-ex-no-bad-techs}, and~\refModel{st-ex-all-techs}.
+
+\RefFigure{diff-solv-tech-comb-solving-time-plot} shows the normalized solving
+times (including \gls{presolving} time) for the four \glspl{constraint model}
+described above, with \glsshort{constraint model}~\refModel{st-ex-no-techs} as
+\gls{baseline} and \glsplshort{constraint
+  model}~\refModel{st-ex-only-good-techs}, \refModel{st-ex-no-bad-techs},
+and~\refModel{st-ex-all-techs} as \glspl{subject}.
+%
+\begin{figure}
+  \centering%
+
+  \mkSolvTechSubfigure[enable]%
+                      {only-all-good}%
+                      [%
+                        Model \refModel{st-ex-no-techs} \versus
+                        \refModel{st-ex-only-good-techs}%
+                      ]%
+                      {OnlyAllGood}%
+  \hfill%
+  \mkSolvTechSubfigure{all-bad}%
+                      [%
+                        Model \refModel{st-ex-no-techs} \versus
+                        \refModel{st-ex-no-bad-techs}%
+                      ]%
+                      {AllBad}
+
+  \vspace{\betweensubfigures}
+
+  \mkSolvTechSubfigure{all}%
+                      [%
+                        Model \refModel{st-ex-no-techs} \versus
+                        \refModel{st-ex-all-techs}%
+                      ]%
+                      {All}
+
+  \caption[%
+            Plot for evaluating the impact on solving time made by different
+            combinations of all solving techniques%
+          ]%
+          {%
+            Normalized solving times (incl.\ presolving time) for four
+            constraint models:
+            %
+            \begin{modelList}
+              \item one with no solving techniques (baseline)
+              \item one with only those who individually lead to an overall
+                solving time improvement (subject)
+                (\refEquationList{impl-cons-defs-dominate-defs,
+                  impl-cons-defs-dominate-entry-blocks,
+                  dom-cons-interch-data-chains, redun-kills,
+                  redun-non-null-copy-matches}, and \gls{canonical.l}
+                \glspl{location}; subject)
+              \item one without those who individually lead to an overall
+                solving time degradation
+                (\refEquationList{illegal-matches-def-locs,
+                  illegal-matches-use-locs}; subject)
+              \item one with all techniques (subject)
+            \end{modelList}.
+            %
+            \Glspl{function} marked with \barNormValueNoBaselineSolution{} are
+            those for which model~\refModel{st-ex-no-techs} fails to produce any
+            solution%
+          }
+  \labelFigure{diff-solv-tech-comb-solving-time-plot}
+\end{figure}
+%
+The solving times range from
+\printMinSolvingTime{
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMin,
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin,
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMin
+} to
+\printMaxSolvingTime{
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeAvgMax,
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax,
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeAvgMax
+} with a \gls{CV} of
+\numMaxOf{
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupNonePrePlusSolvingTimeCvMax,
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax,
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeCvMax
+}.
+%
+The \glspl{GMI} and \glspl{CI} are given in
+\refFigure{diff-solv-tech-comb-solving-time-plot}.
+
+To begin with, we see clearly that all \glsplshort{constraint model}
+significantly improve solving time over \glsshort{constraint
+  model}~\refModel{st-ex-no-techs}.
+%
+For several \glspl{function}, the improvement is considerable (up
+to~\printMaxZCNorm{%
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax,
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax,
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax
+}), and no combination yields considerable degradation for any \gls{function}
+(down
+to at most~\printMinSpeedup{%
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin,
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin,
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMin
+}).
+%
+In fact, for two \glspl{function} \glsshort{constraint
+  model}~\refModel{st-ex-no-techs} is not even able to produce a \gls{solution}
+within the time limit.
+%
+Hence the solving techniques are crucial for scalability.
+
+Next, we observe that \glsshort{constraint model}~\refModel{st-ex-no-bad-techs}
+yields the largest \gls{GMI} over \glsshort{constraint
+  model}~\refModel{st-ex-no-techs} (\printGMI{%
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+}), closely followed by \glsshort{constraint model}~\refModel{st-ex-all-techs}
+(\printGMI{%
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+}),
+which in turn considerably outperforms \glsshort{constraint
+  model}~\refModel{st-ex-only-good-techs}
+(\printGMI{%
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupGmean%
+} with \gls{CI}~\printGMICI{%
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMin%
+}{%
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeRegularSpeedupCiMax%
+}).
+%
+We also note that the maximum improvement for \glsshort{constraint
+  model}~\refModel{st-ex-no-bad-techs} is greater than for \glsshort{constraint
+  model}~\refModel{st-ex-all-techs} (up to \printZCNorm{%
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+} \versus up to \printZCNorm{%
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax
+}).
+%
+Hence, only picking solving techniques that have a statistically significant,
+positive effect on solving time when evaluated individually is too conservative.
+%
+Also, rejecting the \gls{presolving} techniques that have an overall negative
+effect on solving time when evaluated individually yields, in this experiment,
+the \gls{constraint model} with best performance.
+%
+Keep in mind, however, that for \glspl{target machine} with irregular
+\glspl{instruction set} it may be beneficial to keep them in the
+\glsshort{constraint model}.
+
+
+\paragraph{Conclusions}
+
+From the results for these experiments, we conclude:
+%
+\begin{enumerate*}[label=(\roman*), itemjoin={;\ }, itemjoin*={; and\ }]
+  \item that the solving techniques introduced in this chapter are crucial for
+    scalability
+  \item that picking only solving techniques that have a statistically
+    significant, positive effect on solving time when evaluated individually is
+    too conservative
+  \item that rejecting \refEquationList{illegal-matches-def-locs,
+    illegal-matches-use-locs} gives the \gls{constraint model} with best
+    performance for \glspl{target machine} with regular \glspl{instruction set}
+\end{enumerate*}.
+
+
+\section{Summary}
+\labelSection{st-summary}
+
+In this chapter, we have introduced a wide range of techniques for improving
+solving of the \gls{constraint model} introduced in the previous chapter.
+%
+Through experimental evaluation, the techniques were demonstrated to be crucial
+for scalability; for one \gls{function}, the solving time was improved
+by~\printMaxZCNorm{%
+  \SolvTechEnableOnlyAllGoodPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax,
+  %  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax,
+  % This measurement is not included here as we decide to keep all presolving
+  % techniques
+  \SolvTechDisableAllPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax
+}.
+%
+Rejecting \gls{presolving} techniques \refEquationList{illegal-matches-def-locs,
+  illegal-matches-use-locs} increased the improvement further to \printZCNorm{%
+  \SolvTechDisableAllBadPrePlusSolvingTimeSpeedupPrePlusSolvingTimeZeroCenteredSpeedupMax%
+} since the \gls{target machine} is fairly regular (meaning its
+\glspl{instruction} can access the same set of \glspl{register}).
+%
+If the \gls{target machine} has an irregular \gls{instruction set}, however,
+then it may be worthwhile to keep these \gls{presolving} techniques.

@@ -1,0 +1,367 @@
+% -*- coding: utf-8 -*-
+% !TEX program = xelatex
+
+\documentclass[12pt]{beamer}
+
+\usepackage[UTF8,noindent]{ctex}
+\usepackage{arev}
+\usepackage{ragged2e}
+\usepackage{listings}
+\usepackage{tabu}
+
+\makeatletter
+
+\providecommand{\beamer@endinputifotherversion}[1]{}
+
+\ifxetex
+  \setCJKsansfont{SimHei} % fix for ctex 2.0
+  \setCJKmonofont{SimHei}
+  \renewcommand\CJKfamilydefault{\CJKsfdefault}%
+\else
+  \@ifpackagelater{ctex}{2014/03/01}{}{\AtBeginDocument{\heiti}} %无效？
+\fi
+
+\makeatother
+
+\renewcommand{\baselinestretch}{1} % ctex 2.4.1 开始为 1，之前为 1.3
+\renewcommand{\arraystretch}{1.3}
+
+\setlength{\parskip}{7pt plus 1pt minus 1pt}
+
+\justifying
+\let\oldraggedright\raggedright
+\let\raggedright\justifying
+
+\lstset{
+  basicstyle=\ttfamily\color{blue!50!red}
+}
+
+\lstnewenvironment{code}{}{}
+
+\setbeamersize{text margin left=8mm,text margin right=8mm}
+
+\newenvironment{framex}{\begin{frame}[fragile=singleslide,environment=framex]}{\end{frame}}
+
+\setbeamertemplate{frametitle}{\strut\insertframetitle\strut\par}
+\setbeamertemplate{navigation symbols}{}
+
+\newcommand{\ulinefill}[1]{\xleaders\hbox{\underline{\vphantom{#1}\kern1pt}}\hfill\kern0pt}
+\newcommand{\fillbox}[1]{\ulinefill{#1}\underline{#1}\ulinefill{#1}}
+
+\setbeamercolor{normal text}{bg=gray!20}
+
+\setbeamertemplate{title page}{%
+  \renewcommand{\arraystretch}{2}%
+  \usebeamerfont{title}
+  \begin{tabu}{|X|}
+    \hline
+    模板名称：\fillbox{\usebeamercolor[fg]{title}\inserttitle} \\
+    模板作者：\fillbox{\insertauthor} \\
+    所在单位：\fillbox{\insertinstitute} \\
+    更新日期：\fillbox{\the\year}年\fillbox{\the\month}月\fillbox{\the\day}日\\
+    \hline
+  \end{tabu}%
+}
+
+\begin{document}
+
+\title{暨南大学试卷 LaTeX 模板}
+\author{吕\ 荐\ 瑞}
+\institute{暨南大学数学系}
+
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+
+\begin{framex}
+\frametitle{简单介绍}
+本文档介绍 \verb!jnuexam! 文档类。这个文档类提供暨南大学考试试卷的 LaTeX 模板。
+\par
+这个模板将格式和内容分开，而且可以从一份 \verb!tex! 文件编译出四份试卷(A卷 / B卷 / A卷答案 / B卷答案)，使用方便。
+\par
+这个模板的最新版本可以在下面地址下载：\newline
+ \href{https://lvjr.bitbucket.io/jnuexam.html?\the\year}{https://lvjr.bitbucket.io/jnuexam.html}
+\end{framex}
+
+\begin{framex}
+\frametitle{编译方式}
+这个文档类要求所有 \verb!tex! 文件都使用 \verb!UTF8! 编码，
+若使用 \verb!GBK! 编码则无法得到正确结果。
+\par
+如果对文件编码不熟悉，可以直接复制例子文件，然后在其中修改，即可正常编译。
+\par
+这个文档类同时支持 \verb!XeLaTeX! 和 \verb!PDFLaTeX! 方式编译。为得到最好的中文显示效果，
+推荐用较先进的 \verb!XeLaTeX! 编译。
+\end{framex}
+
+\begin{framex}
+\frametitle{试卷结构}
+\begin{code}
+\documentclass{jnuexam}
+\begin{document}
+......
+\makehead %生成试卷表头
+......
+\makepart{填空题}{题数分值}
+......
+\makepart{单选题}{题数分值}
+......
+\makepart{计算题}{题数分值}
+......
+\makepart{证明题}{题数分值}
+......
+\makedata{可能用到的数据} %附录数据
+......
+\end{document}
+\end{code}
+\end{framex}
+
+\begin{framex}
+\frametitle{试卷表头}
+\begin{code}
+\renewcommand{\niandu}{2010--2011}
+\renewcommand{\xueqi}{2}
+\renewcommand{\kecheng}{大学数学}
+\renewcommand{\zhuanye}{理工4学分}
+\renewcommand{\jiaoshi}{某某某}
+\renewcommand{\shijian}{2011年07月08日}
+\renewcommand{\bixiu}{1}   % 1为必修，0为选修
+\renewcommand{\bijuan}{1}  % 1为闭卷，0为开卷
+\renewcommand{\shijuan}{A} % A/B/C卷
+\renewcommand{\neizhao}{1} % 1打勾，0不勾
+\renewcommand{\waizhao}{0} % 1打勾，0不勾
+\makehead %生成试卷表头
+\end{code}
+其中 \verb!\zhuanye! 和 \verb!\shijian! 命令的内容可以为空。
+\end{framex}
+
+\begin{framex}
+\frametitle{填空题目}
+\begin{code}
+\makepart{填空题}{题数分值}
+
+\begin{problem}
+第一道填空题描述\fillout{答案}。
+\end{problem}
+
+\begin{problem}
+第二道填空题描述\fillout{答案}。
+\end{problem}
+\end{code}
+\verb!\fillout! 命令将用下划线填满整行。另有个 \verb!\fillin! 命令，只留下最小宽度的下划线。
+\par
+答案必须放在 \verb!\fillout! 或 \verb!\fillin! 命令里面；这样才能在生成空白试卷时隐藏它。
+\end{framex}
+
+\begin{framex}
+\frametitle{选择题目}
+\begin{code}
+\makepart{单选题}{题数分值}
+
+\begin{problem}
+第一道单选题描述\pickout{答案}。
+\end{problem}
+
+\begin{problem}
+第二道单选题描述\pickout{答案}。
+\end{problem}
+\end{code}
+\verb!\pickout! 命令将把选择圆括号放在本行最右边。另外有个 \verb!\pickin! 命令，将选择圆括号放在当前位置。
+\par
+答案必须放在 \verb!\pickout! 或 \verb!\pickin! 命令里面；这样才能在生成空白试卷时隐藏它。
+\end{framex}
+
+\begin{framex}
+\frametitle{选项排版}
+选择题的四个选项可以用 \verb!abcd! 环境来排版。比如：
+\begin{code}
+\begin{abcd}
+  \item 第一个选项
+  \item 第二个选项
+  \item 第三个选项
+  \item 第四个选项
+\end{abcd}
+\end{code}
+此时 \verb!abcd! 环境将根据各选项长度自动将四个选项分为一行、两行或四行排版，非常方便。
+\end{framex}
+
+
+\begin{framex}
+\frametitle{答题表格}
+在填空题和选择题前面，还可以用 \verb!\answertable! 命令生成空白答题栏。比如：
+\begin{code}
+\answertable[3em]{6}{3}
+\end{code}
+其中 \verb!\answertable! 命令的三个参数含义如下：
+\begin{itemize}
+  \item 第一个可选参数表示空白单元格的高度，默认是 \verb!1em!。
+  \item 第二个必选参数表示总共有多少个题目。
+  \item 第三个必选参数表示每行排版几个题目。
+\end{itemize}
+\end{framex}
+
+\begin{framex}
+\frametitle{计算题目}
+\begin{code}
+\makepart{计算题}{题数分值}
+
+\begin{problem}
+第一道计算题描述。
+\end{problem}
+\begin{solution}
+第一道计算题答案。
+\end{solution}
+
+\begin{problem}
+第二道计算题描述。
+\end{problem}
+\begin{solution}
+第二道计算题答案。
+\end{solution}
+\end{code}
+\end{framex}
+
+\begin{framex}
+\frametitle{证明题目}
+\begin{code}
+\makepart{证明题}{题数分值}
+
+\begin{problem}
+第一道证明题描述。
+\end{problem}
+\begin{solution}
+第一道证明题答案。
+\end{solution}
+
+\begin{problem}
+第二道证明题描述。
+\end{problem}
+\begin{solution}
+第二道证明题答案。
+\end{solution}
+\end{code}
+\end{framex}
+
+\begin{framex}
+\frametitle{评分命令}
+计算题和证明题等主观题的排版方法是完全一样的。在编写这些主观题的解答时，
+可以用 \verb!\score! 命令给出各步骤得分。比如：
+\begin{code}
+\begin{solution}
+$1+1=2$ \score{4}
+$2+2=4$ \score{8}
+\end{solution}
+\end{code}
+评分命令 \verb!\score! 也可在 \verb!align*! 等数学环境中使用，此时评分显示在公式编号位置。
+\end{framex}
+
+\begin{framex}
+\frametitle{其它题型}
+除了上述四种题型之外，其它题型可以用下面方式编写：
+\begin{code}
+\makepart{某题型}{题数分值}
+
+\begin{problem}
+第一题描述。\answer{第一题答案}
+\end{problem}
+
+\begin{problem}
+第二题描述。\answer{第二题答案}
+\end{problem}
+\end{code}
+其中题目答案必须放在 \verb!\answer! 命令里面；这样才能在生成空白试卷时隐藏它。
+\end{framex}
+
+\begin{framex}
+\frametitle{附录数据}
+在试卷最后，可以用下面命令增加附录数据部分：
+\begin{code}
+\makedata{可能用到的数据} %附录数据
+......
+\end{code}
+附录数据必须放在 \verb!\makedata! 命令后面；否则在从A卷生成B卷时会出问题。
+\end{framex}
+
+\begin{framex}
+\frametitle{空白试卷}
+假设 \verb!exam-a.tex! 是含答案的试卷。新建一个包含以下内容的 \verb!exam-a-empty.tex! 文档，
+编译后将得到不含答案的空白试卷。
+\begin{code}
+\PassOptionsToClass{noanswer}{jnuexam}
+\input{exam-a}
+\end{code}
+也就是说，给 \verb!jnuexam! 文档类加上 \verb!noanswer! 选项后，编译时将会自动隐藏试卷答案。
+\end{framex}
+
+\begin{framex}
+\frametitle{逆序出题}
+假设 \verb!exam-a.tex! 是含答案的A卷。新建一个包含以下内容的 \verb!exam-b.tex! 文档，
+编译后将得到逆序出题的B卷。
+\begin{code}
+\PassOptionsToClass{reverse}{jnuexam}
+\input{exam-a}
+\end{code}
+也就是说，给 \verb!jnuexam! 文档类加上 \verb!reverse! 选项后，编译时将会逆序排列各题型的小题。
+\end{framex}
+
+\begin{framex}
+\frametitle{竖直空白}
+在试卷的各个小题后面，可以留下一些竖直空白。本文档类支持下列这些竖直空白命令：\par
+\renewcommand{\arraystretch}{1.3}%
+\begin{tabu}{XX}
+  \hline
+  \texttt{\string\smallskip} & 竖直小空白 \\
+  \hline
+  \texttt{\string\medskip} & 竖直中空白 \\
+  \hline
+  \texttt{\string\bigskip} & 竖直大空白 \\
+  \hline
+  \texttt{\string\vfill} & 竖直填充 \\
+  \hline
+\end{tabu}
+当然，竖直空白命令可以连续使用多个，以得到所需的空白。
+\end{framex}
+
+\begin{framex}
+\frametitle{分页命令}
+分页命令 \verb!\newpage! 同样可以使用。由于A卷和B卷的小题顺序相反，
+其中的分页位置通常也不同。因此这里另外提供 \verb!\newpagea! 和 \verb!\newpageb! 命令，
+分别只对 A 卷和 B 卷有效。
+\par
+\renewcommand{\arraystretch}{1.3}%
+\begin{tabu}{XX[2]}
+  \hline
+  \texttt{\string\newpage} & 分页，对A卷和B卷均有效 \\
+  \hline
+  \texttt{\string\newpagea} & 分页，仅对A卷有效 \\
+  \hline
+  \texttt{\string\newpageb} & 分页，仅对B卷有效 \\
+  \hline
+\end{tabu}
+在试卷中\alert{不要}使用其他分页命令，比如 \verb!\clearpage! 等。
+\end{framex}
+
+\begin{framex}
+\frametitle{分页例子}
+关于分页命令的使用，可以看下面的典型例子：
+\begin{code}
+\makepart{某题型}{题型分值}
+\newpageb
+\begin{problem}第一题\end{problem}\vfill
+\begin{problem}第二题\end{problem}\vfill
+\newpage
+\begin{problem}第三题\end{problem}\vfill
+\begin{problem}第四题\end{problem}\vfill
+\newpagea
+\end{code}
+这样编译得到的A卷就是这样的顺序：
+\begin{code}
+第一题 第二题 分页 第三题 第四题 分页
+\end{code}
+而编译得到的B卷就是这样的顺序：
+\begin{code}
+第四题 第三题 分页 第二题 第一题 分页
+\end{code}
+\end{framex}
+
+\end{document}

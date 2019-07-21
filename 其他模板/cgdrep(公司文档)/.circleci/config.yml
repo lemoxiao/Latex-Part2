@@ -1,0 +1,48 @@
+defaults: &defaults
+  working_directory: /cgdrep
+  steps:
+    - checkout
+    - run:
+        name: Install Tex and Lyx formats
+        command: ./install.sh --global
+    - run:
+        name: Build all examples
+        command: |
+          cd examples
+          make all
+    - run:
+        name: Build user guide (CGD-QP-1401)
+        command: |
+          cd CGD-QP-1401
+          make clean
+          make all
+    - store_artifacts:
+        path: CGD-QP-1401/main.pdf
+        destination: cgd_qp_1401.pdf
+    - store_artifacts:
+        path: examples/report_lyx/main_cn.pdf
+        destination: report_cn.pdf
+    - store_artifacts:
+        path: examples/report_lyx/main_en.pdf
+        destination: report_en.pdf
+
+##################################################################
+
+version: 2
+jobs:
+  build-u1604:
+    <<: *defaults
+    docker:
+      - image: cogenda/cgdrep:u1604_0001
+  build-u1404:
+    <<: *defaults
+    docker:
+      - image: cogenda/cgdrep:u1404_0001
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-u1604
+      - build-u1404
+

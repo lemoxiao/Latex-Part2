@@ -1,0 +1,525 @@
+% **************************************************************************************************************
+% Note:
+%    * You must not use "u etc. in strings/commands that will be spaced out (use \"u or real umlauts instead)
+%    * New enumeration (small caps): \begin{aenumerate} \end{aenumerate}
+%    * For margin notes: \graffito{}
+%    * Do not use bold fonts in this style, it is designed around them
+%    * Use tables as in the examples
+%    * See classicthesis-ldpkg.sty for useful commands
+% **************************************************************************************************************
+% To Do:
+%     * [high] Check this out: http://www.golatex.de/koma-script-warnung-in-verbindung-mit-listings-package-t2058.html
+%    * [medium] mathbb in section-titles/chapter-titles => disappears somehow in headlines!!!
+%    * [low] Calculate text block size for Libertine font
+%    * [low] Think about processing a4paper, a5paper, 10pt, 11pt, 12pt etc. options for typearea layout
+%            (store values in internal variables and handle by \AtEndOfPackage{\areaset...})
+% **************************************************************************************************************
+%*******************************************************
+% Some font experiments
+%*******************************************************
+%\usepackage[osf]{libertine}
+%\usepackage{hfoldsty}
+%\usepackage[light,condensed,math]{iwona}
+%\renewcommand{\sfdefault}{iwona}
+%\usepackage{lmodern} % <-- no osf support :-(
+%\usepackage[urw-garamond]{mathdesign} <-- no osf support :-(
+
+%*******************************************************
+% Fine-tuning for the text area
+%*******************************************************
+%\linespread{1.05} % a bit more for Palatino
+%\areaset[5mm]{312pt}{761pt} % 686 (factor 2.2) + 33 head + 42 head \the\footskip
+%\setlength{\marginparwidth}{7em}%
+%\setlength{\marginparsep}{2em}%
+
+%*******************************************************
+% hack to use citations in float environments 
+% will be fixed with caption package version 3.2
+%*******************************************************
+\usepackage{makerobust} 
+\makeatletter 
+\MakeRobustCommand\caption@xref 
+\makeatother 
+
+%*******************************************************            
+%\usepackage[section,below]{placeins} <--- not everybody wants this, no floating over sections
+%\usepackage[all]{hypcap} <--- does not work with MiKTeX 2.6
+
+%*******************************************************            
+\usepackage[strict]{changepage}%to know on which page we are (left or right)
+
+
+% ********************************************************************
+% Language/strings for backrefs (change here, thanks, Lorenzo)
+%*******************************************************
+%\renewcommand{\backrefnotcitedstring}{\relax}%(Not cited.)
+%\renewcommand{\backrefcitedsinglestring}[1]{(Citato a pagina~#1.)}
+%\renewcommand{\backrefcitedmultistring}[1]{(Citato alle pagine~#1.)}
+%\renewcommand{\backreftwosep}{ e~}
+%\renewcommand{\backreflastsep}{ e~}
+
+% ********************************************************************
+% Setup and Finetuning
+%*******************************************************
+\newlength{\abcd} % for ab..z string length calculation
+%\newcommand{\myfloatalign}{\centering} % how all the floats will be aligned
+\setlength{\extrarowheight}{3pt} % increase table row height
+
+% ********************************************************************
+% Captions look and feel
+%*******************************************************
+\captionsetup{format=hang,font=small}
+
+% ********************************************************************
+% Listings setup
+% ********************************************************************
+%\lstset{emph={trueIndex,root},emphstyle=\color{BlueViolet}}%\underbar} % for special keywords
+% ********************************************************************
+
+% ********************************************************************
+% Where to look for graphics
+%*******************************************************
+\graphicspath{{gfx/}{misc/}} % considered harmful according to l2tabu. Ben: I don't care, Fiddling with TEXINPUTS is much worse
+\newcommand{\evalDir}[1]{./_eval/#1}
+
+% ********************************************************************
+% Hyperreferences
+%*******************************************************
+\hypersetup{%
+    colorlinks=true, 
+    linktocpage=true, 
+    pdfstartpage=3, 
+    pdfstartview=FitV,%
+    % uncomment the following line if you want to have black links (e.g., for printing)
+    colorlinks=false, 
+    linktocpage=false, 
+    pdfborder={0 0 0}, 
+    pdfstartpage=3, 
+    pdfstartview=FitV,% 
+    breaklinks=true, 
+    pdfpagemode=UseNone,
+    pageanchor=true, 
+    pdfpagemode=UseOutlines,%
+    plainpages=false, 
+    bookmarksnumbered, 
+    bookmarksopen=true, 
+    bookmarksopenlevel=1,%
+    hypertexnames=true, 	
+    pdfhighlight=/O,
+    %hyperfootnotes=true,
+    %nesting=true,
+    %frenchlinks,%
+    urlcolor=webbrown,
+    linkcolor=RoyalBlue,
+    citecolor=webgreen, 
+    %pagecolor=RoyalBlue,%
+    %urlcolor=Black, 
+    linkcolor=Black, 
+    citecolor=Black, 
+    %pagecolor=Black,%
+    pdftitle={\myTitle},%
+    pdfauthor={\textcopyright\ \myName, \myUni, \myFaculty},
+    pdfsubject={Master's Thesis},%
+    pdfkeywords={},%
+    pdfcreator={pdfLaTeX},%
+    pdfproducer={LaTeX with hyperref and classicthesis}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% OWN DEFINITIONS
+
+
+
+%\newcommand{\todointernal}[1]{\graffito{\ttfamily TODO: #1}}
+
+
+
+%
+%
+%\lstloadlanguages{C++}
+%\lstset{language=C++,
+%    keywordstyle=\color{RoyalBlue},%\bfseries,
+%    basicstyle=\small\ttfamily,
+%    %identifierstyle=\color{NavyBlue},
+%    commentstyle=\color{Green}\ttfamily,
+%    stringstyle=\rmfamily,
+%    numbers=none,%left,%
+%    numberstyle=\scriptsize,%\tiny
+%    stepnumber=5,
+%    numbersep=8pt,
+%    showstringspaces=false,
+%    breaklines=true,
+%    frameround=ftff,
+%    frame=single,
+%    belowcaptionskip=.75\baselineskip,
+%    morekeywords={Vec2f,Vec3f,Box3f,Index,float},
+%    literate={->}{$\rightarrow$}2
+%    %frame=L
+%} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% FIGURE TOOLS
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%helper functions, no direct use
+
+\newlength\fullmarginwidth
+\fullmarginwidth=\marginparwidth
+\advance\fullmarginwidth by \marginparsep
+
+\newlength\fullwidth
+\fullwidth=\textwidth
+\advance\fullwidth by \fullmarginwidth
+
+
+%                   #1   #2       #3     #4   #5
+%\subFloatCorrCaps{Cap}{ShortCap}{Label}{Opt}{path}
+\newcommand{\subFloatCorrCaps}[5]{
+	\ifthenelse{\equal{#1}{}}%
+  {
+    %subfloat without captions
+    \subfloat{%
+      \expandafter\includegraphics\expandafter[#4]{#5}
+      \label{#3}
+    }
+  }
+  {
+    \ifthenelse{\equal{#2}{}}%
+    {
+      %subfloat with same captions
+      \subfloat[#1][#1]{%
+        \expandafter\includegraphics\expandafter[#4]{#5}
+        \label{#3}
+      }
+    }
+    {
+      %subfloat with different captions
+      \subfloat[#2][#1]{%
+        \expandafter\includegraphics\expandafter[#4]{#5}
+        \label{#3}
+      }
+    }
+  }
+}
+
+%Parameters: [keyvals (see below)]{file}{caption}
+
+
+\makeatletter
+  \define@key[FigTools]{OneFig}{pos}{\def\FtPos{#1}}
+  \define@key[FigTools]{OneFig}{opt}{\def\FtOpt{#1}}
+  \define@key[FigTools]{OneFig}{label}{\def\FtLabel{#1}}
+  \define@key[FigTools]{OneFig}{shortcaption}{\def\FtShortCaption{#1}}
+  
+  \define@key[FigTools]{TwoFig}{pos}{\def\FtPos{#1}}
+  \define@key[FigTools]{TwoFig}{mainlabel}{\def\FtMainLabel{#1}}
+  \define@key[FigTools]{TwoFig}{maincaption}{\def\FtMainCaption{#1}}
+  \define@key[FigTools]{TwoFig}{mainshortcaption}{\def\FtMainShortCaption{#1}}
+  \define@key[FigTools]{TwoFig}{leftopt}{\def\FtLeftOpt{#1}}
+  \define@key[FigTools]{TwoFig}{leftlabel}{\def\FtLeftLabel{#1}}
+  \define@key[FigTools]{TwoFig}{leftcaption}{\def\FtLeftCaption{#1}}
+  \define@key[FigTools]{TwoFig}{leftshortcaption}{\def\FtLeftShortCaption{#1}}
+  \define@key[FigTools]{TwoFig}{rightopt}{\def\FtRightOpt{#1}}
+  \define@key[FigTools]{TwoFig}{rightlabel}{\def\FtRightLabel{#1}}
+  \define@key[FigTools]{TwoFig}{rightcaption}{\def\FtRightCaption{#1}}  
+  \define@key[FigTools]{TwoFig}{rightshortcaption}{\def\FtRightShortCaption{#1}}    
+  \define@key[FigTools]{TwoFig}{spacing}{\def\FtSpacing{#1}}    
+  \define@key[FigTools]{TwoFig}{topspace}{\def\FtTopSpace{#1}}    
+    
+
+  \define@key[FigTools]{ThreeFig}{pos}{\def\FtPos{#1}}
+  \define@key[FigTools]{ThreeFig}{mainlabel}{\def\FtMainLabel{#1}}
+  \define@key[FigTools]{ThreeFig}{maincaption}{\def\FtMainCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{mainshortcaption}{\def\FtMainShortCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{leftopt}{\def\FtLeftOpt{#1}}
+  \define@key[FigTools]{ThreeFig}{leftlabel}{\def\FtLeftLabel{#1}}
+  \define@key[FigTools]{ThreeFig}{leftcaption}{\def\FtLeftCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{leftshortcaption}{\def\FtLeftShortCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{midopt}{\def\FtMidOpt{#1}}
+  \define@key[FigTools]{ThreeFig}{midlabel}{\def\FtMidLabel{#1}}
+  \define@key[FigTools]{ThreeFig}{midcaption}{\def\FtMidCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{midshortcaption}{\def\FtMidShortCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{rightopt}{\def\FtRightOpt{#1}}
+  \define@key[FigTools]{ThreeFig}{rightlabel}{\def\FtRightLabel{#1}}
+  \define@key[FigTools]{ThreeFig}{rightcaption}{\def\FtRightCaption{#1}}  
+  \define@key[FigTools]{ThreeFig}{rightshortcaption}{\def\FtRightShortCaption{#1}}
+  \define@key[FigTools]{ThreeFig}{spacing}{\def\FtSpacing{#1}}
+  \define@key[FigTools]{ThreeFig}{spacingtwo}{\def\FtSpacingTwo{#1}}
+\makeatother
+
+\newcommand{\bigplot}[3][]{%
+  \bigfloatinternal[#1]{#2}{#3}{plot}
+}
+
+\newcommand{\bigfigure}[3][]{%
+  \bigfloatinternal[#1]{#2}{#3}{graph}
+}
+
+
+
+
+\newcommand{\bigfloatinternal}[4][]{%
+  \begingroup
+    \setkeys[FigTools]{OneFig}{ pos=!htp,
+                                label={fig:#2},
+                                shortcaption={#3},
+                                opt={}%width=0.95\textwidth}
+                              }
+    \setkeys[FigTools]{OneFig}{#1}
+    \def\efigure{\begin{figure}}%
+    \expandafter\efigure\expandafter[\FtPos]
+      \checkoddpage
+      \edef\side{\ifoddpage l\else r\fi}
+      \makebox[\textwidth][\side]{% 
+        \begin{minipage}[t]{\fullwidth}
+          \centering
+          \ifthenelse{\equal{#4}{plot}}
+      		{
+          	\input{\evalDir{#2}}
+      		}{
+          	\expandafter\includegraphics\expandafter[\FtOpt]{#2}
+          }
+          \caption[\FtShortCaption]{#3}
+          \label{\FtLabel}
+        \end{minipage}
+      }%
+    \end{figure}
+  \endgroup
+}
+
+\newcommand{\bigdoublefigure}[3][]{%
+  \begingroup
+    %Default values:
+    \setkeys[FigTools]{TwoFig}{ pos=!htp,
+                                mainlabel={fig:#2-#3},
+                                maincaption={#2-#3},
+                                mainshortcaption={},%
+                                leftopt={},%0.45\textwidth,
+                                leftlabel={fig:#2-left},
+                                leftcaption={},
+                                leftshortcaption={},%
+                                rightopt={},%0.45\textwidth,
+                                rightlabel={fig:#3-right},
+                                rightcaption={},
+                                rightshortcaption={},
+                                spacing={\hfill},
+                                topspace={}
+                              }
+    %User provided values:
+    \setkeys[FigTools]{TwoFig}{#1}
+    \def\efigure{\begin{figure}}%
+    \expandafter\efigure\expandafter[\FtPos]
+      \FtTopSpace
+      %Check on which side whe are (right or left)
+      \checkoddpage
+      \edef\side{\ifoddpage l\else r\fi}
+      %Ensure there will be no overfull box message
+      \makebox[\textwidth][\side]{% 
+        \begin{minipage}{\fullwidth}
+          \centering
+					\subFloatCorrCaps{\FtLeftCaption}
+			                     {\FtLeftShortCaption}
+			                     {\FtLeftLabel}
+			                     {\FtLeftOpt}
+			                     {#2}
+			    \FtSpacing
+					\subFloatCorrCaps{\FtRightCaption}
+			                     {\FtRightShortCaption}
+			                     {\FtRightLabel}
+			                     {\FtRightOpt}
+			                     {#3}
+          \caption[\FtMainShortCaption]{\FtMainCaption}
+          \label{\FtMainLabel}
+        \end{minipage}
+      }
+    \end{figure}
+  \endgroup
+}
+
+
+
+\newcommand{\bigtriplefigure}[4][]{%
+  \begingroup
+    %Default values:
+    \setkeys[FigTools]{ThreeFig}{ pos=!htp,
+	                                mainlabel={fig:#2-#3},
+	                                maincaption={#2-#3},
+	                                mainshortcaption={},%
+	                                leftopt={},%0.45\textwidth,
+	                                leftlabel={fig:#2-left},
+	                                leftcaption={},
+	                                leftshortcaption={},%
+	                                midopt={},%0.45\textwidth,
+	                                midlabel={fig:#3-mid},
+	                                midcaption={},
+	                                midshortcaption={},%
+	                                rightopt={},%0.45\textwidth,
+	                                rightlabel={fig:#4-right},
+	                                rightcaption={},
+	                                rightshortcaption={},
+	                                spacing={\hfill},
+	                                spacingtwo={}
+	                              }
+    %User provided values:
+    \setkeys[FigTools]{ThreeFig}{#1}
+    \def\efigure{\begin{figure}}%
+    \expandafter\efigure\expandafter[\FtPos]
+      %Check on which side whe are (right or left)
+      \checkoddpage
+      \edef\side{\ifoddpage l\else r\fi}
+      %Ensure there will be no overfull box message
+      \makebox[\textwidth][\side]{% 
+        \begin{minipage}{\fullwidth}
+          \centering
+					\subFloatCorrCaps{\FtLeftCaption}
+			                     {\FtLeftShortCaption}
+			                     {\FtLeftLabel}
+			                     {\FtLeftOpt}
+			                     {#2}
+			    \FtSpacing
+					\subFloatCorrCaps{\FtMidCaption}
+			                     {\FtMidShortCaption}
+			                     {\FtMidLabel}
+			                     {\FtMidOpt}
+			                     {#3}
+			    \FtSpacing
+			    \FtSpacingTwo
+					\subFloatCorrCaps{\FtRightCaption}
+			                     {\FtRightShortCaption}
+			                     {\FtRightLabel}
+			                     {\FtRightOpt}
+			                     {#4}
+          \caption[\FtMainShortCaption]{\FtMainCaption}
+          \label{\FtMainLabel}
+        \end{minipage}
+      }
+    \end{figure}
+  \endgroup
+}
+
+\newcommand{\normplot}[3][]{%
+  \normfloatinternal[#1]{#2}{#3}{plot}
+}
+
+\newcommand{\normfigure}[3][]{%
+  \normfloatinternal[#1]{#2}{#3}{graph}
+}
+
+
+\newcommand{\normfloatinternal}[4][]{%
+  \begingroup
+    \setkeys[FigTools]{OneFig}{ pos=!htp,
+                                label={fig:#2},
+                                shortcaption={#3},
+                                opt={}%{width=0.95\textwidth}
+                              }
+    \setkeys[FigTools]{OneFig}{#1}
+    \def\efigure{\begin{figure}}%
+    \expandafter\efigure\expandafter[\FtPos]
+      \centering
+      \ifthenelse{\equal{#4}{plot}}
+      {
+        \input{\evalDir{#2}}
+      }{
+      	\expandafter\includegraphics\expandafter[\FtOpt]{#2}
+      }
+      \caption[\FtShortCaption]{#3}
+      \label{\FtLabel}
+    \end{figure}
+  \endgroup
+}
+
+\newcommand{\normdoublefigure}[3][]{%
+  \begingroup
+    %Default values:
+    \setkeys[FigTools]{TwoFig}{ pos=!htp,
+                                mainlabel={fig:#2-#3},
+                                maincaption={},
+                                mainshortcaption={},%
+                                leftopt={},%width=0.45\textwidth},
+                                leftlabel={fig:#2-left},
+                                leftcaption={},
+                                leftshortcaption={},%
+                                rightopt={},%width=0.45\textwidth},
+                                rightlabel={fig:#3-right},
+                                rightcaption={},
+                                rightshortcaption={},
+                                spacing={\hfill}
+                              }
+    %User provided values:
+    \setkeys[FigTools]{TwoFig}{#1}
+    \def\efigure{\begin{figure}}%
+    \expandafter\efigure\expandafter[\FtPos]
+      \centering
+			\subFloatCorrCaps{\FtLeftCaption}
+	                     {\FtLeftShortCaption}
+	                     {\FtLeftLabel}
+	                     {\FtLeftOpt}
+	                     {#2}
+			\FtSpacing
+			\subFloatCorrCaps{\FtRightCaption}
+	                     {\FtRightShortCaption}
+	                     {\FtRightLabel}
+	                     {\FtRightOpt}
+	                     {#3}
+      \caption[\FtMainShortCaption]{\FtMainCaption}
+      \label{\FtMainLabel}
+    \end{figure}
+  \endgroup
+}
+
+
+
+\newcommand{\normtriplefigure}[4][]{%
+  \begingroup
+    %Default values:
+    \setkeys[FigTools]{ThreeFig}{ pos=!htp,
+	                                mainlabel={fig:#2-#3},
+	                                maincaption={},
+	                                mainshortcaption={},%
+	                                leftopt={},%width=0.45\textwidth},
+	                                leftlabel={fig:#2-left},
+	                                leftcaption={},
+	                                leftshortcaption={},%
+	                                midopt={},%width=0.45\textwidth},
+	                                midlabel={fig:#3-mid},
+	                                midcaption={},
+	                                midshortcaption={},%
+	                                rightopt={},%width=0.45\textwidth},
+	                                rightlabel={fig:#4-right},
+	                                rightcaption={},
+	                                rightshortcaption={},
+	                                spacing={\hfill},
+	                                spacingtwo={}
+	                              }
+    %User provided values:
+    \setkeys[FigTools]{ThreeFig}{#1}
+    \def\efigure{\begin{figure}}%
+    \expandafter\efigure\expandafter[\FtPos]
+      \centering
+			\subFloatCorrCaps{\FtLeftCaption}
+	                     {\FtLeftShortCaption}
+	                     {\FtLeftLabel}
+	                     {\FtLeftOpt}
+	                     {#2}
+			\FtSpacing
+			\subFloatCorrCaps{\FtMidCaption}
+	                     {\FtMidShortCaption}
+	                     {\FtMidLabel}
+	                     {\FtMidOpt}
+	                     {#3}
+			\FtSpacing
+			\FtSpacingTwo
+			\subFloatCorrCaps{\FtRightCaption}
+	                     {\FtRightShortCaption}
+	                     {\FtRightLabel}
+	                     {\FtRightOpt}
+	                     {#4}
+      \caption[\FtMainShortCaption]{\FtMainCaption}
+      \label{\FtMainLabel}
+    \end{figure}
+  \endgroup
+}

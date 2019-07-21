@@ -1,0 +1,484 @@
+
+
+%************************************************
+\chapter{Related work}\label{chp:related}
+%************************************************
+
+\quotegraffito{Bernard of Chartres used to say that we are like dwarfs on the shoulders of giants, so that we can see more than they, and things at a greater distance, not by virtue of any sharpness of sight on our part, or any physical distinction, but because we are carried high and raised up by their giant size.}
+{John of Salisbury}
+%
+In addition to the initial, general considerations given in \autoref{sec:intro:related-research-topics} this section treats works from two related research fields.
+
+The first is \emph{visualization of vector fields}. Some works of this field utilize clustering to reduce the information contained within large vector fields. Therefore, the overlap with this thesis is in the \emph{computation result}, \ie, finding clusters in vector fields.
+
+The second is \emph{medical image processing}, in particular work on interpreting and visualizing scans of fibrous organic structures. Some of the approaches involve \emph{streamline clustering}. The association with this thesis is therefore in the \emph{method}, \ie, finding and bundling similar streamlines.
+
+This chapter will now discuss important work from both of these fields, starting with \emph{vector field visualization}.
+
+
+%===================================================================================
+\section{Related work from vector field visualization}
+\label{sec:related:vector_field_vis}
+
+Visualizing vector fields for human interpretation is difficult for two main reasons:
+\begin{enumerate}
+  \item It usually involves large amounts of partially redundant data.
+  \item It is initially unclear which aspects of the data are important to the user.
+\end{enumerate}
+
+The former mainly makes the task more difficult, where the latter motivated the development of many different strategies for vector field visualization. Some of these strategies contain vector field clustering as a preprocessing step, others use it directly for visualization. This section describes the most promising candidates for flow graph generation in the context of this work.
+
+
+%===================================================================================
+\subsection{Vector field hierarchies}
+
+\cauthor{Heckel} introduce a method for vector field clustering using a region splitting approach~\cite{Heckel}. Starting with the whole dataset, they create a \ac{BSP}-tree by recursively splitting the vector field using planes (\autoref{fig:related:heckel-splitplane}). Their algorithm uses the grid points only, without taking connectivity information into account.
+The problem of irregular or disconnected clusters -- which is often an issue when neglecting connectivity information (see \autoref{fig:intro:cluster-problem}) -- is mitigated, because the resulting regions are obviously always convex and connected. The hierarchical \ac{BSP}-tree representation has many advantages in visualization, especially for adaptive \ac{LOD} calculations and visualizations.
+%
+\normdoublefigure[pos=tbhp,
+                  mainlabel={fig:related:heckel},
+                  maincaption={Visualization of the main ideas of Heckel~\etal (Images taken from \cauthor{Heckel}~\cite{Heckel}. The font of the labels was adapted.)},
+                  mainshortcaption={Illustration of a splitting plane.},%
+                  %leftopt={},
+                  leftlabel={fig:related:heckel-splitplane},
+                  leftcaption={\twod-example of a cluster and one desirable splitting plane.},
+                  leftshortcaption={},%
+                  %rightopt={},
+                  rightlabel={fig:related:heckel-streamline-error},
+                  rightcaption={The streamline based error measure for point $\vec{x}$ is the summation of the individual point pair distances.},
+                  rightshortcaption={},
+                  %spacing={}
+                 ]
+{rel-heckel-splitplane}{rel-heckel-streamline-error}
+
+The flow of each region at each level is described by one average position and vector. These are created by averaging over all original positions and vectors of the grid points within that region. The vector field at each level is continuously interpolated from these points using \cauthor{Hardy}'s multiquadric method~\cite{Hardy}.
+
+In order to find splits, they define a visualization driven error measure which is based on streamlines. To find the approximation error of a given point $\vec{x}$, a streamline is traced starting from this point in both the original and the simplified field. They define the error of this particular point by the deviation of the two streamlines, which are described by their points $\vec{s_i}$ and $\vec{s_i'}$ (see \autoref{fig:related:heckel-streamline-error}):
+%
+\begin{equation}
+	\epsilon(\vec{x}) = \sum_{i=1}^{n}{\left\| \vec{s_i} - \vec{s_i'} \right\|}.
+\end{equation}
+%
+The error of a whole cluster $\mathcal C$ is then defined as maximum of the individual errors of its points:
+%
+\begin{equation}
+	\epsilon(\mathcal C) = \max_{\vec{x}\in\mathcal C}{\epsilon(\vec{x})}.
+\end{equation}
+%
+The position and orientation of the splitting plane $P$ for a cluster $\mathcal C$ is derived as best fitting plane to all points of the cluster, where points with low error are weighted higher. The algorithm is as follows:
+%
+\begin{enumerate}
+	\item Compute the weights of each point inversely proportional to their errors:
+%
+	\begin{equation}
+		w(\vec{x_i}) = \frac{1}{W \epsilon(\vec{x_i})},
+		\quad \text{were} \quad
+		W = \sum_{x_j\in\mathcal C}{\epsilon(\vec{x_j})^{-1},
+		\; \epsilon(\vec{x_j}) \neq 0.}
+	\end{equation}
+%
+	\item The splitting plane goes through the weighted average point $\overline{\vec{x}}$ of the cluster:
+%
+		\begin{equation}
+			\overline{\vec{x}} = \frac{1}{k} \sum_{\vec{x_i}\in\mathcal C} 
+			                     {w_i(\vec{x_i}) \cdot \vec{x_i}}.
+		\end{equation}
+%
+  \item The orientation of the splitting plane is (quoting) \emph{``the best-fit
+plane, in the least squares sense, to the set of weighted points}
+%
+    \begin{equation}
+      \left\{w_i(\vec{x_i}) \cdot \vec{x_i} \; \mid \; 
+      \vec{x_i} \in \mathcal C\right\}.\text{''}
+    \end{equation}
+%
+\end{enumerate}
+
+The algorithm for building the \ac{BSP}-tree is now simply to iteratively split the worst current cluster (\ie, the one with highest $\epsilon(\mathcal C)$) with the uniquely defined plane $P$ for this cluster until a global error threshold or a given number of clusters is reached.
+
+\cauthor{Heckel}'s method has several problems in the application area of this work.
+The main problem is that it cannot guarantee connected clusters for complex dataset boundaries as described in \autoref{fig:intro:cluster-problem-part}, \ie, it potentially clusters over mesh boundaries.
+In addition the described visualization driven, streamline based error measure might not lead to a good partition from a physical point of view. This could be circumvented by using a ``physical'' error measure. However, finding good error or distance measures is problematic as described in \autoref{sec:intro:appl-cluster}.
+Lastly, the algorithms decisions (\ie, splits) are both \emph{local} and \emph{greedy}, and are not expected to lead to globally optimal results.
+
+Overall, the approach solves the problem of scattered clusters and finding a distance measure elegantly. In addition it allows fine control over the number of clusters and the associated approximation error. It therefore applies well to the vector field visualization problem, but is not a first candidate for deriving flow graphs.
+
+
+
+%===================================================================================
+\subsection{\texorpdfstring{\kMeans clustering}{k-means clustering}}
+\label{sec:related:kMeans}
+
+A non-local and frequently utilized standard clustering algorithm is \emph{\kMeans.} It is attributed to \cauthor{Lloyd}, who introduced the idea in a signal processing paper in 1957 (published 1982)~\cite{Lloyd}. The algorithm is hence often referred to as \emph{\cauthor{Lloyd}'s algorithm}.
+The term \emph{\kMeans} and a description from a clustering perspective can be found in~\cite{MacQueen}.
+
+The basic algorithm works as follows:
+Given $n$ points or vectors $\mathcal P=\vec{p_0},\dots,\vec{p_{n-1}}$, each with $m$ dimensions, a distance function between two points $d(\vec{p_i}, \vec{p_j})$ and the number of desired clusters $u$,
+%
+\begin{enumerate}
+%
+	\item select $u$ starting points (\emph{seeds}) randomly from $\mathcal P$ as initial cluster centers $\mathcal C^0=\vec{c_{0}^0},\dots,\vec{c_{u-1}^0}$ (\emph{initialization}),
+%
+	\item assign each point $\vec{p_i}$ in $\mathcal P$ to its closest cluster center $\vec{c_j^k}$ in $\mathcal C^k$, according to distance function $d(\vec{p_i}, \vec{c_j^k})$ (\emph{assignment step}),
+%
+	\item compute the new cluster centers $\vec{c_j^{k+1}}$ in $\mathcal C^{k+1}$ as the mean of all points assigned to $\vec{c_j^k}$ (\emph{update step}),
+%
+	\item if any stopping criterion is met, exit, otherwise go to step 2 with $\mathcal C^{k+1}$ (\emph{iteration}).
+%
+\end{enumerate}
+%
+The usual stopping criterion is the minimal total change of the cluster centers, \eg, $\sum_{j=0}^{m-1}{\|\vec{c_j^k} - \vec{c_j^{k+1}}\|}$. Another possible criterion is the maximum number of iterations $k_{\text{max}}$.
+
+The algorithm aims to find the optimal $k$-partition of the points $\mathcal P$, \ie, the partition which minimizes $\sum_{i=0}^{n-1}{d(\vec{p_i}, \vec{c}(\vec{p_i}))}$, where $\vec{c}(\vec{p_i})$ is the cluster center $\vec{p_i}$ is assigned to.
+
+Finding the globally optimal partition for the Euclidean distance function is \ac{NP-hard} for all non-trivial configurations ($u \geq 2$ or $m > 2$)~\cite{Aloise, Mahajan}. The \kMeans algorithm is therefore only a heuristic and may lead to local minima, depending on the initial seeds. For small instances of the problem, this is usually mitigated by repeating the algorithm several times with different initial seeds.
+
+The problem sizes of underhood flow vector fields do not allow repeated application of the algorithm on current computers. In addition \kMeans suffers of the typical problem of purely point based algorithms when applied to vector field clustering: scattered or even disconnected clusters.
+
+
+
+%===================================================================================
+\subsection{Centroidal Voronoi tessellation} 
+\label{sec:related:CVT}
+One sophisticated point based \kMeans algorithm for vector field visualization and segmentation was devised by \cauthor{DuWang}~\cite{DuWang}. They introduce \ac{CVT} and show that their \kMeans algorithm produces such tessellations.
+
+\graffito{A tessellation (term from geometry) for continuous spaces is what a partition (term from set theory) is for sets. For our cause they are the same.} A tessellation of a set $\Omega \subseteq \Reals^n$ consists of regions $\left\{V_i\right\}_{i=1}^k$ which are gap free and non-overlapping.
+
+A \emph{Voronoi tessellation} or \emph{Voronoi diagram} of $\Omega$ consists of the regions $\{\widehat{V_i}\}{}_{i=1}^k$. It is defined by a set of points $\left\{\vec{z_i}\right\}_{i=1}^k \in \Reals^n$ which are termed \emph{generators} and a distance function $d_x$.
+The Voronoi region for each point $\vec{z_i}$ is then defined as the union of all points that are closer to $\vec{z_i}$ than to any other point in $\left\{\vec{z_i}\right\}_{i=1}^k$ according to the distance function $d_x$ (possibly one-sided):
+%
+\begin{equation}
+  \widehat{V_i} = \left\{\vec{x} \in \Omega \mid d_x(\vec{x}, \vec{z_i}) < 
+                  d_x(\vec{x}, \vec{z_j}) 
+                  \quad \text{for} \quad j=1,\cdots,k, \; j \neq i\right\}.
+\end{equation}
+%
+A \emph{\acl{CVT}} is a Voronoi tessellation where the generators $\{\vec{z_i}\}_{i=1}^k$ are also the \emph{mass centroids} of their clusters. The mass centroids or mass centers $\vec{z^*}$ are the minimizers of the energy defined by the sum of squared distances between all points and their respective generators:
+%
+\begin{equation}
+  E(\vec{z},V) = \int_V{d_x^2(\vec{x},\vec{y})\,dx}.
+\end{equation}
+%
+\cauthor{DuWang} also define a \emph{total energy} as the sum of the energies of all regions. After initialization with $n$ randomly selected points, their algorithm tries to optimize this total energy by alternating updates of the cluster centers and the cluster regions (\kMeans).
+
+For distance computations they define a one-sided distance measure $d_p$ from a cluster point $p=(\vec{x_p}, \vec{v_p})$ with position $\vec{x_p}$ and velocity $\vec{v_p}$ to a center point $m=(\vec{x_m}, \vec{v_m})$ with position $\vec{x_m}$ and velocity $\vec{v_m}$:\footnote{Some symbols adjusted to increase clarity.}
+%
+\quotegraffito{Measure what is measurable, and make measurable what is not so.}
+{Galileo Galilei}
+%
+\begin{equation}
+\label{eqn:related:CVT-distance}
+	d_p(p,m) = \sqrt{\|\vec{v_p}\|^2 - \|\vec{v_p}\|\vec{v_p}\cdot\vec{v_m} 
+	           + w \|\vec{v_p}\|^2 \|\vec{x_p} - \vec{x_m}\|^2}.
+\end{equation} 
+%
+The paper features an appendix explaining the reasoning behind this choice. Basically their distance measure contains three parts:
+%
+\begin{enumerate}
+  \item the magnitude of the vector ($\|\vec{v_p}\|^2$),
+  \item a term for angular similarity ($\|\vec{v_p}\|\vec{v_p}\cdot\vec{v_m}$, where $\cdot$ is the scalar product), and 
+  \item a weighted term for spatial proximity ($w \|\vec{v_p}\|^2 \|\vec{x_p} - \vec{x_m}\|^2$).
+\end{enumerate}  
+
+The weight parameter $w$ encodes the relative importance of spatial proximity. Low values of $w$ emphasize flow similarity whereas high values emphasize closeness of points. The authors suggest choosing $w \approx \frac{1}{L^2}$, where $L$ is the spatial diameter of the dataset. \autoref{fig:related:duwang} shows a simple \twod vector field and its tessellation with two different spatial weights.\footnote{The velocity magnitudes are not given, but, judging from the weights, they are similar to the spatial magnitudes.}
+
+The authors include several refinements for their method, including update rules for non-uniformly distributed sample points. The paper closes with visualization applications which are of little interest in the context of this thesis.
+
+\normtriplefigure[pos=tbhp,
+									mainlabel={fig:related:duwang},
+			            maincaption={Example for a \ac{CVT} of a \twod vector field. The vector field is shown at the left, with magnitude proportional to arrow length. In addition two clusterings with $w=0.5$ and $w=0.1$ are shown in the middle and on the left respectively. (Original image in \cauthor{Cohen-Steiner}~\cite{Cohen-Steiner}. The vector field (left) was simplified. The clusterings (middle, right) are depicted without color.)},
+			            mainshortcaption={\acl{CVT}.},%
+			            leftopt={},%width=0.45\textwidth},
+			            %leftlabel={fig:#2-left},
+			            leftcaption={\twod input vector field.},
+			            %leftshortcaption={},%
+			            midopt={},%width=0.45\textwidth},
+			            %midlabel={fig:#2-left},
+			            midcaption={\acs{CVT} clustering with $w=0.5$.},
+			            %midshortcaption={},%
+			            rightopt={},%width=0.45\textwidth},
+			            %rightlabel={fig:#3-right},
+			            rightcaption={\acs{CVT} clustering with $w=0.1$.}
+			            %rightshortcaption={}
+			           ]
+{rel-duwang-clust-arrows}
+{rel-duwang-clust-regions}
+{rel-duwang-clust-regions-curved}
+
+One problem with this approach is the required computational effort for huge datasets. In the standard implementation, each of $n$ points needs to be compared to each of $u$ cluster centers for each of $t$ iterations. The required computational effort is therefore $O(n \cdot u \cdot t)$.
+Another problem is again the possible occurrence of irregular or disconnected clusters of both types depicted in \autoref{fig:intro:cluster-problem}. %Nevertheless, the method was implemented for comparison purposes and will be treated again in the results chapter (\autoref{chp:results}).
+
+
+
+%===================================================================================
+\subsection{Variational clustering}
+\label{sec:related:McKenzie}
+One promising approach to solve the problem of disconnected clusters is the paper on \emph{Variational clustering} by \cauthor{McKenzie}~\cite{McKenzie}. Their work builds on renowned work from \cauthor{Cohen-Steiner} who introduced \emph{variational shape approximation} for mesh simplification~\cite{Cohen-Steiner}. Therefore \cauthor{Cohen-Steiner}'s work will be presented briefly now, followed by \cauthor{McKenzie}'s work.
+
+
+%===================================================================================
+\subsubsection{Variational shape approximation}
+
+\cauthor{Cohen-Steiner} cast shape approximation as \emph{variational partitioning} problem~\cite{Cohen-Steiner}. Their ultimate goal is to approximate a \threed surface mesh by a predetermined number of flat surfaces which are represented by \emph{proxies}. Starting with an $\mathcal{L^{1,2}}$~distortion metric, they introduce a global distortion measure to describe the deviation of the original shape from the proxies.
+
+Based on this measure, an algorithm similar to \kMeans is applied, \ie, the alternating application of an assignment step and an update step. Their problem (clustering surface tiles) is similar to the vector field clustering problem, as it also contains connectivity information and it is also undesirable to have disconnected clusters.
+
+Their solution for keeping clusters connected is very elegant. Instead of defining an error measure that contains a strong spatial component, they use a \emph{flooding approach}. By utilizing region growing from seed tiles according to a distortion measure they ensure connected regions. For each resulting region of surface tiles they compute the exact mean (the \emph{proxy}). The most similar tiles to these proxies are then the seed tiles for the next flooding iteration.\footnote{The exact distortion measures and mean computation formulas are interesting, but irrelevant for this work.}
+\autoref{fig:related:cohensteiner} illustrates the approach.%illustrates the result of the final assignment and update steps as well as the final result.
+
+\normtriplefigure[pos=tbhp,
+                  mainlabel={fig:related:cohensteiner},
+                  maincaption={Initial mesh partition obtained by flooding (left), proxies for the partitions' regions presented as ellipses (middle), and final simplified mesh (right). (Image taken from \cauthor{Cohen-Steiner}~\cite{Cohen-Steiner}.)},
+                  mainshortcaption={Variational shape approximation results.},%
+                  %leftopt={},%width=0.45\textwidth},
+                  %leftlabel={fig:#2-left},
+                  %leftcaption={},
+                  %leftshortcaption={},%
+                  %midopt={},%width=0.45\textwidth},
+                  %midlabel={fig:#3-mid},
+                  %midcaption={},
+                  %midshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  %rightlabel={fig:#4-right},
+                  %rightcaption={},
+                  %rightshortcaption={},
+                  %spacing={\hspace{0.5cm}}
+	                ]
+{rel-cohensteiner-left}
+{rel-cohensteiner-mid}
+{rel-cohensteiner-right}
+
+One drawback of the flooding approach is that small clusters can be trapped in a local minimum between larger clusters, without any possibility to ``escape'' into areas where they could be more useful. \cauthor{Cohen-Steiner} mitigate this problem by applying \emph{region teleportation}, which uses a heuristic for finding trapped regions and moving them to useful areas.
+
+Their algorithm behaves similar to \kMeans, but produces co\-n\-nec\-t\-ed clusters (regions). It requires only one parameter -- the number of clusters -- and produces very good results in shape approximation.
+
+%===================================================================================
+\subsubsection{Adaptations for variational clustering}
+
+\cauthor{McKenzie} adapt the approach of \cauthor{Cohen-Steiner} to vector fields. Instead of \twod surface regions, their algorithm applies to \threed regions in space~\cite{McKenzie}.\footnote{\cauthor{McKenzie} treat mainly \twod vector fields in their paper, this summary concentrates on the \threed aspects and applications.} Surface elements, like triangles, are replaced by volume elements, like tetrahedrons. The \emph{proxy} of  each region is simply defined by a velocity vector $\vec{V_i}$ and its position $\vec{x_i}$.
+
+The first distortion measure introduced in the paper is \emph{position independent}, \ie, it only uses velocity information. The distortion error of a region $\mathcal{R}_i$ is defined as the integral over the squared $\mathcal{L}^2$-distances between velocities $\vec{v}(\vec{x})$ at point $\vec{x}$ and the proxy $\vec{V}_i$:
+%
+\begin{equation}
+  \label{eqn:related:McKenzieErrorInt}
+  E_{\mathcal{L}^2}\left(\mathcal{R}_i, \vec{V_i}\right) = 
+    \iiint\limits_{\vec{x}\in\mathcal{R}_i}{\left\|\vec{v}(\vec{x}) - 
+    \vec{V_i}\right\|^2 d\vec{x}}.
+\end{equation}
+%
+In the discrete mesh, a region $\mathcal{R}_i$ consists of cells $i$ with discrete velocities $\vec{v_i}$ and volumes $|P_i|$. Then the distortion error for one region is
+%
+\begin{equation}
+  E_{\mathcal{L}^2}\left(\mathcal{R}_i, \vec{V_i}\right) = 
+    \sum\limits_{i\in\mathcal{R}_i} {\left\|\vec{v_i} - \vec{V_i}\right\|^2 |P_i|},
+  \label{eqn:related:McKenzieErrorSum}
+\end{equation}
+%
+where the optimal vector proxy for a region is the volume weighted mean of its velocities
+%
+\begin{equation}
+  \vec{V_i} = \frac{\sum\limits_{i\in\mathcal{R}_i}{|P_i|\vec{v_i}}} 
+              {\sum\limits_{i\in\mathcal{R}_i}{|P_i|}}.
+  \label{eqn:related:McKenzieAverage}
+\end{equation}
+%
+The global error of any partition with $k$ regions is then defined as the summed distortion errors of all regions ($E(\mathcal{R}, \mathcal{V})=\sum_{i=1}^k {E(\mathcal{R}_i,\mathcal{V}_i}$).
+
+\cauthor{McKenzie} report, that this simple distortion error produces ``physically relevant partitions''. In addition they introduce higher order measures which are based on divergence, gradient, and curl. These higher order measures satisfy specific visualization purposes.
+
+After defining how to measure the distortion and how to compute average proxies from regions, the algorithmic framework of \cauthor{Cohen-Steiner} can be applied without adaptation. At first, $k$ random seed cells are picked and their velocities are used as proxies for the flooding stage. Afterwards, the average proxy for each region is recomputed. From every region, the cell with the least distortion from the region's proxy is chosen as new seed cell, and the iteration starts again. 
+
+Several stopping criteria can be applied, most importantly the maximum number of iterations and the minimal change of global distortion. The authors also mention that the application of \emph{region teleportation} similar to \cauthor{Cohen-Steiner} improves the results, but they do not detail their heuristics.
+The paper is closed by visualization techniques based on streamline tracing from the cluster centers.
+
+\autoref{fig:related:mckenzie} shows the clustering result of the algorithm on a \threed car dataset. Notice that the flow field concentrates on the vehicle cabin and the vehicle vicinity and is different from an underhood flow field in both resolution and the regions of interest.
+
+\normdoublefigure[pos=tbhp,
+                  mainlabel={fig:related:mckenzie},
+                  maincaption={\threed clustering result of the flow field ``in the wake of a moving automobile, \num{1.25} million tetrahedra'' into 200 clusters  at the left. Exploded view of the same dataset at the right. (Image taken from \cauthor{McKenzie}~\cite{McKenzie}. Additional visualization images omitted.)},
+                  mainshortcaption={Illustration of \threed variational clustering.},%
+                  %leftopt={},
+                  %leftlabel={},
+                  %leftcaption={},
+                  %leftshortcaption={},%
+                  %rightopt={},
+                  %rightlabel={},
+                  %rightcaption={},
+                  %rightshortcaption={},
+                  %spacing={}
+                 ]
+{rel-mckenzie-left}
+{rel-mckenzie-right}
+
+By design, the described algorithm always produces connected regions. Its results are expected to be ``close to optimal'', even if the optimality proofs of \kMeans cannot be applied directly. The only input parameters are the number of clusters ($u$) and the stopping criterion, \ie, the number of iterations ($t$) or some total error threshold $\epsilon$.
+
+\cauthor{McKenzie} themselves do not state the required	 computational effort, their largest \threed dataset is the car dataset shown in \autoref{fig:related:mckenzie} and has \num{1.25} million cells~\cite{McKenzie}. For the underhood flow application however, the computational effort is a major concern, as the number of cells $n$ is very high. The required effort is $O(n \cdot u \cdot t)$. For \num{9.1} million cells, \num{1000} clusters and \num{20} iterations this leads do \num{182} billion distance computations.
+
+Notice, that the simple $\mathcal{L}^2$-distance measure given in \autoref{eqn:related:McKenzieErrorInt} does not incorporate spatial information and only produces compact regions under the assumption that cells with similar velocity lie compact. This might not be the case for the complicated underhood flow dataset and can lead to complex clusters.
+
+Nevertheless, the algorithm is simple and powerful and a first candidate for implementation and comparison. It will therefore be evaluated in the results section (\autoref{chp:results}). The two major concerns of the algorithm, namely computational effort and the possibility of complex clusters will also be analyzed and discussed.
+
+
+%===================================================================================
+\section{Related work from medical image processing}
+\label{sec:related:medical}
+
+Similar to vector flow visualization, the visualization of medical diffusion data poses problems because of data redundancy and finding representations suitable for human interpretation. Although the field is not directly related to vector field clustering, some of the methods involve streamline clustering and are therefore interesting for this thesis.
+
+
+%===================================================================================
+\subsection{Introduction to diffusion tensor imaging}
+
+\emph{\ac{MRI}} is a widely used non-invasive \threed imaging method in radiology. \emph{Diffusion \ac{MRI}} is a specialized form of \ac{MRI} which produces a regular \threed grid with one scalar diffusion value per voxel. 
+\graffito{A vector can be seen as tensor of rank \num{1}.}
+\graffito{While the mental model for a \threed vectors field is a cloud of arrows, one can think of \threed tensor fields as a cloud of ellipsoids.}
+The results are sufficient for analyzing isotropic regions of tissue. To completely capture areas with anisotropic diffusion, one $3\times3$ matrix, the \emph{diffusion tensor}, per voxel is required. A diffusion tensor encodes the diffusion rates into all directions. The method to acquire data of this type is called \ac{DTI}. It combines several diffusion weighted images along several gradient directions. As diffusion tensors are symmetric, at least \num{6} of these images are required, in addition to one reference image without diffusion weighting~\cite{DTI}.
+
+
+%===================================================================================
+\subsection{Diffusion tensor imaging tractography}
+
+Fibrous structures are characterized by high diffusion in fiber direction compared to lower diffusion in the other directions, which is restricted by physical or chemical barriers. Therefore, general directions of fibrous structures like muscles in the body or axons in the brain can be derived from \ac{DTI} scans.
+
+This has proven particularly useful for determining the connectivity of white brain matter. The resulting directions allow tracing streamlines in a similar way as in vector fields. In this domain streamlines are also called \emph{fibers}, referring to their biological meaning. The streamlines trace the direction of neural axons and therefore the connectivity within the brain. However, traced streamlines do not directly represent neural axons, because the dimensions of axon structures %(up to a few \si{\micro\meter}), from wikipedia, omitted 
+are magnitudes below the resolution of \ac{DTI}, which is a few \si{{\cubic{\milli\meter}}}~\cite{DTI} per voxel. 
+Instead they represent general axon directions, capturing several axons going into similar directions~\cite{Schultz}.
+
+\emph{\ac{DTI} tractography} algorithms try to identify and extract the \emph{neural tracts} which connect different parts of the brain. A well researched method to achieve this is to generate the streamlines described above and cluster similar ones to bundles. It is therefore similar to the novel streamline bundling method proposed in this thesis.
+
+The introductory statements on streamline clustering are based on an excellent overview article by \cauthor{Schultz}~\cite{Schultz}.
+
+
+%===================================================================================
+\subsection{Distance measures for streamlines}
+
+The approaches for clustering similar streamlines in \ac{DTI} tractography are based on distance measures between two streamlines $F_i$ and $F_j$. The streamlines are represented by their points $\mathcal P_i = \{\vec{p_{(i,1)}}\dots \vec{p_{(i,n)}}\}$ and $\mathcal P_j = \{\vec{p_{(j,1)}}\dots \vec{p_{(j,m)}}\}$, respectively, which are implicitly connected by lines. Using this definition of discrete streamlines, two distance measures are commonly used: the \emph{mean distance} and the \emph{Hausdorff distance}.
+
+
+%===================================================================================
+\subsubsection{Mean distance of two streamlines}
+
+The \emph{mean distance} $d_\mu$ between the streamlines $F_i$ and $F_j$ is defined as~(\cite[notation adapted]{Schultz})
+%
+\begin{equation}
+  d_\mu(F_i, F_j) = d_\mu(F_j, F_i) = \frac{\overline{d_\mu}(F_i, F_j) + \overline{d_\mu}(F_j, F_i)}{2},
+\end{equation}
+%
+where the one sided distance $\overline{d_\mu}$ is defined as
+%
+\graffitonextline{This is the sum of distances from every point in $F_i$ to its closest neighbor in the other streamline.}
+\begin{equation}
+	\overline{d_{\mu}}(F_i, F_j) = \frac{
+	  \sum\limits_{\vec{p_{(i,k)}}\in \mathcal P_i}\left(
+	    \min\limits_{\vec{p_{(j,l)}}\in \mathcal P_j}{\|\vec{p_{(i,k)}} - \vec{p_{(j,l)}}\|}
+	  \right)}{|\mathcal P_i|}.
+\end{equation}
+
+
+The one sided distances are depicted in \autoref{fig:related:dti-dists-left} and \autoref{fig:related:dti-dists-mid}. Notice that the streamlines can consist of a different number of points and that the mean distance is symmetric.
+
+\bigtriplefigure[pos=tbhp,
+									mainlabel={fig:related:dti-dists},
+			            maincaption={Common distance measures in \acs{DTI} streamline clustering. The mean streamline distance $d_\mu(F_i, F_j)$ is the average of $\overline{d_\mu}(F_i, F_j)$~\subref{fig:related:dti-dists-left} and $\overline{d_\mu}(F_j, F_i)$~\subref{fig:related:dti-dists-mid}. The Hausdorff distance $d_H$ is the maximum of all closest distances, as shown in \subref{fig:related:dti-dists-right}. (Images based on \cauthor{Schultz}~\cite{Schultz}. Adapted color and added labels.)},
+			            mainshortcaption={Common streamline distance measures.},%
+			            leftopt={},%width=0.45\textwidth},
+			            leftlabel={fig:related:dti-dists-left},
+			            leftcaption={One sided streamline distance $\overline{d_\mu}(F_i, F_j)$.},
+			            %leftshortcaption={},%
+			            midopt={},%width=0.45\textwidth},
+			            midlabel={fig:related:dti-dists-mid},
+			            midcaption={One sided streamline distance $\overline{d_\mu}(F_j, F_i)$.},
+			            %midshortcaption={},%
+			            rightopt={},%width=0.45\textwidth},
+			            rightlabel={fig:related:dti-dists-right},
+			            rightcaption={Hausdorff distance $d_H$ (in this case $d_H=\widetilde{d}_H(F_i, F_j)$).},
+			            %spacingtwo={\hspace{3mm}}
+			            %rightshortcaption={}
+			           ]
+{rel-dti-dists-left}
+{rel-dti-dists-mid}
+{rel-dti-dists-right}
+
+
+%===================================================================================
+\subsubsection{Hausdorff distance of two streamlines}
+
+Another distance measure occasionally used is the \emph{Hausdorff distance} $d_H$, which is a ``worst case distance''. It takes the maximum of all the distances used for mean distance computation~\cite[notation adapted]{Schultz}:
+%
+\begin{equation}
+  d_H(F_i, F_j) = d_H(F_j, F_i) = \max\left(\widetilde{d}_H(F_i, F_j), \widetilde{d}_H(F_j, F_i)\right),
+\end{equation}
+%
+where the one sided Hausdorff distance is defined as
+%
+\begin{equation}
+  \widetilde{d}_H(F_i, F_j) = \max\limits_{\vec{p_{(i,k)}}\in \mathcal P_i} \left(\min\limits_{\vec{p_{(j,l)}}\in \mathcal P_j}{\|\vec{p_{(i,k)}} - \vec{p_{(j,l)}}\|}\right).
+\end{equation}
+
+
+\autoref{fig:related:dti-dists-right} shows the Hausdorff distance for two simple streamlines. The Hausdorff metric is also symmetric and allows different point counts for the streamlines.
+
+
+%===================================================================================
+\subsection{Streamline clustering approaches}
+
+Many streamline clustering methods based on these and similar distance measures have been proposed. For an extensive summary see the overview paper of \cauthor{Schultz}~\cite{Schultz}.
+As an example, the next section will discuss \cauthor{Corouge}'s work which also incorporates important ideas for this thesis.
+Afterwards, other approaches will be described in relation to \cauthor{Corouge}'s, and their applicability to this thesis will be discussed.
+
+
+%===================================================================================
+\subsubsection{\texorpdfstring{\protect\cauthor{Corouge}}{Corouge et.al.}'s clustering approach} 
+
+\cauthor{Corouge} use nearest neighbor clustering, where curves with distances below a given threshold are clustered together. Neighborhood is transitive in their method, \ie, a streamline is part of a cluster if it is close enough to any other streamline within this cluster. Their main distance function is the mean distance $d_\mu$. In addition they employ shape based metrics like length, center of mass and second order moments for clustering. They also suggest the usage of the Hausdorff distance to reject outliers.
+
+After clustering, they fit B-splines to the streamlines within a bundle starting from a common starting plane. The B-splines allow equidistant sampling of all streamlines in a bundle, therefore providing the framework for statistics on shape properties like curvature or vorticity. These statistics can be used for defining a bundle by its \emph{prototype} and the shape property statistics~\cite{Corouge}.
+
+Notice two aspects of \cauthor{Corouge}'s work, which will occur in this works approach later, even if in completely different form:
+%
+\begin{enumerate}
+	\item The notion of the prototype, as the main representative of bundles of streamlines.
+	\item The registration of points on streamlines to each other at similar points on the curve.
+\end{enumerate}
+
+
+%===================================================================================
+\subsubsection{Other clustering approaches}
+
+The fundamental differences of other works to \cauthor{Corouge}'s are mainly adaptations of the distance measure. These adaptations include 
+\begin{itemize}
+%
+  \item \cauthor{Ding}'s approach of computing distances of succeeding streamline points, except of closest streamline points~\cite{Ding},
+%
+  \item \cauthor{Brun}'s simplification of the Hausdorff distance by considering only streamline endpoints~\cite{Brun}, and
+%
+  \item \cauthor{Zhang}'s sophisticated adaptation of the mean distance $d_\mu$ by dropping distances below a \emph{minimum distance threshold} and utilizing the minimum\footnote{For example $\min(\overline{d_\mu}(F_i, F_j), \overline{d_\mu}(F_j, F_i))$.} and the maximum\footnote{For example $\max(\overline{d_\mu}(F_i, F_j), \overline{d_\mu}(F_j, F_i))$} of the one sided mean distances instead of their average.
+%
+\end{itemize}
+
+A clustering result example of \cauthor{Zhang} is shown in \autoref{fig:related:zhang-dti}. Notice that only whole streamlines are clustered together.
+
+\normfigure[pos=tbhp,
+            label={fig:related:zhang-dti},
+            shortcaption={\acs{DTI} fiber clustering result.},
+            %opt={}%{width=0.95\textwidth
+           ]
+{rel-zhang-dti}
+{Streamline clustering result of axon fiber traces in a human brain by \cauthor{Zhang} (Image taken from \cauthor{Zhang}~\cite{Zhang}.)}
+
+
+The usual streamline clustering algorithms in this field use the nearest neighbor scheme and its variants, but region splitting approaches have been introduced too~\cite{Brun, ODonnell}. To reduce the required $O(n^2)$ distance computations for $n$ streamlines, several adaptations have been suggested~\cite{Xia, Maddah, ODonnell}.
+
+
+The application of streamline-to-streamline distance measures and greedy hierarchical algorithms are successful in \ac{DTI} fiber clustering, because the goal is to find \emph{bundles of entire streamlines}.
+
+
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+
+
+
+

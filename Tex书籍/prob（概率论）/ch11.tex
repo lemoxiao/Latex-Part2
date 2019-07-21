@@ -1,0 +1,4248 @@
+% Modified on 1/13/05.
+\newdimen\snellbaselineskip
+\newdimen\snellskip
+\snellskip=1.5ex
+\snellbaselineskip=\baselineskip
+\def\srule{\omit\kern.5em\vrule\kern-.5em}
+\newbox\bigstrutbox
+\setbox\bigstrutbox=\hbox{\vrule height14.5pt depth9.5pt width0pt}
+\def\bigstrut{\relax\ifmmode\copy\bigstrutbox\else\unhcopy\bigstrutbox\fi}
+\def\middlehrule#1#2{\noalign{\kern-\snellbaselineskip\kern\snellskip}
+&\multispan#1\strut\hrulefill
+&\omit\hbox to.5em{\hrulefill}\vrule 
+height \snellskip\kern-.5em&\multispan#2\hrulefill\cr}
+
+\makeatletter
+\def\bordermatrix#1{\begingroup \m@th
+  \@tempdima 8.75\p@
+  \setbox\z@\vbox{%
+    \def\cr{\crcr\noalign{\kern2\p@\global\let\cr\endline}}%
+    \ialign{$##$\hfil\kern2\p@\kern\@tempdima&\thinspace\hfil$##$\hfil
+      &&\quad\hfil$##$\hfil\crcr
+      \omit\strut\hfil\crcr\noalign{\kern-\snellbaselineskip}%
+      #1\crcr\omit\strut\cr}}%
+  \setbox\tw@\vbox{\unvcopy\z@\global\setbox\@ne\lastbox}%
+  \setbox\tw@\hbox{\unhbox\@ne\unskip\global\setbox\@ne\lastbox}%
+  \setbox\tw@\hbox{$\kern\wd\@ne\kern-\@tempdima\left(\kern-\wd\@ne
+    \global\setbox\@ne\vbox{\box\@ne\kern2\p@}%
+    \vcenter{\kern-\ht\@ne\unvbox\z@\kern-\snellbaselineskip}\,\right)$}%
+  \null\;\vbox{\kern\ht\@ne\box\tw@}\endgroup}
+
+\makeatother
+
+
+
+%\setcounter{chapter}{9}
+
+\chapter{Markov Chains}\label{chp 11}  
+
+\section{Introduction}\label{sec 11.1}
+
+\par
+Most of our study of probability has dealt with independent trials processes. 
+These processes are the basis of classical probability theory and much of
+statistics.  We have discussed two of the principal theorems for these
+processes: the Law of Large Numbers and the Central Limit Theorem.
+\par
+We have seen that when a sequence of chance experiments forms an independent
+trials process, the possible outcomes for each experiment are the same and
+occur with the same probability.  Further, knowledge of the outcomes of the
+previous experiments does not influence our predictions for the outcomes of the
+next experiment.  The distribution for the outcomes of a single experiment is
+sufficient to construct a tree and a tree measure for a sequence of $n$
+experiments, and we can answer any probability question about these 
+experiments by using this tree measure.
+\par
+Modern probability theory studies chance processes for which the knowledge of
+previous outcomes influences predictions for future experiments.  In principle,
+when we observe a sequence of chance experiments, all of the past outcomes
+could influence our predictions for the next experiment.  For example, this
+should be the case in predicting a student's grades on a sequence of exams in a
+course.  But to allow this much generality would make it very difficult to
+prove general results.
+\par
+In 1907, A.~A. Markov began the study of an important new type of chance
+process.  In this process, the outcome of a given experiment can affect the
+outcome of the next experiment.  This type of process is called a Markov
+chain.
+\subsection*{Specifying a Markov Chain}\index{Markov chain}
+We  describe a Markov chain as follows:  We have a set of \emx {states,} $S =
+\{s_1,s_2,\ldots,s_r\}$.\index{state!of a Markov chain}  The process starts in
+one of 
+these states and moves successively from one state to another.  Each
+move is called a  \emx {step.}  If the chain is currently in state $s_i$, then
+it
+moves to state $s_j$ at the next step with a probability denoted by $p_{ij}$,
+and this
+probability does not depend upon which states the chain was in before the
+current state.
+\par
+The probabilities~$p_{ij}$ are called \emx {transition
+probabilities.}\index{transition
+probability}\index{probability!transition}  The process can remain in the state
+it is in,
+and this occurs with probability~$p_{ii}$.  An initial probability
+distribution, defined
+on~$S$, specifies the starting state.  Usually this is done by specifying a
+particular
+state as the starting state.
+
+R.~A. Howard\footnote{R.~A. Howard, \emx {Dynamic Probabilistic Systems,}
+vol.~1
+(New York: John Wiley and Sons, 1971).}\index{HOWARD, R. A.} provides us with a
+picturesque
+description of a Markov chain as a frog jumping on a set of lily pads. 
+The frog starts on one of the pads and then jumps from lily pad to lily
+pad with the appropriate transition probabilities.
+
+
+
+\begin{example}\label{exam 11.1.1}
+According to Kemeny, Snell, and Thompson,\footnote{J.~G. Kemeny, J.~L. Snell,
+G.~L. Thompson, \emx {Introduction to Finite Mathematics,} 3rd ed.\ (Englewood
+Cliffs, NJ: Prentice-Hall, 1974).}\index{KEMENY, J. G.}\index{SNELL, J.
+L.}\index{THOMPSON, G. L.} the Land of Oz\index{Oz, Land of} is blessed by many
+things, but
+not by good weather.  They never have two nice days in a row.  If they have a
+nice day,
+they are just as likely to have snow as rain the next day.  If they have snow
+or rain, they
+have an even chance of having the same the next day.  If there is change from
+snow or
+rain, only half of the time is this a change to a nice day.  With this
+information we form a
+Markov chain as follows.  We take as states the kinds of weather R, N, and S. 
+From the above information we determine the transition probabilities.  These are most
+conveniently represented
+in a square array as
+$$
+\mat {P} = \bordermatrix{
+        & \mbox {R} & \mbox {N} & \mbox {S} \cr
+\mbox {R} &     1/2 &     1/4 &     1/4 \cr
+\mbox {N} &     1/2 &       0 &     1/2 \cr
+\mbox {S} &     1/4 &     1/4 &     1/2}\ .
+$$
+\end{example}
+
+\subsection*{Transition Matrix}
+The entries in the first row of the matrix $\mat {P}$ in Example~\ref{exam
+11.1.1}
+represent  the probabilities for the various kinds of weather following a rainy
+day.
+Similarly, the entries in the second and third rows represent the probabilities
+for
+the various kinds of weather following nice and snowy days, respectively.
+Such a square array is called the \emx {matrix of transition
+probabilities}, or the  \emx {transition matrix}.\index{transition matrix}
+\par
+We consider the question of determining the probability that, given the chain
+is in
+state $i$ today, it will be in state $j$ two days from now.  We denote this
+probability by $p_{ij}^{(2)}$.  In Example~\ref{exam 11.1.1}, we see that if it
+is
+rainy today then the event that it is snowy two days from now is the disjoint
+union
+of the following three events: 1) it is rainy tomorrow and snowy two days from
+now,
+2) it is nice tomorrow and snowy two days from now, and 3) it is snowy tomorrow
+and
+snowy two days from now.  The probability of the first of these events is the
+product
+of the conditional probability that it is rainy tomorrow, given that it is
+rainy today,
+and the conditional probability that it is snowy two days from now, given that
+it is
+rainy tomorrow.  Using the transition matrix $\mat{P}$, we can write this
+product as
+$p_{11}p_{13}$.  The other two events also have probabilities that can be
+written as products
+of entries of $\mat{P}$.  Thus, we have
+$$p_{13}^{(2)} = p_{11}p_{13} + p_{12}p_{23} + p_{13}p_{33}\ .$$
+This equation should remind the reader of a dot product of two vectors; we are
+dotting the first
+row of $ \mat {P}$ with the third column of $ \mat {P}$.  This is just what is
+done in
+obtaining the $1,3$-entry of the product of $ \mat {P}$ with itself.  
+In general, if a Markov chain has $r$ states, then
+$$p_{ij}^{(2)} = \sum_{k = 1}^r p_{ik}p_{kj}\ .$$
+The following general theorem is easy to prove by using the above observation
+and
+induction.
+\begin{theorem}\label{thm 11.1.1}
+Let $ \mat {P}$ be the transition matrix of a Markov chain.  The $ij$th
+entry~$p_{ij}^{(n)}$ of the matrix~$ \mat {P}^n$ gives the
+probability that the Markov chain, starting in state~$s_i$, will be in
+state~$s_j$ after $n$ steps.
+\proof
+The proof of this theorem is left as an exercise (Exercise~\ref{exer 11.1.18}).
+\end{theorem}
+
+\begin{example}\label{exam 11.1.1.5} (Example~\ref{exam 11.1.1} continued)
+Consider again the weather in the Land of Oz.  We know that the powers of the
+transition matrix give us interesting information about the process as it
+evolves.  We shall be particularly interested in the state of the chain after a
+large number of steps.  The program {\bf MatrixPowers}\index{MatrixPowers (program)} computes
+the powers of~$\mat{P}$.
+\par
+We have run the program {\bf MatrixPowers} for the Land of Oz example
+to compute the successive powers of~$\mat{P}$ from 1~to~6. The results are
+shown 
+in Table~\ref{table 11.1}.  We note that after six days our weather predictions
+are, 
+to three-decimal-place accuracy, independent of today's weather.  The
+probabilities for the three 
+types of weather, R, N, and S, are .4, .2, and .4 no matter where the chain
+started.  This is an
+example of a type of Markov chain called a \emx {regular} Markov chain.  For
+this type of chain,
+it is true that long-range predictions are independent of the starting state. 
+Not all chains are
+regular, but this is an important class of chains that we shall study in detail
+later.
+\begin{table}
+\centering
+$$
+\mat{P}^1  = \bordermatrix{
+            &\mbox{Rain}&\mbox{Nice}&\mbox{Snow} \cr
+\mbox{Rain} & .500      & .250      & .250 \cr
+\mbox{Nice} & .500      & .000      & .500 \cr
+\mbox{Snow} & .250      & .250      & .500 \cr}
+$$
+$$  
+\mat {P}^2  = \bordermatrix{
+            &\mbox{Rain}&\mbox{Nice}&\mbox{Snow} \cr
+\mbox{Rain} & .438     & .188       & .375 \cr
+\mbox{Nice} & .375     & .250       & .375 \cr
+\mbox{Snow} & .375     & .188       & .438 \cr}
+$$
+$$
+\mat {P}^3  = \bordermatrix{
+            &\mbox{ Rain}&\mbox{Nice} &\mbox{Snow} \cr
+\mbox{Rain} & .406       & .203       & .391 \cr
+\mbox{Nice} & .406       & .188       & .406 \cr
+\mbox{Snow} & .391       & .203       & .406 \cr}
+$$
+$$  
+\mat {P}^4  = \bordermatrix{
+            &\mbox{Rain}&\mbox{Nice}&\mbox{Snow} \cr
+\mbox{Rain} & .402      & .199      & .398 \cr
+\mbox{Nice} & .398      & .203      & .398 \cr
+\mbox{Snow} & .398      & .199      & .402 \cr}
+$$
+$$
+\mat {P}^5  = \bordermatrix{
+           &\mbox{Rain}&\mbox{Nice}&\mbox{Snow} \cr
+\mbox{Rain} & .400     & .200     & .399 \cr
+\mbox{Nice} & .400     & .199     & .400 \cr
+\mbox{Snow} & .399     & .200     & .400 \cr}
+$$
+$$  
+\mat {P}^6  = \bordermatrix{
+           &\mbox{Rain}&\mbox{Nice}&\mbox{Snow} \cr
+\mbox{Rain} & .400     & .200     & .400 \cr
+\mbox{Nice} & .400     & .200     & .400 \cr
+\mbox{Snow} & .400     & .200     & .400 \cr}
+$$
+\caption{Powers of the Land of Oz transition matrix.}
+\label{table 11.1}
+\end{table}
+\end{example}
+
+We now consider the long-term behavior of a Markov chain when it starts in a
+state chosen by a probability distribution
+on the set of states, which we will call a \emx {probability
+vector}.\index{probability!vector}  A probability vector with $r$ components is
+a row
+vector whose entries are non-negative and sum to 1.  If $\mat
+{u}$ is a probability vector which represents the initial state of a Markov
+chain, then we
+think of the $i$th component of $\mat {u}$ as representing the probability that
+the
+chain starts in state $s_i$.
+\par
+With this interpretation of random starting states, it is easy to prove the
+following theorem.
+\begin{theorem}\label{thm 11.1.2}
+Let $\mat{P}$ be the transition matrix of a Markov chain, and let $\mat {u}$ be
+the
+probability vector which represents the starting distribution.  Then the
+probability
+that the chain is in state $s_i$ after $n$ steps is the $i$th entry in the
+vector
+$$ \mat{u}^{(n)} = \mat{u}{\mat{P}^n}\ .$$
+\proof
+The proof of this theorem is left as an exercise (Exercise~\ref{exer 11.1.19}).
+\end{theorem}
+
+We note that if we want to examine the behavior of the chain under the
+assumption
+that it starts in a certain state $s_i$, we simply choose $\mat {u}$ to be the
+probability vector with $i$th entry equal to 1 and all other entries equal to
+0.
+
+\begin{example}\label{exam 11.1.1.6} In the Land of Oz example
+(Example~\ref{exam 11.1.1}) let the
+initial probability vector $\mat {u}$ equal $(1/3, 1/3, 1/3)$.  Then we can
+calculate
+the distribution of the states after three days using Theorem~\ref{thm
+11.1.2} and our previous calculation of ${\mat {P}^3}$.  We obtain
+\begin{eqnarray*}
+{\mat {u}}^{(3)} = {\mat {u}}{\mat {P}^3} &=& \pmatrix{ 1/3,& 1/3,& 1/3}
+\pmatrix{ .406 & .203 &
+.391 \cr   .406 & .188 & .406 \cr .391 & .203 & .406 } \cr
+&& \cr
+&=& \pmatrix{ .401,& .198,& .401} \ .
+\end{eqnarray*}
+\end{example}
+
+\subsection*{Examples}
+The following examples of Markov chains will be used throughout the chapter for
+exercises.
+
+\begin{example}\label{exam 11.1.2}
+The President of the United States tells person~A his or her intention to run
+or 
+not to run in the next election.  Then A relays the news to~B, who in turn
+relays 
+the message to~C, and so forth, always to some new person.  We assume that
+there is
+a probability~$a$ that a person will change the answer from yes to no when
+transmitting it to the next person and a probability~$b$ that he or she will
+change it
+from no to yes.  We choose as states the message, either yes or no.  The
+transition matrix is then
+$$
+\mat{P} = \bordermatrix{
+           & \mbox{yes} & \mbox{no} \cr
+\mbox{yes} &      1 - a &         a \cr
+\mbox{no}  &          b &     1 - b}\ .
+$$
+The initial state represents the President's choice.
+\end{example}
+
+\begin{example}\label{exam 11.1.3}
+Each time a certain horse runs in a three-horse race, he has probability~1/2 of
+winning, 1/4 of coming in second, and 1/4 of coming in third, independent of
+the
+outcome of any previous race.  We have an independent trials process, but it
+can also
+be considered from the point of view of Markov chain theory.  The transition
+matrix
+is
+$$
+\mat{P} = \bordermatrix{
+        & \mbox{W} & \mbox{P} & \mbox{S} \cr
+\mbox{W} &      .5 &      .25 &      .25 \cr
+\mbox{P} &      .5 &      .25 &      .25 \cr
+\mbox{S} &      .5 &      .25 &      .25}\ .
+$$
+\end{example}
+\vskip -3pt
+\begin{example}\label{exam 11.1.4}
+In the Dark Ages, Harvard, Dartmouth, and Yale admitted only male students. 
+Assume that, at that time, 80~percent of the sons of Harvard men went to
+Harvard
+and the rest went to Yale, 40~percent of the sons of Yale men went to Yale, and
+the rest split evenly between Harvard and Dartmouth; and of the sons of
+Dartmouth men, 70~percent went to Dartmouth, 20~percent to Harvard, and
+10~percent to Yale.  We form a Markov chain with transition matrix
+$$
+\mat{P} = \bordermatrix{
+        & \mbox{H} & \mbox{Y} & \mbox{D} \cr
+\mbox{H} &      .8 &      .2 &       0 \cr
+\mbox{Y} &      .3 &      .4 &      .3 \cr 
+\mbox{D} &      .2 &      .1 &      .7}\ .
+$$
+\end{example}
+\vskip -3pt
+\begin{example}\label{exam 11.1.5}
+Modify Example~\ref{exam 11.1.4} by assuming that the son of a Harvard man
+always went
+to Harvard.  The transition matrix is now
+$$
+\mat{P} = \bordermatrix{
+        & \mbox{H} & \mbox{Y} & \mbox{D} \cr
+\mbox{H} &       1 &       0 &       0 \cr
+\mbox{Y} &      .3 &      .4 &      .3 \cr
+\mbox{D} &      .2 &      .1 &      .7}\ .
+$$
+\end{example}
+\vskip -3pt
+\begin{example}\label{exam 11.1.6}\index{Ehrenfest model}
+\index{gas diffusion!Ehrenfest model of}
+(Ehrenfest Model) The following is a special case of a model, called the
+Ehrenfest
+model,\footnote{P. and T. Ehrenfest, ``\"{U}ber zwei bekannte Einw\"{a}nde
+gegen das
+Boltzmannsche  H-Theorem," \emx {Physikalishce Zeitschrift,} vol.~8 (1907),
+pp.~311-314.}\index{EHRENFEST, P.}
+\index{EHRENFEST, T}
+that has been used to explain diffusion of gases.  The general model will be
+discussed in detail in Section~\ref{sec 11.5}.  We have two urns that, between
+them,
+contain four balls.  At each step, one of the four balls is chosen at random
+and
+moved from the urn that it is in into the other urn.  We choose, as states, the
+number of balls in the first urn.  The transition matrix is then
+$$
+ \mat {P} = \bordermatrix{
+  &  0  &  1  &  2  &  3  &  4  \cr
+0 &  0  &  1  &  0  &  0  &  0  \cr
+1 & 1/4 &  0  & 3/4 &  0  &  0  \cr
+2 &  0  & 1/2 &  0  & 1/2 &  0  \cr
+3 &  0  &  0  & 3/4 &  0  & 1/4 \cr
+4 &  0  &  0  &  0  &  1  &  0 \cr}\ . 
+$$
+\end{example}
+
+\begin{example}\label{exam 11.1.7}\index{genes}
+(Gene Model) The simplest type of inheritance of traits in animals occurs when
+a trait is
+governed by a pair of genes, each of which may be of two types, say G~and~g. 
+An individual may have a GG combination or Gg (which is genetically the same as
+gG) or gg.  Very often the GG and Gg types are indistinguishable in appearance,
+and then we say that the G~gene dominates the g~gene.  An individual is called
+ \emx {dominant} if he or she has GG~genes, \emx {recessive} if he or she has
+gg, and \emx {hybrid} with a Gg mixture.
+\par
+In the mating of two animals, the offspring inherits one gene of the pair from
+each parent, and the basic assumption of genetics is that these genes are
+selected at random, independently of each other.  This assumption determines
+the probability of occurrence of each type of offspring.  The offspring of two
+purely dominant parents must be dominant, of two recessive parents must be
+recessive, and of one dominant and one recessive parent must be hybrid.
+\par
+In the mating of a dominant and a hybrid animal, each offspring must get a
+G~gene from the former and has an equal chance of getting G~or~g from the
+latter.  Hence there is an equal probability for getting a dominant or a hybrid
+offspring.  Again, in the mating of a recessive and a hybrid, there is an even
+chance for getting either a recessive or a hybrid.  In the mating of two
+hybrids, the offspring has an equal chance of getting G~or~g from each parent. 
+Hence the probabilities are 1/4 for GG, 1/2 for Gg, and 1/4 for gg.
+\par
+Consider a process of continued matings.  We start with an individual of
+known genetic character and mate it with a hybrid.  We assume that there is at
+least
+one offspring.  An offspring is chosen at random and is mated with a hybrid and
+this process
+repeated through a number of generations.  The genetic type of the chosen
+offspring in
+successive generations can be represented by a Markov chain.  The states are
+dominant, hybrid, and recessive, and indicated by GG, Gg, and gg respectively.
+\par
+The transition probabilities are
+$$
+\mat{P} = \bordermatrix{
+          &\mbox{GG} & \mbox{Gg} & \mbox{gg} \cr
+\mbox{GG} &  .5      & .5        &   0       \cr
+\mbox{Gg} & .25      & .5        & .25       \cr
+\mbox{gg} &   0      & .5        &  .5       }\ . 
+$$
+\end{example}
+
+\begin{example}\label{exam 11.1.8}
+Modify Example~\ref{exam 11.1.7} as follows:  Instead of mating the oldest
+offspring with a hybrid, we mate it with a dominant individual.  The transition
+matrix
+is
+$$
+\mat{P} = \bordermatrix{
+   & \mbox{GG} & \mbox{Gg} &\mbox{gg} \cr
+\mbox{GG} &  1 &  0 &  0 \cr
+\mbox{Gg} & .5 & .5 &  0 \cr
+\mbox{gg} &  0 &  1 &  0}\ .
+$$
+\end{example}
+
+\begin{example}\label{exam 11.1.9}
+We start with two animals of opposite sex, mate them, select two of their
+offspring of opposite sex, and mate those, and so forth.  To simplify the
+example, we will assume that the trait under consideration is independent of
+sex.
+\par
+Here a state is determined by a pair of animals.  Hence, the states of our
+process will be: $s_1 = (\mbox{GG},\mbox{GG})$, $s_2 = (\mbox{GG},\mbox{Gg})$,
+$s_3 = (\mbox{GG},\mbox{gg})$, $s_4 = (\mbox{Gg},\mbox{Gg})$, $s_5 =
+(\mbox{Gg},\mbox{gg})$, and $s_6 = (\mbox{gg},\mbox{gg})$.
+\par
+We illustrate the calculation of transition probabilities in terms of the
+state~$s_2$.  When the process is in this state, one parent has GG~genes, the
+other Gg.  Hence, the probability of a dominant offspring is~1/2.  Then the
+probability of transition to~$s_1$ (selection of two dominants) is~1/4,
+transition to~$s_2$ is~1/2, and to~$s_4$ is~1/4.  The other states are treated
+the same way.  The transition matrix of this chain is:  
+\par
+
+$$
+{\mat{P}^1} = \bordermatrix{            
+&\mbox{GG,GG}&\mbox{GG,Gg}&\mbox{GG,gg}&\mbox{Gg,Gg}&\mbox{Gg,gg}&\mbox{gg,gg}\cr
+\mbox{GG,GG} & 1.000 & .000 &  .000 &  .000 &  .000 &  .000\cr
+\mbox{GG,Gg} &  .250 & .500 &  .000 &  .250 &  .000 &  .000\cr
+\mbox{GG,gg} &  .000 & .000 &  .000 & 1.000 &  .000 &  .000\cr
+\mbox{Gg,Gg} &  .062 & .250 &  .125 &  .250 &  .250 &  .062\cr
+\mbox{Gg,gg} &  .000 & .000 &  .000 &  .250 &  .500 &  .250\cr
+\mbox{gg,gg} &  .000 & .000 &  .000 &  .000 &  .000 &  1.000}\ .
+$$
+ 
+\end{example}
+
+\begin{example} \label{exam 11.1.10}\index{stepping stones}
+(Stepping Stone Model)  Our final example is another example that has been used
+in the
+study of genetics.  It is called the \emx {stepping stone} model.\footnote{S.
+Sawyer, ``Results for The Stepping Stone Model for Migration in Population
+Genetics," \emx {Annals of Probability,} vol.~4 (1979),
+pp.~699--728.}\index{SAWYER, S.}  In this
+model we have an $n$-by-$n$ array of squares, and each square is initially any
+one of $k$ different colors.  For each step, a square is chosen at random. 
+This
+square then chooses one of its eight neighbors at random and assumes the color
+of that neighbor.  To avoid boundary problems, we assume that if a square $S$
+is on the
+left-hand boundary, say, but not at a corner, it is adjacent to the square $T$
+on the
+right-hand boundary in the same row as $S$, and $S$ is also adjacent to the
+squares
+just above and below $T$.  A similar assumption is made about squares on the
+upper and
+lower boundaries.  The top left-hand corner square is adjacent to three obvious neighbors, namely the squares below it,  to its right, and diagonally below and to the right.  It has five other neighbors, which are as follows:  the other three corner squares, the square below the upper right-hand corner, and the square to the right of the bottom left-hand corner.  The other three corners also have, in a similar way, eight neighbors.  (These adjacencies are much easier to understand if one
+imagines
+making the array into a cylinder by gluing the top and bottom edge together,
+and then
+making the cylinder into a doughnut by gluing the two circular boundaries
+together.) 
+With these adjacencies, each square in the array is adjacent to exactly eight
+other
+squares.
+\par
+A state in this Markov chain is a description of the color of
+each square.  For this Markov chain the number of states is~$k^{n^2}$, which
+for
+even a small array of squares is enormous.  This is an example of a Markov
+chain that is easy to simulate but difficult to analyze in terms of its
+transition matrix.  The program {\bf SteppingStone}\index{SteppingStone (program)} simulates
+this chain.  We have started with a random initial configuration of two colors
+with $n = 20$ and show the result after the process has run for some time in
+Figure~\ref{fig 11.2}.
+\noindent
+\par
+This is an example of an \emx {absorbing} Markov chain.  This type of chain
+will be studied in
+Section~\ref{sec 11.2}.  One of the theorems proved in that section, applied to
+the present
+example, implies that with
+probability 1, the stones will eventually all be the same color.  By watching
+the program run, you
+can see that territories are established and a battle develops to see which
+color survives.  At
+any time the probability that a particular color will win out is equal to the
+proportion of the
+array of this color.  You are asked to prove this in Exercise~\ref{sec
+11.2}.\ref{exer 11.2.31}.
+\end{example}
+
+\putfig{2truein}{PSfig11-1}{Initial state of the stepping stone model.}{fig 11.1}
+
+%\begin{figure}
+%\centerline{\epsfxsize=2truein 
+%\epsffile{PSfig11-1}}
+%\caption{Initial state of the stepping stone model.}\label{fig 11.1}
+%\end{figure}
+\nopagebreak[4]
+\putfig{2truein}{PSfig11-2}{State of the stepping stone model after 10,000 steps.}{fig 11.2}
+
+%\begin{figure}
+%\centerline{\epsfxsize=2truein 
+%\epsffile{PSfig11-2}}
+%\caption{State of the stepping stone model after 10,000 steps.}\label{fig 11.2}
+%\end{figure}
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 11.1.1} It is raining in the Land of Oz.  Determine a tree and a
+tree 
+measure for the next three days' weather.  Find $\mat {w}^{(1)},  \mat
+{w}^{(2)},$ and
+$ \mat {w}^{(3)}$ and compare with the results obtained from $ \mat {P},~\mat
+{P}^2,$ 
+and~$ \mat {P}^3$.
+
+\i\label{exer 11.1.2} In Example~\ref{exam 11.1.2}, let $a = 0$ and $b = 1/2$. 
+Find 
+$ \mat {P},~ \mat {P}^2,$ and $ \mat {P}^3.$  What would $ \mat {P}^n$ be? 
+What happens 
+to~$ \mat {P}^n$ as $n$ tends to infinity?  Interpret this result.
+
+\i\label{exer 11.1.3} In Example~\ref{exam 11.1.3}, find $\mat{P}$,~$ \mat
+{P}^2,$
+and~$ \mat {P}^3.$  What is $ \mat {P}^n$?
+
+\i\label{exer 11.1.4} For Example~\ref{exam 11.1.4}, find the probability that
+the 
+grandson of a man from Harvard went to Harvard.
+
+\i\label{exer 11.1.5} In Example~\ref{exam 11.1.5}, find the probability that
+the 
+grandson of a man from Harvard went to Harvard.
+
+\i\label{exer 11.1.6} In Example~\ref{exam 11.1.7}, assume that we start with a
+hybrid 
+bred to a hybrid.  Find $ \mat {u}^{(1)},$~$ \mat {u}^{(2)},$ and~$ \mat
+{u}^{(3)}.$  
+What would $ \mat {u}^{(n)}$ be?
+
+\i\label{exer 11.1.7} Find the matrices $\mat{ P}^2,~\mat {P}^3,~\mat {P}^4,$ 
+and~$ \mat {P}^n$ for the Markov chain determined by the transition matrix $
+\mat {P} = 
+\pmatrix{ 1 & 0 \cr 0 & 1 \cr}$.  Do the same for the transition matrix $ \mat
+{P} =
+\pmatrix{ 0 & 1 \cr 1 & 0 \cr}$.  Interpret what happens in each of these
+processes.
+
+\i\label{exer 11.1.8} A certain calculating machine uses only the digits
+0~and~1.  It is supposed to transmit one of these digits through several
+stages.  However, at every stage, there is a probability~$p$ that the digit
+that
+enters this stage will be changed when it leaves and a probability $q = 1 - p$
+that it won't.  Form a Markov chain to represent the process of transmission by
+taking as states the digits 0~and~1.  What is the matrix of transition
+probabilities?
+
+\i\label{exer 11.1.9} For the Markov chain in Exercise~\ref{exer 11.1.8}, draw
+a tree 
+and assign a tree measure assuming that the process begins in state~0 and moves
+through
+two stages of transmission.  What is the probability that the machine, after
+two
+stages, produces the digit~0 (i.e., the correct digit)?  What is the
+probability that the machine never changed the digit from~0?  Now let $p = .1$. 
+Using
+the program {\bf MatrixPowers}, compute the 100th power of the transition
+matrix.
+Interpret the entries of this matrix.  Repeat this with $p = .2$.  Why do the
+100th
+powers appear to be the same?
+
+\i\label{exer 11.1.10} Modify the program {\bf MatrixPowers} so that it prints
+out
+the average $ \mat {A}_n$ of the powers $\mat {P}^n$, for $n = 1$ to $N$.
+Try your program on the Land of Oz example and compare $\mat {A}_n$~and~$\mat
+{P}^n.$
+
+\i\label{exer 11.1.11} Assume that a man's profession can be classified as
+professional, skilled laborer, or unskilled laborer.  Assume that, of the sons
+of professional men, 80~percent are professional, 10~percent are skilled
+laborers, and 10~percent are unskilled laborers.  In the case of sons of
+skilled laborers, 60~percent are skilled laborers, 20~percent are professional,
+and 20~percent are unskilled.  Finally, in the case of unskilled laborers,
+50~percent of the sons are unskilled laborers, and 25~percent each are in the
+other two categories.  Assume that every man has at least one son, and form a
+Markov chain
+by following the profession of a randomly chosen son of a given family through
+several generations.  Set up the matrix of transition probabilities.  Find the
+probability that a randomly chosen grandson of an unskilled laborer is a
+professional man.
+
+\i\label{exer 11.1.12} In Exercise~\ref{exer 11.1.11}, we assumed that every
+man has 
+a son.  Assume instead that the probability that a man has at least one son
+is~.8.  
+Form a Markov chain with four states.  If a man has a son, the probability that
+this
+son is in a particular profession is the same as in Exercise~\ref{exer
+11.1.11}.  If
+there is no son, the process moves to state four which represents families
+whose male line has died out.  Find the matrix of transition probabilities and
+find the probability that a randomly chosen grandson of an unskilled laborer is
+a
+professional man.
+
+\i\label{exer 11.1.14} Write a program to compute $\mat {u}^{(n)}$ given $\mat
+{u}$ and 
+$\mat{P}$.  Use this program to compute $\mat {u}^{(10)}$ for the Land of Oz
+example, with 
+$\mat {u} = (0, 1, 0)$, and with $\mat {u} = (1/3, 1/3, 1/3)$.
+
+\i\label{exer 11.1.15} Using the program {\bf  MatrixPowers}, find $\mat {P}^1$
+through 
+$\mat {P}^6$ for Examples~\ref{exam 11.1.7} and \ref{exam 11.1.8}.  See if you
+can 
+predict the long-range probability of finding the process in each of the states
+for 
+these examples.
+
+\i\label{exer 11.1.16} Write a program to simulate the outcomes of a Markov
+chain after $n$~steps, given the initial starting state and the transition
+matrix $\mat{P}$ as data (see Example~\ref{exam 11.1.10}).  Keep this program
+for use in
+later problems.
+
+\i\label{exer 11.1.17} Modify the program of Exercise~\ref{exer 11.1.16} so
+that it 
+keeps track of the proportion of times in each state in $n$~steps.  Run the
+modified
+program for different starting states for Example~\ref{exam 11.1.1} and 
+Example~\ref{exam 11.1.6}.  Does the initial state affect the proportion of
+time 
+spent in each of the states if $n$ is large?
+
+\i\label{exer 11.1.18} Prove Theorem~\ref{thm 11.1.1}.
+
+\i\label{exer 11.1.19} Prove Theorem~\ref{thm 11.1.2}.
+
+\i\label{exer 11.1.20} Consider the following process.  We have two coins, one
+of which
+is fair, and the other of which has heads on both sides.   We give these two
+coins to
+our friend, who chooses one of them at random (each with probability 1/2). 
+During the
+rest of the process, she uses only the coin that she chose.  She now proceeds
+to toss
+the coin many times, reporting the results.  We consider this process to
+consist solely of
+what she reports to us.
+\begin{enumerate}
+\item Given that she reports a head on the $n$th toss, what is the probability
+that
+a head is thrown on the $(n+1)$st toss?
+
+\item Consider this process as having two states, heads and tails.  By
+computing the
+other three transition probabilities analogous to the one in part (a), write
+down a 
+``transition matrix" for this process.
+
+\item Now assume that the process is in state ``heads" on both the $(n-1)$st
+and the
+$n$th toss.  Find the probability that a head comes up on the $(n+1)$st toss.
+
+\item Is this process a Markov chain?
+\end{enumerate}
+
+\end{LJSItem}
+
+\section{Absorbing Markov Chains}\label{sec 11.2}
+The subject of Markov chains is best studied by considering special types of
+Markov chains.  The first type that we shall study is called an \emx {absorbing
+Markov chain.}\index{Markov chain!absorbing}\index{absorbing Markov chain}
+\begin{definition}
+A state~$s_i$ of a Markov chain is called \emx
+{absorbing}\index{state!absorbing}\index{absorbing state} if it is impossible
+to leave
+it (i.e.,
+$p_{ii} = 1$).  A Markov chain is \emx {absorbing} if it has at least one
+absorbing
+state, and if from every state it is possible to go to an absorbing state (not
+necessarily
+in one step).
+\end{definition}
+\begin{definition}
+In an absorbing Markov chain, a state which is not absorbing is
+called \emx{transient.}\index{state!transient}\index{transient state}
+\end{definition}
+
+\subsection*{Drunkard's Walk}\index{Drunkard's Walk example}
+\begin{example}\label{exam 11.2.1}
+A man walks along a four-block stretch of Park Avenue (see Figure~\ref{fig
+11.3}).  If he is
+at corner 1, 2, or 3, then he walks to the left or right with equal
+probability.
+He continues until he reaches
+corner~4, which is a bar, or corner~0, which is his home.  If he
+reaches either home or the bar, he stays there.
+
+\par
+We form a Markov chain with states 0,~1, 2, 3, and~4.  States 0~and~4 are
+absorbing states.  The transition matrix is then
+
+$$
+\mat{P} =\bordermatrix{
+  &  0  &  1  &  2  &  3  &  4  \cr
+0 &  1  &  0  &  0  &  0  &  0  \cr
+1 & 1/2 &  0  & 1/2 &  0  &  0  \cr
+2 &  0  & 1/2 &  0  & 1/2 &  0  \cr
+3 &  0  &  0  & 1/2 &  0  & 1/2 \cr
+4 &  0  &  0  &  0  &  0  &  1 \cr}\ .
+$$
+The states 1,~2, and~3 are transient states, and from any of these
+it is possible to reach the absorbing states 0~and~4.  Hence the chain is an
+absorbing chain.  When a process reaches an absorbing state, we shall say that
+it is \emx{absorbed}.
+\end{example}
+
+The most obvious question that can be asked about such a chain is:  What is the 
+probability that the process will eventually reach an absorbing state?
+Other interesting questions include:  (a)~What is the probability that the
+process will
+end up in a given absorbing state? (b)~On the average, how long will it take
+for the
+process to be absorbed? (c)~On the average, how many times will the process be
+in each
+transient state?  The answers to all these questions depend, in general, on the
+state from which the process starts as well as the transition probabilities.
+
+\putfig{4.5truein}{PSfig11-3}{Drunkard's walk.}{fig 11.3}
+
+%\begin{figure}
+%\centerline{\epsfxsize=4.5truein 
+%\epsffile{PSfig11-3}}
+%\caption{Drunkard's walk.}\label{fig 11.3}
+%\end{figure}
+
+\subsection*{Canonical Form}\index{canonical form of an absorbing\\ Markov chain}
+Consider an arbitrary absorbing Markov chain.  Renumber the states so that the
+transient states come first.  If there are $r$ absorbing states and $t$
+transient states, the transition matrix will have the following \emx{canonical
+form}
+
+\[
+\offinterlineskip
+\mat{P}\;= \bordermatrix{      
+                               &\hbox{TR.}&\omit\hfil&\hbox{ABS.}\cr
+           \hbox{TR.}\bigstrut &\mat{Q}   &\srule    &\mat{R}    \cr
+\middlehrule{1}{1}
+           \hbox{ABS.}\bigstrut&\mat{0}   &\srule    &\mat{I}}
+\] 
+
+Here $\mat{I}$ is an $r$-by-$r$ indentity matrix, $\mat{0}$ is an $r$-by-$t$
+zero matrix, $\mat{R}$ is a nonzero $t$-by-$r$ matrix, and $\mat{Q}$ is an
+$t$-by-$t$ matrix.  The first $t$ states are transient and the last $r$ states
+are absorbing.
+\par
+In Section~\ref{sec 11.1}, we saw that the entry~$p_{ij}^{(n)}$ of the matrix 
+$\mat{P}^n$ is the probability of being in the state~$s_j$ after $n$ steps,
+when 
+the chain is started in state~$s_i$.  A standard matrix algebra argument shows
+that
+$\mat{P}^n$ is of the form
+ \[
+\offinterlineskip
+\mat{P}^n\;= \bordermatrix{      
+                      &\hbox{TR.}&\omit\hfil&\hbox{ABS.}\cr
+  \hbox{TR.}\bigstrut &\mat{Q}^n &\srule    &\ast       \cr
+\middlehrule{1}{1}
+  \hbox{ABS.}\bigstrut&\mat{0}   &\srule    &\mat{I}}
+\] 
+where the asterisk $*$ stands for the $t$-by-$r$ matrix in the upper right-hand
+corner of~$\mat{P}^n.$  (This submatrix can be written in terms of $\mat{Q}$
+and 
+$\mat{R}$, but the expression is complicated and is not needed at this time.)
+The form of~$\mat{P}^n$ shows that the entries of
+$\mat{Q}^n$ give the probabilities for being in each of the transient states
+after $n$
+steps for each possible transient starting state.  For our first theorem we
+prove that the
+probability of being in the transient states after $n$ steps approaches zero. 
+Thus every entry
+of~$\mat{ Q}^n$ must approach zero as $n$ approaches infinity (i.e, $\mat{Q}^n
+\to \mat{
+0}$).
+
+\subsection*{Probability of Absorption}
+\begin{theorem}\label{thm 11.2.1}
+In an absorbing Markov chain, the probability that the process will be absorbed
+is~1 (i.e., $\mat{Q}^n \to \mat{0}$ as $n \to \infty$).
+
+\proof
+From each nonabsorbing state $s_j$ it is possible to reach an absorbing state.  
+Let $m_j$  be the minimum number of steps required to reach an absorbing state, 
+starting from $s_j$.   Let $p_j$ be the probability that, starting from $s_j$, 
+the process will not reach  an absorbing state in $m_j$ steps.  
+Then $p_j <1$.  Let $m$ be the largest of the $m_j$ and let $p$ be the largest 
+of $p_j$.  The probability of not  being absorbed in $m$ steps is less than or
+equal to $p$, 
+in $2m$ steps less than or equal to $p^2$, etc. Since $p<1$  these
+probabilities tend to 0.  
+Since the probability of not being absorbed in $n$ steps is monotone
+decreasing, these
+probabilities also tend to 0, hence $\lim_{n \rightarrow \infty } \mat{Q}^n =
+0.$
+\end{theorem}
+
+\subsection*{The Fundamental Matrix}
+\begin{theorem}\label{thm 11.2.2}
+For an absorbing Markov chain the matrix $\mat{I} - \mat{Q}$ has an inverse
+$\mat{N}$ and 
+$\mat{N}  =\mat{I} + \mat{Q} + \mat{Q}^{2} + \cdots\ $.  The $ij$-entry
+$n_{ij}$ of the 
+matrix $\mat{N}$ is the expected number of times the chain is in state $s_j$,
+given that 
+it starts in state $s_i$.  The initial state is counted if $i = j$.
+
+\proof  
+Let $(\mat{I} - \mat{Q})\mat{x}~=~0;$ that is $\mat{x}~=~\mat{Q}\mat{x}.$ Then,
+iterating
+this we see that 
+$\mat{x}~=~\mat{Q}^{n}\mat x.$    Since $\mat{Q}^{n} \rightarrow \mat{0}$, we
+have
+$\mat{Q}^n\mat{x} \rightarrow \mat{0}$, so
+$\mat{x}~=~\mat{0}$.   Thus $(\mat{I} - \mat{Q})^{-1}~=~\mat{N}$ exists.  Note
+next that
+$$
+(\mat{I} - \mat{Q}) (\mat{I} + \mat{Q} + \mat{Q}^2 + \cdots + \mat{Q}^n) =
+\mat{I} -
+\mat{Q}^{n + 1}\ .
+$$
+Thus multiplying both sides by $\mat{N}$ gives
+$$
+\mat{I} + \mat{Q} + \mat{Q}^2 + \cdots + \mat{Q}^n = \mat{N} (\mat{I} -
+\mat{Q}^{n + 1})\ .
+$$
+Letting $n$ tend to infinity we have 
+$$
+\mat{N} = \mat{I} + \mat{Q} + \mat{Q}^2 + \cdots\ .
+$$
+
+Let $s_i$ and $s_j$ be two transient states, and assume throughout the
+remainder of the proof
+that $i$ and $j$ are fixed.  Let $X^{(k)}$ be a random variable which equals 1
+if the chain is in
+state $s_j$ after $k$ steps, and equals 0 otherwise.  For each $k$, this random
+variable
+depends upon both $i$ and $j$; we choose not to explicitly show this dependence
+in the
+interest of clarity.  We have
+$$
+P(X^{(k)} = 1) = q_{ij}^{(k)}\ ,
+$$
+and
+$$
+P(X^{(k)} = 0) = 1 - q_{ij}^{(k)}\ ,
+$$
+where $q_{ij}^{(k)}$ is the $ij$th entry of $\mat{Q}^k$.  These equations hold
+for $k = 0$ since $\mat{Q}^0 = \mat{I}$.  Therefore, since $X^{(k)}$ is a 0-1
+random variable, $E(X^{(k)}) = q_{ij}^{(k)}$.  
+\par
+The expected number of times the chain is in state $s_j$ in the first $n$
+steps, 
+given that it starts in state $s_i$, is clearly
+$$E\Bigl(X^{(0)} + X^{(1)} + \cdots + X^{(n)} \Bigr) = q_{ij}^{(0)} +
+q_{ij}^{(1)} +
+\cdots + q_{ij}^{(n)}\ .$$
+Letting $n$ tend to infinity we have 
+$$
+E\Bigl(X^{(0)} + X^{(1)} + \cdots \Bigr) = q_{ij}^{(0)} +
+q_{ij}^{(1)} + \cdots  = n_{ij} \ .
+$$
+\end{theorem}
+
+\begin{definition}
+For an absorbing Markov chain~$\mat{P}$, the matrix $\mat{N} = (\mat{I} -
+\mat{Q})^{-1}$ is
+called the
+\emx {fundamental matrix} for~$\mat{P}$.\index{fundamental
+matrix}\index{matrix!fundamental}  The entry~$n_{ij}$ of~$\mat{N}$ gives the
+expected number
+of times that the process is in the transient state~$s_j$ if it is started in
+the transient 
+state~$s_i$.
+\end{definition}
+
+\begin{example}\label{exam 11.2.2}
+\index{Drunkard's Walk example}(Example~\ref{exam 11.2.1} continued)
+In the Drunkard's Walk example, the transition matrix in canonical form is
+\[
+\offinterlineskip
+\mat{P}\;= \bordermatrix{&
+               \hbox{1} &\hbox{2}&\hbox{3}&\omit\hfil&\hbox{0}&\hbox{4}\cr
+\hbox{1}\strut  &  0    &1/2 &  0     &  \srule  & 1/2    &  0     \cr
+\hbox{2}\strut  &1/2    &  0 &1/2     &  \srule  & 0      &  0     \cr
+\hbox{3}\strut  &  0    &1/2 &  0     &  \srule  & 0      & 1/2\cr
+\middlehrule{3}{2}
+\hbox{0}\strut  &  0    &  0     &  0     &  \srule  & 1      &  0     \cr
+\hbox{4}\strut  &  0    &  0     &  0     &  \srule  & 0      &  1}\ .
+\]
+From this we see that the matrix $\mat{Q}$ is
+$$
+\mat{Q} = \pmatrix{
+0 & 1/2 & 0 \cr
+1/2 & 0 & 1/2 \cr
+0 & 1/2 & 0 \cr}\ ,
+$$
+and
+$$
+\mat{I} - \mat{Q} = \pmatrix{
+1 & -1/2 & 0 \cr
+-1/2 & 1 & -1/2 \cr
+0 & -1/2 & 1 \cr}\ .
+$$
+Computing $(\mat{I} - \mat{Q})^{-1}$, we find
+$$
+\vspace{7pt}\hbox{$\mat{N} = (\mat{I} - \mat{Q})^{-1} = {}$} \bordermatrix{
+  & 1 & 2 & 3 \cr
+1 & 3/2 & 1 & 1/2 \cr
+2 & 1 & 2 & 1 \cr
+3 & 1/2 & 1 & 3/2 \cr}\ .
+$$
+From the middle row of~$\mat{N}$, we see that if we start in state 2, then the
+expected number of times in states 1, 2, and 3 before being absorbed
+are 1, 2, and 1.
+\end{example}
+ 
+\subsection*{Time to Absorption}\index{time to absorption}
+We now consider the question:  Given that the chain starts in state $s_i$, what
+is the expected number of steps before the chain is absorbed?  The answer is
+given
+in the next theorem.
+
+\begin{theorem}\label{thm 11.2.2.5}  Let $t_i$ be the expected number of steps
+before
+the chain is absorbed, given that the chain starts in state $s_i$, and let
+$\mat{t}$ 
+be the column vector whose $i$th entry is $t_i$. Then
+$$\mat{t} = \mat{N}\mat{c}\ ,$$
+where $\mat{c}$ is a column vector all of whose entries are 1.
+
+\proof
+If we add all the entries in the $i$th row of~$\mat{N}$, 
+we will have the expected number of times in any of the transient states for a
+given
+starting state~$s_i$, that is, the expected time required before being
+absorbed.  Thus,
+$t_i$ is the sum of the entries in the $i$th row of $\mat{N}$.  If we write
+this statement
+in matrix form, we obtain the theorem.
+\end{theorem}
+
+\subsection*{Absorption Probabilities}\index{absorption probabilities}
+\begin{theorem}\label{thm 11.2.3}
+Let $b_{ij}$ be the probability that an absorbing chain will be absorbed in the
+absorbing state~$s_j$ if it starts in the transient state~$s_i$.  Let $\mat{B}$
+be the matrix with entries $b_{ij}$.  Then $\mat{B}$ is an $t$-by-$r$ matrix,
+and
+$$
+\mat{B} = \mat{N} \mat{R}\ ,
+$$
+where $\mat{N}$ is the fundamental matrix and $\mat{R}$ is as in the canonical
+form.
+\proof
+We have
+\begin{eqnarray*}
+\mat{B}_{ij} &=& \sum_n\sum_k q_{ik}^{(n)} r_{kj} \\
+&=& \sum_k \sum_n q_{ik}^{(n)} r_{kj} \\
+&=& \sum_k n_{ik}r_{kj} \\
+&=& (\mat{N}\mat{R})_{ij}\ .
+\end{eqnarray*}
+This completes the proof.
+\end{theorem}
+\par
+Another proof of this is given in Exercise~\ref{exer 11.2.33}.
+
+\begin{example}\label{exam 11.2.3}\index{Drunkard's Walk
+example}(Example~\ref{exam 11.2.2}
+continued)
+In the Drunkard's Walk example, we found that
+$$
+\vspace{7pt}\hbox{$\mat{N} = {}$} \bordermatrix{
+  & 1   & 2 & 3   \cr
+1 & 3/2 & 1 & 1/2 \cr
+2 & 1   & 2 & 1   \cr
+3 & 1/2 & 1 & 3/2 \cr}\ .
+$$
+Hence,
+\vspace{7pt}
+\begin{eqnarray*}
+\mat{t} = \mat{N}\mat{c} &=& \pmatrix{
+3/2 & 1 & 1/2 \cr
+  1 & 2 & 1   \cr
+1/2 & 1 & 3/2 \cr
+} \pmatrix{
+1 \cr
+1 \cr
+1 \cr
+}
+\\
+&=& \pmatrix{
+3 \cr
+4 \cr
+3 \cr
+}\ .
+\end{eqnarray*}
+Thus, starting in states 1, 2, and 3, the expected times to absorption are
+3, 4, and 3, respectively.
+\par
+From the canonical form,
+$$
+\vspace{7pt}\hbox{$\mat{ R} = {}$} \bordermatrix{
+  & 0   & 4   \cr
+1 & 1/2 & 0   \cr
+2 & 0   & 0   \cr
+3 & 0   & 1/2 \cr}\ .
+$$
+Hence,
+\begin{eqnarray*}
+\mat{B} = \mat{N} \mat{R} &=& \pmatrix{
+3/2 & 1 & 1/2 \cr
+  1 & 2 & 1   \cr
+1/2 & 1 & 3/2 \cr} \cdot \pmatrix{
+1/2 & 0   \cr
+  0 & 0   \cr
+  0 & 1/2 \cr} \cr
+\cr
+\cr
+&=& \bordermatrix{
+  & 0 & 4 \cr
+1 & 3/4 & 1/4 \cr
+2 & 1/2 & 1/2 \cr
+3 & 1/4 & 3/4 \cr}\ .
+\end{eqnarray*}
+
+
+\noindent Here the first row tells us that, starting from state $1$, there is
+probability~3/4
+of absorption in state $0$ and 1/4 of absorption in state $4$.
+\end{example}
+
+\subsection*{Computation}
+The fact that we have been able to obtain these three descriptive quantities in
+matrix form makes it very easy to write a computer program that determines
+these quantities for a given absorbing chain matrix.   
+
+The program {\bf AbsorbingChain}\index{AbsorbingChain (program)} calculates the basic
+descriptive quantities of an
+absorbing Markov chain.
+
+We have run the program {\bf  AbsorbingChain} for the example of the
+drunkard's walk\index{Drunkard's Walk example} (Example~\ref{exam 11.2.1}) with
+5~blocks. 
+The results are as follows:
+
+$$
+\mat{Q}  = \bordermatrix{
+  & 1     & 2     & 3     & 4  \cr
+1 & .00   & .50   & .00   & .00\cr
+2 & .50   & .00   & .50   & .00\cr
+3 & .00   & .50   & .00   & .50\cr 
+4 & .00   & .00   & .50   & .00}\ ;
+$$
+
+$$
+\mat{R}  = \bordermatrix{
+  & 0     & 5     \cr
+1 & .50   & .00   \cr
+2 & .00   & .00   \cr
+3 & .00   & .00   \cr 
+4 & .00   & .50   }\ ;
+$$
+
+$$
+\mat{N}  = \bordermatrix{
+  & 1      & 2      & 3      &  4  \cr
+1 & 1.60   & 1.20   & .80    & .40 \cr
+2 & 1.20   & 2.40   & 1.60   & .80 \cr
+3 & .80    & 1.60   & 2.40   & 1.20\cr 
+4 & .40    & .80    & 1.20   & 1.60}\ ;
+$$
+
+$$
+\mat{t}  = \bordermatrix{
+ &  \cr
+1  & 4.00 \cr
+2  & 6.00 \cr
+3  & 6.00 \cr
+4  & 4.00}\ ;
+$$
+
+$$
+\mat{B}  = \bordermatrix{
+  & 0     & 5     \cr
+1 & .80   & .20   \cr
+2 & .60   & .40   \cr
+3 & .40   & .60   \cr 
+4 & .20   & .80   }\ .
+$$
+ 
+Note that the probability of reaching the bar before reaching home, starting
+at~$x$, is~$x/5$ (i.e., proportional to the distance of home from the starting
+point).  (See Exercise~\ref{exer 11.2.23}.)
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 11.2.1} In Example~\ref{exam 11.1.2}, for what values of
+$a$~and~$b$ 
+do we obtain an absorbing Markov chain?
+
+\i\label{exer 11.2.2} Show that Example~\ref{exam 11.1.5} is an absorbing
+Markov chain.
+
+\i\label{exer 11.2.3} Which of the genetics examples (Examples~\ref{exam
+11.1.7},
+~\ref{exam 11.1.8}, and~\ref{exam 11.1.9}) are absorbing?
+
+\i\label{exer 11.2.4} Find the fundamental matrix $\mat{N}$ for Example~\ref
+{exam 11.1.8}.
+
+\i\label{exer 11.2.5} For Example~\ref{exam 11.1.9}, verify that the following 
+matrix is the inverse of $\mat{I} - \mat{Q}$ and hence is the fundamental 
+matrix~$\mat{N}$.
+$$
+\mat{N} = \pmatrix{
+8/3 & 1/6 & 4/3 & 2/3 \cr
+4/3 & 4/3 & 8/3 & 4/3 \cr
+4/3 & 1/3 & 8/3 & 4/3 \cr
+2/3 & 1/6 & 4/3 & 8/3 \cr}\ .
+$$
+Find $\mat{N} \mat{c}$ and $\mat{N} \mat{R}$.  Interpret the results.
+
+\i\label{exer 11.2.6} In the Land of Oz example (Example~\ref{exam 11.1.1}), 
+change the transition matrix by making R an absorbing state.  This gives
+$$\mat{P} = 
+\bordermatrix{
+  & \mbox{R} & \mbox{N} & \mbox{S} \cr
+\mbox{R} & 1 & 0 & 0 \cr
+\mbox{N} & 1/2 & 0 & 1/2 \cr
+\mbox{S} & 1/4 & 1/4 & 1/2}\ .
+$$
+Find the fundamental matrix~$\mat{N}$, and also  $\mat{Nc}$ and $\mat{NR}$. 
+Interpret
+the results.
+
+\i\label{exer 11.2.7} In Example~\ref{exam 11.1.6}, make states 0~and~4 into
+absorbing states.  Find the fundamental matrix~$\mat{N}$, and also $\mat{Nc}$
+and
+$\mat{NR}$, for the resulting absorbing chain.  Interpret the results.
+
+\i\label{exer 11.2.8} In Example~\ref{exam 11.2.1} (Drunkard's
+Walk)\index{Drunkard's
+Walk example} of this section,  assume that the probability of a step to the
+right is~2/3,
+and a step to the left  is~1/3.  Find $\mat{N},~\mat{N}\mat{c}$,
+and~$\mat{N}\mat{R}$. 
+Compare these with the results of Example~\ref{exam 11.2.3}.
+
+\i\label{exer 11.2.9} A process moves on the integers 1,~2, 3, 4, and~5.  It
+starts at~1 and, on each successive step, moves to an integer greater than its
+present position, moving with equal probability to each of the remaining larger
+integers.  State five is an absorbing state.  Find the expected number of steps
+to reach state five.
+
+\i\label{exer 11.2.10} Using the result of Exercise~\ref{exer 11.2.9}, make a 
+conjecture for the form of the fundamental matrix if the process moves as in
+that 
+exercise, except that it now moves on the integers from 1~to~$n$.  Test your
+conjecture for several different values of $n$.  Can you conjecture an estimate
+for the expected number of steps to reach state $n$, for large $n$?  (See 
+Exercise~\ref{exer 11.2.10.5} for a method of determining this expected number
+of
+steps.)
+
+\istar\label{exer 11.2.10.5} Let $b_k$ denote the expected number of steps to
+reach
+$n$ from $n-k$, in the process described in Exercise~\ref{exer 11.2.9}.
+\begin{enumerate}
+\item
+Define $b_0 = 0$.  Show that for $k > 0$, we have
+$$b_k = 1 + \frac 1k \bigl(b_{k-1} + b_{k-2} + \cdots + b_0\bigr)\ .$$
+\item
+Let 
+$$f(x) = b_0 + b_1 x + b_2 x^2 + \cdots\ .$$
+Using the recursion in part (a), show that $f(x)$ satisfies the differential
+equation
+$$(1-x)^2 y' - (1-x) y - 1 = 0\ .$$
+\item
+Show that the general solution of the differential equation in part (b) is
+$$y = \frac{-\log(1-x)}{1-x} + \frac c{1-x}\ ,$$
+where $c$ is a constant.
+\item
+Use part (c) to show that 
+$$b_k = 1 + \frac 12 + \frac 13 + \cdots + \frac 1k\ .$$
+\end{enumerate}
+
+\i\label{exer 11.2.11} Three tanks fight a three-way duel.  Tank A has 
+probability~1/2 of destroying the tank at which it fires, tank B has 
+probability~1/3 of destroying the tank at which it fires, and tank C has 
+probability~1/6 of destroying the tank at which it fires.  The tanks fire
+together 
+and each tank fires at the strongest opponent not yet destroyed.  Form a Markov 
+chain by taking as states the subsets of the set of tanks.  Find
+$\mat{N},~\mat{N}\mat{c}$, 
+and~$\mat{N}\mat{R}$, and interpret your results.  \emx {Hint}:
+Take as states ABC, AC, BC, A, B, C, and none, indicating the tanks that could
+survive starting in state ABC.  You can omit AB because this state cannot be
+reached from ABC.
+
+\i\label{exer 11.2.12} Smith is in jail and has 3~dollars; he can get out on
+bail if he has 8~dollars.  A guard agrees to make a series of bets with him. 
+If
+Smith bets $A$~dollars, he wins $A$~dollars with probability~.4 and loses
+$A$~dollars with probability~.6.  Find the probability that he wins 8~dollars
+before losing all of his money if
+\begin{enumerate}
+\item he bets 1~dollar each time (timid strategy).
+
+\item he bets, each time, as much as possible but not more than necessary to
+bring his fortune up to 8~dollars (bold strategy).
+
+\item Which strategy gives Smith the better chance of getting out of jail?
+\end{enumerate}
+
+\i\label{exer 11.2.13} With the situation in Exercise~\ref{exer 11.2.12},
+consider 
+the strategy such that for $i < 4$, Smith bets $\min(i,4 - i)$, and for $i \geq
+4$, 
+he bets according to the bold strategy, where $i$ is his current fortune.  Find
+the
+probability that he gets out of jail using this strategy.  How does this
+probability compare with that obtained for the bold strategy?
+
+\i\label{exer 11.2.14} Consider the game of tennis\index{tennis} when \emx
+{deuce} is
+reached.   If a player wins the next point, he has \emx {advantage.}  On the
+following
+point, he either wins the game or the game returns to \emx {deuce.}  Assume
+that for 
+any point, player A has probability .6 of winning the point and player B has 
+probability .4 of winning the point.
+\begin{enumerate}
+\item Set this up as a Markov chain with state~1: A wins; 2: B wins; 3:
+advantage A; 4: deuce; 5: advantage B.
+
+\item Find the absorption probabilities.
+
+\item At deuce, find the expected duration of the game and the probability
+that B will win.
+\end{enumerate}
+
+\medbreak
+Exercises \ref{exer 11.2.15}~and~\ref{exer 11.2.16} concern the inheritance of
+color-blindness,\index{color-blindness} which is a sex-linked characteristic. 
+There is a
+pair of genes, g~and~G, of which the former tends to produce color-blindness,
+the
+latter normal vision.  The G~gene is dominant.  But a man has only one gene,
+and if this is~g, he is color-blind.  A man inherits one of his mother's two
+genes, while a woman inherits one gene from each parent.  Thus a man may be of
+type G~or~g, while a woman may be type GG or Gg or gg.  We will study a process
+of inbreeding similar to that of Example~\ref{exam 11.1.9} by constructing a
+Markov chain.
+
+\i\label{exer 11.2.15} List the states of the chain.  \emx {Hint}: There are
+six.  Compute the transition probabilities.  Find the fundamental matrix
+$\mat{N}$, 
+$\mat{N}\mat{c}$, and $\mat{N}\mat{R}$.
+
+\i\label{exer 11.2.16} Show that in both Example~\ref{exam 11.1.9} and the
+example
+just given, the probability of absorption in a state having genes of a
+particular type is equal to the proportion of genes of that type in the
+starting state.  Show that this can be explained by the fact that a game in
+which your fortune is the number of genes of a particular type in the state of
+the Markov chain is a fair game.\footnote{H. Gonshor, ``An Application of
+Random Walk to a Problem in Population Genetics," \emx {American Math Monthly,}
+vol.~94 (1987), pp.~668--671}\index{GONSHOR, H.}
+
+\i\label{exer 11.2.17} Assume that a student going to a certain four-year
+medical 
+school in northern New England has, each year, a probability~$q$ of flunking
+out, a
+probability~$r$ of having to repeat the year, and a probability~$p$ of moving
+on to the next year (in the fourth year, moving on means graduating).
+\begin{enumerate}
+\item Form a transition matrix for this process taking as states F,~1, 2, 3,
+4, and~G where F stands for flunking out and G for graduating, and the other
+states represent the year of study.
+
+\item For the case $q = .1$, $r = .2$, and $p = .7$ find the time a
+beginning student can expect to be in the second year.  How long should this
+student expect to be in medical school?
+
+\item Find the probability that this beginning student will graduate.
+\end{enumerate}
+
+\i\label{exer 11.2.18} (E. Brown\footnote{Private communication.})\index{BROWN,
+E.} 
+Mary and John are playing the following game: They have a  three-card deck
+marked with 
+the numbers 1,~2, and~3 and a spinner with the  numbers 1,~2, and~3 on it.  The
+game begins by
+dealing the cards out so that the dealer gets one card and the other person
+gets two.  
+A move in the game consists of a spin of the spinner.  The person having the
+card with the
+number that comes up on the spinner hands that card to the other person.  The
+game ends when
+someone has all the cards.  
+\begin{enumerate}
+
+\item Set up the transition matrix for this absorbing Markov chain, where the
+states
+correspond to the number of cards that Mary has.
+
+\item Find the fundamental matrix.
+
+\item On the average, how many moves will the game last?
+
+\item If Mary deals, what is the probability that John will win the game?
+\end{enumerate}
+
+\i\label{exer 11.2.19} Assume that an experiment has $m$ equally probable
+outcomes.  
+Show that the expected number of independent trials before the first occurrence
+of
+$k$ consecutive occurrences of one of these outcomes is $(m^k - 1)/(m - 1)$. 
+\emx {Hint}: Form an absorbing Markov chain with states 1,~2, \ldots,~$k$ with
+state~$i$ representing the length of the current run.  The expected time until
+a run of~$k$ is 1~more than the expected time until absorption for the chain
+started in state~1.  It has been found that, in the decimal expansion of pi,
+starting with the 24{,}658{,}601st digit, there is a run of nine 7's.  What
+would your result say about the expected number of digits necessary to find
+such a run if the digits are produced randomly?
+
+\i\label{exer 11.2.20} (Roberts\footnote{F. Roberts, \emx {Discrete
+Mathematical 
+Models} (Englewood Cliffs, NJ: Prentice Hall, 1976).})\index{ROBERTS, F.} A
+city is
+divided into 3 areas 1,~2, and~3.  It is estimated that amounts $u_1$,~$u_2$,
+and~$u_3$ of
+pollution are emitted each day from these three areas.  A fraction $q_{ij}$ of
+the pollution from region~$i$ ends up the next day at region~$j$.  A fraction
+$q_i = 1 - \sum_j q_{ij} > 0$ goes into the atmosphere and escapes.  Let
+$w_i^{(n)}$ be the amount of pollution in area~$i$ after $n$~days.
+\begin{enumerate}
+
+\item Show that $\mat{w}^{(n)} = \mat{u} + \mat{u} \mat{Q} +\cdots +
+\mat{u}\mat{Q}^{n - 1}$.
+
+\item Show that $\mat{w}^{(n)} \to \mat{w}$, and show how to compute 
+\mat{w}~from~\mat{u}.
+ 
+\item The government wants to limit pollution levels to a prescribed level by
+prescribing~$\mat{w}.$  Show how to determine the levels of pollution $\mat{u}$
+which would result in a prescribed limiting value~$\mat{w}$.
+\end{enumerate}
+
+\i\label{exer 11.2.21} In the Leontief economic model,\index{LEONTIEF, W.
+W.}\footnote{W.~W. Leontief, 
+\emx {Input-Output Economics} (Oxford: Oxford University Press, 1966).} there
+are
+$n$ industries 1,~2, \ldots,~$n$.  The $i$th industry requires an amount $0
+\leq
+q_{ij} \leq 1$ of goods (in dollar value) from company~$j$ to produce
+1~dollar's worth of goods.  The outside demand on the industries, in dollar
+value, is given by the vector $\mat{d} = (d_1,d_2,\ldots,d_n)$.  Let $\mat{Q}$
+be the matrix with entries~$q_{ij}$.
+\begin{enumerate}
+
+\item Show that if the industries produce total amounts given by the vector
+$\mat{x} = (x_1,x_2,\ldots,x_n)$ then the amounts of goods of each type that
+the
+industries will need just to meet their internal demands is given by the
+vector~$\mat{x} \mat{Q}$.
+
+\item Show that in order to meet the outside demand~$\mat{d}$ and the internal
+demands the industries must produce total amounts given by a vector $\mat{x} =
+(x_1,x_2,\ldots,x_n)$ which satisfies the equation $\mat{x} = \mat{x} \mat{Q} +
+\mat{d}$.
+
+\item Show that if $\mat{Q}$ is the $\mat{Q}$-matrix for an absorbing
+Markov chain, then it is possible to meet any outside demand~$\mat{d}$.
+
+\item Assume that the row sums of~$\mat{Q}$ are less than or equal to~1. 
+Give an economic interpretation of this condition.  Form a Markov chain by
+taking the states to be the industries and the transition probabilites to be
+the~$q_{ij}$.  Add one absorbing state~0.  Define
+$$
+q_{i0} = 1 - \sum_j q_{ij}\ .
+$$
+Show that this chain will be absorbing if every company is either making a
+profit or ultimately depends upon a profit-making company.
+
+\item Define $\mat{x} \mat{c}$ to be the gross national product.  Find an
+expression for the gross national product in terms of the demand vector
+$\mat{d}$
+and the vector $\mat{t}$ giving the expected time to absorption.
+\end{enumerate}
+
+\i\label{exer 11.2.22} A gambler plays a game in which on each play he wins
+one dollar with probability~$p$ and loses one dollar with probability $q = 1 -
+p$.  The \index{Gambler's Ruin}\emx {Gambler's Ruin problem} is the
+problem of
+finding the probability~$w_x$ of winning an amount~$T$ before losing
+everything, starting
+with state~$x$.  Show that this problem may be considered to be an absorbing
+Markov chain with states 0,~1, 2, \ldots,~$T$ with 0~and~$T$ absorbing states. 
+Suppose that a gambler has probability $p = .48$ of winning on each play.  
+Suppose, in addition, that the gambler starts with 50~dollars and that $T =
+100$
+dollars.  Simulate this game 100 times and see how often the gambler is ruined.  
+This estimates $w_{50}$.
+
+\i\label{exer 11.2.23} Show that $w_x$ of Exercise~\ref{exer 11.2.22} satisfies
+the
+following conditions:
+\begin{enumerate}
+
+\item $w_x = pw_{x + 1} + qw_{x - 1}$ for $x = 1$,~2, \ldots,\ $T - 1$.
+
+\item $w_0 = 0$.
+
+\item $w_T = 1$.
+\end{enumerate}
+
+\noindent Show that these conditions determine $w_x$.  Show that, if $p = q =
+1/2$, then
+$$
+w_x = \frac xT
+$$
+satisfies (a), (b), and (c) and hence is the solution.  If $p \ne q$, show that
+$$
+w_x = \frac{(q/p)^x - 1}{(q/p)^T - 1}
+$$
+satisfies these conditions and hence gives the probability of the gambler
+winning.
+
+\i\label{exer 11.2.24} Write a program to compute the probability~$w_x$ of
+Exercise~\ref{exer 11.2.23} for given values of $x$,~$p$, and~$T$.  Study the
+probability that the gambler will ruin the bank in a game that is only slightly
+unfavorable, say $p = .49$, if the bank has significantly more money than
+the gambler.
+
+\istar\label{exer 11.2.25} We considered the two examples of the Drunkard's
+Walk\index{Drunkard's Walk example} corresponding to the cases $n = 4$ and $n =
+5$ blocks
+(see Example~\ref{exam 11.2.1}).  Verify that in these two examples the
+expected time to
+absorption, starting at~$x$, is equal to
+$x(n - x)$.  See if you can prove that this is true in general.  \emx {Hint}:
+Show
+that if $f(x)$ is the expected time to absorption then $f(0) = f(n) = 0$
+and
+$$f(x) = (1/2)f(x - 1) + (1/2)f(x + 1) + 1$$
+for  $0 < x < n$.  Show that if $f_1(x)$ and $f_2(x)$ are two solutions, then
+their difference $g(x)$ is a solution of the equation
+$$g(x) = (1/2)g(x - 1) + (1/2)g(x + 1)\ .$$
+Also, $g(0) = g(n) = 0$.  Show that it is not possible for $g(x)$ to have a
+strict
+maximum or a strict minimum at the point $i$, where $1 \le i \le n-1$.  Use
+this to
+show that $g(i) = 0$ for all i.  This shows that there is 
+at most one solution.  Then verify that the function $f(x) = x(n-x)$ is a
+solution.
+
+\i\label{exer 11.2.29} Consider an absorbing Markov chain with state
+space~$S$.  Let $f$ be a function defined on~$S$ with the property that
+$$
+f(i) = \sum_{j \in S} p_{ij} f(j)\ ,
+$$
+or in vector form
+$$
+\mat{f} = \mat{Pf}\ .
+$$
+Then $f$ is called a \emx {harmonic function} for $\mat{P}$.\index{harmonic
+function}  
+If you imagine a game in which your fortune is $f(i)$ when you are in
+state~$i$, then the
+harmonic condition means that the game is \emx {fair} in the sense that your
+expected fortune after one step is the same as it was before the step.
+\begin{enumerate}
+
+\item Show that for $f$ harmonic
+$$
+\mat{f} = \mat{P}^n{\mat{f}}
+$$
+for all $n$.
+
+\item Show, using (a), that for $f$ harmonic
+$$
+\mat{f} = \mat{P}^\infty \mat{f}\ ,
+$$
+where
+$$
+ \mat{P}^\infty = \lim_{n \to \infty} \mat{P}^n =
+\pmatrix{$$\begin{tabular}{l|r} \mat{0} & \mat{B} \\ \hline 
+                                \mat{0} & \mat{I} \\ \end{tabular}$$ \cr}\ .
+$$
+
+\item Using (b), prove that when you start in a transient state~$i$ your
+expected final fortune
+$$
+\sum_k b_{ik} f(k)
+$$
+is equal to your starting fortune~$f(i)$.  In other words, a fair game on a
+finite state space remains fair to the end.  (Fair games in general are called
+\emx {martingales.}\index{martingale}  Fair games on infinite state spaces need
+not 
+remain fair with an unlimited number of plays allowed.  For example, consider
+the game of
+Heads or Tails (see Example~\ref{exam 1.3}).  Let Peter start with 1~penny and 
+play until he has~2.  Then Peter will be sure to end up 1~penny ahead.)
+\end{enumerate} 
+
+\i\label{exer 11.2.26} A coin is tossed repeatedly.  We are
+interested in finding the expected number of tosses until a particular pattern,
+say B = HTH, occurs for the first time.  If, for example, the outcomes of the
+tosses are HHTTHTH we say that the pattern B has occurred for the first time
+after 7~tosses.  Let $T^B$ be the time to obtain pattern B for the first
+time.  Li\footnote{S-Y.~R. Li, ``A Martingale Approach to the Study of
+Occurrence of Sequence Patterns in Repeated Experiments,'' \emx {Annals of
+Probability,} vol.~8 (1980), pp.~1171--1176.} gives the following method for
+determining $E(T^B)$. 
+
+We are in a casino and, before
+each toss of the coin, a gambler enters, pays 1~dollar to play, and bets that
+the pattern B = HTH will occur on the next three tosses.  If H occurs, he wins
+2~dollars and bets this amount that the next outcome will be~T.  If he wins, he
+wins 4~dollars and bets this amount that H will come up next time.  If he wins,
+he wins 8~dollars and the pattern has occurred.  If at any time he loses, he
+leaves with no winnings.  
+
+Let A and B be two patterns.  Let AB be the amount the gamblers win who
+arrive while the pattern A occurs and bet that B will occur.
+For example, if A = HT and B = HTH then AB = 2 + 4 = 6 since
+the first gambler bet on H and won 2 dollars and then bet on T and won 4
+dollars more. The
+second gambler bet on H and lost.
+If A = HH and B = HTH, then AB = 2 since the first gambler bet on H and won
+but then 
+bet on T and lost and the second gambler bet on H and won. If A = B = HTH
+then AB = BB = 8 + 2 = 10.
+\par
+Now for each gambler coming in, the casino takes in 1~dollar. 
+Thus the casino takes in $T^B$~dollars.  How much does it
+pay out? The only gamblers who go off with any money are those who arrive
+during the time the pattern B occurs and they win the amount BB. 
+But since all the bets made are perfectly fair bets, it seems quite
+intuitive that the expected amount the casino takes in should equal 
+the expected amount that it pays out.  That is, $E(T^B)$ = BB.
+\par
+Since we have seen that for B = HTH,  BB = 10, the
+expected time to reach the pattern HTH for the first time is 10. If we had been
+trying to get the pattern B = HHH, then  BB $= 8 + 4 + 2 = 14$ since all the
+last three gamblers are paid off in this case. Thus the expected time
+to get the pattern HHH is 14. To justify this argument, Li
+used a theorem from the theory of martingales (fair games).
+\par
+We can obtain these expectations by considering a Markov chain whose states
+are the possible initial segments of the sequence HTH; these states are  
+HTH, HT, H, and $\emptyset$, where
+$\emptyset$ is the empty set.  Then, for this example, the transition matrix
+is
+$$
+\bordermatrix{
+&\mbox{HTH} & \mbox{HT} & \mbox{H} & \emptyset \cr
+\mbox{HTH}  & 1 & 0 & 0 & 0 \cr
+\mbox{HT}   & .5 & 0 & 0 & .5 \cr
+\mbox{H}    & 0 & .5 & .5 & 0 \cr
+\emptyset   & 0 & 0 & .5 & .5 }\ ,
+$$
+and if B = HTH, $E(T^B)$ is the expected time to absorption for this chain
+started in
+state~$\emptyset$.
+\par
+Show, using the associated Markov chain, that the values $E(T^B)$ = 10 and
+$E(T^B)$
+= 14 are correct for the expected time to reach the patterns HTH and HHH,
+respectively.
+
+\i\label{exer 11.2.27} We can use the gambling
+interpretation given in Exercise~\ref{exer 11.2.26} to find the expected
+number of tosses required to reach pattern B when we start with pattern
+A.  To be a meaningful problem, 
+we assume that pattern A does not have pattern B as a subpattern.  Let
+$E_A(T^B)$ be
+the expected time to reach pattern B starting with pattern A.   We 
+use our gambling scheme and assume that the first k coin tosses produced
+the pattern A.  During this time, the gamblers made an amount AB.
+The total amount the gamblers will have made
+when the pattern B occurs
+is BB.  Thus, the amount that the gamblers made after
+the pattern A has occurred is  BB - AB.  Again by the fair game argument,
+$E_A(T^B)$ = BB-AB. 
+\par
+For example, suppose that we start with pattern A = HT and  are trying to get
+the pattern B = HTH.  Then we saw in Exercise~\ref{exer
+11.2.26} that AB = 4 and BB = 10 so $E_A(T
+^B)$ = BB-AB=
+6. 
+\par
+Verify that this gambling interpretation
+leads to the correct answer for all starting states in the examples that you
+worked in Exercise~\ref{exer 11.2.26}.
+
+\i\label{exer 11.2.28} Here is an elegant method due to Guibas and
+Odlyzko\footnote{L.~J.
+Guibas and A.~M. Odlyzko, ``String Overlaps, Pattern Matching, and
+Non-transitive Games,"
+\emx {Journal of Combinatorial Theory,} Series~A, vol.~30 (1981),
+pp.~183--208.} to obtain
+the expected time to reach a pattern, say HTH, for the first time.  Let $f(n)$
+be the
+number of sequences of length~$n$ which do not have the pattern HTH.  Let
+$f_p(n)$ be the
+number of sequences that have the pattern for the first time after $n$~tosses. 
+To each
+element of~$f(n)$, add the pattern HTH.  Then divide the resulting sequences
+into three subsets: the set where HTH occurs for the first time at time $n + 1$
+(for this, the original sequence must have ended with HT); the set where HTH
+occurs for the first time at time $n + 2$ (cannot happen for this pattern); and
+the set where the sequence HTH occurs for the first time at time $n + 3$ (the
+original sequence ended with anything except HT).  Doing this, we have
+$$
+f(n) = f_p(n + 1) + f_p(n + 3)\ .
+$$
+Thus,
+$$
+\frac{f(n)}{2^n} = \frac{2f_p(n + 1)}{2^{n + 1}} + \frac{2^3f_p(n + 3)}{2^{n +
+3}}\ .
+$$
+If $T$ is the time that the pattern occurs for the first time, this equality
+states that
+$$
+P(T > n) = 2P(T = n + 1) + 8P(T = n + 3)\ .
+$$
+Show that if you sum this equality over all~$n$ you obtain
+$$
+\sum_{n = 0}^\infty P(T > n) = 2 + 8 = 10\ .
+$$
+Show that for any integer-valued random variable
+$$
+E(T) = \sum_{n = 0}^\infty P(T > n)\ ,
+$$
+and conclude that $E(T) = 10$.  Note that this method of proof makes very
+clear that $E(T)$ is, in general, equal to the expected amount the casino pays
+out and avoids the martingale system theorem used by Li.
+
+\i\label{exer 11.2.30} In Example~\ref{exam 11.1.9}, define $f(i)$ to be the 
+proportion of G~genes in state~$i$.  Show that $f$ is a harmonic function (see 
+Exercise~\ref{exer 11.2.29}).  Why does this show that the probability of being 
+absorbed in state $(\mbox{GG},\mbox{GG})$ is equal to the proportion of G~genes
+in 
+the starting state?  (See Exercise~\ref{exer 11.2.16}.)
+
+\i\label{exer 11.2.31} Show that the stepping stone model (Example~\ref{exam
+11.1.10}) is an absorbing Markov chain.  Assume that you are playing a game
+with
+red and green squares, in
+which your fortune at any time is equal to the proportion of red squares at
+that
+time.  Give an argument to show that this is a fair game in the sense that your
+expected winning after each step is just what it was before this step.\emx
+{Hint}: Show that for every possible outcome in which your fortune will
+decrease by one there is another outcome of exactly the same probability where
+it will increase by one.
+\par
+Use this fact and the results of Exercise~\ref{exer 11.2.29} to show that the
+probability that a particular color wins out is equal to the proportion of
+squares that are initially of this color.
+
+\i\label{exer 11.2.32} Consider a random walker who moves on the integers 0,~1, 
+\ldots,~$N$, moving one step to the right with probability~$p$ and one step to
+the
+left with probability $q = 1 - p$.  If the walker ever reaches 0~or~$N$ he
+stays
+there.  (This is the Gambler's Ruin problem of Exercise \ref{exer 11.2.22}.)  
+If $p = q$ show that the function
+$$
+f(i) = i
+$$
+is a harmonic function (see Exercise~\ref{exer 11.2.29}), and if $p \ne q$ then
+$$
+f(i) = \biggl(\frac  {q}{p}\biggr)^i
+$$
+is a harmonic function.  Use this and the result of Exercise~\ref{exer 11.2.29} 
+to show that the probability $b_{iN}$ of being absorbed in state~$N$ starting
+in
+state~$i$ is
+$$
+ b_{iN} = \left \{ \matrix{
+                                   \frac iN, &\mbox{if}\,\, p = q, \cr
+          \frac{({q \over p})^i - 1}{({q \over p})^{N} - 1}, & 
+\mbox{if}\,\,p \ne q.\cr}\right.
+$$
+For an alternative derivation of these results see Exercise~\ref{exer 11.2.23}.
+
+\i\label{exer 11.2.33}  Complete the following alternate proof of
+Theorem~\ref{thm 
+11.2.3}.  Let $s_i$ be a transient state and $s_j$ be an absorbing state.  If
+we 
+compute $b_{ij}$ in terms of the possibilities on the outcome of the first
+step, then
+we have the equation
+$$
+b_{ij} = p_{ij} + \sum_k p_{ik} b_{kj}\ ,
+$$
+where the summation is carried out over all transient states~$s_k$.  Write this
+in matrix form, and derive from this equation the statement
+$$\mat{B} = \mat{N}\mat{R}\ .$$
+
+\i\label{exer 11.2.34}  In Monte Carlo roulette\index{roulette} (see
+Example~\ref{exam 6.1.5}),
+under option (c), there are six states ($S$, $W$, $L$, $E$, $P_1$, and $P_2$). 
+The reader
+is referred to Figure~\ref{fig 6.1.5}, which contains a tree for this option. 
+Form 
+a Markov chain for this option, and use the program {\bf AbsorbingChain} to
+find the
+probabilities that you win, lose, or break even for a 1 franc bet on red. 
+Using these
+probabilities, find the expected winnings for this bet.  For a more general
+discussion of 
+Markov chains applied to roulette, see the article of H. Sagan referred to in 
+Example~\ref{exam 6.7}.
+
+\i\label{exer 11.5.26} We consider next a game called \emx {Penney-ante} by its 
+inventor W. Penney.\footnote{W. Penney, ``Problem: Penney-Ante," \emx {Journal
+of
+Recreational Math,} vol.~2 (1969), p.~241.}\index{PENNEY, W.}  There are two
+players; the first
+player picks a pattern  A of H's and T's, and then the second player,
+knowing the choice of the first player, picks a different pattern B.
+We assume that neither pattern is a subpattern of the other pattern.
+A coin is tossed a sequence of times, and the player
+whose pattern comes up first is the winner.  To analyze the game, we need to
+find the
+probability $p_A$ that pattern A will occur before 
+pattern B and the probability $p_B = 1- p_A$ that pattern
+B occurs before pattern A. To determine these probabilities we use the
+results of 
+Exercises~\ref{exer 11.2.26} and \ref{exer 11.2.27}.  Here you were asked
+to  show that, the expected time to
+reach a pattern B for the first time is,
+$$
+E(T^B) = BB\ ,
+$$
+and, starting with pattern A, the expected time to reach pattern B is
+$$
+E_A(T^B) = BB - AB\ .
+$$
+
+\begin{enumerate}
+\item Show that the odds that the first player will win are given by John
+Conway's
+formula\footnote{M. Gardner, ``Mathematical Games," \emx {Scientific American,}
+ vol.~10 (1974), pp. 120--125.}\index{CONWAY, J.}:
+$$
+\frac{p_A}{1-p_A} = \frac{p_A}{p_B} = \frac{BB - BA}{AA - AB}\ .
+$$
+\emx {Hint}: Explain why 
+$$
+E(T^B) = E(T^{A\ {\rm or}\ B}) + p_A E_A(T^B)
+$$
+
+and thus
+$$
+BB = E(T^{A\ {\rm or}\ B}) + p_A (BB - AB)\ .
+$$
+Interchange A and B to find a similar equation involving 
+the  $p_B$.  Finally, note that
+$$
+p_A + p_B = 1\ .$$
+Use these equations to solve for $p_A$ and $p_B$.
+
+\item Assume that both players choose a pattern of the same length k. Show
+that, if $k = 2$, this is a fair game, but, if $k =
+3$, the second player has an advantage no matter what choice the first player
+makes. 
+(It has been shown that, for $k \geq 3$, if the first player chooses
+$a_1$,~$a_2$, \ldots,~$a_k$, then the optimal strategy for the second player is
+of the form $b$,~$a_1$, \ldots,~$a_{k - 1}$ where $b$ is the better of the two
+choices H~or~T.\footnote{Guibas and Odlyzko, op. cit.})
+\end{enumerate}
+
+\end{LJSItem}
+
+\section{Ergodic Markov Chains}\label{sec 11.3} 
+ 
+A second important kind of Markov chain we shall study in detail is an
+\emx{ergodic} Markov
+chain, defined as follows.
+
+\begin{definition}\label{defn 11.3.6.5}
+A Markov chain is called an \emx {ergodic} chain if it is possible to go from 
+every state to every state (not necessarily in one move).\index{ergodic Markov
+chain}
+\index{Markov chain!ergodic}
+\end{definition}
+\par
+In many books, ergodic Markov chains are called \emx
+{irreducible}.\index{irreducible
+Markov chain}\index{Markov chain!irreducible}
+
+\begin{definition}\label{defn 11.3.7}
+A Markov chain is called a \emx {regular} chain if some power of the
+transition matrix has only positive elements.\index{regular Markov chain}
+\index{Markov chain!regular}
+\end{definition}
+\par
+In other words, for some $n$, it is possible to go from any state to any state
+in exactly $n$ steps.  It is clear from this definition that every regular 
+chain is ergodic.  On the other hand, an ergodic chain is not necessarily 
+regular, as the following examples show.
+
+\begin{example}
+Let the transition matrix of a Markov chain be defined by
+$$\mat{P} = \bordermatrix{
+   &  1  &  2  \cr
+1  &  0  &  1  \cr
+2  &  1  &  0}\ .
+$$
+Then is clear that it is possible to move from any state to any state, so the
+chain is ergodic.  However, if $n$ is odd, then it is not possible to move from 
+state 0 to state 0 in $n$ steps, and if $n$ is even, then it is not possible to
+move from state 0 to state 1 in $n$ steps, so the chain is not regular.
+\end{example}
+A more interesting example of an ergodic, non-regular Markov chain is provided
+by the Ehrenfest urn model.
+
+\begin{example}
+Recall the Ehrenfest urn model (Example~\ref{exam 11.1.6}).\index{Ehrenfest
+model}
+\index{gas diffusion!Ehrenfest model of}  
+The transition matrix for this example is
+$$
+\mat{P} = \bordermatrix{
+  &  0  &  1  &  2  &  3  &  4  \cr
+0 &  0  &  1  &  0  &  0  &  0  \cr
+1 & 1/4 &  0  & 3/4 &  0  &  0  \cr
+2 &  0  & 1/2 &  0  & 1/2 &  0  \cr
+3 &  0  &  0  & 3/4 &  0  & 1/4 \cr
+4 &  0  &  0  &  0  &  1  &  0}\ .
+$$
+In this example, if we start in state~0 we will, after any even number of
+steps, be in either state 0, 2 or 4, and after any odd number of steps, 
+be in states 1~or~3.  Thus this chain is ergodic but not regular.
+\end{example}
+
+\subsection*{Regular Markov Chains}
+
+Any transition matrix that has no zeros determines a regular Markov
+chain.  However, it is possible for a regular Markov chain to have a 
+transition matrix that has zeros.  The transition
+matrix of the Land of Oz example of Section~\ref{sec 11.1} has $p_{NN} = 0$ but
+the
+second power $\mat{P}^2$ has no zeros, so this is a regular Markov chain.  
+\par
+An example of a nonregular Markov chain is an absorbing chain.  For example,
+let 
+$$
+\mat{P} = \pmatrix{
+1 & 0 \cr
+1/2 & 1/2 \cr}
+$$
+be the transition matrix of a Markov chain.  Then all powers of $\mat{P}$ will 
+have a 0 in the upper right-hand corner.
+\par
+We shall now discuss two important theorems relating to regular chains.  
+
+\begin{theorem}\label{thm 11.3.6}
+Let $\mat{P}$ be the transition matrix for a regular chain.  Then, as $n \to
+\infty$, the powers $\mat{P}^n$ approach a limiting matrix $\mat{W}$ with all
+rows the same vector $\mat{w}$.  The vector $\mat{w}$ is a strictly positive
+probability vector
+(i.e., the components are all positive and they sum to one).
+\end{theorem}
+\par
+In the next section we give two proofs of this fundamental theorem.  We give
+here the
+basic idea of the first proof.
+\par
+We want to show that the powers $\mat{P}^n$ of a regular transition matrix tend
+to a matrix
+with all rows the same. This is the same as showing that $\mat{P}^n$ converges
+to a matrix
+with constant columns.  Now the $j$th column of $\mat{P}^n$ is $\mat{P}^{n}
+\mat{y}$ where
+$\mat{y}$ is a column vector with $1$ in the $j$th entry and 0 in the other
+entries.  Thus
+we need only prove that for any column vector $\mat{y},\mat{P}^{n} \mat{y}$
+approaches a
+constant vector as
+$n$ tend to infinity.
+\par
+Since each row of $\mat{P}$ is a probability vector, $\mat{Py}$ replaces
+$\mat{y}$ by
+averages of its components.  Here is an example:
+$$\pmatrix{1/2 & 1/4 & 1/4 \cr 1/3 & 1/3 & 1/3 \cr 1/2 & 1/2 & 0\cr} \pmatrix
+{1 \cr 2 \cr
+3 \cr} = 
+\pmatrix{1/2 \cdot 1+ 1/4 \cdot 2+ 1/4 \cdot 3\cr 
+         1/3 \cdot 1+ 1/3 \cdot 2+ 1/3 \cdot 3\cr 
+         1/2 \cdot 1+ 1/2 \cdot 2+ 0   \cdot 3\cr}
+=\pmatrix {7/4 \cr 2 \cr 3/2 \cr}\ .   
+$$
+The result of the averaging process is to make the components of $\mat{Py}$
+more similar
+than those of $\mat{y}$.  In particular, the maximum component decreases (from
+3 to 2) and
+the minimum component increases (from 1 to 3/2).  Our proof will show that as
+we do more
+and more of this averaging to get $\mat{P}^{n} \mat{y}$, the difference between
+the maximum
+and minimum component will tend to 0 as $n \rightarrow \infty$.  This
+means
+$\mat{P}^{n} \mat{y}$ tends to a constant vector.
+The $ij$th entry of $\mat{P}^n$, $p_{ij}^{(n)}$, is the probability that the
+process will be in state~$s_j$ after $n$ steps if it starts in state~$s_i$.
+If we denote the common row of $\mat{W}$ by $\mat{w}$, then Theorem~\ref{thm
+11.3.6} states that
+the probability of being in~$s_j$ in the long run is approximately~$w_j$, the
+$j$th entry
+of $\mat{w}$, and is independent of the starting state.
+
+\begin{example}\label{exam 11.3.1}
+Recall that for the Land of Oz example of Section~\ref{sec 11.1}, the sixth
+power
+of the transition matrix~$\mat{P}$ is, to three decimal places,
+$$
+\mat{P}^6 = \bordermatrix{
+         & \mbox{R} & \mbox{N} & \mbox{S} \cr
+\mbox{R} & .4 & .2 & .4 \cr
+\mbox{N} & .4 & .2 & .4 \cr
+\mbox{S}  & .4 & .2 & .4}\ .
+$$
+Thus, to this degree of accuracy, the probability of rain six days after a
+rainy day is the same as the probability of rain six days after a nice day, or
+six days after a snowy day.  Theorem~\ref{thm 11.3.6} predicts that, for
+large~$n$,
+the rows of~$\mat{P}$ approach a common vector.  It is interesting that this
+occurs
+so soon in our example.  
+\end{example}
+
+\begin{theorem}\label{thm 11.3.8}
+Let $\mat {P}$ be a regular transition matrix, let 
+$$\mat{W} = \lim_{n \rightarrow \infty} \mat{P}^n\ ,$$
+let $\mat{w}$ be the common row of $\mat{W}$, and let $\mat{c}$ be the column
+vector all of
+whose components are 1.  Then
+\begin{description}
+\item[(a)]
+$\mat{w}\mat{P} =
+\mat{w}$, and any row vector~$\mat{v}$ such that $\mat{v}\mat{P} = \mat{v}$ is
+a constant
+multiple of~$\mat{w}$.  
+\item[(b)]
+$\mat{P}\mat{c} = \mat{c}$, and any column vector~\mat{x} such that
+$\mat{P}\mat{x} =
+\mat{x}$ is a multiple of~$\mat{c}$.
+\end{description}
+\proof
+To prove part (a), we note that from Theorem~\ref{thm 11.3.6}, 
+$$
+\mat{P}^n \to \mat{W}\ .
+$$
+Thus,
+$$
+\mat{P}^{n + 1} = \mat{P}^n \cdot \mat{P} \to \mat{W}\mat{P}\ .
+$$
+But $\mat{P}^{n + 1} \to \mat{W}$, and so $\mat{W} = \mat{W}\mat{P}$, and
+$\mat{w} =
+\mat{w}\mat{P}$. 
+\par
+Let $\mat{v}$ be any vector 
+with $\mat{v} \mat{P} = \mat{v}$.  Then $\mat{v} = \mat{v} \mat{P}^n$, and
+passing to
+the limit, $\mat{v} = \mat{v} \mat{W}$.   Let $r$ be the sum of the components
+of $\mat{v}$.
+Then it is easily checked that $\mat{v}\mat{W} = r\mat{w}$.  So, $\mat{v} =
+r\mat{w}$.
+\par
+To prove part (b), assume that $\mat{x} = \mat{P} \mat{x}$.  Then $\mat{x} =
+\mat{P}^n
+\mat{x}$, and again passing to the limit, $\mat{x} =  \mat{W}\mat{x}$.  Since
+all rows of
+$\mat{W}$ are the same, the components of $\mat{W}\mat{x}$ are all equal, so
+$\mat{x}$ is a
+multiple of $\mat{c}$.
+\end{theorem}
+
+Note that an immediate consequence of Theorem~\ref{thm 11.3.8} is the fact that
+there is only
+one probability vector $\mat{v}$ such that $\mat{v}\mat{P} = \mat{v}$.
+
+\subsection*{Fixed Vectors}
+\begin{definition}\label{def 11.3.1}
+A row vector~$\mat{w}$ with the property $\mat{w}\mat{P} = \mat{w}$ is called a
+\emx {fixed row vector} for~$\mat{P}$.\index{fixed row vector}  Similarly, a
+column
+vector~$\mat{x}$ such that $\mat{P}\mat{x} = \mat{x}$ is called a \emx 
+{fixed column vector} for~$\mat{P}$.\index{fixed column vector}  
+\end{definition}
+
+Thus, the common row of~$\mat{W}$ is the unique vector~$\mat{w}$ which is both
+a fixed
+row vector for~$\mat{P}$ and a probability vector.  Theorem~\ref{thm 11.3.8}
+shows that any
+fixed row vector for~$\mat{P}$ is a multiple of~$\mat{w}$ and any fixed column
+vector
+for~$\mat{P}$ is a constant vector.
+\par
+One can also state Definition~\ref{def 11.3.1} in terms of eigenvalues and
+eigenvectors.
+A fixed row vector is a left eigenvector of the matrix $\mat{P}$ corresponding
+to the 
+eigenvalue 1.  A similar statement can be made about fixed column vectors.  
+\par
+We will now give several different methods for calculating the fixed row vector
+\mat{w} for
+a regular Markov chain.
+
+\begin{example}\label{exam 11.3.2}
+By Theorem~\ref{thm 11.3.6} we can find the limiting vector~$\mat{w}$ for the 
+Land of Oz from the fact that
+$$
+w_1 + w_2 + w_3 = 1
+$$
+and
+$$
+ \pmatrix{ w_1 & w_2 & w_3 } \pmatrix{
+ 1/2 & 1/4 & 1/4 \cr
+ 1/2 & 0   & 1/2 \cr
+ 1/4 & 1/4 & 1/2 \cr} = \pmatrix{ w_1 & w_2 & w_3 }\ .
+$$
+
+These relations lead to the following four equations in three unknowns:
+\begin{eqnarray*}
+                            w_1   + w_2 + w_3 &=& 1\ ,   \\
+             (1/2)w_1 + (1/2)w_2  + (1/4)w_3  &=& w_1\ , \\
+                        (1/4)w_1  + (1/4)w_3  &=& w_2\ , \\
+             (1/4)w_1 + (1/2)w_2  + (1/2)w_3  &=& w_3\ .
+\end{eqnarray*}
+
+Our theorem guarantees that these equations have a unique solution.  If the
+equations are solved, we obtain the solution
+$$
+\mat{w} = \pmatrix{ .4 & .2 & .4 }\ ,
+$$
+in agreement with that predicted from~$\mat{P}^6$, given in Example~\ref{exam
+11.1.1.5}.
+\end{example}
+
+To calculate the fixed vector, we can assume that the value at a particular
+state, say state one, is~1, and then use all but one of the linear equations
+from 
+$\mat{w}\mat{P} = \mat{w}$.  This set of equations will have a unique solution
+and 
+we can obtain $\mat{w}$ from this solution by dividing each of its entries by
+their 
+sum to give the probability vector~$\mat{w}$.  We will now illustrate this idea
+for the 
+above example. 
+\begin{example}\label{exam 11.3.2.5}(Example~\ref{exam 11.3.2} continued)
+We set $w_1 = 1$, and then solve the first and second linear equations from
+$\mat{w}\mat{P} =
+\mat{w}$. We have
+\begin{eqnarray*}
+             (1/2) + (1/2)w_2  + (1/4)w_3  &=& 1\ , \\
+                        (1/4)  + (1/4)w_3  &=& w_2\ . \\
+\end{eqnarray*}
+If we solve these, we obtain 
+$$\pmatrix{w_1&w_2&w_3} = \pmatrix{1&1/2&1}\ .$$
+Now we divide this vector by the sum of the components, to obtain the final
+answer:
+$$\mat{w} = \pmatrix{.4&.2&.4}\ .$$
+This method can be easily programmed to run on a computer.
+\end{example}
+\par
+As mentioned above, we can also think of the fixed row vector $\mat{w}$ as a
+left eigenvector of
+the transition matrix $\mat{P}$.  Thus, if we write $\mat{I}$ to denote the
+identity matrix, then
+$\mat{w}$ satisfies the matrix equation
+$$\mat{w}\mat{P} = \mat{w}\mat{I}\ ,$$
+or equivalently,
+$$\mat{w}(\mat{P} - \mat{I}) = \mat{0}\ .$$
+Thus, $\mat{w}$ is in the left nullspace of the matrix $\mat{P} - \mat{I}$. 
+Furthermore, Theorem~\ref{thm 11.3.8} states that this left nullspace has
+dimension 1. 
+Certain computer programming languages can find nullspaces of matrices.  In
+such languages,
+one can find the fixed row probability vector for a matrix $\mat{P}$ by
+computing the left
+nullspace and then normalizing a vector in the nullspace so the sum of its
+components is 1.
+\par
+The program {\bf FixedVector}\index{FixedVector (program)} uses one of the above methods
+(depending upon the language in
+which it is written) to calculate the fixed row probability vector for regular
+Markov chains.
+\par
+So far we have always assumed that we started in a specific state.  The
+following theorem generalizes Theorem~\ref{thm 11.3.6} to the case where the 
+starting state is itself determined by a probability vector.
+
+\begin{theorem}\label{thm 11.3.9}
+Let $\mat{P}$ be the transition matrix for a regular chain and $\mat{v}$ an
+arbitrary
+probability vector.  Then
+$$
+\lim_{n \to \infty} \mat{v} \mat{P}^n = \mat{w}\ ,
+$$
+where $\mat{w}$ is the unique fixed probability vector for $\mat{P}$.
+\proof
+By Theorem~\ref{thm 11.3.6},
+$$
+\lim_{n \to \infty} \mat{P}^n = \mat {W}\ .
+$$
+Hence,
+$$
+\lim_{n \to \infty} \mat {v} \mat {P}^n = \mat {v} \mat {W}\ .
+$$
+But the entries in $\mat {v}$ sum to 1, and each row of $\mat {W}$ equals $\mat
+{w}$.
+From these statements, it is easy to check that
+$$
+\mat {v} \mat {W} = \mat {w}\ .
+$$
+\end{theorem}
+
+If we start a Markov chain with initial probabilities given by~$\mat{v}$, then
+the 
+probability vector $\mat{v}
+\mat{P}^n$ gives the probabilities of being in the various states after
+$n$~steps. 
+Theorem~\ref{thm 11.3.9} then establishes the fact that, even in this more
+general class of
+processes, the probability of being in~$s_j$ approaches $w_j$.
+
+\subsection*{Equilibrium}
+We also obtain a new interpretation for~$\mat{w}$.  Suppose that our 
+starting vector picks state~$s_i$ as a starting state with probability~$w_i$,
+for all~$i$.  Then the probability of being in the various states after $n$
+steps is given by $\mat {w} \mat {P}^n = \mat {w}$, and is the same on all
+steps. 
+This method of starting provides us with a process that is called
+``stationary."
+The fact that $\mat{w}$ is the only probability vector for which $\mat {w} \mat
+{P} = 
+\mat {w}$ shows that we must have a starting probability vector of exactly the
+kind 
+described to obtain a stationary process.
+\par
+Many interesting results concerning regular Markov chains depend only on the
+fact that the chain has a unique fixed probability vector which is positive. 
+This property holds for all ergodic Markov chains.
+
+\begin{theorem}\label{thm 11.3.10}
+For an ergodic Markov chain, there is a unique probability vector~$\mat{w}$
+such
+that $\mat {w} \mat {P} = \mat {w}$ and $\mat{w}$ is strictly positive.  Any
+row 
+vector such that $\mat {v} \mat {P} = \mat {v}$ is a multiple of~$\mat{w}$. 
+Any column
+vector~$\mat{x}$ such that $\mat {P} \mat {x} = \mat {x}$ is a constant vector.
+\proof
+This theorem states that Theorem~\ref{thm 11.3.8} is true for ergodic chains.
+The result follows easily from the fact that, if $\mat{P}$ is an ergodic 
+transition matrix, then $\bar{\mat{P}} = (1/2)\mat {I} + (1/2)\mat {P}$ is a 
+regular transition matrix with the same fixed vectors (see Exercises~\ref{exer
+11.3.24}--\ref{exer 11.3.27}).
+\end{theorem}
+\par
+For ergodic chains, the fixed probability vector has a slightly different
+interpretation.  The following two theorems, which we will not prove here,
+furnish an interpretation for this fixed vector.
+
+\begin{theorem}\label{thm 11.3.11}
+Let $\mat{P}$ be the transition matrix for an ergodic chain.  Let $\mat {A}_n$
+be the
+matrix defined by
+$$
+\mat {A}_n = \frac{\mat {I} + \mat {P} + \mat {P}^2 +\cdots + \mat {P}^n}{n +
+1}\ .
+$$
+Then $\mat {A}_n \to \mat {W}$, where $\mat{W}$ is a matrix all of whose rows
+are equal 
+to the unique fixed probability vector $\mat{w}$ for $\mat{P}$.  
+\end{theorem}
+
+\par
+If $\mat{P}$ is the transition matrix of an ergodic chain, then
+Theorem~\ref{thm 11.3.8} states
+that there is only one fixed row probability vector for $\mat{P}$.  Thus, we
+can use the same
+techniques that were used for regular chains to solve for this fixed vector. 
+In particular,
+the program {\bf FixedVector} works for ergodic chains.
+\par
+To interpret Theorem~\ref{thm 11.3.11}, let us assume that we have an ergodic
+chain that
+starts in state~$s_i$.  Let $X^{(m)} = 1$ if the $m$th step is to state~$s_j$
+and 0
+otherwise.  Then the average number of times in state~$s_j$ in the first $n$
+steps is given by
+$$
+H^{(n)} = \frac{X^{(0)} + X^{(1)} + X^{(2)} +\cdots+ X^{(n)}}{n + 1}\ .
+$$
+But $X^{(m)}$ takes on the value~1 with probability~$p_{ij}^{(m)}$ and 0
+otherwise.  Thus $E(X^{(m)}) = p_{ij}^{(m)}$, and the $ij$th entry of~$\mat
+{A}_n$
+gives the expected value of~$H^{(n)}$, that is, the expected proportion of
+times in state~$s_j$ in the first $n$ steps if the chain starts in state~$s_i$.
+
+If we call being in state~$s_j$ \emx{success} and any other state
+\emx{failure,} we could ask
+if a theorem analogous to the law of large numbers for independent trials
+holds.  
+The answer is yes and is given by the following theorem.
+
+\begin{theorem}{\bf (Law of Large Numbers for Ergodic Markov Chains)}\label{thm
+11.3.12}
+\index{Law of Large Numbers!for Ergodic Markov Chains}
+Let $H_j^{(n)}$ be the proportion of times in $n$ steps that an ergodic chain
+is in state~$s_j$.  Then for any $\epsilon > 0$,
+$$
+P\Bigl(|H_j^{(n)} - w_j| > \epsilon\Bigr) \to 0\ ,
+$$
+independent of the starting state~$s_i$.
+\end{theorem}
+
+We have observed that every regular Markov chain is also an ergodic chain. 
+Hence, Theorems~\ref{thm 11.3.11}~and~\ref{thm 11.3.12} apply also for regular
+chains.  For example, this gives us a new interpretation for the fixed vector
+$\mat {w} = (.4,.2,.4)$ in the Land of Oz example.  Theorem~\ref{thm 11.3.11} 
+predicts that, in the long run, it will rain 40~percent of the time in the Land
+of
+Oz, be nice 20~percent of the time, and snow 40~percent of the time.
+
+\subsection*{Simulation}
+We illustrate Theorem~\ref{thm 11.3.12} by writing a program to simulate the
+behavior of a
+Markov chain.  {\bf  SimulateChain}\index{SimulateChain (program)} is such a program.  
+
+\begin{example}\label{exam 11.3.2.6}
+In the Land of Oz, there are 525 days in a year.
+\index{Oz, Land of}  We have simulated the weather for one year in
+the Land of Oz, using the program {\bf SimulateChain}.  The results are shown
+in 
+Table~\ref{table 11.2}. 
+
+\begin{table}[h]
+\centering
+\begin{verbatim}
+     SSRNRNSSSSSSNRSNSSRNSRNSSSNSRRRNSSSNRRSSSSNRSSNSRRRRRRNSSS 
+     SSRRRSNSNRRRRSRSRNSNSRRNRRNRSSNSRNRNSSRRSRNSSSNRSRRSSNRSNR
+     RNSSSSNSSNSRSRRNSSNSSRNSSRRNRRRSRNRRRNSSSNRNSRNSNRNRSSSRSS
+     NRSSSNSSSSSSNSSSNSNSRRNRNRRRRSRRRSSSSNRRSSSSRSRRRNRRRSSSSR
+     RNRRRSRSSRRRRSSRNRRRRRRNSSRNRSSSNRNSNRRRRNRRRNRSNRRNSRRSNR
+     RRRSSSRNRRRNSNSSSSSRRRRSRNRSSRRRRSSSRRRNRNRRRSRSRNSNSSRRRR
+     RNSNRNSNRRNRRRRRRSSSNRSSRSNRSSSNSNRNSNSSSNRRSRRRNRRRRNRNRS
+     SSNSRSNRNRRSNRRNSRSSSRNSRRSSNSRRRNRRSNRRNSSSSSNRNSSSSSSSNR
+     NSRRRNSSRRRNSSSNRRSRNSSRRNRRNRSNRRRRRRRRRNSNRRRRRNSRRSSSSN
+     SNS
+\end{verbatim}
+\begin{tabular}{lcc}
+State    &      Times     &      Fraction\\
+         &                &           \\
+R        &        217     &      .413 \\
+N        &        109     &      .208 \\
+S        &        199     &      .379 \\
+\end{tabular}
+\caption{Weather in the Land of Oz.}
+\label{table 11.2}
+\end{table}
+ 
+We note that the simulation gives a proportion of times in each of the states
+not too different from the long run predictions of .4,~.2, and~.4 assured by
+Theorem~\ref{thm 11.3.6}.  To get better results we have to simulate our chain 
+for a longer time.  We do this for 10{,}000 days without printing out each
+day's
+weather.  The results are shown in Table~\ref{table 11.3}.  We see that the
+results are 
+now quite close to the theoretical values
+of .4,~.2, and~.4.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+State &      Times     &     Fraction\\
+      &                &           \\
+R     &      4010      &      .401 \\
+N     &      1902      &      .19  \\
+S     &      4088      &      .409 \\
+\end{tabular}
+\caption{Comparison of observed and predicted frequencies for the Land of Oz.}
+\label{table 11.3}
+\end{table}
+\end{example}
+
+\subsection*{Examples of Ergodic Chains}
+
+The computation of the fixed vector~$\mat{w}$ may be difficult if the
+transition matrix is very large.  It is sometimes useful to guess the fixed
+vector
+on purely intuitive grounds.  Here is a simple example to illustrate this kind
+of situation.
+
+\begin{example}\label{exam 11.3.3}
+A white rat is put into the maze of Figure~\ref{fig
+11.4}.\index{rat}\index{maze}  There are nine
+compartments with connections between the compartments as indicated.  The rat
+moves through the
+compartments at random.  That is, if there are $k$~ways to leave a compartment,
+it chooses each of these with equal probability.  We can represent the travels
+of the rat by a Markov chain process with transition matrix given by
+$$
+\mat {P} = \bordermatrix{
+& 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \cr
+1 & 0 & 1/2 & 0 & 0 & 0 & 1/2 & 0 & 0 & 0 \cr
+2 & 1/3 & 0 & 1/3 & 0 & 1/3 & 0 & 0 & 0 & 0 \cr
+3 & 0 & 1/2 & 0 & 1/2 & 0 & 0 & 0 & 0 & 0 \cr
+4 & 0 & 0 & 1/3 & 0 & 1/3 & 0 & 0 & 0 & 1/3 \cr
+5 & 0 & 1/4 & 0 & 1/4 & 0 & 1/4 & 0 & 1/4 & 0 \cr
+6 & 1/3 & 0 & 0 & 0 & 1/3 & 0 & 1/3 & 0 & 0 \cr
+7 & 0 & 0 & 0 & 0 & 0 & 1/2 & 0 & 1/2 & 0 \cr
+8 & 0 & 0 & 0 & 0 & 1/3 & 0 & 1/3 & 0 & 1/3 \cr
+9 & 0 & 0 & 0 & 1/2 & 0 & 0 & 0 & 1/2 & 0}\ .
+$$
+
+\putfig{2truein}{PSfig11-4}{The maze problem.}{fig 11.4}
+ 
+%\begin{figure}
+%\centerline{\epsfxsize=2truein 
+%\epsffile{PSfig11-4}}
+%\caption{The maze problem.}\label{fig 11.4}
+%\end{figure}
+\par
+That this chain is not regular can be seen as follows: From an odd-numbered
+state
+the process can go only to an even-numbered state, and from an even-numbered
+state it can go only to an odd number.  Hence, starting in state $i$ the
+process
+will be alternately in even-numbered and odd-numbered states.  Therefore, odd
+powers
+of~$\mat{P}$ will have 0's for the odd-numbered entries in row~1.  On the other
+hand, a glance at the maze shows that it is possible to go from every state to
+every other state, so that the chain is ergodic.
+\par
+To find the fixed probability vector for this matrix, we would have to solve
+ten equations in nine unknowns.  However, it would seem reasonable that the
+times spent in each compartment should, in the long run, be proportional to the
+number of entries to each compartment.  Thus, we try the vector whose $j$th
+component is the number of entries to the $j$th compartment:
+$$
+\mat {x} = \pmatrix{ 2 & 3 & 2 & 3 & 4 & 3 & 2 & 3 & 2}\ .
+$$
+It is easy to check that this vector is indeed a fixed vector so that the
+unique probability vector is this vector normalized to have sum~1:
+$$
+\mat {w} = \pmatrix{ \frac1{12} & \frac18 & \frac1{12} & \frac18 & \frac16 &
+\frac18 & \frac 1{12} & \frac18 & \frac1{12} }\ .
+$$
+\end{example}
+
+\begin{example}\label{exam 11.3.4}(Example~\ref{exam 11.1.6} continued)
+We recall the Ehrenfest urn model of Example~\ref{exam 11.1.6}.
+\index{Ehrenfest model}\index{gas diffusion!Ehrenfest model of}
+The transition
+matrix for this chain is as follows:
+
+$$
+\mat {P} = \bordermatrix{
+  & 0    & 1     &  2   & 3    & 4   \cr
+0 & .000 & 1.000 & .000 & .000 & .000\cr
+1 & .250 &  .000 & .750 & .000 & .000\cr
+2 & .000 &  .500 & .000 & .500 & .000\cr
+3 & .000 &  .000 & .750 & .000 & .250\cr
+4 & .000 &  .000 & .000 &1.000 & .000}\ .
+$$
+If we run the program {\bf FixedVector} for this chain, we obtain the vector
+$$
+\mat {w} = \bordermatrix{ 
+  &     0  &    1  &    2  &    3  &    4\cr
+  & .0625  &.2500  &.3750  &.2500  &.0625}\ .
+$$
+
+By Theorem~\ref{thm 11.3.12}, we can interpret these values for~$w_i$ as the
+proportion of times the process is in each of the states in the long run.  For
+example, the proportion of times in state~0 is .0625 and the proportion of
+times in state~1 is .375.  The astute reader will note that these numbers are
+the binomial distribution 1/16,~4/16, 6/16, 4/16,~1/16.  We could have guessed
+this answer as follows: If we consider a particular ball, it simply moves
+randomly back and forth between the two urns.  This suggests that the
+equilibrium state should be just as if we randomly distributed the four balls
+in the two urns.  If we did this, the probability that there would be exactly
+$j$~balls in one urn would be given by the binomial distribution $b(n,p,j)$
+with $n = 4$ and $p = 1/2$.
+\end{example}
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 11.3.1} Which of the following matrices are transition matrices
+for 
+regular Markov chains?
+\begin{enumerate}
+\item $\mat {P} = \pmatrix{ .5 & .5 \cr .5 & .5 }$.
+\smallskip
+\item $\mat {P} = \pmatrix{ .5 & .5 \cr 1 & 0 }$.
+\smallskip
+\item $\mat {P} = \pmatrix{ 1/3 & 0 & 2/3 \cr 0 & 1 & 0 \cr 0 & 1/5 & 4/5}$.
+\smallskip
+\item $\mat {P} = \pmatrix{ 0 & 1 \cr 1 & 0}$.
+\smallskip
+\item $\mat {P} = \pmatrix{ 1/2 & 1/2 & 0 \cr 0 & 1/2 & 1/2 \cr 1/3 & 1/3 &
+1/3}$.
+\smallskip
+\end{enumerate}
+
+\i\label{exer 11.3.2} Consider the Markov chain with transition matrix
+$$
+\mat {P} = \pmatrix{ 1/2 & 1/3 & 1/6 \cr3/4 & 0 & 1/4 \cr 0 & 1 & 0}\ .
+$$
+\begin{enumerate}
+
+\item Show that this is a regular Markov chain.
+
+\item The process is started in state~1; find the probability that it is in
+state~3 after two steps.
+
+\item Find the limiting probability vector~$\mat{w}$.
+\end{enumerate}
+
+\i\label{exer 11.3.3} Consider the Markov chain with general $2 \times 2$
+transition matrix
+$$
+\mat {P} = \pmatrix{ 1 - a & a \cr b & 1 - b}\ .
+$$
+\begin{enumerate}
+
+\item Under what conditions is $\mat{P}$ absorbing?
+
+\item Under what conditions is $\mat{P}$ ergodic but not regular?
+
+\item Under what conditions is $\mat{P}$ regular?
+\end{enumerate}
+
+\i\label{exer 11.3.4} Find the fixed probability vector~$\mat{w}$ for the
+matrices in 
+Exercise~\ref{exer 11.3.3} that are ergodic.
+
+\i\label{exer 11.3.5} Find the fixed probability vector~$\mat{w}$ for each of
+the 
+following regular matrices.
+\begin{enumerate}
+\item $\mat {P} = \pmatrix{ .75 & .25 \cr .5 & .5}$.
+\smallskip
+\item $\mat {P} = \pmatrix{ .9 & .1 \cr .1 & .9}$.
+\smallskip
+\item $\mat {P} = \pmatrix{ 3/4 & 1/4 & 0 \cr 0 & 2/3 & 1/3 \cr 1/4 & 1/4 &
+1/2}$.
+\smallskip
+\end{enumerate}
+
+\i\label{exer 11.3.6} Consider the Markov chain with transition matrix in
+Exercise~\ref{exer
+11.3.3}, with $a = b = 1$.  Show that this chain is ergodic but not regular. 
+Find the fixed
+probability vector and interpret it.  Show that $\mat {P}^n$ does not tend to a
+limit, but that
+$$
+\mat {A}_n = \frac{\mat {I} + \mat {P} + \mat {P}^2 +\cdots + \mat {P}^n}{n +
+1}
+$$
+does.
+
+\i\label{exer 11.3.7} Consider the Markov chain with transition matrix of
+Exercise~\ref{exer
+11.3.3}, with $a = 0$ and $b = 1/2$.  Compute directly the unique fixed
+probability vector,
+and use your result to prove that the chain is not ergodic.
+
+\i\label{exer 11.3.8} Show that the matrix
+$$
+\mat {P} = \pmatrix{ 1 & 0 & 0 \cr 1/4 & 1/2 & 1/4 \cr 0 & 0 & 1}
+$$
+has more than one fixed probability vector.  Find the matrix that $\mat {P}^n$
+approaches as $n \to \infty$, and verify that it is not a matrix all of whose
+rows are the same.
+
+\i\label{exer 11.3.9} Prove that, if a 3-by-3 transition matrix has the
+property 
+that its \emx {column} sums are~1, then $(1/3, 1/3, 1/3)$ is a fixed
+probability
+vector.  State a similar result for $n$-by-$n$ transition matrices.  Interpret 
+these results for ergodic chains.
+
+\i\label{exer 11.3.10} Is the Markov chain in Example~\ref{exam 11.1.8}
+ergodic?
+
+\i\label{exer 11.3.10.5} Is the Markov chain in Example~\ref{exam 11.1.9}
+ergodic?
+
+\i\label{exer 11.3.11} Consider Example~\ref{exam 11.2.1} (Drunkard's
+Walk).\index{Drunkard's Walk example}   Assume that if the walker reaches
+state~0, he turns
+around and returns to state~1  on the next step and, similarly, if he reaches 4
+he returns
+on the next step to state~3.  Is this new chain ergodic?  Is it regular?
+
+\i\label{exer 11.3.12} For Example~\ref{exam 11.1.2} when $\mat{P}$ is ergodic,
+what 
+is the proportion of people who are told that the President will run? 
+Interpret 
+the fact that this proportion is independent of the starting state.
+
+\i\label{exer 11.3.13} Consider an independent trials process to be a Markov 
+chain whose states are the possible outcomes of the individual trials.  What is 
+its fixed probability vector?  Is the chain always regular?  Illustrate this
+for
+Example~\ref{exam 11.1.3}.
+
+\i\label{exer 11.3.14} Show that Example~\ref{exam 11.1.6} is an ergodic chain, 
+but not a regular chain.  Show that its fixed probability vector~$\mat{w}$ is a
+binomial distribution.
+
+\i\label{exer 11.3.15} Show that Example~\ref{exam 11.1.7} is regular and find
+the 
+limiting vector.
+
+\i\label{exer 11.3.16} Toss a fair die repeatedly.  Let $S_n$ denote the total
+of
+the outcomes through the $n$th toss.  Show that there is a limiting value for
+the
+proportion of the first $n$ values of~$S_n$ that are divisible by~7, and
+compute 
+the value for this limit.  \emx {Hint}: The desired limit is an equilibrium
+probability vector for an appropriate seven state Markov chain.
+
+\i\label{exer 11.3.17} Let $\mat{P}$ be the transition matrix of a regular
+Markov 
+chain.  Assume that there are $r$~states and let $N(r)$ be the smallest
+integer~$n$
+such that $\mat{P}$ is regular if and only if $\mat {P}^{N(r)}$ has no zero
+entries. 
+Find a finite upper bound for~$N(r)$.  See if you can determine $N(3)$ exactly.
+
+\istar\label{exer 11.3.18} Define $f(r)$ to be the smallest integer $n$ such
+that
+for all regular Markov chains with $r$ states, the $n$th power of the
+transition
+matrix has all entries positive.  It has been shown,\footnote{E. Seneta, \emx
+{Non-Negative Matrices:  An Introduction to Theory and Applications,}
+Wiley, New York, 1973, pp.~52-54.\index{SENETA, E.}}
+that $f(r) = r^2 - 2r + 2$.  
+\begin{enumerate}
+\item
+Define the transition matrix of an $r$-state Markov chain as follows:
+For states $s_i$, with $i = 1$,~2, \ldots,~$r - 2$, 
+$\mat {P}(i,i + 1) = 1$, $\mat {P}(r - 1,r) = \mat {P}(r - 1, 1) = 1/2$, and 
+$\mat {P}(r,1) = 1$. Show that this is a regular Markov chain.
+
+\item For $r = 3$, verify that the fifth power is the first power that has
+no zeros.
+
+\item Show that, for general $r$, the smallest $n$ such that $\mat {P}^n$ has
+all 
+entries positive is $n = f(r)$.
+\end{enumerate}
+
+\i\label{exer 11.3.19} A discrete time queueing system of capacity~$n$
+consists of the person being served and those waiting to be served.  The queue
+length~$x$ is observed each second.  If $0 < x < n$, then with probability~$p$,
+the queue size is increased by one by an arrival and, inependently, with
+probability~$r$, it is decreased by one because the person being served
+finishes
+service.  If $x = 0$, only an arrival (with probability~$p$) is possible.  If
+$x
+= n$, an arrival will depart without waiting for service, and so only the
+departure (with probability~$r$) of the person being served is possible.  Form
+a
+Markov chain with states given by the number of customers in the queue.  Modify
+the program {\bf  FixedVector} so that you can input $n$,~$p$, and~$r$, and the
+program will construct the transition matrix and compute the fixed vector.  The
+quantity $s = p/r$ is called the \emx {traffic intensity.}  Describe the
+differences in the fixed vectors according as $s < 1$, $s = 1$, or $s > 1$.
+
+\i\label{exer 11.3.20} Write a computer program to simulate the queue in
+Exercise~\ref{exer 11.3.19}.  Have your program keep track of the proportion of 
+the time that the queue length is $j$ for $j = 0$,~1, \ldots,~$n$ and the
+average
+queue length.  Show that the behavior of the queue length is very different
+depending upon whether the traffic intensity~$s$ has the property $s < 1$, $s =
+1$,
+or $s > 1$.
+
+\i\label{exer 11.3.21} In the queueing problem of Exercise~\ref{exer 11.3.19}, 
+let $S$ be the total service time required by a customer and $T$ the time
+between 
+arrivals of the customers.
+\begin{enumerate}
+\item Show that $P(S = j) = (1 - r)^{j - 1}r$ and $P(T = j) = (1 - p)^{j -
+1}p$, for $j > 0$.
+
+\item Show that $E(S) = 1/r$ and $E(T) = 1/p$.
+
+\item Interpret the conditions $s < 1$, $s = 1$ and $s > 1$ in terms of
+these expected values.
+\end{enumerate}
+
+\i\label{exer 11.3.22} In Exercise~\ref{exer 11.3.19} the service time~$S$ has 
+a geometric  distribution with $E(S) = 1/r$.  Assume that the service time is,
+instead, a constant time of $t$~seconds.  Modify your computer program of
+Exercise~\ref{exer 11.3.20} so that it simulates a constant time service
+distribution.  Compare the average queue length for the two types of
+distributions
+when they have the same expected service time (i.e., take $t = 1/r$).  Which
+distribution leads to the longer queues on the average?
+
+\i\label{exer 11.3.23} A certain experiment is believed to be described by a 
+two-state Markov chain with the transition matrix $\mat{P}$, where
+$$
+\mat {P} = \pmatrix{ .5 & .5 \cr p & 1 - p}
+$$
+and the parameter~$p$ is not known.  When the experiment is performed many
+times, the chain ends in state one approximately 20~percent of the time and in
+state two approximately 80~percent of the time.  Compute a sensible estimate
+for the unknown parameter~$p$ and explain how you found it.
+
+\i\label{exer 11.3.24} Prove that, in an $r$-state ergodic chain, it is
+possible to go from any state to any other state in at most $r - 1$ steps.
+
+\i\label{exer 11.3.25} Let $\mat{P}$ be the transition matrix of an $r$-state
+ergodic chain.  Prove that, if the diagonal entries $p_{ii}$ are positive, then
+the chain is regular.
+
+\i\label{exer 11.3.26} Prove that if $\mat{P}$ is the transition matrix of an 
+ergodic chain, then $(1/2)(\mat {I} + \mat {P})$ is the transition matrix of a 
+regular chain.  \emx {Hint}: Use Exercise~\ref{exer 11.3.25}.
+
+\i\label{exer 11.3.27} Prove that $\mat{P}$ and $(1/2)(\mat {I} + \mat {P})$
+have the
+same fixed vectors.
+
+\i\label{exer 11.3.28} In his book, \emx {Wahrscheinlichkeitsrechnung und
+Statistik,}\footnote{A. Engle, \emx {Wahrscheinlichkeitsrechnung und
+Statistik,} vol.~2 
+(Stuttgart: Klett Verlag, 1976).}\index{ENGLE, A.} A.~Engle proposes an
+algorithm for finding the fixed
+vector for an ergodic Markov chain when the transition probabilities are
+rational numbers. 
+Here is his algorithm: For each state~$i$, let $a_i$ be the  least common
+multiple of the
+denominators of the non-zero entries in the $i$th  row.  Engle describes his
+algorithm in
+terms of moving chips around on the states---indeed, for small examples, he
+recommends
+implementing the algorithm this way.  Start by putting $a_i$ chips on state~$i$
+for
+all~$i$.  Then, at each state, redistribute the $a_i$ chips, sending $a_i
+p_{ij}$ to
+state~$j$.  The number of chips at state~$i$ after this redistribution need not
+be a
+multiple of~$a_i$.  For each state~$i$, add just enough chips to bring the
+number of chips at state~$i$ up to a multiple of~$a_i$.  Then redistribute the
+chips in the same manner.  This process will eventually reach a point where the
+number of chips at each state, after the redistribution, is the same as before
+redistribution.  At this point, we have found a fixed vector.  Here is an
+example:
+$$
+\mat {P} = \bordermatrix{
+& 1 & 2 & 3 \cr
+1 & 1/2 & 1/4 & 1/4 \cr
+2 & 1/2 & 0 & 1/2 \cr
+3 & 1/2 & 1/4 & 1/4}\ .
+$$
+We start with $\mat {a} = (4,2,4)$.  The chips after successive redistributions
+are
+shown in Table~\ref{table 11.4}.
+
+\begin{table}
+\centering
+$$\begin{array}{lll}
+(4 & 2\;\; & 4)\\
+(5 & 2 & 3)\\
+(8 & 2 & 4)\\
+(7 & 3 & 4)\\
+(8 & 4 & 4)\\
+(8 & 3 & 5)\\
+(8 & 4 & 8)\\
+(10 & 4 & 6)\\
+(12 & 4 & 8)\\
+(12 & 5 & 7)\\
+(12 & 6 & 8)\\
+(13 & 5 & 8)\\
+(16 & 6 & 8)\\
+(15 & 6 & 9)\\
+(16 & 6 & 12)\\
+(17 & 7 & 10)\\
+(20 & 8 & 12)\\
+(20 & 8 & 12)\ .
+\end{array}
+$$
+\caption{Distribution of  chips.}
+\label{table 11.4}
+\end{table}
+We find that $\mat {a} = (20,8,12)$ is a fixed vector.
+
+\begin{enumerate}
+\item Write a computer program to implement this algorithm.
+
+\item Prove that the algorithm will stop.  \emx {Hint}: Let $\mat{b}$ be a
+vector with integer components that is a fixed vector for~$\mat{P}$ and such
+that
+each coordinate of the starting vector $\mat{a}$ is less than or equal to the
+corresponding component of~$\mat{b}$.  Show that, in the iteration, the
+components
+of the vectors are always increasing, and always less than or equal to the
+corresponding component of~$\mat{b}$.
+\end{enumerate}
+
+\i\label{exer 11.3.29} (Coffman, Kaduta, and Shepp\footnote{E.~G. Coffman, 
+J.~T. Kaduta, and L.~A.  Shepp,  ``On the Asymptotic Optimality of
+First-Storage
+Allocation," \emx {IEEE Trans.\ Software Engineering,} vol.~II (1985),
+pp.~235-239.}) A
+computing center  keeps information on a tape in positions of unit length. 
+During each
+time unit  there is one request to occupy a unit of tape.  When this arrives
+the first 
+free unit is used.  Also, during each second, each of the units that are
+occupied is
+vacated with probability~$p$.  Simulate this process, starting with an empty
+tape.  Estimate the expected number of sites occupied for a given value
+of~$p$.  If $p$ is small, can you choose the tape long enough so that there is
+a small probability that a new job will have to be turned away (i.e., that all
+the sites are occupied)?  Form a Markov chain with states the number of sites
+occupied.  Modify the program {\bf  FixedVector} to compute the fixed
+vector.  Use this to check your conjecture by simulation.
+
+\istar\label{exer 11.3.30} (Alternate proof of Theorem~\ref{thm 11.3.8})  Let
+$\mat{P}$ be the
+transition matrix of an ergodic  Markov chain.  Let $\mat{x}$ be any column
+vector such that
+$\mat{P}
+\mat{x} =
+\mat{ x}$.  Let $M$ be the  maximum value of the components of $\mat{x}$. 
+Assume that $x_i
+= M$.  Show that if $p_{ij} > 0$ then $x_j = M$.  Use this to prove that
+$\mat{x}$
+must be a constant vector.
+
+\i\label{exer 11.3.31} Let $\mat{P}$ be the transition matrix of an ergodic
+Markov 
+chain.  Let $\mat{w}$ be a fixed probability vector (i.e., $\mat{w}$ is a row
+vector 
+with $\mat {w}\mat {P} = \mat {w}$).  Show that if $w_i = 0$ and $p_{ji} > 0$
+then 
+$w_j = 0$.  Use this to show that the fixed probability vector for an ergodic
+chain
+cannot have any 0 entries.
+
+\i\label{exer 11.3.32} Find a Markov chain that is neither absorbing or
+ergodic.
+
+\end{LJSItem}
+
+\section[Fundamental Limit Theorem]{Fundamental Limit Theorem for Regular
+\newline Chains}\label{sec 11.4}
+
+The fundamental limit theorem for regular Markov chains states that if
+$\mat{P}$ is
+a regular transition matrix then
+$$
+\lim_{n \to \infty} \mat {P}^n = \mat {W}\ ,
+$$
+where $\mat{W}$ is a matrix with each row equal to the unique fixed probability
+row vector
+$\mat{w}$ for $\mat{P}$.  In this section we shall give two very different
+proofs of this
+theorem.
+\par
+Our first proof is carried out by showing that, for any column vector
+$\mat{y}$,
+$\mat{P}^n \mat {y}$ tends to a constant vector.  As indicated in
+Section~\ref{sec 11.3}, this
+will show that $\mat{P}^n$ converges to a matrix with constant columns or,
+equivalently, to a
+matrix with all rows the same.
+\par
+The following lemma says that if an $r$-by-$r$ transition matrix has no zero
+entries, 
+and $\mat {y}$ is any column vector with $r$ entries, then the vector $\mat
+{P}\mat{y}$ has
+entries which are ``closer together" than the entries are in $\mat {y}$.
+
+\begin{lemma}
+Let $\mat{P}$ be an $r$-by-$r$ transition matrix with no zero entries.  Let $d$
+be
+the smallest entry of the matrix.  Let $\mat{y}$ be a column vector with $r$
+components, the largest of which is $M_0$ and the smallest $m_0$.  Let
+$M_1$~and~$m_1$ be the largest and smallest component, respectively, of the
+vector $\mat {P} \mat {y}$.  Then
+$$
+M_1 - m_1 \leq (1 - 2d)(M_0 - m_0)\ .
+$$
+
+\proof
+In the discussion following Theorem\ref{thm 11.3.6}, it was noted that each
+entry in the vector
+$\mat {P}\mat{y}$ is a weighted average of the entries in $\mat {y}$.  The
+largest weighted
+average that could be obtained in the present case would occur if all but one
+of the entries of
+$\mat {y}$ have  value $M_0$ and one entry has value $m_0$, and this one small
+entry is weighted 
+by the smallest possible weight,  namely $d$.  In this case, the weighted
+average
+would equal
+$$dm_0 + (1-d)M_0\ .$$
+Similarly, the smallest possible weighted average equals
+$$dM_0 + (1-d)m_0\ .$$
+Thus,
+\begin{eqnarray*}
+M_1 - m_1 &\le& \Bigl(dm_0 + (1-d)M_0\Bigr) - \Bigl(dM_0 + (1-d)m_0\Bigr) \\
+          &=& (1 - 2d)(M_0 - m_0)\ .
+\end{eqnarray*}
+This completes the proof of the lemma.
+\end{lemma}
+
+We turn now to the proof of the fundamental limit theorem for regular Markov
+chains.  
+
+\begin{theorem}{\bf (Fundamental Limit Theorem for Regular Chains)}
+\index{Fundamental Limit Theorem for Regular Markov Chains}\index{Markov
+Chains!Fundamental
+Limit Theorem for Regular}
+If $\mat{P}$ is the transition matrix for a regular Markov chain, then
+$$
+\lim_{n \to \infty} \mat {P}^n = \mat {W}\ ,
+$$
+where $\mat {W}$ is matrix with all rows equal.  Furthermore, all entries in
+$\mat{W}$ are 
+strictly positive.
+
+\proof
+We prove this theorem for the special case that $\mat{P}$ has no 0~entries. 
+The extension 
+to the general case is indicated in Exercise~\ref{exer 11.4.6}. Let \mat {y} be
+any 
+$r$-component column vector, where $r$ is the number of states of the chain. 
+We assume that
+$r > 1$, since otherwise the theorem is trivial.  Let
+$M_n$ and
+$m_n$ be, respectively, the maximum and minimum components of the
+vector~$\mat {P}^n \mat { y}$.  The vector~$\mat {P}^n \mat {y}$ is obtained
+from the
+vector~$\mat {P}^{n - 1} 
+\mat {y}$ by multiplying on the left by the matrix~$\mat{P}$.  Hence each
+component 
+of $\mat {P}^n \mat {y}$ is an average of the components of $\mat {P}^{n - 1} 
+\mat {y}$.  Thus
+$$
+M_0 \geq M_1 \geq M_2 \geq\cdots
+$$
+and
+$$
+m_0 \leq m_1 \leq m_2 \leq\cdots\ .
+$$
+Each sequence is monotone and bounded:
+$$
+m_0 \leq m_n \leq M_n \leq M_0\ .
+$$
+Hence, each of these sequences will have a limit as $n$ tends to infinity.
+\par
+Let $M$ be the limit of~$M_n$ and $m$ the limit of~$m_n$.  We know that $m \leq
+M$.  We shall prove that $M - m = 0$.  This will be the case if $M_n - m_n$
+tends to~0.  Let $d$ be the smallest element of~$\mat{P}$.  Since all entries
+of $\mat{P}$
+are strictly positive, we have $d > 0$.  By our lemma
+$$
+M_n - m_n \leq (1 - 2d)(M_{n - 1} - m_{n - 1})\ .
+$$
+From this we see that
+$$
+M_n - m_n \leq (1 - 2d)^n(M_0 - m_0)\ .
+$$
+Since $r \ge 2$, we must have $d \leq 1/2$, so $0 \leq 1 - 2d < 1$, so 
+the difference $M_n - m_n$ tends to~0 as $n$ tends to infinity.  Since every
+component of~$\mat {P}^n \mat {y}$ lies between $m_n$~and~$M_n$, each component
+must
+approach the same number $u = M = m$.  
+This shows that
+$$
+\lim_{n \to \infty} \mat {P}^n \mat {y} = \mat{u}\ ,  \label{eq 11.4.4}
+$$
+where $\mat{u}$ is a column vector all of whose components equal $u$.  
+\par
+Now let $\mat{y}$ be the vector with $j$th component equal to 1 and all other
+components equal to
+0. Then $\mat {P}^n \mat {y}$ is the
+$j$th column of~$\mat {P}^n$.  Doing this for each~$j$ proves that the columns
+of~$\mat {P}^n$ approach constant column vectors.  That is, the rows of~$\mat
+{P}^n$
+approach a common row vector~$\mat{w}$, or,
+$$
+\lim_{n \to \infty} \mat {P}^n = \mat {W}\ .  \label{eq 11.4.5}
+$$
+\par
+It remains to show that all entries in $\mat{W}$ are strictly positive.  As
+before, let
+$\mat{y}$ be the vector with $j$th component equal to 1 and all other
+components equal to 0.  
+Then $\mat{P}\mat{y}$ is the $j$th column of $\mat{P}$, and this column has all
+entries strictly
+positive.  The minimum component of the vector $\mat{P}\mat{y}$ was defined to
+be $m_1$, hence
+$m_1 > 0$.  Since $m_1 \le m$, we have $m > 0$.  Note finally that this value
+of $m$ is just the
+$j$th component of $\mat{w}$, so all components of $\mat{w}$ are strictly
+positive. 
+\end{theorem}
+
+\subsection*{Doeblin's Proof}
+We give now a very different proof of the main part of the fundamental limit
+theorem for 
+regular Markov chains.  This proof was first given by Doeblin,\index{DOEBLIN,
+W.}\footnote{W. Doeblin, ``Expos\'e de la Th\'eorie des Chaines Simple Constantes
+de Markov \`a un
+Nombre Fini d'Etats," \emx {Rev.\ Mach.\ de l'Union Interbalkanique,} vol.~2
+(1937), pp.~77--105.} a brilliant young  mathematician who was killed in
+his twenties in the Second World War. 
+
+\begin{theorem}\label{thm 11.4.1}
+Let $\mat {P}$ be the transition matrix for a regular Markov chain with fixed
+vector
+$\mat {w}$.  Then for any initial probability vector $\mat {u}$, 
+$\mat {uP}^n \rightarrow \mat {w}$ as $n \rightarrow \infty.$ 
+
+\proof  Let $ X_0,\ X_1,\ \ldots$ be a Markov
+chain with transition matrix $\mat {P}$ started in state $s_i$.  Let $Y_0,\
+Y_1,\ \ldots$  be a Markov
+chain with transition probability $\mat {P}$ started with initial probabilities
+given by
+$\mat {w}$.   The $X$ and $Y$ processes are run independently of each other.
+\par
+We consider also a third Markov chain  $\mat{P}^*$  which consists of watching
+both the
+$X$ and $Y$ processes.  The states for $\mat{P}^*$
+are pairs $(s_i, s_j)$.  The transition probabilities are given by 
+$$\mat{P}^{*}[(i,j),(k,l)] = \mat{P}(i,k) \cdot  \mat{P}(j,l)\ .$$   
+Since $\mat{P}$ is regular there is an $N$ such that $\mat{P}^{N}(i,j) > 0$ for
+all $i$
+and
+$j$.  Thus for the
+$\mat{P}^*$ chain it is also possible to go from any state $(s_i, s_j)$ to any
+other state
+$(s_k,s_l)$ in at most $N$ steps.  That is $\mat{P}^*$ is also a regular Markov
+chain. 
+\par
+We know that a regular Markov chain will reach any state in a finite time.  Let
+$T$ be
+the first time the the chain $\mat{P}^*$ is in a state of the form $(s_k,s_k)$. 
+In other words,
+$T$ is the first time that the $X$ and the $Y$ processes are in the same state. 
+Then we have shown that
+$$
+P[T > n] \rightarrow 0 \;\;\mbox{as}\;\; n \rightarrow \infty\ .
+$$
+If we watch the $X$ and $Y$ processes after the first time they are in the same
+state we would not predict any difference in their long range behavior. Since
+this will
+happen no matter how we started these two processes, it seems clear that the
+long range
+behaviour should not depend upon the starting state.  We now show that this is
+true.  
+\par
+We first note that if $n \ge T$, then since $X$ and $Y$ are both in the
+same state at time $T$,
+$$
+P(X_n = j\ |\ n \ge T) = P(Y_n = j\ |\ n \ge T)\ .
+$$
+If we multiply both sides of this equation by $P(n \ge T)$, we obtain
+\begin{equation}
+P(X_n = j,\ n \ge T) = P(Y_n = j,\ n \ge T)\ .
+\label{eq 11.4.1}
+\end{equation}
+We know that for all $n$, 
+$$P(Y_n = j) = w_j\ .$$
+But
+$$P(Y_n = j) = P(Y_n = j,\ n \ge T) + P(Y_n = j,\ n < T)\ ,$$
+and the second summand on the right-hand side of this equation goes to 0 as $n$
+goes to
+$\infty$, since $P(n < T)$ goes to 0 as $n$ goes to $\infty$.  So,
+$$P(Y_n = j,\ n \ge T) \rightarrow w_j\ ,$$
+as $n$ goes to $\infty$.  From Equation~\ref{eq 11.4.1}, we see that
+$$P(X_n = j,\ n \ge T) \rightarrow w_j\ ,$$
+as $n$ goes to $\infty$.  But by similar reasoning to that used above, the
+difference
+between this last expression and $P(X_n = j)$ goes to 0 as $n$ goes to
+$\infty$.  Therefore,
+$$P(X_n = j) \rightarrow w_j\ ,$$
+as $n$ goes to $\infty$.  This completes the proof.
+\end{theorem}
+In the above proof, we have said nothing about the rate at which the
+distributions of the
+$X_n$'s approach the fixed distribution $\mat {w}$.  In fact, it can be shown
+that\footnote{T. Lindvall, \emx {Lectures on the Coupling Method}   (New York:
+Wiley 1992).}
+$$
+\sum ^{r}_{j = 1} \mid P(X_{n} = j) - w_j \mid \leq 2 
+P(T > n)\ .
+$$
+The left-hand side of this inequality can be viewed as the distance between the
+distribution
+of the Markov chain after $n$ steps, starting in state $s_i$, and the limiting
+distribution
+$\mat {w}$.
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 11.4.1} Define $\mat{P}$ and $\mat{y}$ by
+$$
+\mat {P} = \pmatrix{ .5 & .5 \cr.25 & .75 }, \qquad
+\mat {y} = \pmatrix{ 1 \cr 0 }\ .
+$$
+Compute $\mat {P}\mat{y}$, $\mat {P}^2 \mat {y}$, and $\mat {P}^4 \mat {y}$ and
+show that the
+results are approaching a constant vector.  What is this vector?
+
+\i\label{exer 11.4.2} Let $\mat{P}$ be a regular $r \times r$ transition matrix
+and 
+$\mat{y}$ any $r$-component column vector.  Show that the value of the limiting
+constant vector for~$\mat {P}^n \mat {y}$ is~$\mat{w}\mat{y}$.
+
+\i\label{exer 11.4.3} Let
+$$
+\mat {P} = \pmatrix{ 1 & 0 & 0 \cr .25 & 0 & .75 \cr 0 & 0 & 1 }
+$$
+be a transition matrix of a Markov chain.  Find two fixed vectors of $\mat {P}$
+that
+are linearly independent.  Does this show that the Markov chain is not regular?
+
+\i\label{exer 11.4.4} Describe the set of all fixed column vectors for the
+chain 
+given in Exercise~\ref{exer 11.4.3}.
+
+\i\label{exer 11.4.6} The theorem that $\mat {P}^n \to \mat {W}$ 
+was proved only for the case that $\mat{P}$ has no zero entries.  Fill in the
+details
+of the following extension to the case that $\mat{P}$ is regular.  Since
+$\mat{P}$ is
+regular, for some $N, \mat {P}^N$ has no zeros.  Thus, the proof given shows
+that
+$M_{nN} - m_{nN}$ approaches 0 as $n$ tends to infinity.  However, the
+difference $M_n - m_n$ can never increase.  (Why?)  Hence, if we know that the
+differences obtained by looking at every $N$th time tend to~0, then the entire
+sequence must also tend to~0.
+
+\i\label{exer 11.4.7} Let $\mat{P}$ be a regular transition matrix and let
+$\mat{w}$ 
+be the unique non-zero fixed vector of $\mat{P}$.  Show that no entry of
+$\mat{w}$
+is 0.
+
+\i\label{exer 11.4.8} Here is a trick to try on your friends.  Shuffle a deck
+of cards and deal them out one at a time.  Count the face cards each as ten. 
+Ask
+your friend to look at one of the first ten cards; if this card is a six, she
+is
+to look at the card that turns up six cards later; if this card is a three, she
+is to look at the card that turns up three cards later, and so forth. 
+Eventually she will reach a point where she is to look at a card that turns up
+$x$~cards later but there are not $x$~cards left.  You then tell her the last
+card that she looked at even though you did not know her starting point.  You
+tell her you do this by watching her, and she cannot disguise the times that
+she
+looks at the cards.  In fact you just do the same procedure and, even though
+you
+do not start at the same point as she does, you will most likely end at the
+same
+point.  Why?
+
+\i\label{exer 11.4.9} Write a program to play the game in Exercise~\ref{exer
+11.4.8}.
+
+\i\label{exer 11.4.10}  (Suggested by Peter Doyle)\index{DOYLE, P. G.} In the proof of Theorem~\ref{thm 11.4.1}, 
+we assumed the existence of a fixed vector $\mat{w}$.  
+To avoid this assumption, beef up the coupling argument to show (without assuming the existenceof a stationary distribution $\mat{w}$) that for appropriate constants$C$ and $r<1$, the distance between $\alpha P^n$ and $\beta P^n$ is at most$C r^n$ for any starting distributions $\alpha$ and $\beta$.Apply this in the case where $\beta = \alpha P$ toconclude that the sequence $\alpha P^n$ is a Cauchy sequence,and that its limit is a matrix $W$ whose rows are all equal to a probabilityvector $w$ with $wP=w$.  Note that the distance between $\alpha P^n$ and$w$ is at most $C r^n$, so in freeing ourselves from the assumption abouthaving a fixed vector we've proved that the convergence to equilibriumtakes place exponentially fast.
+\end{LJSItem}
+
+\section[Mean First Passage Time]{Mean First Passage Time for Ergodic
+Chains}\label{sec 11.5}
+In this section we consider two closely related descriptive quantities of
+interest for ergodic chains: the mean time to return to a state and the mean
+time to go from one state to another state.
+\par
+Let $\mat{P}$ be the transition matrix of an ergodic chain with states
+$s_1$,~$s_2$, \ldots,~$s_r$.  Let $\mat {w} = (w_1,w_2,\ldots,w_r)$ be the
+unique
+probability vector such that $\mat {w} \mat {P} = \mat {w}$.  Then, by the Law
+of Large
+Numbers for Markov chains, in the long run the process will spend a
+fraction~$w_j$ of the time in state~$s_j$.  Thus, if we start in any state, 
+the chain will eventually reach state~$s_j$; in fact, it will be in state~$s_j$
+infinitely often.
+\par
+Another way to see this is the following:  Form a new Markov chain by making
+$s_j$ an
+absorbing state, that is, define $p_{jj} = 1$.  If we start at any state other
+than $s_j$,
+this new process will behave exactly like the original chain up to the first
+time that state
+$s_j$ is reached.  Since the original chain was an ergodic chain, it was
+possible to reach
+$s_j$ from any other state.  Thus the new chain is an absorbing chain with a
+single absorbing
+state $s_j$ that will eventually be reached.  So if we start the original chain
+at a state
+$s_i$ with $i \ne j$, we will eventually reach the state $s_j$.
+\par
+Let $\mat{N}$ be the fundamental matrix for the new chain.  The entries
+of~$\mat{N}$
+give the expected number of times in each state before absorption.  In terms of
+the original chain, these quantities give the expected number of times in each
+of the states before reaching state~$s_j$ for the first time.  The $i$th
+component of the vector~$\mat {N} \mat {c}$ gives the expected number of steps
+before
+absorption in the new chain, starting in state~$s_i$.  In terms of the old
+chain, this is the expected number of steps required to reach state~$s_j$ for
+the first time starting at state~$s_i$.
+
+\subsection*{Mean First Passage Time}
+\begin{definition}
+If an ergodic Markov chain is started in state~$s_i$, the expected number of
+steps to reach state~$s_j$ for the first time is called the \emx {mean first
+passage time}\index{mean first passage time} from~$s_i$ to~$s_j$.  
+It is denoted by $m_{ij}$.  By convention $m_{ii} = 0$.
+\end{definition}
+\begin{example}\label{exam 11.5.1}
+Let us return to the maze example (Example~\ref{exam
+11.3.3}).\index{rat}\index{maze}  
+We shall make this ergodic chain into an absorbing chain by making state~5 an
+absorbing state. 
+For example, we might assume that food is placed in the center of the maze and
+once the rat finds the food, he stays to enjoy it (see Figure~\ref{fig 11.5}).
+\putfig{2truein}{PSfig11-5}{The maze problem.}{fig 11.5} 
+%\begin{figure}
+%\centerline{\epsfxsize=2truein 
+%\epsffile{PSfig11-5}}
+%\caption{The maze problem.}\label{fig 11.5}
+%\end{figure}
+\par
+The new transition matrix in canonical form is
+$$
+\mat {P}\;= \bordermatrix{&                 
+\hbox{1}&\hbox{2}&\hbox{3}&\hbox{4}&\hbox{6}&\hbox{7}&\hbox{8}
+&\hbox{9}&\omit\hfil&\hbox{5}\cr
+\hbox{1}\strut   &  0     &1/2     &  0     &   0    & 1/2    &  0     & 0      
+&    0   &\srule    & 0 \cr
+\hbox{2}\strut   &1/3     &  0     &1/3     &   0    &  0     &  0     & 0     
+&    0   &\srule    &1/3\cr
+\hbox{3}\strut   &  0     &1/2     &  0     & 1/2    &  0     &  0     & 0     
+&    0   &\srule    & 0 \cr
+\hbox{4}\strut   &  0     &  0     &1/3     &   0    &  0     &1/3     & 0     
+& 1/3    &\srule    &1/3\cr
+\hbox{6}\strut   &1/3     &  0     &  0     &   0    &  0     &  0     & 0     
+&   0    &\srule    &1/3\cr
+\hbox{7}\strut   &  0     &  0     &  0     &   0    &1/2     &  0     & 1/2   
+&   0    &\srule    &0  \cr
+\hbox{8}\strut   &  0     &  0     &  0     &   0    &  0     &1/3     & 0     
+& 1/3    &\srule    &1/3\cr
+\hbox{9}\strut   &  0     &  0     &  0     &1/2     &  0     &  0     & 1/2&  
+0        &\srule    & 0 \cr
+\middlehrule{8}{1}
+\hbox{5}\strut   &  0     &  0     &  0     &   0    & 0      & 0      & 0     
+& 0      &\srule   
+& 1}\ .
+$$
+If we compute the fundamental matrix~$\mat{N}$, we obtain
+$$
+\mat {N} = \frac18 \pmatrix{
+14 & 9 & 4 & 3 & 9 & 4 & 3 & 2 \cr
+6 & 14 & 6 & 4 & 4 & 2 & 2 & 2 \cr
+4 & 9 & 14 & 9 & 3 & 2 & 3 & 4 \cr
+2 & 4 & 6 & 14 & 2 & 2 & 4 & 6 \cr
+6 & 4 & 2 & 2 & 14 & 6 & 4 & 2 \cr
+4 & 3 & 2 & 3 & 9 & 14 & 9 & 4 \cr
+2 & 2 & 2 & 4 & 4 & 6 & 14 & 6 \cr
+2 & 3 & 4 & 9 & 3 & 4 & 9 & 14 \cr}\ .
+$$
+The expected time to absorption for different starting states is given by the
+vector~$\mat {N} \mat {c}$, where
+$$
+\mat {N} \mat {c} = \pmatrix{ 6 \cr 5 \cr 6 \cr 5 \cr 5 \cr 6 \cr 5 \cr 6 \cr}\
+.
+$$
+We see that, starting from compartment~1, it will take on the average six steps
+to reach food.  It is clear from symmetry that we should get the same answer
+for starting at state~3, 7, or~9.  It is also clear that it should take one
+more step, starting at one of these states, than it would starting at 2,~4, 6,
+or~8.  Some of the results obtained from~$\mat{N}$ are not so obvious.  For
+instance, we note that the expected number of times in the starting state is
+14/8 regardless of the state in which we start.
+\end{example}
+
+\subsection*{Mean Recurrence Time}
+A quantity that is closely related to the mean first passage time is the
+\emx{mean recurrence
+time,} defined as follows.  Assume that we start in state~$s_i$; consider the
+length of time
+before we return to~$s_i$ for the first time.  It is clear that we must return,
+since we either
+stay at~$s_i$ the first step or go to some other state~$s_j$, and from any
+other
+state~$s_j$, we will eventually reach $s_i$ because the chain is ergodic.
+
+\begin{definition}
+If an ergodic Markov chain is started in state~$s_i$, the expected number of
+steps to return to~$s_i$ for the first time is the \emx {mean recurrence time}
+\index{mean recurrence time} for~$s_i$.  It is denoted by~$r_i$.
+\end{definition}
+
+We need to develop some basic properties of the mean first passage time. 
+Consider the mean first
+passage time from $s_i$~to~$s_j$; assume that $i \ne j$.  This may be computed
+as follows: take
+the expected number of steps required given the outcome of the first step,
+multiply by the
+probability that this outcome occurs, and add.  If the first step is to~$s_j$,
+the expected
+number of steps required is~1; if it is to some other state~$s_k$, the expected
+number of steps required is $m_{kj}$~plus~1 for the step already taken.  Thus,
+$$
+m_{ij} = p_{ij} + \sum_{k \ne j} p_{ik}(m_{kj} + 1)\ ,
+$$
+or, since $\sum_k p_{ik} = 1$,
+\begin{equation}
+m_{ij} = 1 + \sum_{k \ne j}p_{ik} m_{kj}\ .\label{eq 11.5.1}
+\end{equation}
+
+Similarly, starting in~$s_i$, it must take at least one step to return. 
+Considering all possible first steps gives us
+\begin{eqnarray}
+r_i &=& \sum_k p_{ik}(m_{ki} + 1) \\
+    &=& 1 + \sum_k p_{ik} m_{ki}\ .\label{eq 11.5.2}
+\end{eqnarray}
+
+\subsection*{Mean First Passage Matrix and Mean Recurrence Matrix}
+Let us now define two matrices $\mat{M}$~and~$\mat{D}$.  The $ij$th
+entry~$m_{ij}$
+of~$\mat{M}$ is the mean first passage time to go from~$s_i$ to~$s_j$ if $i \ne
+j$;
+the diagonal entries are 0.  The matrix $\mat{M}$ is called the \emx {mean
+first passage
+matrix.}
+\index{mean first passage matrix}  The matrix $\mat{D}$ is the matrix with all
+entries 0 except
+the diagonal entries $d_{ii} = r_i$.  The matrix $\mat{D}$ is called the \emx
+{mean recurrence
+matrix.}
+\index{mean recurrence matrix} 
+Let $\mat {C}$ be an $r \times r$ matrix with all entries~1.  Using
+Equation~\ref{eq 11.5.1} for
+the case $i \ne j$ and Equation~\ref{eq 11.5.2} for the case $i = j$, we obtain
+the matrix equation
+\begin{equation}
+\mat{M} = \mat{P} \mat{M} + \mat{C} - \mat{D}\ ,  
+\label{eq 11.5.3}
+\end{equation}
+or
+\begin{equation}
+(\mat{I} - \mat{P}) \mat{M} = \mat{C} - \mat{D}\ . 
+\label{eq 11.5.4}
+\end{equation}
+Equation~\ref{eq 11.5.4} with $m_{ii} = 0$ implies Equations~\ref{eq 11.5.1}
+and~\ref{eq 11.5.2}.  We are now in a position to prove our first basic
+theorem.
+
+\begin{theorem}
+For an ergodic Markov chain, the mean recurrence time for state $s_i$ is $r_i =
+1/w_i$, where $w_i$ is the $i$th component of the fixed probability vector for
+the transition matrix.
+\proof
+Multiplying both sides of Equation~\ref{eq 11.5.4} by~$\mat{w}$ and using the
+fact
+that 
+$$
+\mat {w}(\mat {I} - \mat {P}) = \mat {0}
+$$ 
+gives
+$$
+\mat {w} \mat {C} - \mat {w} \mat {D} = \mat {0}\ .
+$$
+Here $\mat {w} \mat {C}$ is a row vector with all entries 1 and $\mat {w} \mat
+{D}$ 
+is a row vector with $i$th entry $w_i r_i$.  Thus
+$$
+(1,1,\ldots,1) = (w_1r_1,w_2r_2,\ldots,w_nr_n)
+$$
+and
+$$
+r_i = 1/w_i\ ,
+$$
+as was to be proved.
+\end{theorem}
+
+\begin{corollary}\label{cor 11.5.17}
+For an ergodic Markov chain, the components of the fixed probability
+vector~{\bf
+w} are strictly positive.
+\proof
+We know that the values of~$r_i$ are finite and so $w_i = 1/r_i$ cannot be 0.
+\end{corollary}
+
+\begin{example}
+In Example~\ref{exam 11.3.3} we found the fixed probability vector for the maze
+example to be
+$$
+\mat {w} = \pmatrix{ \frac1{12} & \frac18 & \frac1{12} & \frac18 & \frac16 &
+\frac18 & \frac1{12} & \frac18 & \frac1{12}}\ .
+$$
+Hence, the mean recurrence times are given by the reciprocals of these
+probabilities.  That is,
+$$
+\mat {r} = \pmatrix{ 12 & 8 & 12 & 8 & 6 & 8 & 12 & 8 & 12 }\ .
+$$
+\end{example}
+
+Returning to the Land of Oz, we found that the weather in the Land of Oz could
+be represented by a Markov chain with states rain, nice, and snow.  In
+Section~\ref{sec 11.3} we found that the limiting vector was $\mat {w} = 
+(2/5,1/5,2/5)$.  From this we see that the mean number of days between rainy
+days 
+is 5/2, between nice days is 5, and between snowy days is 5/2.
+
+\subsection*{Fundamental Matrix}
+We shall now develop a fundamental matrix for ergodic chains that will play a
+role
+similar to that of the fundamental matrix $\mat {N} = (\mat {I} - \mat
+{Q})^{-1}$
+for absorbing chains.  As was the case with absorbing chains, the fundamental
+matrix
+can be used to find a number of interesting quantities involving ergodic
+chains.
+Using this matrix, we will give a method for calculating
+the mean first passage times for ergodic chains that is easier to use than the
+method
+given above.  In addition, we will state (but not prove) the Central Limit
+Theorem for
+Markov Chains, the statement of which uses the fundamental matrix.  
+\par
+We begin by considering the case that \mat{P} is the transition matrix of a
+regular 
+Markov chain.  Since there are no absorbing states, we might be tempted to try 
+$\mat {Z} = (\mat {I} - \mat {P})^{-1}$ for a fundamental matrix.  But $\mat
+{I} - \mat {P}$
+does not  have an inverse.  To see this, recall that a matrix~$\mat{R}$ has an
+inverse if and
+only if $\mat {R} \mat {x} = \mat {0}$ implies $\mat {x} = \mat {0}$.  But
+since $\mat {P}
+\mat {c} = \mat {c}$ we have $(\mat {I} - \mat {P})\mat {c} = \mat {0}$, and so
+$\mat {I} -
+\mat {P}$ does not have an inverse.  
+\par
+We recall that if we have an absorbing Markov chain, and \mat{Q} is the
+restriction of the transition matrix to the set of transient states, then the
+fundamental
+matrix \mat {N} could be written as
+$$\mat {N} = \mat {I} + \mat {Q} + \mat {Q}^2 + \cdots\ .$$
+The reason that this power series converges is that $\mat {Q}^n \rightarrow 0$,
+so this series
+acts like a convergent geometric series.
+\par
+This idea might prompt one to try to find a similar series for regular chains. 
+Since we
+know that $\mat {P}^n \rightarrow \mat {W}$, we might consider the series
+\begin{equation}
+\mat {I} + (\mat {P} -\mat {W}) + (\mat {P}^2 - \mat{W}) + \cdots\ .\label{eq
+11.5.8}
+\end{equation}
+We now use special properties of \mat {P} and \mat {W} to rewrite this series. 
+The special
+properties are:  1) $\mat {P}\mat {W} = \mat {W}$, and 2) $\mat {W}^k = \mat
+{W}$ for all 
+positive integers $k$.  These facts are easy to verify, and are left as an
+exercise (see
+Exercise~\ref{exer 11.5.28}).  Using these facts, we see that
+\begin{eqnarray*}
+(\mat {P} - \mat {W})^n &=& \sum_{i = 0}^n (-1)^i{n \choose i}\mat
+{P}^{n-i}\mat {W}^i \\
+&=& \mat {P}^n + \sum_{i = 1}^n (-1)^i{n \choose i} \mat {W}^i \\
+&=& \mat {P}^n + \sum_{i = 1}^n (-1)^i{n \choose i} \mat {W} \\
+&=& \mat {P}^n + \Biggl(\sum_{i = 1}^n (-1)^i{n \choose i}\Biggr) \mat {W}\ .
+\end{eqnarray*}
+If we expand the expression $(1-1)^n$, using the Binomial Theorem, we obtain
+the expression in
+parenthesis above, except that we have an extra term (which equals 1).  Since
+$(1-1)^n = 0$,
+we see that the above expression equals -1.  So we have
+$$(\mat {P} - \mat {W})^n = \mat {P}^n - \mat {W}\ ,$$
+for all $n \ge 1$.
+\par
+We can now rewrite the series in \ref{eq 11.5.8} as
+$$\mat {I} + (\mat {P} - \mat {W}) + (\mat {P} - \mat {W})^2 + \cdots\ .$$
+Since the $n$th term in this series is equal to $\mat {P}^n - \mat {W}$, the
+$n$th term goes
+to 0 as $n$ goes to infinity.  This is sufficient to show that this series
+converges, and
+sums to the inverse of the matrix $\mat {I} - \mat {P} + \mat {W}$.  We call
+this inverse the
+\emx {fundamental matrix} associated with the chain, and we denote it by \mat
+{Z}.\index{fundamental matrix!for a regular Markov chain}
+\par
+In the case that the chain is ergodic, but not regular, it is not true that
+$\mat {P}^n
+\rightarrow \mat {W}$ as $n \rightarrow \infty$.  Nevertheless, the matrix
+$\mat {I} - \mat
+{P} + \mat {W}$ still has an inverse, as we will now show.
+
+\begin{proposition}
+Let \mat {P} be the transition matrix of an ergodic chain, and let \mat {W} be
+the matrix all
+of whose rows are the fixed probability row vector for \mat {P}.  Then the
+matrix
+$$\mat {I} - \mat {P} + \mat {W}$$
+has an inverse.
+
+\proof
+Let $\mat{x}$ be a column vector such that
+$$
+(\mat {I} - \mat {P} + \mat {W})\mat {x} = \mat {0}\ .
+$$
+To prove the proposition, it is sufficient to show that \mat {x} must be the
+zero vector.
+Multiplying this equation by~$\mat{w}$ and using the fact that $\mat{w}(\mat{I}
+- \mat{
+P}) = \mat{0}$ and $\mat{w} \mat{W} = \mat {w}$, we have
+$$
+\mat {w}(\mat {I} - \mat {P} + \mat {W})\mat {x} = \mat {w} \mat {x} = \mat
+{0}\ .
+$$
+Therefore,
+$$
+(\mat {I} - \mat {P})\mat {x} = \mat {0}\ .
+$$
+
+But this means that $\mat {x} = \mat {P} \mat {x}$ is a fixed column vector
+for~$\mat{P}$. 
+By Theorem~\ref{thm 11.3.10}, this can only happen if $\mat{x}$ is a constant
+vector.  
+Since $\mat {w}\mat {x} = 0$, and \mat {w} has strictly positive entries, we
+see that
+$\mat {x} = \mat {0}$.  This completes the proof.
+\end{proposition}
+\par
+As in the regular case, we will call the inverse of the matrix $\mat {I} - \mat
+{P} + \mat {W}$
+the \emx {fundamental matrix}\index{fundamental
+matrix!for an ergodic Markov chain} for the ergodic chain with transition
+matrix \mat {P}, and we will
+use \mat {Z} to denote this fundamental matrix.
+
+\begin{example}\label{exam 11.5.2} 
+Let $\mat{P}$ be the transition matrix for the weather in the Land of Oz.  Then
+\begin{eqnarray*}
+\mat{I} - \mat{P} + \mat{W} &=& \pmatrix{
+1 & 0 & 0\cr
+0 & 1 & 0\cr
+0 & 0 & 1\cr} - \pmatrix{
+1/2 & 1/4 & 1/4\cr
+1/2 & 0   & 1/2\cr
+1/4 & 1/4 & 1/2\cr} + \pmatrix{
+2/5 & 1/5 & 2/5\cr
+2/5 & 1/5 & 2/5\cr
+2/5 & 1/5 & 2/5\cr} \cr
+&=& \pmatrix{
+9/10 & -1/20 & 3/20\cr
+-1/10 & 6/5   & -1/10\cr
+3/20 & -1/20 & 9/10\cr}\ ,\cr
+\end{eqnarray*}
+so
+$$
+\mat{Z} = (\mat{I} - \mat{P} + \mat{W})^{-1} =
+\pmatrix{                   
+86/75 & 1/25 & -14/75\cr
+2/25 & 21/25 & 2/25\cr
+-14/75 & 1/25 & 86/75\cr}\ .         
+$$
+\end{example}
+
+\subsection*{Using the Fundamental Matrix to Calculate the Mean First Passage
+Matrix}
+
+We shall show how one can obtain the mean first passage matrix \mat{M} from the
+fundamental
+matrix \mat{Z} for an ergodic Markov chain.  Before stating the theorem which
+gives the first
+passage times, we need a few facts about \mat{Z}.
+
+\begin{lemma}\label{thm 11.5.18}
+Let $\mat{Z} = (\mat{I} - \mat{P} + \mat{W})^{-1}$, and let $\mat{c}$ be a
+column vector of all
+1's.  Then
+$$\mat{Z}\mat{c} = \mat{c}\ ,$$
+$$\mat{w}\mat{Z} = \mat{w}\ ,$$
+and
+$$\mat{Z}(\mat{I} - \mat{P}) = \mat{I} - \mat{W}\ .$$
+\proof
+Since $\mat{P}\mat{c} = \mat{c}$ and $\mat{W}\mat{c} = \mat{c}$,
+$$\mat{c} = (\mat{I} - \mat{P} + \mat{W}) \mat{c}\ .$$
+If we multiply both sides of this equation on the left by $\mat{Z}$, we obtain
+$$\mat{Z}\mat{c} = \mat{c}\ .$$
+\par
+Similarly, since $\mat{w}\mat{P} = \mat{w}$ and $\mat{w}\mat{W} = \mat{w}$,
+$$\mat{w} = \mat{w}(\mat{I} - \mat{P} + \mat{W})\ .$$
+If we multiply both sides of this equation on the right by $\mat{Z}$, we obtain
+$$\mat{w}\mat{Z} = \mat{w}\ .$$
+\par
+Finally, we have
+\begin{eqnarray*}
+(\mat{I} - \mat{P} + \mat{W})(\mat{I} - \mat{W}) &=& 
+\mat{I} - \mat{W} - \mat{P} + \mat{W} + \mat{W} - \mat{W}\\
+    &=& \mat{I} - \mat{P}\ .
+\end{eqnarray*}
+Multiplying on the left by \mat{Z}, we obtain
+$$\mat{I} - \mat{W} = \mat{Z}(\mat{I} - \mat{P})\ .$$
+This completes the proof.
+\end{lemma}
+
+The following theorem shows how one can obtain the mean first passage times
+from the
+fundamental matrix.
+
+\begin{theorem}\label{thm 11.5.19}
+The mean first passage matrix~$\mat{M}$ for an ergodic chain is determined from
+the
+fundamental matrix $\mat{Z}$ and the fixed row probability vector $\mat{w}$ by
+$$
+m_{ij} = \frac{z_{jj} - z_{ij}}{w_j}\ .
+$$
+\proof
+We showed in Equation~\ref{eq 11.5.4} that
+$$
+(\mat {I} - \mat {P})\mat {M} = \mat {C} - \mat {D}\ .
+$$
+Thus,
+$$
+\mat {Z}(\mat {I} - \mat {P})\mat {M} = \mat {Z} \mat {C} - \mat {Z} \mat {D}\
+,
+$$
+and from Lemma~\ref{thm 11.5.18},
+$$
+\mat {Z}(\mat {I} - \mat {P})\mat {M} = \mat {C} - \mat {Z} \mat {D}\ .
+$$
+Again using Lemma~\ref{thm 11.5.18}, we have
+$$
+\mat {M} - \mat{W}\mat {M} = \mat {C} - \mat {Z} \mat {D}
+$$
+or
+$$
+\mat {M} = \mat {C} - \mat {Z} \mat {D} + \mat{W}\mat {M}\ .
+$$
+From this equation, we see that
+\begin{equation}
+m_{ij} = 1 - z_{ij}r_j + (\mat{w} \mat{M})_j\ .  \label{eq 11.5.6}
+\end{equation}
+But $m_{jj} = 0$, and so
+$$
+0 = 1 - z_{jj}r_j + (\mat {w} \mat {M})_j\ ,
+$$
+or
+\begin{equation}
+(\mat{w} \mat{M})_j = z_{jj}r_j - 1\ .  \label{eq 11.5.7}
+\end{equation}
+From Equations~\ref{eq 11.5.6} and \ref{eq 11.5.7}, we have
+$$
+m_{ij} = (z_{jj} - z_{ij}) \cdot r_j\ .
+$$
+Since $r_j = 1/w_j$,
+$$
+m_{ij} = \frac{z_{jj} - z_{ij}}{w_j}\ .
+$$
+\end{theorem}
+
+\begin{example}\label{exam 11.5.3} (Example~\ref{exam 11.5.2} continued)
+In the Land of Oz example, we find that
+$$
+\mat{Z} = (\mat{I} - \mat{P} + \mat{W})^{-1} =
+\pmatrix{                   
+86/75 & 1/25 & -14/75\cr
+2/25 & 21/25 & 2/25\cr
+-14/75 & 1/25 & 86/75\cr}\ .         
+$$
+We have also seen that $\mat {w} = (2/5,1/5, 2/5)$.  So, for example,
+\begin{eqnarray*}
+m_{12} &=& \frac{z_{22} - z_{12}}{w_2} \\
+       &=& \frac{21/25 - 1/25}{1/5} \\
+       &=& 4\ ,\\
+\end{eqnarray*}
+by Theorem~\ref{thm 11.5.19}.  Carrying out the calculations for
+the other entries of $\mat{M}$, we obtain
+$$
+\mat {M} = \pmatrix{
+   0 & 4 & 10/3\cr
+ 8/3 & 0 & 8/3\cr
+10/3 & 4 & 0\cr}\ .
+$$
+\end{example}
+
+\subsection*{Computation}
+The program {\bf ErgodicChain}
+calculates the fundamental matrix, the fixed vector, the mean recurrence
+matrix~$\mat{D}$, 
+and the mean first passage matrix~$\mat{M}$.  We have run the program for the
+Ehrenfest 
+urn model (Example~\ref{exam 11.1.6}).\index{Ehrenfest model} \index{gas
+diffusion!Ehrenfest model of}
+We obtain:
+$$
+\mat {P} = \bordermatrix{
+    &  0  & 1 & 2 & 3 & 4 \cr
+  0 &   .0000 & 1.0000 &  .0000 &  .0000 &  .0000\cr
+  1 &   .2500 & .0000  &  .7500 &  .0000 &  .0000\cr
+  2 &   .0000 & .5000  &  .0000 &  .5000 &  .0000\cr
+  3 &   .0000 & .0000  &  .7500 &  .0000 &  .2500\cr
+  4 &   .0000 & .0000  &  .0000 &  1.0000&  .0000}\ ;
+$$
+ 
+$$
+\mat {w} = \bordermatrix{
+  &     0  &   1   &   2   &   3   &    4\cr
+  & .0625  &.2500  &.3750  &.2500  &.0625}\ ;
+$$
+
+$$
+\mat {r} = \bordermatrix{
+  &       0  &      1  &      2 &       3 &       4\cr
+  & 16.0000  & 4.0000  & 2.6667 &  4.0000 & 16.0000}\ ;
+$$
+
+$$
+\mat {M} = \bordermatrix{
+  &        0 &      1 &      2 &       3 &       4\cr
+0 &    .0000 & 1.0000 & 2.6667 &  6.3333 & 21.3333\cr
+1 &  15.0000 &  .0000 & 1.6667 &  5.3333 & 20.3333\cr
+2 &  18.6667 & 3.6667 &  .0000 &  3.6667 & 18.6667\cr
+3 &  20.3333 & 5.3333 & 1.6667 &   .0000 & 15.0000\cr
+4 &  21.3333 & 6.3333 & 2.6667 &  1.0000 &   .0000}\ .
+$$ 
+\par
+From the mean first passage matrix, we see that the mean time to go from
+0~balls in urn~1 to 2~balls in urn~1 is 2.6667 steps while the mean time to go
+from 2~balls in urn~1 to 0~balls in urn~1 is 18.6667.  This reflects the
+fact that the model exhibits a central tendency.  Of course, the physicist is
+interested in the case of a large number of molecules, or balls, and so we
+should consider this example for~$n$ so large that we cannot compute it even
+with a computer.
+
+\subsection*{Ehrenfest Model}
+\begin{example}(Example~\ref{exam 11.3.4} continued)
+Let us consider the Ehrenfest model (see Example \ref{exam
+11.1.6})\index{Ehrenfest model} 
+\index{gas diffusion!Ehrenfest model of} for gas
+diffusion  for the general case of $2n$ balls.  Every second, one of the $2n$
+balls is chosen 
+at random and moved from the urn it was in to the other urn.  If there are
+$i$~balls 
+in the first urn, then with probability $i/2n$ we take one of them out and put
+it 
+in the second urn, and
+with probability $(2n - i)/2n$ we take a ball from the second urn and put it in
+the first urn.  At each second we let the number~$i$ of balls in the first urn
+be the state of the system.  Then from state~$i$ we can pass only to state $i -
+1$ and $i + 1$, and the transition probabilities are given by
+$$
+p_{ij} = \left \{ \matrix{
+               \frac i{2n}\ , & \mbox{if} \,\,j = i-1, \cr
+               1 - \frac i{2n}\ , & \mbox{if} \,\,j = i+1, \cr
+               0\ , & \mbox{otherwise.}\cr}\right.
+$$
+\par
+This defines the transition matrix of an ergodic, non-regular Markov chain
+(see Exercise~\ref{exer 11.3.14}).  Here the physicist is interested in
+long-term
+predictions about the state occupied.  In Example~\ref{exam 11.3.4}, we gave an
+intuitive reason for expecting that the fixed vector $\mat{w}$ is the binomial
+distribution with parameters $2n$ and $1/2$.  It is easy to check that this is 
+correct.  So,
+$$
+w_i = \frac{{2n \choose i}}{2^{2n}}\ .
+$$
+Thus the mean recurrence time for state~$i$ is
+$$
+r_i = \frac{2^{2n}}{{2n \choose i}}\ .
+$$
+\par
+Consider in particular the central term $i = n$.  We have seen that this term
+is
+approximately $1/\sqrt{\pi n}$.  Thus we may approximate $r_n$ by $\sqrt{\pi
+n}$.
+\par
+This model was used to explain the concept of reversibility in physical
+systems.  Assume that we let our system run until it is in equilibrium.  At
+this
+point, a movie is made, showing the system's progress.  The movie is then shown
+to you, and you are asked to tell if the movie was shown in the forward or
+the reverse direction.  It would seem that there
+should always be a tendency to move toward an equal proportion of balls so that
+the correct order of time should be the one with the most transitions from~$i$
+to
+$i - 1$ if $i > n$ and $i$ to $i + 1$ if $i < n$.
+
+\putfig{4truein}{PSfig11-6}{Ehrenfest simulation.}{fig 11.6}
+
+%\begin{figure}
+%\centerline{\epsfxsize=4truein 
+%\epsffile{PSfig11-6}}
+%\caption{Ehrenfest simulation.}\label{fig 11.6}
+%\end{figure}
+\par
+In Figure~\ref{fig 11.6} we show the results of simulating the Ehrenfest urn
+model for the
+case of $n = 50$ and 1000 time units, using the program {\bf 
+EhrenfestUrn}.\index{EhrenfestUrn (program)}  The top graph shows these results graphed in the
+order in which they occurred and the bottom graph shows the same results but with time
+reversed.  There is no apparent difference.
+\par
+We note that if we had not started in equilibrium, the two graphs would
+typically
+look quite different.
+\end{example}
+
+\subsection*{Reversibility}
+If the Ehrenfest model is started in equilibrium, then the process has no
+apparent time
+direction.  The reason for this is that this process has a property called \emx
+{reversibility.}\index{reversibility}  Define $X_n$ to be the number of balls
+in 
+the left urn at step $n$.  We can calculate, for a general ergodic chain, the
+reverse transition
+probability:
+\begin{eqnarray*}
+P(X_{n - 1} = j | X_n = i) &=& \frac{P(X_{n - 1} = j,X_n = i)}{P(X_n = i)} \\
+     &=& \frac{P(X_{n - 1} = j) P(X_n = i | X_{n - 1} = j)}{P(X_n = i)} \\
+     &=& \frac{P(X_{n - 1} = j) p_{ji}}{P(X_n = i)}\ .\\
+\end{eqnarray*}
+\par
+In general, this will depend upon $n$, since $P(X_n = j)$ and also $P(X_{n - 1}
+= j)$ change with~$n$.  However, if we start with the vector~$\mat{w}$ or wait
+until equilibrium is reached, this will not be the case.  Then we can define
+$$
+p_{ij}^* = \frac{w_j p_{ji}}{w_i}
+$$
+as a transition matrix for the process watched with time reversed.
+\par
+Let us calculate a typical transition probability for the reverse chain $\mat{
+P}^* = \{p_{ij}^*\}$ in the Ehrenfest model.  For example,
+\begin{eqnarray*}
+ p_{i,i - 1}^* &=& \frac{w_{i - 1} p_{i - 1,i}}{w_i} = 
+\frac{{2n \choose {i - 1}}}{2^{2n}}
+                  \times \frac{2n - i + 1}{2n} \times 
+\frac{2^{2n}}{{2n \choose i}}\\
+               &=& \frac{(2n)!}{(i - 1)!\,(2n - i + 1)!} \times 
+\frac{(2n - i + 1) i!\,
+                  (2n - i)!}{2n(2n)!} \\
+               &=& \frac{i}{2n} = p_{i,i - 1}\ .\\
+\end{eqnarray*}
+\par
+Similar calculations for the other transition probabilities show that $\mat
+{P}^*
+= \mat {P}$.  When this occurs the process is called \emx {reversible.} 
+Clearly,
+an ergodic chain is reversible if, and only if, for every pair of states
+$s_i$~and~$s_j$, $w_i p_{ij} = w_j p_{ji}$.  In particular, for the Ehrenfest
+model
+this means that $w_i p_{i,i - 1} = w_{i - 1} p_{i - 1,i}$.  Thus, in
+equilibrium, the pairs $(i, i - 1)$ and $(i - 1, i)$ should occur with the same
+frequency.  While many of the Markov chains that occur in applications are
+reversible, this is a very strong condition.  In Exercise~\ref{exer 11.5.12}
+you 
+are asked to find an example of a Markov chain which is not reversible.
+ 
+\subsection*{The Central Limit Theorem for Markov Chains}
+Suppose that we have an ergodic Markov chain with states $s_1, s_2, \ldots,
+s_k$.
+It is natural to consider the distribution of the random variables $S^{(n)}_j$,
+which
+denotes the number of times that the chain is in state $s_j$ in the first $n$
+steps.
+The $j$th component $w_j$ of the fixed probability row vector $\mat{w}$ is the
+proportion of
+times that the chain is in state $s_j$ in the long run.  Hence, it is
+reasonable to conjecture
+that the expected value of the random variable $S^{(n)}_j$, as $n \rightarrow
+\infty$, is
+asymptotic to $nw_j$, and it is easy to show that this is the case (see
+Exercise~\ref{exer
+11.5.29}).
+\par
+It is also natural to ask whether there is a limiting distribution of the
+random variables
+$S^{(n)}_j$.  The answer is yes, and in fact, this limiting distribution is the
+normal
+distribution.  As in the case of independent trials, one must normalize these
+random
+variables.  Thus, we must subtract from $S^{(n)}_j$ its expected value, and
+then 
+divide by its standard deviation.  In both cases, we will use the asymptotic
+values of these
+quantities, rather than the values themselves.  Thus, in the first case, we
+will use the
+value $nw_j$.  It is not so clear what we should use in the second case.  It
+turns out that
+the quantity 
+\begin{equation}
+\sigma_j^2 = 2w_jz_{jj} - w_j - w_j^2
+\label{eq 11.5.9}
+\end{equation}
+represents the asymptotic variance.  Armed with these ideas, we can state the
+following
+theorem.
+\begin{theorem}\label{thm 11.5.20}{\bf (Central Limit Theorem for Markov
+Chains)}
+\index{Central Limit Theorem!for Markov Chains}\index{Markov Chains!Central
+Limit Theorem for}
+For an ergodic chain, for any real numbers $r < s$, we have
+$$P\Biggl(r < {{S^{(n)}_j - nw_j}\over{\sqrt{n\sigma_j^2}}}< s\Biggr)
+\rightarrow 
+{1\over{\sqrt {2\pi}}}\int_r^s e^{-x^2/2}\,dx\
+,$$ as $n \rightarrow \infty$, for any choice of starting state, where
+$\sigma_j^2$ is
+the quantity defined in Equation~\ref{eq 11.5.9}.
+\end{theorem}
+
+
+\subsection*{Historical Remarks}
+
+Markov chains were introduced by Andre\u i Andreevich Markov\index{MARKOV, A.
+A.} (1856--1922) and
+were named in his honor.  He was a talented undergraduate who received a gold
+medal for his undergraduate thesis at St.~Petersburg University.  Besides being
+an active research mathematician and teacher, he was also active in politics
+and patricipated in the liberal movement in Russia at the beginning of the
+twentieth century.  In 1913, when the government celebrated the 300th
+anniversary of the House of Romanov family, Markov organized a 
+counter-celebration of the 200th anniversary of Bernoulli's discovery of the 
+Law of Large Numbers.
+\par
+Markov was led to develop Markov chains as a natural extension of sequences of
+independent random variables.  In his first paper, in 1906, he proved that for
+a Markov chain with positive transition probabilities and numerical states the
+average of the outcomes converges to the expected value of the limiting
+distribution (the fixed vector).  In a later paper he proved the central limit
+theorem for such chains.  Writing about Markov, A.~P. Youschkevitch remarks:
+\begin{quote}
+Markov arrived at his chains starting from the internal needs of probability
+theory, and he never wrote about their applications to physical science.  For
+him the only real examples of the chains were literary texts, where the two
+states denoted the vowels and consonants.\footnote{See \emx {Dictionary of
+Scientific Biography,} ed.~C.~C. Gillespie (New York: Scribner's Sons, 1970),
+pp.~124--130.}
+\end{quote}
+\par
+In a paper written in 1913,\footnote{A.~A. Markov, ``An Example of Statistical
+Analysis of the Text of Eugene Onegin Illustrating the Association of Trials
+into a Chain," \emx {Bulletin de l'Acadamie Imperiale des Sciences de
+St.~Petersburg,} ser.~6, vol.~7 (1913), pp.~153--162.} Markov chose a sequence
+of 20{,}000 letters from Pushkin's \emx {Eugene Onegin} to see if this
+sequence can be approximately considered a simple chain.  He obtained the
+Markov chain with transition matrix
+$$
+\bordermatrix{
+& \mbox{vowel} & \mbox{consonant} \cr
+\mbox{vowel} & .128 & .872 \cr
+\mbox{consonant} & .663 & .337}\ .
+$$
+\par
+The fixed vector for this chain is $(.432, .568)$, indicating that we should
+expect about 43.2~percent vowels and 56.8~percent consonants in the novel,
+which was borne out by the actual count.
+\par
+Claude Shannon considered an interesting extension of this idea in his book
+\emx {
+The Mathematical Theory of Communication,}\index{SHANNON, C. E.}\index{WEAVER,
+W.}\footnote{C.~E.
+Shannon and W. Weaver, \emx {The Mathematical Theory of Communication} (Urbana:
+Univ.\ of
+Illinois Press, 1964).} in which he developed the informa\-tion-theoretic
+concept 
+of entropy.  Shannon considers a series of Markov chain approximations to
+English
+prose.  He does this first by chains in which the states are letters and then
+by chains in which the states are words.  For example, for the case of words he
+presents first a simulation where the words are chosen independently but with
+appropriate frequencies.
+\par
+\begin{quote}
+REPRESENTING AND SPEEDILY IS AN GOOD APT OR COME CAN DIFFERENT NATURAL HERE HE
+THE A IN CAME THE TO OF TO EXPERT GRAY COME TO FURNISHES THE LINE MESSAGE HAD
+BE THESE.
+\end{quote}
+\par
+He then notes the increased resemblence to ordinary English text when the words
+are chosen as a Markov chain, in which case he obtains
+ 
+
+\begin{quote}
+THE HEAD AND IN FRONTAL ATTACK ON AN ENGLISH WRI\-TER THAT THE CHARACTER OF
+THIS
+POINT IS THEREFORE ANOTHER METHOD FOR THE LETTERS THAT THE TIME OF WHO EVER
+TOLD THE PROBLEM FOR AN UNEXPECTED.
+\end{quote}
+\par
+A simulation like the last one is carried out by opening a book and choosing
+the first word, say it is \emx {the.}  Then the book is read until the word
+\emx {the} 
+appears again and the word after this is chosen as the second word, which
+turned out to be 
+\emx {head.}  The book is then read until the word \emx {head} appears again
+and the next
+word, \emx {and,} is chosen, and so on.
+\par
+Other early examples of the use of Markov chains occurred in Galton's study of
+the problem of survival of family names in 1889 and in the Markov chain
+introduced by P. and T. Ehrenfest in 1907 for diffusion. 
+Poincar\'{e} in 1912 dicussed card shuffling in terms of an ergodic Markov
+chain defined 
+on a permutation group.  Brownian motion, a continuous time version of random
+walk, 
+was introducted in 1900--1901 by L. Bachelier in his  study of the stock
+market, 
+and in 1905--1907 in the works of A. Einstein and M. Smoluchowsky in their
+study of
+physical processes.
+\par
+One of the first systematic studies of finite Markov chains was carried out by
+M. Frechet.\index{FRECHET, M.}\footnote{M. Frechet, ``Th\'eorie des
+\'ev\'enements en chaine dans
+le cas d'un nombre fini d'\'etats possible," in \emx {Recherches th\'eoriques
+Modernes sur le calcul des probabilit\'es,} vol.~2 (Paris, 1938).}  The
+treatment of Markov chains in terms of the two fundamental matrices that we
+have used was developed by Kemeny and Snell\index{KEMENY, J. G.}\index{SNELL,
+J. L.}
+\footnote{J. G. Kemeny and J. L. Snell, \emx {
+Finite Markov Chains.}} to avoid the use of eigenvalues that one of these
+authors found too complex.  The fundamental matrix~$\mat{N}$ occurred also in
+the
+work of J.~L. Doob and others in studying the connection between Markov
+processes and classical potential theory.  The fundamental matrix~$\mat{Z}$ for
+ergodic chains appeared first in the work of Frechet, who used it to find the
+limiting variance for the central limit theorem for Markov chains.
+
+\exercises
+\begin{LJSItem}
+\i\label{exer 11.5.1} Consider the Markov chain with transition matrix
+$$
+\mat {P} = \pmatrix{ 1/2 & 1/2 \cr 1/4 & 3/4}\ .
+$$
+Find the fundamental matrix~$\mat{Z}$ for this chain.
+Compute the mean first passage matrix using $\mat{Z}$.
+
+\i\label{exer 11.5.2} A study of the strengths of Ivy League football teams 
+shows that if a school has a strong team one year it is equally likely to have
+a
+strong team or average team next year; if it has an average team, half the time
+it
+is average next year, and if it changes it is just as likely to become strong
+as
+weak; if it is weak it has 2/3 probability of remaining so and 1/3 of becoming
+average.
+\begin{enumerate}
+\item A school has a strong team.  On the average, how long will it be
+before it has another strong team?
+
+\item A school has a weak team; how long (on the average) must the alumni
+wait for a strong team?
+\end{enumerate}
+
+\i\label{exer 11.5.3} Consider Example~\ref{exam 11.1.2} with $a = .5$ and 
+$b = .75$.  Assume that the President says that he or she will run.  Find the
+expected length of time before the first time the answer is passed on
+incorrectly.
+
+\i\label{exer 11.5.4} Find the mean recurrence time for each state of 
+Example~\ref{exam 11.1.2} for $a = .5$ and $b = .75$.  Do the same for general
+$a$~and~$b$.
+
+\i\label{exer 11.5.5} A die is rolled repeatedly.  Show by the results of this 
+section that the mean time between occurrences of a given number is~6.
+
+\i\label{exer 11.5.6} For the Land of Oz example (Example~\ref{exam 11.1.1}),
+make rain into an
+absorbing  state and find the fundamental matrix~$\mat{N}$.  Interpret the
+results obtained 
+from this chain in terms of the original chain.
+
+\i\label{exer 11.5.7} A rat runs through the maze shown in Figure~\ref{fig
+11.6.5}.  
+At each step it leaves the room it is in by choosing at random one of the doors 
+out of the room.
+\putfig{2truein}{PSfig11-6-5}{Maze for Exercise \protect\ref{exer 11.5.7}\protect.}{fig 11.6.5}
+%\begin{figure}
+%\centerline{\epsfxsize=2truein 
+%\epsffile{PSfig11-6.5}}
+%\caption{Maze for Exercise \protect\ref{exer 11.5.7}\protect.}\label{fig 11.6.5}
+%\end{figure}
+\begin{enumerate}
+
+\item Give the transition matrix $\mat{P}$ for this Markov chain.
+
+\item Show that it is an ergodic chain but not a regular chain.
+
+\item Find the fixed vector.
+
+\item Find the expected number of steps before reaching Room~5 for the first
+time, starting in Room~1.
+\end{enumerate}
+
+\i\label{exer 11.5.8} Modify the program {\bf  ErgodicChain} so that you 
+can compute the basic quantities for the queueing example of Exercise~\ref{sec
+11.3}.\ref{exer
+11.3.19}.  Interpret the mean recurrence time for state~0.
+
+\i\label{exer 11.5.9} Consider a random walk on a circle of circumference $n$. 
+The walker
+takes one unit step clockwise with  probability~$p$ and one unit
+counterclockwise with
+probability $q = 1 - p$.   Modify the program {\bf  ErgodicChain} to allow you
+to input
+$n$~and~$p$ and compute the basic quantities for this chain.
+\begin{enumerate}
+
+\item For which values of $n$ is this chain regular?  ergodic?
+
+\item What is the limiting vector $\mat{w}$?
+
+\item Find the mean first passage matrix for $n = 5$ and $p = .5$.  Verify
+that $m_{ij} = d(n - d)$, where $d$ is the clockwise distance from $i$~to~$j$.
+\end{enumerate}
+ 
+\i\label{exer 11.5.10} Two players match pennies and have between them a total 
+of 5~pennies.  If at any time one player has all of the pennies, to keep the
+game
+going, he gives one back to the other player and the game will continue.  Show
+that
+this game can be formulated as an ergodic chain.  Study this chain using the
+program
+{\bf  ErgodicChain}.
+
+\i\label{exer 11.5.11} Calculate the reverse transition matrix for the Land of 
+Oz example (Example~\ref{exam 11.1.1}).  Is this chain reversible?
+
+\i\label{exer 11.5.12} Give an example of a three-state ergodic Markov chain
+that is not reversible.
+
+\i\label{exer 11.5.13} Let $\mat{P}$ be the transition matrix of an ergodic
+Markov 
+chain and $\mat{P}^*$ the reverse transition matrix.  Show that they have the
+same 
+fixed probability vector~$\mat{w}$.
+
+\i\label{exer 11.5.14} If $\mat{P}$ is a reversible Markov chain, is it 
+necessarily true that the mean time to go from state~$i$ to state~$j$ is equal 
+to the mean time to go from state~$j$ to state~$i$?  \emx {Hint}: Try the 
+Land of Oz example (Example~\ref{exam 11.1.1}).
+
+\i\label{exer 11.5.15} Show that any ergodic Markov chain with a symmetric 
+transition matrix (i.e., $p_{ij} = p_{ji})$ is reversible.
+
+\i\label{exer 11.5.18} (Crowell\footnote{Private
+communication.})\index{CROWELL, R.} Let $\mat{P}$ 
+be the transition matrix of an ergodic Markov chain.  Show that
+$$
+(\mat {I} + \mat {P} +\cdots+ \mat {P}^{n - 1})(\mat {I} - \mat {P} + \mat {W})
+= \mat {I} -
+\mat {P}^n + n\mat {W}\ ,
+$$
+and from this show that
+$$
+\frac{\mat {I} + \mat {P} +\cdots+ \mat {P}^{n - 1}}n \to \mat {W}\ ,
+$$ 
+as $n \rightarrow \infty$.
+
+\i\label{exer 11.5.19} An ergodic Markov chain is started in equilibrium
+(i.e., with initial probability vector~$\mat{w}$).  The mean time until the
+next
+occurrence of state~$s_i$ is $\bar{m_i} = \sum_k w_k m_{ki} + w_i r_i$. 
+Show that $\bar {m_i} = z_{ii}/w_i$, by using the facts that $\mat {w}\mat {Z}
+= 
+\mat {w}$ and $m_{ki} = (z_{ii} - z_{ki})/w_i$.
+
+\i\label{exer 11.5.20} A perpetual craps\index{craps} game goes on at
+Charley's.  Jones comes 
+into Charley's on an evening when there have already been 100 plays.  He plans
+to
+play until the next time that snake eyes (a pair of ones) are rolled.  Jones
+wonders
+how many times he will play.  On the one hand he realizes that the average time
+between snake eyes is 36 so he should play about 18~times as he is equally
+likely to have come in on either side of the halfway point between occurrences
+of snake eyes.  On the other hand, the dice have no memory, and so it would
+seem that he would have to play for 36 more times no matter what the previous
+outcomes have been.  Which, if either, of Jones's arguments do you believe? 
+Using the result of Exercise~\ref{exer 11.5.19}, calculate the expected to 
+reach snake eyes, in equilibrium, and see if this resolves the apparent
+paradox.  
+If you are still in doubt, simulate the experiment to decide which argument is
+correct.  Can you give an
+intuitive argument which explains this result?
+
+\i\label{exer 11.5.22} Show that, for an ergodic Markov chain (see Theorem
+ \ref{thm 11.5.19}),
+$$
+\sum_j m_{ij} w_j = \sum_j z_{jj} - 1 = K\ .
+$$
+The second expression above shows that the number $K$ is independent of $i$. 
+The
+number $K$ is called \emx {Kemeny's constant.}\index{Kemeny's constant}  A
+prize was offered to the
+first  person to give an intuitively plausible reason for the above sum to be
+independent
+of~$i$.  (See also Exercise~\ref{exer 11.5.27}.)
+
+\i\label{exer 11.5.23} Consider a game played as follows: You are given a
+regular Markov chain
+with transition matrix
+$\mat P$, fixed probability vector $\mat{w}$, and a payoff function $\mat f$
+which assigns to each
+state $s_i$ an amount $f_i$ which may be positive or negative.  Assume that
+$\mat {w}\mat {f} =
+0$.  You watch this Markov chain as it evolves, and every time you are in state
+$s_i$ you receive an amount
+$f_i$.  Show that your expected winning after
+$n$~steps can be represented by a column vector~$\mat{g}^{(n)}$,  with
+$$\mat{g}^{(n)} = (\mat {I} + \mat {P} + \mat {P}^2 +\cdots+ \mat {P}^n)
+\mat {f}.$$ Show that as $n \to
+\infty$, $\mat {g}^{(n)} \to \mat {g}$  with $\mat {g} = \mat {Z} \mat {f}$.
+ 
+\i\label{exer 11.5.24} A highly simplified game of ``Monopoly" is played on a 
+board with four squares as shown in Figure~\ref{fig 11.7}.\index{Monopoly}
+You start at GO.  You roll a die and move clockwise around the board a number
+of squares equal to the number that turns up on the die.  You collect or pay an
+amount indicated on the square on which you land.  You then roll the die again
+and move around the board in the same manner from your last position. Using the
+result of 
+Exercise~\ref{exer 11.5.23}, estimate the amount you should expect to win in
+the long run
+playing this version of Monopoly.
+\putfig{1truein}{PSfig11-7}{Simplified Monopoly.}{fig 11.7}
+
+%\begin{figure}[here]
+%\centerline{\epsfxsize=1truein 
+%\epsffile{PSfig11-7}}
+%\caption{Simplified Monopoly.}\label{fig 11.7}
+%\end{figure}
+ 
+\i\label{exer 11.5.28} Show that if $\mat P$ is the transition matrix of a
+regular Markov
+chain, and $\mat W$ is the matrix each of whose rows is the fixed probability
+vector
+corresponding to $\mat {P}$, then $\mat {P}\mat {W} = \mat {W}$, and $\mat
+{W}^k = \mat {W}$
+for all positive integers $k$.
+
+\i\label{exer 11.5.29} Assume that an ergodic Markov chain has states $s_1,
+s_2, \ldots,
+s_k$.  Let $S^{(n)}_j$ denote the number of times that the chain is in state
+$s_j$ in the
+first $n$ steps.  Let $\mat{w}$ denote the fixed probability row vector for
+this chain.  Show
+that, regardless of the starting state, the expected value of $S^{(n)}_j$,
+divided by $n$,
+tends to $w_j$ as $n \rightarrow \infty$.  \emx {Hint}:  If the chain starts in
+state
+$s_i$, then the expected value of $S^{(n)}_j$ is given by the expression
+$$\sum_{h = 0}^n p^{(h)}_{ij}\ .$$
+
+\i\label{exer 11.5.27} In the course of a walk with Snell along Minnehaha Avenue in Minneapolisin the fall of 1983, Peter Doyle\footnote{Private
+communication.}\index{DOYLE, P. G.} suggested the following explanation for the constancy of\emx {Kemeny's
+constant}\index{Kemeny's constant} (see
+Exercise~\ref{exer 11.5.22}).  Choose a target state accordingto the fixed vector~$\mat{w}$.  Start from state $i$ and wait until the time $T$ thatthe target state occurs for the first time.  Let $K_i$ be the expected valueof $T$.  Observe that$$K_i + w_i \cdot 1/w_i= \sum_j P_{ij} K_j + 1\ ,$$and hence$$K_i = \sum_j P_{ij} K_j\ .
+$$By the maximum principle, $K_i$ is a constant.Should Peter have been given the prize?
+\end{LJSItem}
+
+

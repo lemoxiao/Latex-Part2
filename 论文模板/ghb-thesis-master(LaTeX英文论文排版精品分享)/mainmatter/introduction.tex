@@ -1,0 +1,1268 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{Introduction}
+\labelChapter{introduction}
+
+Processors are built to execute a vast range of \glspl{program}, from tiny
+\emph{Hello, world!} samples to large-scale Earth simulations.
+%
+Most importantly, the processors are built to minimize the execution time for
+these \glspl{program}.
+%
+To this end, CPU manufacturers continuously extend their processors with new,
+sophisticated \glspl{instruction} that allow complex computations to be executed
+using fewer \glspl{instruction}.
+%
+Such \glspl{instruction} are especially common in \glspl!{DSP} that appear in
+most contemporary mobile phones.
+%
+But while the technology behind modern processors continues to advance, the
+techniques for \gls!{instruction selection} -- the task of choosing the
+\glspl{instruction} for a given \gls{program} -- have not.
+%
+In fact, the state-of-the-art \glspl{compiler}, which are tools for translating
+\glspl{program} into \gls{assembly code}, essentially apply the same
+\gls{instruction selection} techniques as were used in the 1980s.
+
+
+\paragraph{Problem Statement}
+
+% LAYOUT FIX:
+% Make the problem statement fit on one page
+\enlargethispage{3pt}
+
+Due to underlying assumptions, many of the \glspl{instruction} currently
+available in modern processors cannot be handled by these techniques.
+%
+In particular, they rely on representations that are too limited for modeling
+these \glspl{instruction}.
+%
+Instead, \gls{compiler} developers are forced to implement hand-written routines
+for checking whether a specific \gls{instruction} is applicable and, if so,
+greedily selecting it.
+%
+With over \num{100}~million microprocessors being shipped every
+quarter~\cite{Intel:2014:NewsRelease}, through release cycles that become
+shorter and shorter, there is a growing need for new and improved
+\gls{instruction selection} techniques.
+
+Furthermore, the set of selectable \glspl{instruction} is highly dependent on
+other \gls{compiler} tasks.
+%
+One such task is \gls!{global code motion}, which involves moving computations
+from one part of the \gls{program} to another.
+%
+Integrating \gls{global code motion} with \gls{instruction selection} enables a
+larger set of combinations of computations, some of which may be implemented
+using sophisticated \glspl{instruction}.
+%
+Another task is \gls!{block ordering}, which involves placing the \gls{program}
+\glspl{block} in a consecutive sequence.
+%
+Depending on the processor, one set of selected \glspl{instruction} may impact
+the possible \gls{block} sequence and vice versa.
+%
+Consequently, in order to generate high-quality code, these tasks must be
+performed in unison.
+
+
+\paragraph{Universal Instruction Selection}
+
+This dissertation introduces \gls!{universal instruction selection} -- a new
+approach that addresses the problems recently described.\!%
+%
+\footnote{%
+  The source code is freely available on
+  {\relsize{-.5}{\url{github.com/unison-code/uni-instr-sel}}}.%
+}
+%
+Outlined in \refFigure{approach-overview}, the approach is the first to combine
+\gls{instruction selection} with \gls{global code motion} and \gls{block
+  ordering}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/introduction/approach-overview}
+
+  \caption{Overview of universal instruction selection}
+  \labelFigure{approach-overview}
+\end{figure}
+%
+In doing so, the approach alleviates selection of sophisticated
+\glspl{instruction} that would otherwise not have been selectable.
+
+To handle the combinatorial nature of these problems, the approach is based on a
+combinatorial optimization method called \glsdesc!{CP}.
+%
+It relies on a novel combinatorial model that is simpler and more flexible
+compared to the techniques currently used by modern \glspl{compiler}.
+%
+In addition, it captures crucial features that are ignored by other, existing
+combinatorial approaches.
+%
+The dissertation also proposes extensions for integrating \gls{instruction
+  scheduling} and \gls{register allocation}, which are two other \gls{code
+  generation} tasks known to impact \gls{instruction selection}.
+
+The model is enabled by a novel, \gls{graph}-based representation that unifies
+data flow and control flow for entire \glspl{function}.
+%
+Not only is this representation crucial for combining \gls{instruction
+  selection} with \gls{global code motion}, it also enables \glspl{instruction}
+whose behavior contains both data and control flow to be modeled as
+\glspl{graph}.
+%
+Hence there is no longer any need for hand-written routines to handle
+\glspl{instruction} that violate underlying assumptions about the
+\gls{instruction set}.
+
+
+\section{Thesis Statement}
+\labelSection{intro-thesis-statement}
+
+\begin{statement}
+  \Glsdesc{CP} is a flexible, practical, competitive, and
+  extensible approach for combining \gls{global.is} \gls{instruction selection},
+  \gls{global code motion}, and \gls{block ordering}.
+\end{statement}
+%
+By \emph{flexible}, it means that the approach can handle hardware architectures
+with a rich \gls{instruction set}.
+%
+By \emph{practical}, it means that the approach can select \glspl{instruction}
+for \glspl{program} of sufficient complexity and scales to medium-sized
+\glspl{function} (measured in hundreds of \glspl{operation}).
+%
+By \emph{competitive}, it means that the approach generates code of equal or
+better quality compared to the state of the art.
+%
+By \emph{extensible}, it means that the approach can be extended to integrate
+other \gls{code generation} tasks.
+
+
+\section{Motivation}
+\labelSection{intro-motivation}
+
+A \gls!{compiler} is a tool that takes a \gls{program}, written in some
+programming language, as input and produces equivalent \gls{assembly code} for a
+specific processor, called the \gls!{target machine}, as output.
+%
+As shown in \refFigure{compiler-overview}, a \gls{compiler} typically consists
+of three parts:%
+%
+\begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+  \item a \gls{frontend}
+  \item an \gls{optimizer}
+  \item a \gls{backend}
+\end{inlinelist}.
+%
+\begin{figure}
+  \centering%
+  \input{figures/introduction/compiler-overview}
+
+  \caption{Overview of a typical compiler}
+  \labelFigure{compiler-overview}
+\end{figure}
+
+The \gls!{frontend} performs \glsshort{syntactic analysis} and \gls{semantic
+  analysis} on the \gls{program} under compilation, making sure that the
+\gls{program} is syntactically and semantically valid.
+%
+After passing all checks, it then transforms the \gls{program} into an \gls!{IR}
+and passes the code to the \gls{optimizer}.
+
+The \gls!{optimizer} (sometimes called \gls!{middle-end}) consists of many
+target-independent \gls{program} optimizations, such as \gls{constant folding},
+\gls{dead code elimination}, and \gls{loop unrolling}.
+%
+Consequently, it is often the largest component of most \glspl{compiler}.
+%
+\Gls{global code motion} is typically also included in this component, where
+\glspl{operation} are moved across \gls{block} boundaries in order to move
+expensive \glspl{operation} into \glspl{block} with lower execution frequency.
+%
+Once optimized, the \gls{IR} code is then passed to the \gls{backend}.
+
+The \gls!{backend} performs \gls{code generation}, which also consists of many
+tasks but of which three tasks are most prominent:%
+%
+\begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+  \item \gls{instruction selection}, which we are already familiar with
+  \item \gls!{register allocation}, where \glspl{temporary} are assigned to
+    \glspl{register}
+  \item \gls!{instruction scheduling}, where \glspl{instruction} are reordered
+    to increase instruction-level parallelism and avoid stalls
+\end{inlinelist}.
+%
+Among other tasks, the \gls{backend} then performs \gls{block ordering} in order
+to minimize the number of jump \glspl{instruction}.
+%
+After these steps the \gls{program} has been fully transformed into
+\gls{assembly code}, which can then be translated into \gls{machine code} to be
+executed by the \gls{target machine}.
+
+
+\subsection{The Need for New Techniques and Representations}
+\labelSection{intro-saturated-arithmetic}
+
+\RefFigure{isel-gcmotion-example} shows a program that computes the saturated
+sums of two integer arrays.
+%
+\begin{filecontents*}{isel-gcmotion-example.c}
+int i = 0;
+while (i < N) {
+  int a = A[i];
+  int b = B[i];
+  int c = a + b;
+  if (MAX < c) c = MAX;
+  C[i] = c;
+  i++;
+}
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{C code\labelFigure{isel-gcmotion-example-c}}%
+                {%
+                  \begin{lstpage}{42mm}%
+                    \lstinputlisting[language=c]{isel-gcmotion-example.c}%
+                  \end{lstpage}%
+                }%
+  \hfill\hfill%
+  \subcaptionbox{Corresponding IR and control-flow graph%
+                 \labelFigure{isel-gmotion-example-ir}}%
+                [64mm]%
+                {\input{figures/introduction/isel-gcmotion-example-ir}}%
+  \hfill%
+  \mbox{}
+
+  \caption[%
+            Example illustrating the need for new techniques and the interaction
+            between instruction selection and global code motion%
+          ]{%
+            Example to illustrate the need for new techniques and the
+            interaction between instruction selection and global code motion.
+            %
+            The program computes the saturated sums of two arrays \irVar*{A} and
+            \irVar*{B} as a new array~\irVar*{C}, all of which are assumed to be
+            of equal length and stored in memory.
+            %
+            The variables \irVar*{N} and \irVar*{MAX} are constants representing
+            the array length and the upper limit, respectively.
+            %
+            An integer is assumed to be four~bytes%
+          }
+  \labelFigure{isel-gcmotion-example}%
+\end{figure}
+%
+In \gls!{saturation arithmetic}, the result of an arithmetic \gls{operation}
+will always stay within a range fixed by a minimum and maximum value.
+%
+If the \gls{operation} would produce a value outside of this range, then the
+value is set (``clamped'') to the closest limit, thus becoming ``saturated''.
+
+Assume that the \gls{target machine} has an instruction capable of implementing
+the saturated-add \gls{operation} used in the \gls{program} shown in
+\refFigure{isel-gcmotion-example}.
+%
+Hence the \gls{instruction} would implement the following five
+\glspl{operation}:%
+%
+\begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+  \item the \irAdd*{\irVar*{a}}{\irVar*{b}} addition
+  \item the \irLE*{\irVar*{MAX}}{\irVar*{c}} comparison
+  \item the conditional jump to either of blocks~\irBlock*{b4} and~\irBlock*{b5}
+  \item the \irAssign*{\irVar*{c}}{\irVar*{MAX}} assignment
+  \item the unconditional jump to~\irBlock*{b5}
+\end{inlinelist}.
+%
+Selecting this \gls{instruction} can have tremendous impact on performance.
+%
+Assume, for example, that each \gls{operation} can be implemented using an
+\gls{instruction} that takes one cycle to execute.
+%
+Hence executing one iteration of the loop takes \num{16}~cycles, and selecting
+the saturated-add \gls{instruction} would reduce the execution time by
+\SI{25}{\percent}.
+
+Existing \gls{instruction selection} techniques and representations, however, do
+not support selection of such \glspl{instruction}.
+%
+Since the \glspl{operation} above reside in separate \glspl{block}
+(\irBlock*{b3} and \irBlock*{b4}), making use of the saturated-add
+\gls{instruction} requires an \gls{instruction selector} that is capable of
+processing multiple \glspl{basic block} simultaneously.
+%
+In comparison, traditional \gls{instruction selection} techniques only consider
+one \gls{basic block} at a time.
+%
+Moreover, most approaches represent the \glspl{instruction} as \glspl{graph}.
+%
+As the saturated-add \gls{instruction} contains \glspl{operation} for both data
+and control flow, modeling it as a \gls{graph} requires a representation that
+captures both data and control flow.
+%
+In comparison, existing representations only capture data flow.
+
+
+\subsection{For Combining Instruction Selection and Global Code Motion}
+
+Assume that the \gls{target machine} also has a \glsunset{SIMD.i}\gls{SIMD.i}
+\gls{instruction} for addition.\!%
+%
+\footnote{%
+  A \glsreset{SIMD.i}\gls!{SIMD.i}[ \gls{instruction}] is an \gls{instruction}
+  that executes the same \gls{operation} over multiple sets of input data.%
+}
+%
+Revisiting the example shown in \refFigure{isel-gcmotion-example}, there are
+four additions in the \gls{program} (\irAdd*{\irVar*{A}}{\irTemp*{2}},
+\irAdd*{\irVar*{B}}{\irTemp*{2}}, \irAdd*{\irVar*{C}}{\irTemp*{2}}, and
+\irAdd*{\irVar*{i}}{\irVar*{1}}) which are independent from one another and can
+therefore be executed in parallel.
+%
+Assuming again that all \glspl{instruction} take one cycle to execute,
+implementing these four additions using a single \gls{SIMD.i} \gls{instruction}
+would reduce execution time by almost \SI{19}{\percent}.
+%
+This requires, however, that the two additions in block~\irBlock*{b5} be moved
+to block~\irBlock*{b4}, which is the task of \gls{global code motion}.
+%
+Since \gls{global code motion} is commonly considered to be a target-independent
+optimization, this task is often done before \gls{code generation}.
+%
+Consequently, the \gls{global code mover} may take decisions which prevent
+selection of such \glspl{instruction}.
+
+
+\subsection{For Taking Cost of Data Copying Into Account}
+
+Although selecting \gls{SIMD.i} \glspl{instruction} may significantly improve
+code quality -- like in the previous example -- doing so carelessly may also
+have the opposite effect.
+%
+Assume, for example, that the \gls{SIMD.i} \gls{instruction} uses a limited set
+of \glspl{register}.
+%
+If the other selected \glspl{instruction} cannot directly write to and read from
+these registers, then additional \glspl{instruction} must be emitted to copy the
+values between the general registers and the \gls{SIMD.i} registers.
+%
+In the case of the program shown in \refFigure{isel-gcmotion-example}, eight
+such \glspl{instruction} would be needed, which instead increases execution time
+with \SI{31}{\percent}.
+%
+The task of inserting these copy \glspl{instruction} is known as \gls!{data
+  copying}, and the \gls{instruction selector} must be aware of the cost of
+\gls{data copying} in order to make effective use of \gls{SIMD.i}
+\glspl{instruction}.
+
+
+\subsection{For Combining Instruction Selection and Block Ordering}
+
+\RefFigure{isel-blorder-example} shows a \gls{function} that keeps calling
+another \gls{function} (with side effects) until it returns a non-zero value.
+%
+\begin{filecontents*}{isel-blorder-example.c}
+int f() {
+  int a;
+  do {
+    a = g();
+  } while (a == 0);
+  return a;
+}
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \subcaptionbox{C code\labelFigure{isel-blorder-example-c}}%
+                {%
+                  \begin{lstpage}{36mm}%
+                    \lstinputlisting[language=c]{isel-blorder-example.c}
+                  \end{lstpage}%
+                }%
+  \hspace{5mm}%
+  \subcaptionbox{%
+                  Corresponding IR and control-flow graph%
+                  \labelFigure{isel-blorder-example-ir}%
+                }%
+                [64mm]%
+                {\input{figures/introduction/isel-blorder-example-ir}}%
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox{%
+                  Selecting basic jump instruction, after block ordering.
+                  %
+                  Cycle count: 6%
+                  \labelFigure{isel-blorder-example-code-1}%
+                }%
+                {%
+                  \figureFontSize%
+                  \begin{tabular}{%
+                                   >{\instrFont{}}l@{\hspace{.5em}}%
+                                   >{\instrFont{}}l@{\hspace{.5em}}%
+                                   >{\instrFont{}}l%
+                                 }
+                    \toprule
+                    b1: & call & a $\leftarrow$ g()\\
+                        & cmp  & \instrTemp{1} $\leftarrow$
+                                 \instrEQ{\instrVar{a}}{\instrVar{0}}\\
+                        & jmp  & \instrTemp{1}, \instrBlock{b1}\\
+                    b2: & ret  & \instrVar{a}\\
+                    \bottomrule
+                  \end{tabular}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Selecting complex jump instruction, before block ordering.
+                  %
+                  Cycle count: 5%
+                  \labelFigure{isel-blorder-example-code-2}%
+                }%
+                [38mm]%
+                {%
+                  \figureFontSize%
+                  \begin{tabular}{%
+                                   >{\instrFont{}}l@{\hspace{.5em}}%
+                                   >{\instrFont{}}l@{\hspace{.5em}}%
+                                   >{\instrFont{}}l%
+                                 }
+                    \toprule
+                    b1: & call & a $\leftarrow$ g()\\
+                        & jmp  & \instrNE{\instrVar{a}}{\instrVar{0}},
+                                 \instrBlock{b2}\\
+                    \\
+                    b2: & ret  & \instrVar{a}\\
+                    \bottomrule
+                  \end{tabular}%
+                }
+  \hfill%
+  \subcaptionbox{%
+                  Selecting complex jump instruction, after block ordering.
+                  %
+                  Cycle count: 8%
+                  \labelFigure{isel-blorder-example-code-3}%
+                }%
+                [39mm]%
+                {%
+                  \figureFontSize%
+                  \begin{tabular}{%
+                                   >{\instrFont{}}l@{\hspace{.5em}}%
+                                   >{\instrFont{}}l@{\hspace{.5em}}%
+                                   >{\instrFont{}}l%
+                                 }
+                    \toprule
+                    b1: & call & a $\leftarrow$ g()\\
+                        & jmp  & \instrNE{\instrVar{a}}{\instrVar{0}},
+                                 \instrBlock{b2}\\
+                        & jmp  & \instrBlock{b1}\\
+                    b2: & ret  & \instrVar{a}\\
+                    \bottomrule
+                  \end{tabular}%
+                }
+
+  \caption[%
+            Example illustrating the interaction between instruction
+            selection and block ordering%
+          ]{%
+            Example to illustrate the interaction between instruction
+            selection and block ordering.
+            %
+            The function \irCode*{f} calls another function \irCode*{g} until it
+            returns a non-zero value, and then returns that value%
+          }
+  \labelFigure{isel-blorder-example}%
+\end{figure}
+%
+Assume that the \gls{target machine} has three \glspl{instruction} for handling
+control flow:%
+%
+\begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+  \item a \mbox{{\instrFont*jmp} $p$\hspace{-.8pt}, $b$} \gls{instruction},
+    which branches to block~$b$ if the value in register~$p$ corresponds the
+    Boolean value~$\mathit{true}$
+  \item a \mbox{{\instrFont*jmp} $r \neq 0$, $b$} \gls{instruction}, which
+    branches to block~$b$ if the condition \mbox{$r \neq 0$} holds, where $r$
+    is a register
+  \item a \mbox{{\instrFont*jmp} $b$} \gls{instruction}, which unconditionally
+    branches to block~\mbox{$b$\hspace{-1pt}.}
+\end{inlinelist}
+%
+Assume also that these branch \glspl{instruction} take three cycles compared to
+the other \glspl{instruction} in the \gls{target machine}, which take one cycle.
+
+At first glance it appears that only the first jump \gls{instruction} is
+selectable for implementing the conditional branch (see
+\refFigure{isel-blorder-example-code-1}).
+%
+Selecting this \gls{instruction} leads to a total of six cycles for the entire
+\gls{function}.
+%
+But by flipping the condition and swapping block labels (conditionally jumping
+to \irBlock*{b2} instead of \irBlock*{b1}), the more complex jump
+\gls{instruction} becomes selectable (see
+\refFigure{isel-blorder-example-code-2}).
+%
+Selecting this \gls{instruction} brings the cycle count to five cycles, thus
+reducing the execution time by almost \SI{17}{\percent}.
+%
+However, although this decision may appear better at the point of
+\gls{instruction selection}, it requires an additional jump \gls{instruction}
+when ordering the \glspl{block} (because block~\irBlock*{b1} cannot fall-through
+to the top of itself; see \refFigure{isel-blorder-example-code-3}).
+%
+This code takes eight cycles to execute, thus increasing execution time with
+\SI{33}{\percent}.
+%
+The \gls{instruction selector} must therefore be aware of additional jump
+\glspl{instruction} that may be required when making such decisions.
+
+
+\section{Contributions}
+\labelSection{intro-contributions}
+
+The dissertation makes six contributions to the areas of \gls{code generation}
+and \glsdesc{CP}:
+%
+\begin{contributions}
+  \item \labelContribution{survey}
+    It presents a comprehensive and systematic survey that
+    %
+    \begin{contributions}
+      \item \labelContribution{survey-spanning}
+        examines over four decades of research on \gls{instruction selection},
+        covering a significantly wider scope and time span compared to existing
+        surveys \cite{Cattell:1977, GanapathiEtAl:1982:Survey, Lunell:1983,
+          Leupers:2000:Survey, BoulytchevLomov:2001} which are either too old
+        or incomplete.
+    \end{contributions}
+    %
+    The survey identifies%
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{survey-principles}
+        four fundamental \gls{instruction selection} \glspl{principle} --
+        \gls{macro expansion}, \gls{tree covering}, \gls{DAG covering}, and
+        \gls{graph covering} --
+    \end{contributions}
+    %
+    and
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{survey-instruction-characteristics}
+        five \glspl{instruction characteristic} -- \gls{single-output.ic},
+        \gls{multi-output.ic}, \gls{disjoint-output.ic}, \gls{inter-block.ic},
+        and \gls{interdependent.ic} --
+    \end{contributions}
+    %
+    and systematically classifies the techniques along these two dimensions.
+    %
+    In addition, the survey
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{survey-problem-identification}
+        identifies connections between \gls{instruction selection} and other
+        \gls{code generation} problems that have yet to be investigated.
+    \end{contributions}
+
+  \item \labelContribution{representations}
+    It introduces a novel \gls{program} and \gls{instruction} representation
+    that
+    %
+    \begin{contributions}
+      \item \labelContribution{rep-data-and-control-flow}
+        captures both data and control flow for entire \glspl{function} and
+        \glspl{instruction},
+    \end{contributions}
+    %
+    which enables
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{rep-complex-instructions}
+        an unprecedented range of instruction behaviors to be captured and
+        modeled as \glspl{graph}.
+    \end{contributions}
+    %
+    In addition, the representation is crucial for
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{rep-combining-problems}
+        combining \gls{instruction selection} and \gls{global code motion} and
+        solving these two problems in unison.
+    \end{contributions}
+
+  \item \labelContribution{constraint-model}
+    It introduces a \gls{constraint model} and related transformations for
+    \gls{universal instruction selection} which, for the first time, enables
+    %
+    \begin{contributions}
+      \item \labelContribution{cp-uniform-selection}
+        uniform selection of data and control \glspl{instruction},
+    \end{contributions}
+    %
+    and integration of
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{cp-global-instruction-selection}
+        \gls{global.is} \gls{instruction selection} with
+      \item \labelContribution{cp-global-code-motion}
+        \gls{global code motion}.
+    \end{contributions}
+    %
+    In addition, the \gls{constraint model} integrates
+    %
+    \begin{contributions}[resume]
+      \item \labelContribution{cp-data-copying}
+        \gls{data copying},
+      \item \labelContribution{cp-value-reuse}
+        \gls{value reuse}, and
+      \item \labelContribution{cp-block-ordering}
+        \gls{block ordering}.
+    \end{contributions}
+
+  \item \labelContribution{solving-techniques}
+    It introduces techniques to improve solving of the \gls{constraint model},
+    which are essential for scalability and making the approach work in
+    practice.
+
+  \item \labelContribution{experiments}
+    It presents thorough experiments demonstrating that the approach scales to
+    medium-sized \glspl{program} and yields equal or better code than the state
+    of the art.
+
+  \item \labelContribution{integration}
+    It describes how the \gls{constraint model} can be extended to integrate
+    other \gls{code generation} tasks, such as \gls{instruction scheduling} and
+    \gls{register allocation}.
+\end{contributions}
+%
+\refTable{contributions-per-chapter} shows in which part of the dissertation
+each contribution is manifested.
+
+\begin{table}
+  \centering%
+  \begin{tabular}{c@{\qquad}*{6}{c}}
+    \toprule
+      \tabhead chapter
+    & \tabhead\refContribution{survey}
+    & \tabhead\refContribution{representations}
+    & \tabhead\refContribution{constraint-model}
+    & \tabhead\refContribution{solving-techniques}
+    & \tabhead\refContribution{experiments}
+    & \tabhead\refContribution{integration}\\
+    \midrule
+    \refChapter*{existing-isel-techniques-and-reps}
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refChapter*{universal-representation}
+    & \supportNo
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refChapter*{constraint-model}
+    & \supportNo
+    & \supportNo
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refChapter*{solving-techniques}
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportYes
+    & \supportNo
+    & \supportNo\\
+    \refChapter*{exp-evaluation-using-the-state-of-the-art}
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportYes
+    & \supportNo\\
+    \refChapter*{proposed-model-extensions}
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportYes\\
+    \refAppendix*{macro-expansion}
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refAppendix*{tree-covering}
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refAppendix*{dag-covering}
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refAppendix*{graph-covering}
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \bottomrule
+  \end{tabular}
+
+  \caption{Contributions per chapter}
+  \labelTable{contributions-per-chapter}
+\end{table}
+
+The material presented in \refChapter{solving-techniques} is based on ideas
+conceived in collaboration with Mats~Carlsson.
+
+
+\section{Publications}
+\labelSection{intro-publications}
+
+This dissertation is based on material presented in the following publications:
+
+
+\paragraph{Books}
+
+\begin{publications}
+  \item \labelPublication{survey-book}
+    \fullcite{HjortBlindell:2016:Survey}.
+\end{publications}
+
+
+\paragraph{Conference Papers}
+
+\begin{publications}[resume]
+  \item \labelPublication{cp-paper}
+    \fullcite{HjortBlindellEtAl:2015:CP}.
+    %
+    \begin{authorsContribution}
+      The author of this dissertation designed and implemented the work
+      presented in the paper, oversaw the writing of the paper, wrote the
+      majority of the text, designed the figures, and assisted in experiment
+      data gathering and analysis.
+    \end{authorsContribution}
+\end{publications}
+
+
+\paragraph{Articles}
+
+\begin{publications}[resume]
+  \item \labelPublication{cases-paper}
+    \fullcite{HjortBlindellEtAl:2017:CASES}.
+    %
+    \begin{authorsContribution}
+      The author designed and implemented the work presented in the paper,
+      gathered and analyzed the experiment data, oversaw the writing of the
+      paper, wrote the majority of the text, and designed the figures.
+    \end{authorsContribution}
+\end{publications}
+%
+\refTable{contributions-per-publication} shows the relation between the
+contributions and the publications above.
+%
+Note that contribution~\refContribution{integration} only appears in this
+dissertation and in none of the publications.
+
+\begin{table}
+  \centering%
+  \begin{tabular}{c@{\qquad}*{11}{c}}
+    \toprule
+      \tabhead publication
+    & \tabhead\refContribution{survey}
+    & \tabhead\refContribution{representations}
+    & \multicolumn{6}{c}{\tabhead\refContribution{constraint-model}}
+    & \tabhead\refContribution{solving-techniques}
+    & \tabhead\refContribution{experiments}
+    & \tabhead\refContribution{integration}\\
+    \cmidrule(lr){4-9}%
+    &
+    &
+    & \tabhead\refContribution{cp-uniform-selection}
+    & \tabhead\refContribution{cp-global-instruction-selection}
+    & \tabhead\refContribution{cp-global-code-motion}
+    & \tabhead\refContribution{cp-data-copying}
+    & \tabhead\refContribution{cp-value-reuse}
+    & \tabhead\refContribution{cp-block-ordering}
+    &
+    &
+    &\\
+    \midrule
+    \refPublication{survey-book}
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo\\
+    \refPublication{cp-paper}
+    & \supportNo
+    & \supportYes
+    & \supportYes
+    & \supportYes
+    & \supportYes
+    & \supportYes
+    & \supportNo
+    & \supportYes
+    & \supportNo
+    & \supportYes
+    & \supportNo\\
+    \refPublication{cases-paper}
+    & \supportNo
+    & \supportYes
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportNo
+    & \supportYes
+    & \supportNo
+    & \supportYes
+    & \supportYes
+    & \supportNo\\
+    \bottomrule
+  \end{tabular}
+
+  \caption{Contributions per publication}
+  \labelTable{contributions-per-publication}
+\end{table}
+
+The author also participated in the following publications not included in the
+dissertation:
+
+
+\paragraph{Book Chapters, Conference Papers, and Workshop Papers}
+
+\begin{publications}[resume]
+  \item \labelPublication{survey-report}
+    \fullcite{HjortBlindell:2013:Survey}.
+  \item \labelPublication{scopes}
+    \fullcite{CastanedaLozanoEtAl:2013:M-SCOPES}.
+    %
+    \begin{authorsContribution}
+      The author assisted in writing the paper.
+    \end{authorsContribution}
+  \item \labelPublication{lctes}
+    \fullcite{CastanedaLozanoEtAl:2014:LCTES}.
+    %
+    \begin{authorsContribution}
+      The author assisted in experiment data gathering and analysis, and in
+      writing the paper.
+    \end{authorsContribution}
+  \item \labelPublication{cc}
+    \fullcite{CastanedaLozanoEtAl:2016:CC}.
+    %
+    \begin{authorsContribution}
+      The author assisted in writing the paper.
+    \end{authorsContribution}
+  \item \labelPublication{fdl-2016}
+    \fullcite{HjortBlindellEtAl:2016:FDL}.
+    %
+    \begin{authorsContribution}
+      The author designed and implemented the work presented in the paper,
+      gathered and analyzed the experiment data, oversaw the writing of the
+      paper, wrote the majority of the text, and designed the figures.
+    \end{authorsContribution}
+\end{publications}
+%
+\refPublication{survey-report} is excluded as it is subsumed and extended by
+\refPublication{survey-book}.
+%
+\refPublication{scopes}--\refPublication{cc} are excluded as they are only
+partially related to the dissertation (they apply \glsdesc{CP} to solve
+\gls{register allocation} and \gls{instruction scheduling} without considering
+\gls{instruction selection}).
+%
+\refPublication{fdl-2016} is excluded as it belongs to a different topic
+entirely (high-level code generation for graphics processors).
+
+
+\section{Research Methodology}
+\labelSection{intro-research-methodology}
+
+We begin with a comprehensive and systematic literature survey to identify the
+strengths and limitations of existing \gls{instruction selection} techniques and
+common denominators among them.
+%
+As part of this survey, four fundamental \gls{instruction selection}
+\glspl{principle} and five \glspl{instruction characteristic} are identified,
+and the techniques are systematically classified accordingly.
+%
+This classification enables us to recognize that certain classes of
+\glspl{instruction} are poorly supported by existing \gls{instruction selection}
+techniques.
+%
+This is in particular due to lack of appropriate \gls{program} and
+\gls{instruction} representations.
+
+Having established the need for new representations, we identify a set of
+requirements that such a representation must fulfill.
+%
+We then build a new representation by unifying two existing, well-established
+representations -- one for capturing data flow and another for capturing control
+flow -- and then augment the representation as needed until all requirements are
+met.
+%
+As is common, we then apply a traditional \gls{subgraph isomorphism} algorithm
+for performing \gls{pattern matching} on the new representation.
+
+With the new representation at hand, we proceed with building the
+\gls{constraint model}.
+%
+For each task to be integrated, we first identify what constitutes a
+\gls{solution} to this task and then add the necessary \glspl{variable} and
+\glspl{constraint} to enforce such \glspl{solution}.
+%
+If more than one design choice exists for integrating the task, then we
+implement both as separate \glsplshort{constraint model} and evaluate which is
+better before proceeding.
+%
+This is because the tasks are orthogonal from one another and can therefore be
+evaluated in isolation.
+%
+The evaluation methodology is described in
+\refSection{intro-evaluation-methodology}.
+
+Once all tasks are integrated, we design a range of solving techniques in order
+to increase scalability and robustness.
+%
+Because these techniques influence one another, we first evaluate the usefulness
+of each solving technique individually in order to form groups of solving
+techniques and then evaluate each group as a whole.
+%
+This is to avoid unreasonably long experiment runtimes.
+
+Using the \gls{constraint model} with the best design choices and solving
+techniques, we then evaluate the significance of \gls{universal instruction
+  selection} by comparing the code it generates with that generated by the state
+of the art.
+
+
+\section{Evaluation Methodology}
+\labelSection{intro-evaluation-methodology}
+
+\subsection{Experiment Setup}
+
+To evaluate a \gls{constraint model}, we implement it using
+\mbox{\gls!{MiniZinc} 2.1.6}~\cite{NethercoteEtAl:2007}, which is a high-level
+\gls{constraint} modeling language.
+%
+The algorithms for transforming a given \gls{function} into a \gls{graph},
+performing \gls{pattern matching}, and producing the data to instantiate the
+\gls{constraint model} are implemented in \gls{Haskell}.
+%
+The presolving techniques are implemented in \gls{Python}.
+%
+The model is solved using \gls!{Chuffed}~\cite{Chu:2011} -- a
+\glsdesc{LCG}-based \glsshort{constraint solver} included in \gls{MiniZinc} --
+on a Linux machine with an \gls{Intel} Xeon W3530 at \SI{2.80}{\GHz} and
+\SI{16}{\giga\byte} main memory.
+%
+We invoke \gls{Chuffed} with flags \cCode*{-f --rnd-seed 3218642}.
+
+To mitigate deviations in the measurements, we run each experiment ten times and
+then take the arithmetic average together with the \gls!{CV}.
+%
+When summarizing ratios, we instead take the geometric mean since this is more
+appropriate in such cases~\cite{FlemingWallace:1986}.
+
+As problem instances, we use the \glspl{function} provided by
+\gls!{MediaBench}~\cite{LeeEtAl:1997} -- a benchmark suite for embedded systems
+-- and the \glspl{instruction} in \gls{Hexagon}~V5 -- a \gls{DSP} with a rich
+\gls{instruction set}.
+%
+The \gls{MediaBench} suite consists of \num{6313}~\glspl{function}, which are
+compiled into \gls{LLVM} \gls{IR} code -- the intermediate format used by
+\gls{LLVM} -- using \mbox{\gls{LLVM} 3.8} with optimization flag~\texttt{-O3}.
+%
+Due to insufficient support in the current tool chain, we remove all
+\glspl{function} that operate on non-integer data types (such as floating point
+and vector data types).
+%
+This leaves \num{3094}~\glspl{function}, on which further filtering will be
+performed as needed for the given experiment.
+
+For all experiments in this dissertation, the remaining pool of \glspl{function}
+is too large for all to be included in the experiment as that would lead to
+unreasonably long experiment runtimes.
+%
+We therefore draw a limited number of samples from this pool.
+%
+To attain a diverse set of samples, we apply \gls{k-means
+  clustering}~\cite{PhansalkarEtAl:2005} to divide the \glspl{function} into
+twenty clusters based on three features.
+%
+The first feature is the application from which the \gls{function} is derived
+since, intuitively, \glspl{function} from different applications should exhibit
+different characteristics.
+%
+The second feature is the size in number of \gls{LLVM} \gls{IR}
+\glspl{instruction}.
+%
+This is to evaluate how the \gls{constraint model} behaves as the
+\glspl{function} grow larger.
+%
+The third feature is the number of memory \glspl{instruction}.
+%
+This is because, due to its many \glspl{addressing mode}, the memory
+\glspl{instruction} constitute a large part of the more sophisticated
+\glspl{instruction} in the \gls{instruction set}.
+%
+Based on these features, from each cluster we then randomly select one
+\gls{function}, giving a total of twenty \glspl{function}.
+
+
+\subsection{Normalizing Measurements}
+
+\newcommand{\speedupCase}[1]{\textrm{\textsc{#1}}}
+
+When we are interested in the relative difference between the measurements, we
+normalize all values to those obtained from one \glsshort{constraint model}
+which has been chosen as the \gls!{baseline}.
+%
+In this context, the other \glsplshort{constraint model} are called the
+\glspl!{subject}.
+
+For time measurements, the most typical method for normalization is to calculate
+the \gls!{speedup}, which is computed as
+%
+\begin{equation}
+  \frac{t_b}{t_a}
+  \labelEquation{speedup-normalization}
+\end{equation}
+%
+where $t_a$ and $t_b$ denote time measurements obtained for a given problem
+instance from \gls{subject} \glsshort{constraint model}~$a$ respectively
+\gls{baseline} \glsshort{constraint model}~\mbox{$b$\hspace{-1pt}.}
+%
+A value greater than \num{1} means $a$ is faster than~\mbox{$b$\hspace{-1pt},} a
+value less than \num{1} means $b$ is faster than~\mbox{$a$\hspace{-.8pt},} and a
+value of exactly \num{1} means $a$ and $b$ are equally fast.
+
+This method, however, creates problems when plotting the normalized values as
+bar charts.
+%
+Since the normalized values are centered around \num{1}, when $a$ is twice as
+fast as $b$ we intuitively expect the normalized value to be equally far away
+from \num{1} as when $b$ is twice as fast as~\mbox{$a$\hspace{-.8pt}.}
+%
+With \refEquation{speedup-normalization}, this is not the case.
+%
+See for example \refFigure{speedup-comparison-regular}, illustrating two
+cases: \speedupCase{i}, where $a$ is twice as fast as $b$; and \speedupCase{ii},
+where $b$ is twice as fast as~\mbox{$a$\hspace{-.8pt}.}
+%
+\begin{figure}
+  \renewcommand{\functionName}[1]{{\Large\speedupCase{#1}}}%
+  \renewcommand{\plotNormTicsFont}{\large}%
+  \renewcommand{\barNormValueFont}{\scriptsize}%
+
+  \def\insertSpeedupExamplePlot#1{%
+    \maxsizebox{30mm}{!}{%
+      \trimbox{18pt 8pt 74mm 45mm}{%
+        \input{figures/introduction/speedup-example-#1.plot}%
+      }%
+    }%
+  }%
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Values normalized using speedup method
+                  (\refEquation{speedup-normalization})%
+                  \labelFigure{speedup-comparison-regular}%
+                }%
+                [40mm]%
+                {%
+                  \insertSpeedupExamplePlot{regular}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Values normalized using zero-centered normalization
+                  (\refEquation{zero-centered-normalization})%
+                  \labelFigure{speedup-comparison-zero-centered}%
+                }%
+                [50mm]%
+                {%
+                  \insertSpeedupExamplePlot{zero-centered}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Comparison between two methods for normalizing measurements]%
+          {%
+            Comparison between the two methods for normalizing measurements.
+            %
+            The comparison is done for two problem instances:
+            %
+            \begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+              \item one where the subject is twice as fast as the baseline
+                (\speedupCase{i})
+              \item one where the baseline is twice as fast as the subject
+                (\speedupCase{ii})%
+            \end{inlinelist}%
+          }%
+  \labelFigure{speedup-comparison}%
+\end{figure}
+%
+When plotting such values, we therefore normalize the values using a different
+method, called \gls!{zero-centered normalization}, which is computed as
+%
+\begin{equation}
+  \left\{
+  \begin{array}{ll}
+    \frac{t_b - t_a}{t_a} & \text{if $t_b \geq t_a$,} \\
+    \frac{t_b - t_a}{t_b} & \text{otherwise.}
+  \end{array}
+  \right.
+  \labelEquation{zero-centered-normalization}
+\end{equation}
+%
+As seen in \refFigure{speedup-comparison-zero-centered}, this method results in
+normalized values that are centered around \num{0} (hence its name) and, unlike
+the \gls{speedup} method, are equally far apart in the case of \speedupCase{i}
+and \speedupCase{ii}.
+%
+A normalized value $v$ using \gls{zero-centered normalization} corresponds a
+\gls{speedup} of \mbox{$v + 1$} if \mbox{$v \geq 0$}, otherwise
+\mbox{$\frac{1}{1 - v}$}.
+%
+To distinguish between the two, we suffix \gls{speedup} and
+\glsshort{zero-centered normalization} values with a $\mSpeedupSuffix$ and
+$\mZCNormSuffix$, respectively (\eg \printSpeedup{3.5} and \printZCNorm{2.5}).
+
+\Gls{zero-centered normalization} is also applied when comparing \gls{solution}
+costs as they represent an estimate of the time it would take to execute the
+code yielded by the \glspl{solution} (the current implementation is not yet able
+to hook back into the \gls{compiler} in order to generate executable code).
+
+When summarizing normalized values, however, we do not use \gls{zero-centered
+  normalization} as the geometric mean cannot be computed for such values.
+%
+Instead we compute the geometric mean for the values normalized using the
+\gls{speedup} method, which we call the \gls!{GMI}.
+%
+A result is considered positive or negative if the \gls{GMI} is greater than
+respectively less than~\num{1}.
+%
+In terms of solving time, for example, a \gls{subject} model~$a$ leads to an
+overall reduction over another \gls{baseline} model~$b$ if the \gls{GMI} is
+greater than~\num{1}.
+
+
+\subsection{Attaining Statistically Significant Results}
+
+Because we can only run experiments on a small set of \glspl{function} sampled
+from much larger pool, the \gls{GMI} we attain from the sampled set may not be
+representative for the pool as a whole.
+%
+In other words, the result may not be statistically significant.
+%
+Therefore, for the \gls{GMI} value we also compute the
+\gls!{CI}~\cite{Neyman:1937}, which is a method of estimating the uncertainty of
+a value computed from a set of samples.
+%
+Every \gls{CI} is computed with a predefined degree of confidence, typically
+written as the $X$\textsuperscript{th} \gls{CI}.
+%
+This means that if the $X$\textsuperscript{th} \gls{CI} of the \gls{GMI} value
+is greater than or less than~\num{1}, then we can statistically conclude with
+\SI[parse-numbers=false]{\text{$X$}}{\percent} confidence that the result is
+positive respectively negative.
+%
+If the \gls{CI} contains~\num{1}, then the result is inconclusive.
+
+For the experiments described in this dissertation, we compute the
+\num{95}\textsuperscript{th} \gls{CI} as is common for most statistical
+experiments.
+%
+Since we know nothing about the underlying distributions for our observations,
+we compute the \gls{CI} using \gls{percentile bootstrapping} with
+\num{100000}~iterations~\cite{EfronTibshirani:1994}.
+
+
+\section{Outline}
+\labelSection{intro-outline}
+
+As shown in \refFigure{dissertation-structure}, the dissertation is structured
+into four parts:
+%
+\begin{figure}
+  \centering%
+  \input{figures/introduction/dissertation-structure}
+
+  \caption{Structure of the dissertation}
+  \labelFigure{dissertation-structure}
+\end{figure}
+%
+\begin{description}
+  \item[Background]
+    Provides necessary background material:
+    %
+    \begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+      \item \refChapter{constraint-programming} describes \glsdesc{CP}
+      \item \refAppendix{graph-definitions} provides exact definitions of
+        \glspl{graph} and related terms used throughout the dissertation
+    \end{inlinelist}.
+  \item[Literature survey]
+    Discusses existing \gls{instruction selection} techniques:
+    %
+    \begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+      \item \refChapter{existing-isel-techniques-and-reps} covers the techniques
+        most relevant for \gls{universal instruction selection}
+      \item \refAppendixRange{macro-expansion}{graph-covering} cover the
+        remaining techniques
+      \item \refAppendix{list-of-techniques} lists a summary of all discussed
+        techniques
+    \end{inlinelist}.
+  \item[Universal instruction selection]
+    Presents the approach:
+    %
+    \begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+      \item \refChapter{universal-representation} introduces the \gls{universal
+        representation}
+      \item \refChapter{constraint-model} introduces the \gls{constraint model}
+      \item \refChapter{solving-techniques} introduces the solving techniques
+      \item \refChapter{exp-evaluation-using-the-state-of-the-art} evaluates the
+        approach using the state of the art
+      \item \refAppendix{minizinc-implementation} provides an implementation of
+        the \gls{constraint model}, written in \gls{MiniZinc}
+    \end{inlinelist}.
+  \item[Ending]
+    Closes the dissertation:
+    %
+    \begin{inlinelist}[itemjoin={; }, itemjoin*={; and}]
+    \item \refChapter{proposed-model-extensions} proposes
+      \glsshort{constraint model} extensions
+      \item \refChapter{conclusions-future-work} presents conclusions and
+        future work
+    \end{inlinelist}.
+\end{description}

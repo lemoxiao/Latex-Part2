@@ -1,0 +1,645 @@
+
+
+%************************************************
+\chapter{Results}
+\label{chp:results}
+%*******
+%Results for preprocessing.
+%Results for Streambundling -> compare to McKenzie
+% Eventuell results für fremd-datensatz?
+% Results for Exploration/Streampath (AVL-Zeugs)
+%Somewhere add that other datasets where tried too, but cannot be included here. Probably in chapter results. Also ask \ac{ViF} if this is ok.
+%*****************************************
+
+\quotegraffito{He [Taniyama] was gifted with the special capability of making many mistakes, mostly in the right direction. I envied him for this and tried to imitate him, but found it quite difficult to make good mistakes.}
+{Goro Shimura (Nova program on Fermat's Last Theorem)}
+
+This chapter starts with briefly discussing the results and limitations of the preprocessing stage described in \autoref{sec:theory:undesired-geometry}.
+
+Afterwards, the applicability of streamline bundling and \cauthor{McKenzie} clustering to resistance graph simulation is evaluated.
+This is followed by the description of an envisioned flow graph exploration tool that is based on streamline bundles. Both of these evaluations are performed on the \toyotadataset.
+Finally the result of streamline bundling on a centrifugal pump dataset is briefly discussed.
+
+All computations were performed on a laptop with an Intel Core 2 Duo \ac{CPU} with \SI{2.4}{GHz} and \SI{4}{GB} of \ac{RAM}. All stated calculation durations apply to this setup and do not include the time for saving intermediate data to the hard disk.
+
+
+
+%===================================================================================
+\section{Preprocessing results}
+\label{sec:results:preprocessing}
+
+In \autoref{sec:theory:undesired-geometry} and \autoref{sec:impl:undesired-geometry} two approaches for removing undesired outside geometry where discussed: region growing and depth probing. The results for each of them will be discussed in the following sections. 
+
+
+
+%===================================================================================
+\subsection{Region growing}
+The major problem with region growing is the removal of inside cells near complex interface areas. No satisfying criterion could be derived to stop regions from growing into these areas. For the \toyotadataset all front inlets are problematic zones in this sense. The hybrid approach described in \autoref{sec:impl:region-growing} leads to the results shown in \autoref{fig:outside-geometry-regiongrowing}.
+
+\autoref{fig:outside-geometry-regiongrowing-50} shows the result for region growing from exposed cells up to a seed distance of \num{50}. Not all outside cells were removed, but some inside cells around the inlets already are. With a seed distance of \num{85}, almost all outside cells on the hood are removed, although there is still outside geometry left at the vehicle bottom (\autoref{fig:outside-geometry-regiongrowing-85}). In addition, the number of removed inside cells at the problematic inlets is even higher.
+
+\bigdoublefigure[pos=tbhp,
+                  mainlabel={fig:outside-geometry-regiongrowing},
+                  maincaption={Results of the region growing approach. Figure~\subref{fig:outside-geometry-regiongrowing-50}, shows the result for a seed distance of \num{50}. Not all outside cells are removed as desired (green cells on the hood), but some inside cells already are (top right corner of the bottom inlet). Figure~\subref{fig:outside-geometry-regiongrowing-85} shows the same situation for a seed distance of \num{85}. Outside geometry is largely eliminated, but the problematic areas at the inlets lack even more inside cells.},
+                  mainshortcaption={Region growing results.},%
+                  %leftopt={width=7cm},
+                  leftlabel={fig:outside-geometry-regiongrowing-50},
+                  leftcaption={Maximum seed distance of \num{50}.},
+                  %leftshortcaption={},%
+                  %rightopt={width=7cm},
+                  rightlabel={fig:outside-geometry-regiongrowing-85},
+                  rightcaption={Maximum seed distance of \num{85}.}
+                  %rightshortcaption={},
+                  %spacing={\hfill}
+                 ]
+{res-surfclean-regiongrowing-depth50}
+{res-surfclean-regiongrowing-depth85}
+
+The calculation durations where about \SI{2}{min} for a seed distance of \num{50} and about \SI{3}{min} for a seed distance of \num{85}. Exact durations cannot be given, as they varied due to the unpredictable handling of memory requests by the \ac{OS}.
+
+
+
+%===================================================================================
+\subsection{Depth probing}
+The second approach for removing outside geometry was depth probing as discussed in \autoref{sec:theory:undesired-geometry} and \autoref{sec:impl:depth-probing}. It removes almost all outside cells for the \toyotadataset, which is illustrated in \autoref{fig:outside-geometry-depthprobe}.
+
+\autoref{fig:outside-geometry-depthprobe-3} shows the outcome of depth probing if the maximum depth is set too low, in this case \num{3}. Stacks that are higher than maximum depth are left untouched by the algorithm. \autoref{fig:outside-geometry-depthprobe-5} shows the outcome for the correct maximum depth for this dataset (\num{5}). The image also demonstrates that depth probing is well suited for cleaning the \toyotadataset and similar datasets.
+
+\bigdoublefigure[pos=tbhp,
+                  mainlabel={fig:outside-geometry-depthprobe},
+                  maincaption={Results of the depth probing approach. Figure~\subref{fig:outside-geometry-depthprobe-3}, shows the result for maximum depth of \num{3}. Some stacks of outside cells are too high and are not removed as required (green spots on the hood). Figure~\subref{fig:outside-geometry-depthprobe-5} shows the same situation for a maximum depth of \num{5}. The outside geometry is eliminated almost entirely without affecting any inside cells near the inlets.},
+                  mainshortcaption={Depth probing results.},%
+                  %leftopt={width=7.3cm},
+                  leftlabel={fig:outside-geometry-depthprobe-3},
+                  leftcaption={Maximum depth of \num{3}.},
+                  %leftshortcaption={Maximum depth of 4.},
+                  %rightopt={width=7.3cm},
+                  rightlabel={fig:outside-geometry-depthprobe-5},
+                  rightcaption={Maximum depth of \num{5}.},
+                  %rightshortcaption={Maximum depth of 5}
+                  %spacing={\hfill}
+                 ]
+{res-surfclean-depthprobe-3}
+{res-surfclean-depthprobe-5}
+
+Nevertheless, two problems remain with depth probing. \autoref{fig:outside-geometry-depthprobe-problems} illustrates both of them. 
+
+\normdoublefigure[pos=tbhp,
+                  mainlabel={fig:outside-geometry-depthprobe-problems},
+                  maincaption={Problems of the depth probing approach.},%
+                  mainshortcaption={Problems of depth probing.},
+                  %leftopt={width=5.6cm},
+                  leftlabel={fig:outside-geometry-depthprobe-problem-edgecase},
+                  leftcaption={Self supporting outside geometry remains.},
+                  %leftshortcaption={},%
+                  %rightopt={width=5.6cm},
+                  rightlabel={fig:outside-geometry-depthprobe-problem-thin},
+                  rightcaption={Thin inside geometry removed.}
+                  %rightshortcaption={},
+                  %spacing={\hfill}
+                 ]
+{res-surfclean-depthprobe-5-problem-edgecase}
+{res-surfclean-depthprobe-5-problem-thin}
+
+
+The first problem (\autoref{fig:outside-geometry-depthprobe-problem-edgecase}) is created by groups of self supporting cells, \ie, several stacks of cells with neighboring pyramids or tetrahedrons at either end. These problems could be eliminated by running the depth probing algorithm twice, thus removing the cells from a perpendicular direction. However, as such islands are very rare, this was not carried out.
+
+The second problem is more severe. Imagine inside geometry that is \emph{thin itself}, \ie, that contains stacks of inside cells that are lower than the maximum depth. All stacks of these type are removed by the depth probing algorithm, even if this is not desired. The depth probing approach is therefore useless for these datasets.
+
+Fortunately there is only a small region with thin inside geometry in the \toyotadataset. A pipe is running near the rear bottom of the dataset and generates thin geometry within a small area. \autoref{fig:outside-geometry-depthprobe-problem-thin} shows how cells were erroneously removed from that area.
+
+
+
+%===================================================================================
+\section{Applicability for simulation}
+
+The best evaluation for the resistance graph simulation application would be direct simulation. However, as stated before, a resistance graph simulator is not available, as this thesis is a part of its preliminary work. In consequence, this section can only evaluate the fundamental properties of good flow graph partitions: spatial \emph{compactness} and \emph{similarity} of velocities and pressures.
+
+Usually, these two properties contradict each other. More compact clusters are less similar and vice versa. Therefore, clustering algorithms require the possibility to trade them off against each other. For \cauthor{McKenzie}'s approach, this is accomplished through the distortion function. For streamline bundling, several of the described parameters influence this trade off.
+
+In the next section the employed error measures are explained. The following section treats the choice of parameters for the simulation application. Afterwards, the general characteristics of \cauthor{McKenzie}'s approach and streamline bundling are illustrated with the help of a standard example.
+Finally, the error measures for different operating points and region counts are compared briefly.
+
+
+
+%===================================================================================
+\subsection{Error measures}
+\label{sec:results:error-measures}
+
+The following error measures are computed on whole flow graphs and measure the global error of the underlying partition. As the best tradeoff between spatial closeness, velocity similarity and pressure similarity is not known, they will be treated by three separate error measures.
+
+The spatial, velocity and pressure errors of the flow graphs ($E_\vec{x}(\mathtt{G})$, $E_\vec{v}(\mathtt{G})$ and $E_p(\mathtt{G})$ respectively) are defined as global \acp{SSE}. $E_\vec{v}(\mathtt{G})$ was already defined in \autoref{sec:theory:graph-error-measures}, in the context of choosing good candidate edges during the graph collapse stage. The spatial and pressure errors are defined analogously as
+%
+\begin{equation}
+  E_\vec{x}(\mathtt{G}) = \sum\limits_{\mathtt{v_i}\in\mathtt{V}}{
+    \|\vec{E}_\vec{x}(\mathtt{v_i})\|
+  },
+  \quad\text{where }
+  \vec{E}_\vec{x}(\mathtt{v_i}) =
+  \normprod{
+    \boldsymbol\sigma^2_\vec{x}(\mathtt{v_i})
+   }{
+     V(\mathtt{v_i})
+   },
+\end{equation}
+%
+and
+%
+\begin{equation}
+  E_p(\mathtt{v_i}) =
+  \normprod{
+    \sigma^2_p(\mathtt{v_i})
+   }{
+     V(\mathtt{v_i})
+   }.
+\end{equation}
+%{
+%[Same equations but $N_c(.)$ instead of $V(.)$]
+%}
+
+%\deleted[][After volume weighting was introduced, values are in good magnitude.]
+%{
+%To get small, easily interpretable values, all \ac{SSE} values are divided by the total dataset volume, \ie, all error values are given as \emph{\ac{SSE} per cell count} in the whole chapter.
+%}
+
+
+
+%===================================================================================
+\subsection{Parameters for streamline bundling}
+
+One big disadvantage of streamline bundling is the large amount of required parameters, even if the parameters are quite comprehensible and allow a great level of control.
+Thankfully, most parameters never need to be modified, \ie, have well performing defaults. The following paragraphs provide guidelines for all available parameters.
+
+
+
+%===================================================================================
+\paragraph{Parameters for seeding and streamtracing}
+
+The simulation application requires a \emph{complete partition} of the dataset. This can only be achieved by dense streamlines traced from dense seed points. For the \toyotadataset this leads to hybrid seeding with \num{3000} random points and \SI{5}{\percent} of all interface points ($\cos(\alpha_\text{thres})=0.8$). Increasing these values will improve the result slightly, but also increases the processing time considerably.
+
+The parameters for streamline tracing are explained in detail within the \vtk documentation.\footnote{It can currently be found at \url{http://www.vtk.org/VTK/help/documentation.html}.} It is important to trace into both directions and to set a high terminal speed (\eg, \SI{0.5}{\metpersec}) to prevent curls.
+The streamlines should be as long as possible (maximum propagation length: \SI{5}{m}, maximum step count per line: \num{10000}). The required time for stream tracing can be reduced by increasing the step size parameters from the defaults (initial: \num{0.5} cells, minimum: \num{0.05} cells, maximum: \num{0.75} cells).
+
+
+
+%===================================================================================
+\paragraph{Parameters for streamline bundling}
+
+The different prototype selection and bundle collision strategies were discussed in \autoref{sec:theory:prototype-selection} and \autoref{sec:theory:bundle-collision}, respectively. To reach maximum coverage a good choice is to \emph{overwrite existing bundles if worse}.
+
+The target is to create compact and similar regions. These are created from short, thick bundles of parallel streamlines.
+The main parameter to create short, thick bundles is the ``lost mate ratio'' (\num{0.75}). To avoid bent bundles, the total change of the prototype direction is restricted to \SI{15}{\degree}.
+
+The initial bundle purity (``initial slice mate ratio'') is set to \num{0.9} and the size of the initial slice is restricted by the ``initial slice radius'' to \SI{0.2}{m}. The maximum slice radius is set to twice the initial radius in order to prevent extremely cone-shaped bundles.
+
+Some outliers within the individual slices can be tolerated. Therefore only the spatial proximity criterion -- \ie, the radius -- given in \autoref{eqn:theory:slicesimil:radius} is used for choosing mates, while all other criteria are neglected.
+
+
+
+%===================================================================================
+\paragraph{Parameters for the remaining steps}
+\emph{All} cells need to be mapped to a region. Therefore no threshold-radius was employed and each cell was mapped to its spatially closest bundle.
+
+\graffitonextline{One could see this approach as a sophisticated way of initializing a simple region merging algorithm.}
+The number of regions -- and therefore the number of flow graph vertices -- cannot be chosen in advance for the streamline bundling algorithm. Hence, graph collapse operations are required to thin the graph to the final number of vertices. The employed version of graph collapse has no parameters (see \autoref{sec:theory:graph-collapse} and \autoref{sec:impl:graph-collapse}).
+
+
+
+%===================================================================================
+\subsection{Parameters for \texorpdfstring{\cauthor{McKenzie}}{Mc~Kenzie \etal}}
+
+The two main parameters of \cauthor{McKenzie}'s algorithm are the \emph{targeted number of regions} and the \emph{number of iterations}. The former is predetermined by the setup, the choice of the latter is discussed in the \autoref{sec:results:mck-iterations}.
+
+Two distortion functions were selected to be included in the evaluation: \cauthor{McKenzie}'s own \emph{velocity-only} distortion function (see \autoref{eqn:related:McKenzieErrorSum}) and another function suggested within their paper, namely \cauthor{DuWang}'s distance function (see \autoref{eqn:related:CVT-distance}).
+For \cauthor{DuWang}'s distance function the user interface provides a \emph{velocity influence factor} between \num{0.0} and \num{1.0}. Setting it to \num{0.5} leads to $w=\frac{1}{2L^2}$ as advocated by \cauthor{DuWang}, \num{1.0} sets $w=0$, and \num{0.0} translates to $w=\frac{5}{2L^2}$. The remaining values are linearly interpolated.
+
+
+%===================================================================================
+\subsection{Standard example results}
+
+Nine configurations of the \toyotadataset were evaluated in this work. These configurations arise from partitioning the datasets of the three available operating points (\SI{30}{\kmh}, \SI{190}{\kmh} and \vmax) into \num{100}, \num{500} and \num{1000} regions. This section discusses the central setup of this three-times-three configuration table -- \SI{190}{\kmh} and \num{500} regions -- in detail.
+
+%===================================================================================
+\subsubsection{Naive cuboid partitioning}
+
+By utilizing the error measures introduced in \autoref{sec:results:error-measures}, the results of the different approaches can be compared to each other. However, they do not allow statements about the \emph{absolute} quality of the results.
+
+To enable absolute statements to some extent, a naive partition was created to provide baseline errors. The partition is created by splitting the dataset into cuboids of constant size, as depicted in \autoref{fig:results:intervalpartition}. The dataset is split into \num{7}, \num{10} and \num{11} evenly spaced intervals in $x$-, $y$- and $z$-direction, respectively. After removing all empty cuboids, this results in \num{506} regions; close enough to \num{500} to qualify for comparison. 
+
+\normfigure[pos=tbhp,
+            %opt={width=11.8cm},
+            label={fig:results:intervalpartition},
+            shortcaption={Naive cuboid illustration.}
+           ]
+{res-3d-intervalpartition}
+{Partition of the dataset into \num{506} cuboids of constant size. This partition is used for comparison purposes.}
+
+Naturally, this partition leads to regions that are spatially very compact. The velocity and pressure \acp{SSE} on the other hand should offer plenty of space for improvement.
+
+%===================================================================================
+\subsubsection{Error evaluation for the standard example}
+
+\autoref{tab:results:standard-errors-descr} shows the algorithms and settings for different setups. In combination with the previous discussion on parameter selection, the setups are completely defined.
+
+\begin{table}[h!tp]
+	\centering
+	\input{\evalDir{standardBspErrorBars/errBarsDescr.tab}}
+  \caption[Error evaluation setups.]{The setups (algorithms, settings and associated colors) for error evaluation.}
+  \label{tab:results:standard-errors-descr}
+\end{table}
+
+\autoref{fig:results:standard-errors} shows a graphical illustration of the \acp{SSE} for all setups. The three error measures are shown in three separate groups, which are individually normalized to the \acp{SSE} of the naive cuboid partition. \autoref{tab:results:standard-errors} contains the according absolute values of the individual bars.
+
+\bigplot[	pos=h!tbp,
+					label={fig:results:standard-errors},
+          shortcaption={Absolute \acsp{SSE} for different approaches.}
+        ]
+{standardBspErrorBars/errBars.tikz}
+{Absolute \ac{SSE} values for different approaches and settings. All three error groups are normalized to the \acp{SSE} of the naive cuboid partition. See \autoref{tab:results:standard-errors} for the absolute values.}
+
+\begin{table}[h!tp]
+	\centering
+	\input{\evalDir{standardBspErrorBars/errBars.tab}}
+  \caption[Absolute \acsp{SSE} for different approaches.]{Absolute \ac{SSE} values for different approaches and settings. See \autoref{fig:results:standard-errors} for a graphical representation.}
+  \label{tab:results:standard-errors}
+\end{table}
+
+The first observation is that no approach can match the compactness of the naive partition (maroon). This is because the naive partition has a very good spatial layout. The higher spatial errors of the other approaches are therefore not as inadequate as it may seem, they are expected.
+
+Another critical observation concerns \cauthor{McKenzie}'s approach with \cauthor{DuWang}'s distortion function; the velocity and pressure errors only depend slightly on the influence factor.\footnote{There is room for even greater spatial influence by using higher values for $w$. However, the need for this was not anticipated (currently a ``velocity influence factor'' of \num{0.0} yields a four times higher $w$ than recommended by \cauthor{DuWang}.}
+
+Also notice, that no approach could decrease the velocity \ac{SSE} nearly as well as \cauthor{McKenzie}'s in combination with their own velocity distortion function. This is also true for the \cauthor{DuWang} distance function with no spatial influence ($w=0$, \ie, the function at its velocity bias limit). The price for \cauthor{McKenzie}'s result is the high spatial \ac{SSE}.
+
+
+
+%===================================================================================
+\subsubsection{Typical region shapes}
+
+\graffito{Best insight can be gained by directly examining the partitions in \paraview. Use the threshold filter to isolate regions.}
+The different error structures shown in the previous section provoke the examination of the region shapes for the different setups. To provide a good insight into the kinds of regions produced, the overall clustering result of each setup is shown together with one typical sample of an isolated region.
+
+\autoref{fig:results:shapes-streambundling-before-part} shows the partition created by the random streamline bundling approach, before graph collapse. The dataset is segmented into \num{3100} partitions (one partition per identified bundle). The parameters forced the algorithm to find thick, straight bundles. Therefore the basic regions, which are covered by bundles, are shaped similar to cylinders. However, because of outlier cells which are not directly covered by a bundle, these basic regions can grow into more complex shapes. \autoref{fig:results:shapes-streambundling-before-sample} shows a typical one, the elongated bulge at the bottom right is due to uncovered outlier cells.
+
+\bigdoublefigure[	pos=tbhp,
+                  mainlabel={fig:results:shapes-streambundling-before},
+                  maincaption={\colorlegend{MyGreen} The left image shows a typical partition created by the streamline bundling approach. It illustrates the state after mapping the bundles to regions ($\approx$\num{3100} partitions), but \emph{before} reducing the vertices by collapsing edges. The right image shows one typical example region from this partition, a cylinder-shaped region with a bulge that stems from uncovered cells.},%
+                  mainshortcaption={Region shapes: Streambundling \num{1}.},
+                  %leftopt={},%width=0.45\textwidth},
+                  leftlabel={fig:results:shapes-streambundling-before-part},
+                  leftcaption={Whole partition.},
+                  %leftshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  rightlabel={fig:results:shapes-streambundling-before-sample},
+                  rightcaption={Isolated region.},
+                  %rightshortcaption={},
+                  %spacing={\hspace{1cm}}
+                 ]
+{res-3d-slb-before}
+{res-3d-slb-before-sample}
+
+\autoref{fig:results:shapes-streambundling-after-part} shows the situation after graph collapse was performed on the streamline bundling result. As the collapse operation is purely velocity guided, complicated shapes are theoretically possible. In practice, complicated shapes only occur in low interest areas, \ie, in border areas with relatively low velocity. The regions in the center area usually stay compact during the graph collapse stage.
+
+\autoref{fig:results:shapes-streambundling-after-sample} shows a partition after graph collapse at the transition between these two areas. The colors encode the regions before graph collapse. The top region lies adjacent to the center region and is therefore compact, even though it consists of \num{10} bundle regions. The bottom extension branch curls into a low velocity region and happened to have similar velocity to the bulk at the top.
+
+
+\bigdoublefigure[	pos=tbhp,
+                  mainlabel={fig:results:shapes-streambundling-after},
+                  maincaption={\colorlegend{MyGreen} The left image shows a typical partition of the streamline bundling approach for the \toyotadataset. It illustrates the state \emph{after} collapsing edges to reach \num{500} vertices. The right image shows one typical example region from this partition.},%
+                  mainshortcaption={Region shapes: Streambundling \num{2}.},
+                  %leftopt={},%width=0.45\textwidth},
+                  leftlabel={fig:results:shapes-streambundling-after-part},
+                  leftcaption={Whole partition},
+                  %leftshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  rightlabel={fig:results:shapes-streambundling-after-sample},
+                  rightcaption={Isolated region.},
+                  %rightshortcaption={},
+                  %spacing={\hspace{1cm}}
+                 ]
+{res-3d-slb-after}
+{res-3d-slb-after-sample}
+
+
+\autoref{fig:results:shapes-mckenzie-veloc-part} displays the partitioning outcome of \cauthor{McKenzie} clustering with the velocity-only distortion function. The global optimization nature of the algorithm is immediately recognizable by the smooth region borders. Also notice the sound segmentation of the inlet regions. The little colored disturbances that are visible in some of the regions are due to flat regions that develop near the surface of calm areas. The disturbances stem from the regions lying beneath.
+
+The individual regions are smooth and rounded and tend to be more complex than the ones shown previously. See \autoref{fig:results:shapes-mckenzie-veloc-sample} for an example.
+
+\bigdoublefigure[	pos=tbhp,
+                  mainlabel={fig:results:shapes-mckenzie-veloc},
+                  maincaption={\colorlegend{black} A partition created by \cauthor{McKenzie}'s algorithm with their own velocity-only distortion function (left). The right image shows one typical example region from this partition.},%
+                  mainshortcaption={Region shapes: Mc~Kenzie, velocity-only.},
+                  %leftopt={},%width=0.45\textwidth},
+                  leftlabel={fig:results:shapes-mckenzie-veloc-part},
+                  leftcaption={Whole partition.},
+                  %leftshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  rightlabel={fig:results:shapes-mckenzie-veloc-sample},
+                  rightcaption={Isolated region.},
+                  %rightshortcaption={},
+                  spacing={\hspace{-0.4cm}}
+                 ]
+{res-3d-mckenzie-veloc}
+{res-3d-mckenzie-veloc-sample}
+
+
+\enlargethispage{\baselineskip}
+
+\autoref{fig:results:shapes-mckenzie-duwang-part} shows the overall partition of \cauthor{McKenzie} clustering with the \cauthor{DuWang} distance function and the recommended $w$ (velocity influence factor \num{0.5}). The outcome looks very similar to the previous one, but lacks the small disturbances because of stronger spatial bias.
+
+
+\bigdoublefigure[	pos=tbhp,
+                  mainlabel={fig:results:shapes-mckenzie-duwang},
+                  maincaption={\colorlegend{GreyLight} A partition created by \cauthor{McKenzie}'s algorithm with \cauthor{DuWang}'s distance measure (left). The right image shows one typical example region from this partition.},%
+                  mainshortcaption={Region shapes: Mc~Kenzie, Du~Wang.},
+                  %leftopt={},%width=0.45\textwidth},
+                  leftlabel={fig:results:shapes-mckenzie-duwang-part},
+                  leftcaption={Whole partition},
+                  %leftshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  rightlabel={fig:results:shapes-mckenzie-duwang-sample},
+                  rightcaption={Isolated region.},
+                  %rightshortcaption={},
+                  %spacing={\hspace{1cm}}
+                 ]
+{res-3d-mckenzie-duwang05}
+{res-3d-mckenzie-duwang05-sample}
+
+
+The \author{DuWang} distance function produces similarly shaped cluster as the velocity-only distortion function. Apart from that, it has the tendency to produce more elongated clusters like the one shown in \autoref{fig:results:shapes-mckenzie-duwang-sample}
+
+
+
+%===================================================================================
+\subsubsection{Required iterations for \texorpdfstring{\cauthor{McKenzie}}{McKenzie \etal}'s approach}
+\label{sec:results:mck-iterations}
+
+\autoref{fig:mck-error-devel-veloc} and \autoref{fig:mck-error-devel-duwang0.5} show the error development for \num{40} iterations of \cauthor{McKenzie} clustering. The former illustrates the development for the velocity-only distortion function, the latter for \cauthor{DuWang}'s distance function.
+
+\bigplot[	pos=!p,
+					label={fig:mck-error-devel-veloc},
+          shortcaption={Development: Mc~Kenzie, velocity-only.}
+        ]
+{mck_190_500_40/mckErrorDevelop.tikz}
+{Error development of \cauthor{McKenzie}'s algorithm over \num{40} iterations with the velocity-only distortion function. All four value series are normalized to start at \num{1.0} -- see the legend for normalization factors. As expected, the distortion series is constantly decreasing, and the global velocity and global pressure \acp{SSE} are both correlated with it. As a tradeoff, the global spatial \ac{SSE} increases over its initial value.}
+
+\bigplot[	pos=!p,
+					label={fig:mck-error-devel-duwang0.5},
+          shortcaption={Development: Mc~Kenzie, Du~Wang.}
+        ]
+{mck_190_500_duwang-0.5_40/mckErrorDevelop.tikz}
+{Error development of \cauthor{McKenzie}'s clustering over \num{40} iterations with \cauthor{DuWang}'s error measure. All four value series are normalized to start at \num{1.0} -- see the legend for normalization factors. Here, the distortion series decreases too, but it seems to be a mediocre choice for driving down the ``real'' error functions.}
+
+\graffito{Don't make the mistake of thinking \cauthor{DuWang}'s distance measure produces poor results. Iteration zero is the situation after the initial flooding stage, which can already be a good partition.}
+From these two plots, reasonable iteration counts can directly be derived. \num{20} iterations is a reasonable choice for the velocity-only distortion function, as the minor improvements after that do not justify the increased calculation time. When utilizing \cauthor{DuWang}'s distance function, there is no use in iterating very long. The algorithm manages to drive down the distortion function, but this does not improve the relevant error measures. Five iterations suffice in this case.
+
+When comparing the values of the two plots, please account for the normalization factors. The plots are mainly meant for guiding the choice of the number of iterations. 
+
+
+%===================================================================================
+\subsubsection{Calculation durations}
+
+
+\quotegraffito{If computers take over (which seems to be their natural tendency), it will serve us right.}
+{Alfred Alistair Cooke}% (1908–) [citation needed]
+%
+All durations in this section correspond to the full \toyotadataset at \SI{190}{\kmh}.
+The durations for reading the input, fixing the surface normals and cleaning the dataset from outside geometry is the same for all approaches (\SI{30}{s}, \SI{5}{s}, and \SI{1}{min}~\SI{50}{s}, respectively). It totals to about \SI{2}{min}~\SI{30}{s}.
+
+The required time for \cauthor{McKenzie}'s approach (velocity-only distortion function) and \num{500} target clusters is about \SI{1}{min}~\SI{35}{s} per iteration. Including setup, \num{20} iterations required \SI{47}{min}~\SI{19}{s} for the standard example.
+Mapping the partition of \num{500} regions to a graph required \SI{5}{min}~\SI{47}{s}.
+Therefore this approach requires a \emph{total processing time} of \SI{55}{min}, when ignoring the times for storing sub results to the hard disk. As large amounts of memory are requested from and returned to the \acl{OS}, the processing time can vary by a few minutes.
+
+Streamline bundling consists of more steps, but the individual steps are carried out faster. Hybrid seeding was finished after \SI{1}{min}~\SI{5}{s}, stream tracing required \SI{2}{min}~\SI{32}{s}.
+
+The computational requirements of streamline bundling depend heavily on the used parameters. For the same bundle count, prototype selection by subsampling requires significantly more time than random prototype selection. As the results of both approaches are comparable (see \autoref{tab:results:standard-errors-descr}), it is advisable to use random prototype selection for this application. The \num{3100} bundles were created after \SI{2}{min}~\SI{13}{s} with random prototype selection.\footnote{The subsampling approach would have taken at least \SI{20}{min}.} Mapping the bundles to regions is a rather quick operation and was finished after \SI{1}{min}~\SI{44}{s}. Mapping these regions to a graph is the same operation as in the \cauthor{McKenzie} processing chain and required \SI{4}{min}~\SI{13}{s}. The final collapse graph operation took \SI{13}{s}.
+
+Hence, the streamline bundling approach required a \emph{total processing time} of \SI{15}{min} for this application. As before, memory handling by the \acl{OS} leads to varying processing durations.
+
+
+
+%===================================================================================
+\subsection{Results for different configurations}
+
+\autoref{fig:plot-allerrs-spatial}, \autoref{fig:plot-allerrs-veloc} and \autoref{fig:plot-allerrs-press} illustrate the behavior for all configurations. The results were created using \cauthor{McKenzie}'s approach. All plots show the expected behavior, namely,
+%
+\begin{itemize}
+  \item all error measures decrease with increasing region count,
+  \item the spatial \ac{SSE} is invariant against velocity changes, and
+  \item the velocity and pressure \acp{SSE} decrease with decreasing velocity.\footnote{The pressure and velocity \ac{SSE} at \SI{30}{\kmh} are not zero. They are just too small for the scale of the $y$-axis, which must contain a squared error measure of pressure values in \si{\pascal} and \si{m^2/s^2}, respectively.}
+\end{itemize}.
+
+\normplot[pos=!p,
+					label={fig:plot-allerrs-spatial},
+          shortcaption={Spatial \acsp{SSE} for all setups.}
+        ]
+{allErrors/mckAllErrorsSpatial.tikz}
+{Spatial \ac{SSE} for different operation points (velocities) and region counts. As expected, the spatial \ac{SSE} decreases with increasing region count and is invariant to velocity changes.}
+
+\normplot[	pos=!p,
+					label={fig:plot-allerrs-veloc},
+          shortcaption={Velocity \acsp{SSE} for all setups.}
+        ]
+{allErrors/mckAllErrorsVeloc.tikz}
+{Velocity \ac{SSE} for different operation points (velocities) and region counts. As expected, the spatial \ac{SSE} decreases with increasing region count and decreasing velocity (less turbulence).}
+
+\normplot[	pos=!p,
+					label={fig:plot-allerrs-press},
+          shortcaption={Pressure \acsp{SSE} for all setups.}
+        ]
+{allErrors/mckAllErrorsPress.tikz}
+{Pressure \ac{SSE} for different operation points (velocities) and region counts. As expected, the pressure \ac{SSE} decreases with increasing region count and decreasing velocity (less turbulence).}
+
+
+
+%===================================================================================
+\subsection{Discussion of results for simulation}
+
+
+This section discussed the results of the implemented algorithms for the resistance graph simulation application. It showed that the methods cover the different tradeoffs between spatial similarity and velocity and pressure similarity quite well.
+
+When designing a resistance graph simulator, it is advisable to start with results from \cauthor{McKenzie}'s approach. The available choices for this algorithm cover the tradeoffs very well, and the algorithm is simple to configure.
+
+If computation time is of primary concern, one could also look into the streamline bundling approach. It is more fragile and has many parameters, but it computes considerably faster.
+
+To answer the question about the suitable trade-off for resistance graph simulation with certainty, direct simulation is required. However, it is expected that similarity of velocities is more important than spatial compactness.
+%
+%The previous sections showed that the streamline bundling approach does find meaningful flow graphs for the simulation application, compared to an arbitrary fixed scheme. Nevertheless, it cannot compete with \cauthor{McKenzie}'s approach. The slight advantage over \cauthor{McKenzie} in calculation time is more than compensated by the simplicity and the low \ac{SSE} errors of their approach. Even if spatially compact clusters are sought after, they can be provided by utilizing \cauthor{DuWang}'s error measure. The resulting inferior velocity and pressure \acp{SSE} are still better than the ones derived by streamline bundling.
+%
+%This result is mainly due to the bottom-up nature of streamline bundling. It finds regions with similar flow properties easily, but turbulent border regions cannot be covered within reasonable time. Cells at these turbulent gaps between bundles have to be assigned to the closest bundle, even if they do not fit there at all. Finally, the graph collapse operation, which reduces several thousand vertices to a few hundred vertices, further increases the similarity errors.
+%
+%The strengths of streamline bundling, even if initially intended for this application, surely lie somewhere else.
+
+
+%===================================================================================
+\section{Applicability for visualization}
+\label{sec:results:applicability-visualization}
+
+\quotegraffito{An attempt at visualizing the Fourth Dimension: Take a point, stretch it into a line, curl it into a circle, twist it into a sphere, and punch through the sphere.}{Albert Einstein}
+Streamline bundling is well suited for identifying large and homogeneous regions within flow fields, but it is not suited for partitioning turbulent, non-uniform areas. Hence, it is not the optimal choice for the simulation application, as a full partition is required there. However it can be of great value for visualization applications.
+
+To shortly sketch the idea, imagine a streamline bundling algorithm that is configured to identify large, possibly bent bundles of parallel streamlines. %It would identify important, large flow bundles.
+Afterwards, by mapping these bundles to regions, a flow graph can be constructed from these regions. Then, two representations of this flow graph can be displayed to the user: the \threed regions of the initial dataset, and the streamline bundles leading to these regions. A third abstract visualization of the flow graph can guide navigation.
+
+The following sections detail different aspects of this idea. Notice, that the described system is only envisioned, not implemented. All screen shots were manually created with the help of \paraview.
+
+%===================================================================================
+\subsection{Flow graph representations}
+
+When exploring \threed flow fields there are two important aspects of the individual regions associated to each vertex:
+%
+\begin{enumerate}
+  \item{The location and extent of a region, and}
+  \item{The flow properties within this region.}
+\end{enumerate}.
+%
+A suitable representation for the first aspect is the \threed region itself (\emph{\threed representation}), whereas a suitable representation for the second aspect is the underlying streamline bundle (\emph{bundle representation}).
+
+Both of the above representations are still too complex to be understood as a whole for large datasets. If many \threed regions and streamline bundles are displayed at the same time, they hide each other and obscure the view to the overall picture. A third representation is required that introduces some structure and reduces the complexity. One possibility for this representation is a visualization based on simple \threed primitives, like cylinders and arrows (\emph{simple representation}).
+
+\autoref{fig:res:flowgraph-rep} demonstrates these three representations for the same path within the \toyotadataset. The blue wireframe representation of the region outline aids user orientation.
+
+\bigtriplefigure[	pos=tbhp,
+                  mainlabel={fig:res:flowgraph-rep},
+                  maincaption={Different representations of paths through a flow graph.},
+                  mainshortcaption={Flow graph path representations.},%
+                  %leftopt={width=4.8cm},%0.45\textwidth,
+                  leftlabel={fig:res:flowgraph-rep-threed},
+                  leftcaption={\threeD cell representation.},
+                  leftshortcaption={},%
+                  %midopt={width=4.8cm},%0.45\textwidth,
+                  midlabel={fig:res:flowgraph-rep-bundles},
+                  midcaption={Bundle representation.},
+                  %midshortcaption={},%
+                  %rightopt={width=4.8cm},%0.45\textwidth,
+                  rightlabel={fig:res:flowgraph-rep-simpl},
+                  rightcaption={Simple representation.},
+                  %rightshortcaption={},
+                  %spacing={},
+                  %spacingtwo={}
+	              ]
+{res-vis-repraes-3d}
+{res-vis-repraes-bundles}
+{res-vis-repres-simple}
+
+%===================================================================================
+\subsection{Interactive flow graph exploration}
+
+\quotegraffito{Imagination is more important than knowledge.}
+{Albert Einstein}
+
+The three described representations and the underlying flow graph can be combined into an interactive user interface for exploring and visualizing flow fields. Starting from a default view, the user can interactively explore the dataset by tracing paths through the graph and displaying the associated regions. A click on any inlet traces the strongest path within the underlying flow graph and displays it in simple representation.
+At any time, the user can switch between the different representations of any path.
+
+Relatively strong edges that are not yet expanded can be displayed as \threed arrows. Clicking on them could expand the strongest path starting from that particular edge.
+
+The following example outlines the envisioned interaction.
+
+%The envisioned interaction is demonstrated using two examples. The \toyotadataset and the \cauthor{CentrifugalPumpDataset}
+
+%===================================================================================
+\subsubsection{Exploration example}
+
+\autoref{fig:results:intact1} shows the beginning of the interaction. The car hull is rendered as a black wireframe to provide initial context. The user chooses to trace the flow graph from two inlet regions, one at the top left inlet and the other at the right of the bottom inlet. The two paths are shown in the simple representation; the magenta colored arrows indicate possible extension points.
+
+The user decides to switch the upper path to the \threed representation, the lower path to bundle representation, and to color both paths by velocity magnitude. The result is shown in \autoref{fig:results:intact2}.
+In order to understand the underlying partitions of the paths and to choose the next extension point, the user colors both paths by region \ac{ID} (\autoref{fig:results:intact3}).
+By tracing one of the upper extension points, the visualization in \autoref{fig:results:intact4} is obtained. The displayed information becomes overwhelming.
+Finally, the user switches back to the simple representation to get an overview of the situation, as shown in \autoref{fig:results:intact5}.
+
+\bigfigure[pos=tbhp,
+            %opt={width=15.2cm},
+            label={fig:results:intact1},
+            shortcaption={Example interaction step 1.}
+           ]
+{res-vis-1-twoinlets}
+{Interaction step 1: Initial configuration with black hull wireframe for context and two traced paths in simple representation.}
+
+\bigfigure[pos=tbhp,
+            opt={width=13cm},
+            label={fig:results:intact2},
+            shortcaption={Example interaction step 2.}
+           ]
+{res-vis-2-twoinlets-top3d-bottombundles-colorveloc}
+{Interaction step 2: Situation after hiding the hull and switching the top path to \threed and the bottom path to bundle representation. Both are colored by velocity magnitude.}
+
+\bigfigure[pos=tbhp,
+            opt={width=13cm},
+            label={fig:results:intact3},
+            shortcaption={Example interaction step 3.}
+           ]
+{res-vis-3-twoinlets-top3d-bottombundles-colorregs}
+{Interaction step 3: Result of coloring \autoref{fig:results:intact2} by region identifier.}
+
+\bigfigure[	pos=tbhp,
+            opt={width=13cm},            
+						label={fig:results:intact4},
+            shortcaption={Example interaction step 4.}
+           ]
+{res-vis-4-twoinlets-expanded-top3d-bottombundles}
+{Interaction step 4: The result after expanding one of the upper extension points. The screen starts to look cluttered.}
+
+\bigfigure[	pos=tbhp,
+            opt={width=13cm},             
+            label={fig:results:intact5},
+            shortcaption={Example interaction step 5.}
+           ]
+{res-vis-5-twoinlets-expanded-simple}
+{Interaction 5: After switching back to the simple representation for all paths, the situation is clear again.}
+
+%Using this interaction, the user can produce visualizations as shown in Figure x, y and z.
+%=Envisioned user interaction...
+
+%===================================================================================
+\section{Results for the centrifugal pump dataset}
+\label{sec:results:pump-dataset}
+
+The \cauthor{CentrifugalPumpDataset} contains three flow simulations of a centrifugal pump that differ only in the simulation approach. It was provided for the \IEEE Visualization Contest 2011~\cite{CentrifugalPumpDataset}. \autoref{fig:results:pump-cut} displays a view of the dataset cut in half.
+
+\normfigure[pos=tbhp,
+            %opt={width=13cm},            
+						label={fig:results:pump-cut},
+            shortcaption={Centrifugal pump dataset.}
+           ]
+{res-pump}
+{The centrifugal pump dataset cut in half and colored by velocity magnitude.}
+
+The original goal of the contest was turbulence modeling, which cannot be provided by the algorithms presented in this thesis.
+Nevertheless the dataset is a good candidate to evaluate streamline bundling, because the general flow of a centrifugal pump is well defined.
+
+The parameters for applying streamline bundling to this dataset were set quite strictly, with small differences in angular velocity (\SI{20}{\degree} for initial slices and \SI{40}{\degree} for incremental slices) and high mate ratios (\num{0.9} for initial slice, \num{0.8} for incremental slices and \num{0.7} to stop bundling). Prototype selection was performed using subsampling, bundle collisions were always resolved by keeping the existing bundle.
+
+\autoref{fig:results:pump-bundles} shows the streamline bundling result with similar view settings as in \autoref{fig:results:pump-cut}. A full view of the result is shown in \autoref{fig:results:pump-bundles-full}.
+
+The inlet in the middle of the dataset is nicely segmented into one bundle (violet bundle), except of the circular flows at the boundaries of the inlet tube. The turbulent flow within the impeller is covered by many small bundles. The result in this region could definitely be improved to better emphasize the flow between the blades of the impeller. The circular flow at the outer ring of the pump is acceptably covered by thick bundles.
+
+Overall, the bundles cover the dataset quite well and almost as expected. The result would definitely allow exploring the dataset using the methods described above. However, some improvements are required to better accommodate the inherent circular flows within the dataset and its resulting flow graph.
+
+\bigfigure[	pos=tbhp,
+            %opt={width=13cm},            
+						label={fig:results:pump-bundles},
+            shortcaption={Centrifugal pump bundling result 1.}
+           ]
+{res-pump-bundles}
+{Result of streamline bundling for the \cauthor{CentrifugalPumpDataset}. The result was cut in half to increase insight.}
+
+\bigfigure[	pos=tbhp,
+            %opt={width=13cm},            
+						label={fig:results:pump-bundles-full},
+            shortcaption={Centrifugal pump bundling result 2.}
+           ]
+{res-pump-bundles-full}
+{Result of streamline bundling for the \cauthor{CentrifugalPumpDataset}. Full view.}
+
+
+
+
+
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+
+
+
+

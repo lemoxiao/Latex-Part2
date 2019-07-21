@@ -1,0 +1,407 @@
+% XeLaTeX can use any Mac OS X font. See the setromanfont command below.
+% Input to XeLaTeX is full Unicode, so Unicode characters can be typed directly into the source.
+
+% The next lines tell TeXShop to typeset with xelatex, and to open and save the source with Unicode encoding.
+
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+
+% Apple Documentation Style - Latex Template
+% https://github.com/wnagrodzki/AppleDocumentationStyleLatexTemplate
+% Wojciech Nagrodzki 2013
+
+
+\documentclass[10pt]{extarticle}
+\usepackage[margin=2cm]{geometry}		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   	% ... or a4paper or a5paper or ... 
+\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{titlesec}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{minted}
+
+
+% Define section, subsection and subsubsection font size and color
+\definecolor{AllportsColor}{HTML}{0769AE}
+
+\titleformat*{\section}
+{\huge}
+
+\titleformat*{\subsection}
+{\color{AllportsColor}\LARGE}
+
+\titleformat*{\subsubsection}
+{\color{AllportsColor}\large}
+
+
+% Define the colors of table of contents
+% This is helpful to understand http://tex.stackexchange.com/questions/110253/what-the-first-argument-for-lsubsection-actually-is
+\definecolor{LochmaraColor}{HTML}{0C88CC}
+
+\makeatletter
+
+\renewcommand{\l@section}[2]{\vspace{14pt}\@dottedtocline{2}{0pt}{0pt}{\bfseries\textcolor{LochmaraColor}{#1}}{#2}} 
+\renewcommand{\l@subsection}[2]{\@dottedtocline{2}{0pt}{0pt}{\textcolor{LochmaraColor}{#1}}{#2}}
+\renewcommand{\l@subsubsection}[2]{\@dottedtocline{2}{20pt}{0pt}{\textcolor{LochmaraColor}{#1}}{#2}}
+
+\renewcommand{\@dotsep}{10000}
+
+\makeatother
+
+
+% Insert 22pt white space before roc title. \titlespacing at line 65 changes it by -22 later on.
+\renewcommand*\contentsname{\hspace{22pt}Contents}
+
+
+% Remove numbers before sections, it does not remove a spacing from the left side of section
+% Look below to see how I remove them
+\renewcommand\thesection{}
+\renewcommand\thesubsection{}
+\renewcommand\thesubsubsection{}
+
+
+% Define a spacing for section, subsection and subsubsection
+% http://tex.stackexchange.com/questions/108684/spacing-before-and-after-section-titles
+\titlespacing*{\section}
+{-22pt}{0pt plus 0pt minus 0pt}{40pt plus 0pt minus 0pt}
+\titlespacing*{\subsection}
+{-18pt}{42pt plus 64pt minus 0pt}{0pt}
+\titlespacing*{\subsubsection}
+{-13pt}{12pt plus 0pt minus 0pt}{0pt}
+
+
+% Section begins on new page
+\newcommand{\sectionbreak}{\clearpage}
+
+
+% Line spacing
+\linespread{1.3}
+
+
+% Lists Objective-C code inside of a blue border
+\definecolor{BaliHaiColor}{HTML}{7CA1B3}
+\newminted[objclisting]{objective-c}{tabsize=4, fontsize=\footnotesize}
+\usemintedstyle{xcode}
+\BeforeBeginEnvironment{objclisting}{\footnotesize\mdframed[middlelinewidth=0.5pt, middlelinecolor=BaliHaiColor, skipabove=15pt]}%
+\AfterEndEnvironment{objclisting}{\endmdframed\vspace{12pt}\normalsize}
+
+
+% Lists Swift code inside of a blue border
+\definecolor{BaliHaiColor}{HTML}{7CA1B3}
+\newminted[swiftlisting]{swift}{tabsize=4, fontsize=\footnotesize}
+\usemintedstyle{xcode}
+\BeforeBeginEnvironment{swiftlisting}{\footnotesize\mdframed[middlelinewidth=0.5pt, middlelinecolor=BaliHaiColor, skipabove=15pt]}%
+\AfterEndEnvironment{swiftlisting}{\endmdframed\vspace{12pt}\normalsize}
+
+
+% Lists text inside yellow border
+\definecolor{GoldenDreamColor}{HTML}{F2D138}
+\newenvironment{tiplisting}
+{\small\mdframed[middlelinewidth=0.5pt, middlelinecolor=GoldenDreamColor, skipabove=15pt]{\textbf{Tip:}}}
+{\endmdframed\vspace{12pt}\normalsize}
+
+
+% Lists text inside a blue border
+\definecolor{MatisseColor}{HTML}{236AB2}
+\newenvironment{importantlisting}
+{\mdframed[middlelinewidth=0.5pt, middlelinecolor=MatisseColor, skipabove=15pt]{\textbf{Important:}}}
+{\endmdframed\vspace{12pt}}
+
+
+% Inline monospaced text
+\definecolor{TundoraColor}{HTML}{444444}
+\newcommand{\inlinecode}[1]{{\textcolor{TundoraColor}{\texttt{#1}}}}
+
+
+% Hyperlinks
+\hypersetup{
+    colorlinks = true,
+    allcolors = {LochmaraColor},
+}
+
+
+% Will Robertson's fontspec.sty can be used to simplify font choices.
+% To experiment, open /Applications/Font Book to examine the fonts provided on Mac OS X,
+% and change "Hoefler Text" to any of these choices.
+
+\usepackage{fontspec,xltxtra,xunicode}
+\defaultfontfeatures{Mapping=tex-text}
+\setromanfont[Mapping=tex-text]{Lucida Grande}
+\setsansfont[Scale=MatchLowercase,Mapping=tex-text]{Gill Sans}
+\setmonofont[Scale=MatchLowercase]{Menlo Regular}
+
+
+\begin{document}
+
+\begin{titlepage} 
+\title{Apple Documentation Style - Latex Template}
+\author{Wojciech Nagrodzki}
+\maketitle
+\end{titlepage}
+
+\tableofcontents
+
+% Presenting text
+\section{Lorem ipsum dolor sit amet}
+\lipsum[1]
+
+\subsection{Nam dui ligula, fringilla a, euismod sodales}
+\lipsum[2]
+
+\subsection{Nulla malesuada porttitor diam}
+\lipsum[3]
+\subsubsection{Quisque ullamcorper placerat ipsum}
+\lipsum[4]
+
+\subsection{Fusce mauris. Vestibulum luctus nibh at lectus}
+\lipsum[5]
+
+\subsubsection{Suspendisse vel felis}
+\lipsum[6]
+
+\subsubsection{Sed commodo posuere pede. Mauris ut est}
+\lipsum[7]
+
+% Presenting Objective-C code listing
+\section{Fusce sed justo eu urna porta tincidunt.}
+
+\begin{objclisting}
+- (BOOL)loginUser:(NSString *)user withPassword:(NSString *)password error:(NSError **)error
+{
+    if (user.length < 6) {
+        if (error != NULL)
+            *error = [NSError errorWithDomain:ExampleDomain
+                                         code:1001
+                                     userInfo:@{NSLocalizedDescriptionKey: @"User has to..."}];
+        return NO;
+    }
+   
+    if (password.length < 8)
+        if (error != NULL)
+            *error = [NSError errorWithDomain:ExampleDomain
+                                         code:1002
+                                     userInfo:@{NSLocalizedDescriptionKey: @"Password has to..."}];
+        return NO;
+   
+    // logging in code
+}
+\end{objclisting}
+
+\subsection{Aenean faucibus pede eu ante}
+
+\begin{objclisting}
+typedef NS_ENUM(NSInteger, Enumeration) {
+    EnumerationInvalid,
+    EnumerationA,
+    EnumerationB,
+    EnumerationC,
+};
+\end{objclisting}
+
+\subsubsection{Quisque egestas wisi eget nunc}
+
+\begin{objclisting}
++ (NSCalendar *)currentCalendar
+{
+    NSMutableDictionary *threadDictionary = [[NSThread currentThread] threadDictionary];
+    NSCalendar * currentCalendar = threadDictionary[kCurrentCalendarKey];
+    if (currentCalendar == nil) {
+        currentCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+        currentCalendar.timeZone = [NSTimeZone timeZoneWithName:@"Europe/Copenhagen"];
+        [threadDictionary setObject:currentCalendar forKey:kCurrentCalendarKey];
+    }
+    return currentCalendar;
+}
+\end{objclisting}
+
+\subsection{Pellentesque habitant morbi tristique senectus et netus}
+
+\lipsum[8]
+
+\begin{objclisting}
+static void * const kNavigationItemKey = (void *)&kNavigationItemKey;
+
+- (void)setNavigationItem:(UINavigationItem *)navigationItem
+{
+    objc_setAssociatedObject(self, 
+                             kNavigationItemKey, 
+                             navigationItem, 
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UINavigationItem *)navigationItem
+{
+    UINavigationItem * navigationItem = objc_getAssociatedObject(self, kNavigationItemKey);
+    if (navigationItem == nil) {
+        navigationItem = [[UINavigationItem alloc] init];
+        self.navigationItem = navigationItem;
+    }
+    return navigationItem;
+}
+\end{objclisting}
+
+\lipsum[9]
+
+% Presenting Swift code listing
+\section{Aliquam arcu neque, ornare in, ullamcorper quis}
+
+\begin{swiftlisting}
+struct SilentCondition<T: OperationCondition>: OperationCondition 
+{
+    let condition: T
+    
+    static var name: String { return "Silent<\(T.name)>" }
+    
+    static var isMutuallyExclusive: Bool { return T.isMutuallyExclusive }
+    
+    init(condition: T) {
+        self.condition = condition
+    }
+    
+    func dependencyForOperation(operation: Operation) -> NSOperation? {
+        // Returning nil means we will never a dependency to be generated.
+        return nil
+    }
+    
+    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+        condition.evaluateForOperation(operation, completion: completion)
+    }
+}
+}\end{swiftlisting}
+
+\subsection{Nam elementum ullamcorper leo. Morbi dui.}
+
+\begin{swiftlisting}
+switch directionToHead {
+case .North:
+    println("Lots of planets have a north")
+case .South:
+    println("Watch out for penguins")
+case .East:
+    println("Where the sun rises")
+case .West:
+    println("Where the skies are blue")
+}
+\end{swiftlisting}
+
+\subsubsection{Morbi eros pede, suscipit ac, varius vel, egestas non, eros}
+
+\begin{swiftlisting}
+private func ~=(lhs: (String, Int, String?), rhs: (String, Int, String?)) -> Bool {
+    return lhs.0 ~= rhs.0 && lhs.1 ~= rhs.1 && lhs.2 == rhs.2
+}
+
+private func ~=(lhs: (String, OperationErrorCode, String), rhs: (String, Int, String?)) -> Bool {
+    return lhs.0 ~= rhs.0 && lhs.1.rawValue ~= rhs.1 && lhs.2 == rhs.2
+}
+\end{swiftlisting}
+
+\subsection{Suspendisse vitae elit}
+
+\lipsum[10]
+
+\begin{swiftlisting}
+class EarthquakeTableViewCell: UITableViewCell {
+    // MARK: Properties
+
+    @IBOutlet var locationLabel: UILabel!
+    @IBOutlet var timestampLabel: UILabel!
+    @IBOutlet var magnitudeLabel: UILabel!
+    @IBOutlet var magnitudeImage: UIImageView!
+    
+    // MARK: Configuration
+    
+    func configure(earthquake: Earthquake) {
+        timestampLabel.text = Earthquake.timestampFormatter.stringFromDate(earthquake.timestamp)
+
+        magnitudeLabel.text = Earthquake.magnitudeFormatter.stringFromNumber(earthquake.magnitude)
+        
+        locationLabel.text = earthquake.name
+        
+        let imageName: String
+        
+        switch earthquake.magnitude {
+            case 0..<2: imageName = ""
+            case 2..<3: imageName = "2.0"
+            case 3..<4: imageName = "3.0"
+            case 4..<5: imageName = "4.0"
+            default:    imageName = "5.0"
+        }
+
+        magnitudeImage.image = UIImage(named: imageName)
+    }
+}
+\end{swiftlisting}
+
+\lipsum[11]
+
+
+% Presenting tip listing
+\section{Cum sociis natoque penatibus et magnis dis parturient montes}
+
+\begin{tiplisting}
+\lipsum[12-13]
+\end{tiplisting}
+
+\subsection{Fusce elementum convallis neque}
+
+\begin{tiplisting}
+\lipsum[14-15]
+\end{tiplisting}
+
+\subsubsection{Etiam ac leo a risus tristique nonummy}
+
+\begin{tiplisting}
+\lipsum[16]
+\end{tiplisting}
+
+\subsection{Nulla in ipsum. Praesent eros nulla, congue vitae}
+
+\lipsum[17]
+
+\begin{tiplisting}
+\lipsum[18]
+\end{tiplisting}
+
+\lipsum[19]
+
+% Presenting important note listing
+\section{Phasellus facilisis ipsum quis ante}
+
+\begin{importantlisting}
+\lipsum[20-21]
+\end{importantlisting}
+
+\subsection{Nullam urna nulla, ullamcorper in, interdum sit amet}
+
+\begin{importantlisting}
+\lipsum[22]
+\end{importantlisting}
+
+\subsubsection{Suspendisse congue nisl eu elit}
+
+\begin{importantlisting}
+\lipsum[23]
+\end{importantlisting}
+
+\subsection{Etiam suscipit aliquam arcu}
+
+\lipsum[24]
+
+\begin{importantlisting}
+\lipsum[25]
+\end{importantlisting}
+
+\lipsum[26]
+
+% Presenting hyperlinks
+\section{Vestibulum ante ipsum primis in faucibus orci}
+
+\href{https://github.com/izydor86/AppleDocumentationStyleLatexTemplate}{Vivamus} eu tellus sed tellus consequat suscipit. Nam orci orci, malesuada id, gravida nec, ultricies vitae, erat. Donec risus turpis, luctus sit amet, interdum quis, porta sed, ipsum. Suspendisse condi- mentum, tortor at egestas posuere, neque metus tempor orci, et tincidunt urna nunc a purus. Sed facilisis blandit tellus. Nunc risus sem, suscipit nec, eleifend quis, cursus quis, \href{https://github.com/izydor86/AppleDocumentationStyleLatexTemplate}{libero}. Curabitur et dolor. Sed vitae sem. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas ante. Duis ullamcorper enim. Donec tristique enim eu leo. Nullam mo- lestie elit eu dolor. \href{https://github.com/izydor86/AppleDocumentationStyleLatexTemplate}{Nullam bibendum}, turpis vitae tristique gravida, quam sapien tempor lectus, quis pretium tellus purus ac quam. Nulla facilisi.
+
+\end{document}

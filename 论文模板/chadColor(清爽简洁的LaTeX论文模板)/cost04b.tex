@@ -1,0 +1,1546 @@
+\documentclass[12pt,twoside]{article}
+\usepackage{chadstyle}  % Loads my formatting 
+\usepackage{tweaklist}   
+
+%% Shortcut commands
+\newcommand{\growth}[1]{\frac{\dot{#1}_t}{{#1}_t}}
+\newcommand{\prtl}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\commentno}[2]{\underset{\mbox{#2}}{#1}}
+\newcommand{\comment}[2]{\underbrace{#1}_{\mbox{#2}}}
+\newcommand{\cn}[1]{\citet*{#1}}
+\newcommand{\cnp}[1]{(\citealt{#1})}  % (Jones 2002)
+\newcommand{\fignote}[2]{\begin{center}\parbox[c]{#1}{\footnotesize #2} \end{center}}
+\newcommand{\tabnote}[2]{\begin{center}\parbox[c]{#1}{\footnotesize #2} \end{center}}
+\newcommand{\Prob}[1]{\mbox{\textnormal{Pr}} \, [#1] } 
+\newcommand{\SubSubSection}[1]{\subsubsection{#1} \baselineskip=18pt}
+\newcommand{\problem}[2]{\hspace{.1in} {{\color{ChadBlue}{\bf #1:} #2}}}
+\newcommand{\proptitle}[1]{\color{ChadBlue} \textnormal{(#1):}}
+\newtheorem{proposition}{\color{ChadGreen} Proposition}
+\newcommand{\assume}[2]{{\bf{Assumption #1}} (#2)} 
+\newcommand{\clr}[1]{{\color{ChadBlue} #1}}
+\newcommand{\clrg}[1]{{\color{ChadGreen} #1}}
+\newcommand{\Proof}[2]{\newline {\hspace{-\parindent} {\color{ChadGreen}\bf Proof of Proposition}~\ref{#1}.}
+{\color{ChadBlue} #2} \vspace{.1in}}
+
+% Adjust spacing in itemize/enumerate; see tweaklist.sty
+\renewcommand{\enumhook}{\setlength{\topsep}{2pt}%
+  \setlength{\itemsep}{0pt}}
+\renewcommand{\itemhook}{\setlength{\topsep}{2pt}%
+  \setlength{\itemsep}{0pt}}
+
+
+\begin{document}
+\bibliographystyle{aernobold}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TITLE PAGE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{singlespacing}
+\begin{spacing}{0.9}
+\begin{titlepage}
+
+%Two authors: \author{Matthias Doepke\\{\small UCLA, NBER, CEPR, and IZA}
+%\and Mich\`{e}le Tertilt\\
+%{\small Stanford University, NBER, and CEPR}}
+
+\title{The Costs of Economic Growth}
+\runningheads{Charles I. Jones}{The Costs of Economic Growth}
+
+
+\author{\large \href{http://elsa.berkeley.edu/~chad}{Charles I.
+    Jones}\thanks{I am grateful to the National Science Foundation for
+    financial support and to the Stanford GSB for hosting me during this
+    research.}\\ { U.C. Berkeley and NBER}
+%{\normalsize \url{http://www.econ.berkeley.edu/~chad}}
+}
+
+\date{\small \today \ -- Version 0.4\\ {\it Preliminary}}
+\maketitle
+\thispagestyle{empty}
+
+%\clearpage
+\vspace{-0.3in}
+
+\begin{abstract}
+
+The benefits of economic growth are widely touted in the literature. But
+what about the costs? Pollution, nuclear accidents, global warming, the
+rapid global transmission of disease, and bioengineered viruses are just
+some of the dangers created by technological change. How should these be
+weighed against the benefits, and in particular, how does the
+recognition of these costs affect the theory of economic growth? This
+paper shows that taking these costs into account has first-order
+consequences for economic growth. The rising value of life associated
+with standard utility functions generates a conservative bias to
+technological change, significantly slowing the optimal rate of economic
+growth.
+
+\end{abstract}
+
+\end{titlepage}
+\end{spacing}
+%\end{singlespacing}
+
+
+\begin{quote}
+{\it  
+Certain events quite within the realm of possibility, such as a major
+asteroid collision, global bioterrorism, abrupt global warming --- even
+certain lab accidents--- could have unimaginably terrible consequences
+up to and including the extinction of the human race...  I am not a
+Green, an alarmist, an apocalyptic visionary, a catastrophist, a Chicken
+Little, a Luddite, an anticapitalist, or even a pessimist.  But... I
+have come to believe that what I shall be calling the ``catastrophic
+risks'' are real and growing...}
+\end{quote} \hspace{2.8in} --- Richard A. \citet[p. v]{Posner2004}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+In October 1962, the Cuban missile crisis brought the world to the brink
+of a nuclear holocaust. President John F. Kennedy put the chance of
+nuclear war at ``somewhere between one out of three and even.'' The
+historian Arthur Schlesinger, Jr., at the time an adviser of the
+President, later called this ``the most dangerous moment in human
+history.''\footnote{For these quotations, see \cite[p. 26]{Rees2003}.}
+What if a substantial fraction of the world's population had been killed
+in a nuclear holocaust in the 1960s? In some sense, the overall cost of
+the technological innovations of the preceding 30 years would then seem
+to have outweighed the benefits.
+
+While nuclear devastation represents a vivid example of the potential
+costs of technological change, it is by no means unique. The benefits
+from the internal combustion engine must be weighed against the costs
+associated with pollution and global warming. Biomedical advances have
+improved health substantially but made possible weaponized anthrax and
+lab-enhanced viruses. The potential benefits of nanotechnology stand
+beside the ``grey goo'' threat that a self-replicating machine could
+someday spin out of control. Experimental physics has brought us x-ray
+lithography techniques and superconductor technologies but also the
+remote possibility of devastating accidents as we smash particles
+together at ever higher energies. These and other technological dangers
+are detailed in a small but growing literature on so-called
+``existential risks''; \cn{Posner2004} is likely the most familiar of
+these references, but see also \cn{Bostrom2002}, \cn{Joy2002},
+\cn{Overbye2008}, and \cn{Rees2003}.
+
+Technologies need not pose risks to the existence of humanity in order
+to have costs worth considering. New technologies come with risks as
+well as benefits. A new pesticide may turn out to be harmful to
+children. New drugs may have unforeseen side effects. Marie Curie's
+discovery of the new element radium led to many uses of the
+glow-in-the-dark material, including a medicinal additive to drinks and
+baths for supposed health benefits, wristwatches with luminous dials,
+and as makeup --- at least until the dire health consequences of
+radioactivity were better understood. Other examples of new products
+that were intially thought to be safe or even healthy include
+thalidomide, lead paint, asbestos, and cigarettes.
+
+The benefits of economic growth are truly amazing and have made enormous
+contributions to welfare. However, this does not mean there are not also
+costs. How does this recognition affect the theory of economic growth?
+This paper shows that taking these costs into account has first-order
+consequences. In particular, the rising value of life associated with
+standard utility functions generates a conservative bias to
+technological change, significantly slowing the optimal rate of economic
+growth.
+
+
+\section{The Model}
+
+At some level, this paper is about speed limits. You can drive you car
+slowly and safely, or fast and recklessly. Similarly, a key decision the
+economy must make is to set a safety threshold: researchers can
+introduce many new ideas without regard to safety, or they can select a
+very tight safety threshold and introduce fewer ideas each year, slowing
+growth to some extent.
+
+The model below is a standard idea-based growth model, along the lines
+of \cn{Romer90} and \cn{JonesRND}. Researchers introduce new varieties
+of intermediate goods, and the economy's productivity is increasing in
+the number of varieties. The key change relative to standard models is
+that each variety $i$ also comes with a danger level, $z^i$. Some ideas
+are especially dangerous (nuclear weapons or lead paint) and have a high
+value of $z^i$, while other ideas are relatively harmless and have a low
+$z^i$. The mortality rate in the economy depends on the values of the
+$z^i$ that are consumed as well as on the amount consumed.
+
+In the equilibrium allocation we study, firms that sell dangerous
+products must pay a fee for each person they kill, and this fee is a
+price determined in equilibrium.
+
+
+
+
+\subsection{The Economic Environment}
+
+The economy features three types of goods: consumption goods (which come
+in a range of varieties), ideas, and people. People and ideas are the
+two key factors of production, combining to produce the consumption
+goods and new ideas.
+
+At any point in time, a variety of consumption goods indexed by $i$ on
+the interval $[0,A_t]$ are available for purchase.  We could define
+utility directly over this variety of goods, but for the usual reasons,
+it is easier to handle the aggregation on the production side.  Hence,
+we assume these varieties combine in a CES fashion to produce a single
+aggregate consumption good:
+\begin{equation}
+\label{eq:C}
+\clr{ C_t = \left(\int_0 ^{A_t} X_{it} ^\theta di \right)^{1/\theta},
+  \ \ \ \ \theta>1 }
+\end{equation}
+
+New varieties (ideas) are produced by researchers. If $L_{at}$ units of
+labor are used in research with a current stock of knowledge $A_t$, then
+research leads to the discovery of $\alpha L_{at} ^\lambda A_t ^\phi$
+new varieties. This technology for producing new ideas is similar to
+\cn{JonesRND}.
+
+What's novel here is that each new variety $i$ is also associated with a
+danger level, $z^i$. This danger level is drawn from a distribution with
+cdf $F(z)$ and is observed as soon as the variety is discovered.
+Researchers decide whether or not to complete the development of a new
+variety after observing its danger level. Given that varieties are
+otherwise symmetric, this leads to a cutoff level $z_t$: varieties with
+a danger level below $z_t$ get implemented, whereas more dangerous
+varieties do not. $z_t$ is a key endogenous variable determined within
+the model. The fraction $F(z_t)=\Prob{z^i \leq z_t}$ of candidate
+varieties get implemented, so the additional number of new varieties
+introduced at any point in time is
+\begin{equation}
+\label{eq:Adot}
+\clr{ \dot{A}_t = \alpha F(z_t) L_{at} ^\lambda A_t ^\phi, \ \ \ \ A_0 \mbox{ given}.}
+\end{equation}
+
+One unit of labor can produce one unit of any existing variety, and
+labor used for different purposes cannot exceed the total amount
+available in the economy, $N_t$:
+\begin{equation}
+\label{eq:RC}
+\clr{ \int_0 ^{A_t} X_{it} di + L_{at} \leq N_t. }
+\end{equation}
+This total population is assumed to grow over time according to
+\begin{equation}
+\label{eq:Ndot}
+\clr{ \dot{N}_t = (\bar{n} - \delta_t) N_t, \ \ \ \ N_0 \mbox{ given}. }
+\end{equation}
+The parameter $\bar{n}$ captures exogenous fertility net of mortality
+unrelated to technological change.
+
+Mortality from technological danger is denoted $\delta_t$. In principle,
+it should depend on the amount of each variety consumed and the danger
+associated with each variety, and it could even be stochastic (nuclear
+weapons are a problem only if they are used). There could also be timing
+issues: the use of fossil fuels today creates global warming that may be
+a problem in the future.
+
+These issues are interesting and could be considered in future work. To
+keep the present model tractable, however, we make some simplifying
+assumptions in determining mortality. In particular, all of the deaths
+associated with any new technology occur immediately when that
+technology is implemented, and the death rate depends on average
+consumption across all varieties.  That is,
+\begin{equation}
+\label{eq:dlta}
+\clr{ \delta_t = \bar{\delta} \dot{A}_t x_t \Gamma(z_t),}
+\end{equation}
+where $x_t \equiv \int_0 ^{A_t} X_{it}/N_t di / A_t$ is the average
+amount consumed of each variety and $\Gamma(z_t) \equiv E[z^i | z^i \leq
+  z_t] = \int_0 ^{z_t} z dF(z) / F(z_t)$ is the average mortality rate
+associated with those new varieties. The mortality rate $\delta_t$,
+then, is the product of the per capita quantity of new varieties
+consumed, $\dot{A}_t x_t$, and their average mortality rate.
+
+Individuals care about expected utility, where the expectation is
+taken with respect to mortality.  Let $S_t$ denote the probability a
+person survives until date $t$ conditional on being alive at date 0.
+Expected utility is given by
+\begin{equation}
+\clr{ U= \int_0 ^\infty e^{-\rho t} u(c_t) S_t dt,}
+\end{equation}
+where
+\begin{equation}
+\clr{ \dot{S}_t = -\delta_t S_t, \ \ \ S_0=1.}
+\end{equation}
+Finally, we assume that flow utility $u(c)$ is
+\begin{equation}
+\label{eq:u}
+\clr{ u(c_t) = \bar{u} + \frac{c_t ^{1-\gamma}}{1-\gamma}, \ \ \ \ c_t
+  \equiv C_t/N_t, \ \ \bar{u}>0.}
+\end{equation}
+The key properties of this utility function are discussed next.
+
+\subsection{Flow Utility and the Value of Life}
+
+The cost of dying is the loss of future periods of utility. The flow
+lost in year $t$ depends directly on $u(c_t)$. Figure~\ref{fig:u} shows
+this flow utility for the CRRA formulation used in this paper,
+equation~\eqref{eq:u}, for the special case in which $\gamma>1$.  This
+case turns out to be especially interesting in what follows.
+\begin{figure}[tp]
+\caption{Flow Utility $u(c)$ for $\gamma>1$}
+\label{fig:u}
+%\centering \includegraphics[width=3.5in]{utilitygraph.ps} 
+\fignote{4.5in}{Note: Flow utility is bounded for $\gamma>1$. If
+  $\bar{u}=0$, then flow utility is negative and dying is
+  preferred to living.}
+\end{figure} 
+There are two points to notice in this graph. First, if $\bar{u}=0$,
+then flow utility is negative. Since we have (implicitly) normalized the
+utility of death at zero in writing lifetime utility, utility would be
+maximized by never living in this case. Hence $\bar{u}>0$ is required
+for this model to make sense.
+
+Second, flow utility is bounded for $\gamma>1$. Marginal utility goes to
+zero very quickly for these preferences. Eating more sushi on a given
+day when one is already eating sushi for breakfast, lunch, and dinner
+has very low returns. Instead, preserving extra days of life on which to
+eat sushi is the best way to increase utility.
+
+This point can also be made with the algebra. Valued in units of
+consumption instead of utils and expressed as a ratio to current
+consumption, the flow value of a year of life is
+\begin{equation}
+ \clr{ \frac{u(c_t)}{u'(c_t) c_t} = \bar{u} c_t ^{\gamma-1} -
+   \frac{1}{1-\gamma} }
+\end{equation}
+For $\gamma>1$, the value of life rises faster than consumption; this is
+the essential mechanism that leads the economy to tilt its allocation
+away from consumption growth and toward preserving life in the model.
+This point is more general than the particular utility function assumed
+here. For example, any bounded utility function will deliver this
+result, as will log utility.\footnote{For log preferences,
+  $u(c)=\bar{u}+\log c$. Because $u'(c)c=1$, the value of a year of life
+  in consumption units is just $u(c)$ itself, which increases without
+  bound in consumption.}
+
+\subsection{A Rule of Thumb Allocation}
+
+Given the symmetry of $X_{it}$, there are two nontrivial allocative
+decisions that have to be made in this economy at each date. First is
+the allocation of labor between $L_{at}$ and $X_{it}$. Second is the key
+tradeoff underlying this paper, the choice of the safety threshold
+$z_t$.  A high cutoff for $z_t$ implies that more new ideas are
+introduced in each period but it also means a higher mortality rate.
+This is the model's analog to driving fast and recklessly instead of
+slowly and safely.
+
+In the next main section, we will let markets allocate resources and
+study an equilibrium allocation. To get a sense for how the model works,
+however, it is convenient to begin first with a simple rule of thumb
+allocation. For this example, we assume the economy puts a constant
+fraction $\bar{s}$ of its labor in research and allocates the
+remainder symmetrically to the production of the consumption goods. In
+addition, we assume the safety cutoff is constant over time at
+$\bar{z}$.
+
+Let $g_x$ denote the growth rate of some variable $x$ along a balanced
+growth path. Then, we have the following result (proofs for this and
+other propositions are given in Appendix~\ref{app:proofs}):
+\begin{proposition}
+\proptitle{\hyperlink{proof:rule}{BGP under the Rule of Thumb Allocation}}
+\label{prop:rule} \hypertarget{prop:rule}{}
+Under the rule of thumb allocation, there exists a balanced growth path
+such that $g_c=\sigma g_A$ and
+\begin{equation}
+\label{eq:drule}
+\delta^* = \bar{\delta} g_A (1-\bar{s}) \Gamma(\bar{z})
+\end{equation}
+\begin{equation}
+\label{eq:gNrule}
+ g_N = \bar{n}-\delta^*
+\end{equation}
+\begin{equation}
+\label{eq:gArule}
+g_A =\frac{\lambda (\bar{n}-\delta^*)}{1-\phi} = \frac{\lambda \bar{n}}{1-\phi+\lambda \bar{\delta}
+  (1-\bar{s}) \Gamma(\bar{z})}.  
+\end{equation}
+\end{proposition}
+
+Along the balanced growth path, the mortality rate is constant and
+depends on (a) how fast the economy grows, (b) the intensity of
+consumption, and (c) the danger threshold. As in \cn{JonesRND}, the
+steady-state growth rate is proportional to the rate of population
+growth. However, the population growth rate is now an endogenous
+variable because of endenous mortality.  For example, an increase in
+research intensity $\bar{s}$ will reduce the steady-state mortality rate
+(a lower consumption intensity) and therefore increase the long-run
+growth rate.
+
+The effect of changing the danger threshold $\bar{z}$ is more subtle
+and is shown graphically in Figure~\ref{fig:rule}.
+\begin{figure}[tp]
+\caption{Growth under the Rule of Thumb Allocation}
+\label{fig:rule}
+%\centering \includegraphics[width=3.5in]{rule2.ps} 
+\fignote{4.5in}{Note: There is a medium-run tradeoff between growth and
+  technological danger, but no long-run tradeoff.  In the long run,
+  safer choices lead to faster net population growth and therefore
+  faster consumption growth.}
+\end{figure} 
+As emphasized earlier, there is indeed a basic tradeoff in this model
+between growth and safety.  Over the first 300+ years in the example,
+the safer choice of $\bar{z}$ leads to slower growth as researchers
+introduce fewer new varieties.  However, this tradeoff disappears in the
+long run because the growth rate itself depends on population growth.  A
+safer technology choice reduces the mortality rate, raises the
+population growth rate, and therefore raises consumption growth in the
+long run.
+
+%% Two last remarks are worth noting before we turn to an equilibrium
+%% allocation in this model.  First, by setting the danger threshold
+%% sufficiently low, we can make the growth rate arbitrarily close to
+%% $\lambda \bar{n}/(1-\phi)$, which is the familiar semi-endogenous growth
+%% rate in \cn{JonesRND}.  Second, for any threshold $\bar{z}>0$, there is
+%% no ``knife-edge'' problem at $\phi=1$.  This is because of the feedback
+%% between technological change and mortality.  In standard idea-based
+%% growth models, the condition $\phi=1$ leads to explosive growth in the
+%% presence of population growth.  Here, however, 
+
+
+\section{A Competitive Equilibrium with Patent Buyouts}
+
+The rule of thumb allocation suggests that this model will deliver a
+balanced growth path with an interesting distinction between the
+medium-run and long-run tradeoffs between growth and safety.  Moreover,
+the model features endogenous growth in the strong sense that changes in
+policy can affect the long-run growth rate.  Somewhat surprisingly,
+neither of these results will hold in the competitive equilibrium, and
+our rule of thumb allocation turns out not to be a particularly good
+guide to the equilibrium dynamics of the competitive equilibrium.
+
+\subsection{An Overview of the Equilibrium}
+
+A perfectly competitive equilibrium will not exist in this model because
+of the nonrivalry of ideas \citep{Romer90}. Instead of following Romer
+and introducing imperfect competition, we use a mechanism advocated by
+\cn{Kremer98}. That is, we consider an equilibrium in which research is
+funded entirely by ``patent buyouts'': the government in our model purchases new
+ideas at a price $P_{at}$ and makes the designs publicly available at no
+charge. The motivation for this approach is largely technical: it
+simplifies the model so it is easier to understand. However, there is
+probably some interest in studying this institution in its own right.
+
+The other novel feature of this equilibrium is that we introduce a
+competitive market for mortality: idea producers pay a price $v_t$ for
+every person they kill, and households ``sell'' their mortality as if
+survival were a consumer durable. This market bears some resemblence to
+one that emerges in practice through the legal system of torts and
+liabilities.
+
+In equilibrium, these two institutions determine the key allocations.
+Patent buyouts pin down the equilibrium amount of research and the
+mortality market pins down the danger cutoff.
+
+\subsection{Optimization Problems}
+
+The equilibrium introduces three prices: a wage $w_t$, the price of
+mortality $v_t$, and the price of new ideas $P_{at}$. The equilibrium
+then depends on three optimization problems.
+
+First, a representative household supplies a unit of labor, chooses how
+much of her life to sell in the mortality market, pays a lump-sum tax
+$\tau_t$, and eats the proceeds. Our timing assumption is that mortality
+is realized at the end of the period, after consumption occurs.\vspace{.1in}
+
+\hypertarget{HH}{
+\problem{HH Problem}{Given $\{w_t, v_t, \tau_t\}$, the representative
+household solves
+\[ \max_{\{\delta_t ^h\}} \int_0 ^\infty e^{-\rho t} u(c_t) S_t dt \]
+\begin{center}
+s.t.  $c_t = w_t + v_t \delta_t ^h - \tau_t$ and $\dot{S}_t = -\delta_t ^h S_t$.
+\end{center}}}
+
+\vspace{-.1in} Next, a representative firm in the perfectly competitive
+market for the final good (FG) solves the following profit maximization
+problem:\vspace{.1in}
+
+\hypertarget{FG}{}
+\problem{FG Problem}{At each date $t$, given $w_t$ and $A_t$, 
+\[ \max_{\{X_{it}\}} \left( \int_0 ^{A_t} X_{it} ^\theta di \right)^{1/\theta} - w_t
+\int_0 ^{A_t} X_{it} di. \] }
+
+\vspace{-.1in}
+Finally, a representative research firm produces ideas in the perfectly
+competitive idea sector and chooses a cutoff danger level $z_t$ based on
+the price of mortality.  The research firm sees constant returns to idea
+production at productivity $\alpha_t$, so the effects associated with
+$\lambda<1$ and $\phi \neq 0$ are external:\vspace{.1in}
+
+\hypertarget{RD}{}
+\problem{R\&D Problem}{At each date $t$, given $P_{at}, w_t, v_t, x_t, \alpha_t$, 
+\[ \max_{L_{at},z_t} P_{at} \alpha_t F(z_t) L_{at} - w_t L_{at} - v_t
+\delta_t N_t  \ \mbox{ s.t } \ \delta_t = \bar{\delta} x_t \alpha_t
+F(z_t) L_{at} \Gamma(z_t).  \]}
+
+\vspace{-.2in}
+\subsection{Defining the Competitive Equilibrium}
+
+The competitive equilibrium in this economy solves the optimization
+problems given in the previous section and the relevant markets clear.
+The only remaining issue to discuss is the government purchase of ideas.
+We've already assumed the government pays a price $P_{at}$ for any idea
+and releases the design into the public domain. We assume this is the
+only option for researchers --- there is no way to keep ideas secret and
+earn a temporary monopoly profit. As discussed above, the reason for
+this is to keep the model simple; nothing would change qualitatively if
+we introduced monopolistic competition, either through secrecy or
+patents.
+
+In addition, we assume the idea purchases are financed with lump-sum
+taxes on households and that the government's budget balances in each
+period. Moreover, we assume the government sets the price at which ideas
+are purchased so that total purchases of ideas are a constant proportion
+$\beta$ of aggregate consumption; we will relax this assumption later.
+
+The formal definition of the equilibrium allocation follows:
+{\color{ChadBlue}
+\begin{quote}
+{\bf {Definition}}
+A {\it CE with public support for R\&D} consists of quantities $\{c_t,\delta_t ^h,
+X_{it}, A_t, L_{at}, N_t, \tau_t, \delta_t, z_t, \alpha_t, x_t \}$ and
+prices $\{w_t,P_{at},v_t\}$ such that
+\begin{enumerate}
+\item $\{c_t,\delta_t ^h\}$ solve the \hyperlink{HH}{HH Problem}.
+\item $X_{it}$ solve the \hyperlink{FG}{FG Problem}.
+\item $L_{at},z_t,\delta_t,A_t$ solve the \hyperlink{RD}{R\&D Problem}.
+\item $w_t$ clears the labor market: $\int_0 ^{A_t} X_{it}di+L_{at}=N_t$.
+\item $v_t$ clears the mortality market: $\delta_t ^h=\delta_t$.
+\item The government buys ideas: $P_{at} \dot{A}_t = \beta c_t N_t$.
+\item Lump sum taxes $\tau_t$ balance the budget: $\tau_t =P_{at}
+  \dot{A}_t / N_t$.
+\item Other conditions:
+$\dot{N}_t = (\bar{n} -\delta_t)N_t$,
+$\alpha_t = \alpha L_{at} ^{\lambda-1} A_t ^\phi$, and 
+$x_t \equiv \frac{1}{A_t} \int_0 ^{A_t} X_{it} di / N_t$.
+\end{enumerate}
+\end{quote}}
+
+\subsection{The Benchmark Case}
+
+The equilibrium behavior of the economy depends in important ways on a
+few parameters. We specify a benchmark case that will be studied in
+detail, and then in subsequent sections consider the effect of deviating
+from this benchmark. In specifying the benchmark, it is helpful to note
+that in equilbrium $c_t = A_t ^\sigma (1-s_t)$, where $\sigma \equiv
+\frac{1-\theta}{\theta}$ is the elasticity of consumption with respect
+to the stock of ideas. The benchmark case is then given by
+
+\vspace{.1in} 
+\hypertarget{ASSUME}{} \clr{
+\assume{A.}{Benchmark Case} 
+Let $\eta \equiv \lim_{z \rightarrow 0} F'(z) z/F(z)$.  Assume
+\begin{enumerate} 
+\addtolength{\itemsep}{-\baselineskip}
+\setlength{\itemindent}{2em}
+\item[A1.] Finite elasticity of $F(z)$ as $z \rightarrow 0$: $\ \eta \in (0,\infty)$  \\
+\item[A2.] Rapidly declining marginal utility of consumption: $\ \gamma>1$ \\
+\item[A3.] Knowledge spillovers are not too strong: $\ \phi<1+\eta \sigma (\gamma-1)$.
+\end{enumerate}
+} \vspace{.1in}
+{\noindent 
+We will discuss the nature and role of each of these assumptions in more
+detail as we develop the results. The least familiar assumption is A1,
+but note that both the exponential and the Weibull distributions have
+this property. In contrast, the lognormal and Fr\'{e}chet distributions
+have an infinite elasticity in the limit as $z$ goes to zero. This has
+interesting implications that we will explore in detail.}
+
+\subsection{The Equilibrium Balanced Growth Path}
+
+We are now ready to solve for the equilibrium in this growth model with
+dangerous technologies.  In particular, we can characterize a balanced
+growth path:
+
+\begin{proposition}
+\proptitle{\hyperlink{proof:CE}{Equilibrium Balanced Growth}}
+\label{prop:CE} \hypertarget{prop:CE}{}
+Under Assumption A,
+the competitive equilibrium exhibits an asymptotic balanced growth path
+as $t \rightarrow \infty$ such that
+\begin{equation}
+s_t \rightarrow \frac{\beta}{1+\beta+\eta} 
+\end{equation}
+\begin{equation}
+z_t \rightarrow 0 \mbox{ (and therefore } \delta_t \rightarrow 0
+\mbox{)} 
+\end{equation}
+\begin{equation}
+\label{eq:gz} \dot{z}_t/z_t \rightarrow g_z = - (\gamma-1) g_c 
+\end{equation}
+\begin{equation}
+\dot{c}_t/c_t \rightarrow g_c=\sigma g_A \equiv \frac{\lambda \sigma
+  \bar{n}}{1-\phi+\eta \sigma (\gamma-1)}
+\end{equation}
+\begin{equation}
+\label{eq:v}
+u'(c_t) v_t \rightarrow \frac{\bar{u}}{\rho}. 
+\end{equation}
+\end{proposition}
+
+
+The somewhat surprising result that emerges from the equilibrium under
+\hyperlink{ASSUME}{Assumption A} is that mortality and the danger
+threshold, rather than being constant in steady state, decline at a
+constant exponential rate.  Technological change becomes increasingly
+conservative over time, as an increasing fraction of possible new ideas
+are rejected because they are too dangerous.
+
+The consequence of this conservative bias in technological change is no
+less surprising: it leads to a slowdown in steady-state growth. There
+are several senses in which this is true, and these will be explored as
+the paper goes on. But two are evident now. First, the negative growth
+rate of $z_t$ introduces a negative trend in TFP growth for the idea
+sector, other things equal. Recall that the idea production function is
+$\dot{A}_t = \alpha F(z_t) L_{at} ^\lambda A_t ^\phi$. $z_t$ declines at
+the rate $(\gamma-1)g_c$, ultimately getting arbitrarily close to zero.
+By Assumption A1, the elasticity of the distribution $F(z)$ at zero is
+finite and given by $\eta$, so $F(z_t)$ declines at rate $\eta
+(\gamma-1) g_c = \eta (\gamma-1) \sigma g_A$. 
+
+The second way to see how this bias slows down growth is to focus
+directly on consumption growth itself.  The steady-state rate of
+consumption growth is 
+\begin{equation}
+\label{eq:gc}
+\clr{ g_c=\frac{\lambda \sigma \bar{n}}{1-\phi+\eta \sigma (\gamma-1)}. }
+\end{equation}
+The last term in the denominator directly reflects the negative TFP
+growth in the idea production function resulting from the tightening of
+the danger threshold.  
+
+That this slows growth can be seen by considering the following thought
+experiment.  A feasible allocation in this economy is to follow the
+equilibrium path until $z_t$ is arbitrarily small and then keep it
+constant at this value.  This results in a mortality rate that is
+arbitrarily close to zero, and the growth rate in this case will be
+arbitrarily close to $\lambda \sigma \bar{n} / (1-\phi)$, which is
+clearly greater than the equilibrium growth rate.  Rather than keep $z$
+constant at a small level, the equilibrium continues to reduce the
+danger cutoff, slowing growth.  Some numerical examples at the end of
+this paper suggest that this slowdown can be substantial.
+
+Of course, this raises a natural question: {\it Why} does the equilbrium
+allocation lead the danger threshold to fall exponentially to zero? To
+see the answer, first consider the economic interpretation of the
+mortality price $v_t$. This is the price at which firms must compensate
+households per unit of mortality that their inventions inflict. In the
+terminology of the health and risk literatures, it is therefore equal to
+the value of a statistical life (VSL).\footnote{Suppose the mortality
+  rate is $\delta_t=.001$ and $v_t=$ \$1 million. In this example, each
+  person receives \$1000 ($=v_t \delta_t$) for the mortality risk they
+  face. For every thousand people in the economy, one person will die,
+  and the total compensation paid out for this death will equal \$1
+  million.}
+
+Along the balanced growth path, the value of life satisfies
+equation~\eqref{eq:v}:
+\begin{equation}
+\label{eq:vSS}
+\clr{ u'(c_t) v_t \rightarrow \frac{\bar{u}}{\rho}. }
+\end{equation}
+This equation simply says that the value of life measured in utils is
+asymptotically equal to the present discounted value of utility: as
+consumption goes to infinity, flow utility converges to $\bar{u}$, so
+lifetime utility is just $\bar{u}/\rho$.
+
+Viewed in another way, this equation implies that the value of life
+grows faster than consumption. Given our functional form assumption for
+preferences, $u'(c_t)=c_t ^{-\gamma}$. So $c_t ^{-\gamma} v_t$ converges
+to a constant, which means that $g_v \rightarrow \gamma g_c$. Because
+$\gamma$ is larger than one, marginal utility falls rapidly, and the
+value of life rises faster than consumption.
+
+With this key piece of information, we can turn to the first-order
+condition for the choice of $z_t$ in the \hyperlink{RD}{R\&D Problem}.
+That first-order condition is
+\begin{equation}
+\label{eq:z}
+\clr{ z_t = \frac{P_{at}}{v_t N_t \bar{\delta} x_t} = \frac{\beta
+    c_t}{v_t \bar{\delta} g_{At} (1-s_t)}. }
+\end{equation}
+The first part of this equation says that the danger threshold $z_t$
+equals the ratio of two terms. The numerator is related to the marginal
+benefit of allowing more dangerous technologies to be used, which is
+proportional the price at which the additional ideas could be sold. The
+denominator is related to the marginal cost, which depends on the value
+of the additional lives that would be lost.
+
+The second equation in~\eqref{eq:z} uses the fact that $P_{at} \dot{A}_t
+= \beta C_t$ to eliminate the price of ideas. This last expression
+illustrates the key role played by the value of life. In particular, we
+saw above that $v_t/c_t$ grows over time since $\gamma>1$; the value of
+life rises faster than consumption. Because both $g_{At}$ and $1-s_t$
+are constant along the balanced growth path, the rapidly rising value of
+life leads to the exponential decline in $z_t$. More exactly, $v_t/c_t$
+grows at rate $(\gamma-1) g_c$, so this is the rate at which $z_t$
+declines, as seen in equation~\eqref{eq:gz}.
+
+What is the economic intuition? Because $\gamma$ exceeds 1, flow utility
+$u(c)$ is bounded and the marginal utility of additional consumption
+falls very rapidly.  This leads the value of life to rise faster than
+consumption. The benefit of using more dangerous technologies is that
+the economy gets more consumption. The cost is that more people die.
+Because the marginal utility of consumption falls so quickly, the costs
+of people dying exceed the benefit of increasing consumption and the
+equilibrium delivers a declining threshold for technological danger.
+Safety trumps economic growth.
+
+
+\subsection{Growth Consequences}
+
+From the standpoint of growth theory, there are some interesting
+implications of this model.  First, as we saw in the context of the
+rule-of-thumb allocation, this model is potentially a fully endogenous
+growth model.  Growth is proportional to population growth, but because
+the mortality rate is endogenous, policy changes can affect the
+mortality rate and therefore affect long-run growth, at least
+potentially.
+
+Interestingly, however, that is not the case in the equilibrium
+allocation. Instead, the mortality rate trends to zero and is unaffected
+by policy changes in the long run. Hence, the equilibrium allocation
+features semi-endogenous growth, where policy changes have long-run
+level effects but not growth effects. In particular, notice that the
+patent buyout parameter $\beta$, which influences the long-run share of
+labor going to research, is not a determinant of the long-run growth
+rate in \eqref{eq:gc}. Moreover, the invariance of long-run growth to
+policy is true even though a key preference parameter, $\gamma$,
+influences the long-run growth rate.
+
+Finally, it is interesting to consider the special case of $\phi=1$, so
+the idea production function resembles that in \cn{Romer90}. In this
+case,
+\[
+\clr{ \frac{\dot{A}_t}{A_t} = \alpha F(z_t) L_{at} ^\lambda. }
+\]
+Here, growth does not explode even in the presence of population growth
+with $\phi=1$, as can be seen in equation~\eqref{eq:gc}. Instead, the
+negative trend in $z_t$ and the fact that the mortality rate depends on
+the growth rate conspire to keep growth finite.
+
+
+\section{Extensions}
+
+The crucial assumptions driving the results have been collected together
+and labeled as \hyperlink{ASSUME}{Assumption A}. In this section, we
+illustrate how things change when these assumptions are relaxed.
+Briefly, there are two main findings. First, when we consider
+distributions with an infinite elasticity at $z=0$, the concern for
+safety exhibits an even more extreme technological bias: equilibrium
+growth slows all the way to zero asymptotically. Second, we highlight
+the role played by $\gamma>1$: if instead $\gamma<1$, then the
+equilibrium allocation looks like the rule of thumb allocation,
+selecting a constant danger threshold in steady state.
+
+
+\subsection{Relaxing A1: Letting $\eta=\infty$}
+
+Recall that $\eta$ is the elasticity of the danger distribution $F(z)$
+in the limit as $z \rightarrow 0$.  Intuitively, this parameter plays an
+important role in the model because $F(z)$ is the fraction of new ideas
+that are used in the economy, and $z$ is trending exponentially to zero.
+The term $\eta g_z = -\eta (\gamma-1) g_c$ therefore plays a key role in
+determining the growth rate of ideas along the balanced growth path:
+\begin{equation}
+\label{eq:gA}
+\clr{ g_A = \frac{\lambda \bar{n}}{1-\phi+\eta \sigma (\gamma-1)} }.
+\end{equation}
+
+Assumption A1 says that $\eta$ is finite. This is true for a number of
+distributions, including the exponential ($\eta=1$), the Weibull, and
+the gamma distributions. However, it is not true for a number of other
+distributions. Both the lognormal and the Fr\'{e}chet distributions have
+an infinite elasticity at zero, for example. Given that we have no prior
+over which of these distributions is most relevant to our problem, it is
+essential to consider carefully the case of $\eta=\infty$.
+
+In fact, it is easy to get a sense for what will happen by considering
+equation~\eqref{eq:gA}. As $\eta$ rises in this equation, the
+steady-state growth rate of the economy declines. Intuitively, a 1\%
+reduction in $z$ has a larger and larger effect on $F(z)$: an increasing
+fraction of ideas that were previously viewed as safe are now rejected
+as too dangerous. This reasoning suggests that as $\eta$ gets large, the
+steady-state growth rate falls to zero, and this intuition is confirmed
+in the following proposition:
+
+\begin{proposition}
+\proptitle{\hyperlink{proof:eta}{Equilibrium Growth with $\eta=\infty$}}
+\label{prop:eta} \hypertarget{prop:eta}{}
+Let Assumptions A2 and A3 hold, but instead of A1, assume $\eta=\infty$.
+In the competitive equilibrium, as $t \rightarrow \infty$
+\begin{enumerate}
+%\setlength{\itemsep}{3pt}  \setlength{\parskip}{0pt}
+%  \setlength{\parsep}{0pt} 
+\item The growth rate of consumption falls to zero: $\dot{c}_t/c_t \rightarrow 0$
+\item The level of consumption goes to infinity: $c_t \rightarrow \infty$
+\item The technology cutoff, the mortality rate, and the share of labor
+  devoted to research all go to zero: $z_t \rightarrow 0$, $\delta_t \rightarrow 0$, $s_t \rightarrow 0$.
+\end{enumerate}
+\end{proposition}
+
+When $\eta=\infty$, the increasingly conservative bias of technological
+change slows the exponential growth rate all the way to zero. However,
+this does not mean that growth ceases entirely. Instead, the level of
+consumption still rises to infinity, albeit at a slower and slower rate.
+
+%Thick lower tail.  A 1\% reduction in z has a larger and larger effect,
+%meaning that an increasing fraction of the remaining ideas get tossed
+%out for being too dangerous.
+
+
+\subsection{Relaxing A2: Assume $\gamma<1$}
+
+The most important assumption driving the results in this paper is that
+marginal utility diminishes quickly, in the sense that $\gamma>1$.  For
+example, the value of a year of life in year $t$ as a ratio to
+consumption is
+\[ \clr{ 
+  \frac{u(c_t)}{u'(c_t)c_t} = \bar{u} c_t^{\gamma-1}+
+  \frac{1}{1-\gamma}}. 
+\] 
+For $\gamma>1$, this rises to infinity as consumption grows. But for
+$\gamma<1$, it converges to $1/(1-\gamma)$: the value of life is
+proportional to consumption. In this case, the elasticity of utility
+with respect to consumption remains positive rather than falling to
+zero, which keeps the value of life and consumption on equal footing.
+The result is that the conservative bias of technological change
+disappears: the economy features exponential growth in consumption with
+a constant danger cutoff and a constant, positive mortality rate:
+
+\begin{proposition}
+\proptitle{\hyperlink{proof:gamma}{Equilibrium Growth with $\gamma<1$}}
+\label{prop:gamma} \hypertarget{prop:gamma}{}
+Let Assumptions A1 and A3 hold, but instead of A2, assume $\gamma<1$.
+The competitive equilibrium exhibits an asymptotic balanced growth path
+as $t \rightarrow \infty$ such that
+\[ z_t \rightarrow z^* \in (0,\infty), \ \ \delta_t \rightarrow \delta^* \in (0,\infty)  \] 
+\[ s_t \rightarrow \frac{\beta (1-\frac{\Gamma(z^*)}{z^*})}{1+\beta (1-\frac{\Gamma(z^*)}{z^*})} \]
+\[ \growth{c} \rightarrow g_c=\frac{\lambda(\bar{n}-\delta^*)}{1-\phi}= \frac{\lambda \sigma
+  \bar{n}}{1-\phi+\lambda \bar{\delta} (1-s^*) \Gamma(z^*)}\]
+\[ \frac{v_t}{c_t} \rightarrow \frac{1}{1-\gamma} \cdot
+\frac{1}{\rho+\delta^*-(1-\gamma) g_c} \]
+\end{proposition}
+
+For $\gamma<1$, the economy looks very similar to the rule of thumb
+allocation; for example, compare the growth rate to that in
+Proposition~\ref{prop:rule}. The economy features a constant danger
+cutoff as well as endogenous growth: an increase in idea purchases by
+the government (a higher $\beta$) will shift more labor into research,
+lower the mortality rate, and increase the long-run growth
+rate.\footnote{The intermediate case of log utility ($\gamma=1$)
+  requires separate consideration. In this case, the technology cutoff
+  $z_t$ still declines to zero, but this decline is slower than
+  exponential. The long-run growth rate is then precisely back to the
+  semi-endogenous growth case: $g_A = \lambda \bar{n}/(1-\phi)$. }
+
+
+\subsection{Optimality}
+
+In this section, we study the allocation of resources that maximizes a
+social welfare function. There are three reasons for this. First, it is
+important to verify that the declining danger threshold we uncovered in
+the equilibrium allocation is not a perverse feature of our equilibrium.
+Second, in the equilibrium allocation, individuals put no weight on the
+welfare of future generations; it is a purely selfish equilibrium. It is
+interesting to study the effect of deviations from this benchmark.
+Finally, our equilibrium allocation employed a particular institution
+for funding research: patent buyouts where spending on new ideas is in
+constant proportion to consumption. This institution is surely special
+(and not generally optimal), so it is important to confirm that it is
+not driving the results.  The bottom line of this extension to an
+optimal allocation is that all of the previous results hold up well.
+
+In this environment with multiple generations, there is no indisputable
+social welfare function. However, a reasonably natural choice that
+serves our purposes is to treat flows of utility from different people
+symmetrically and to discount flows across time at rate $\rho$. This
+leads to the following definition of an optimal allocation:
+
+{\color{ChadBlue}
+\begin{quote}
+{\bf {Definition}}
+An {\it optimal allocation} in this economy is a time path for $\{s_t,
+z_t\}$ that solves
+\[ \max_{\{s_t,z_t\}} \int_0 ^\infty e^{-\rho t} N_t
+u(c_t) dt \ \ \mbox{ subject to}\]
+\[ c_t =A_t ^\sigma (1-s_t) \]
+\[ \dot{A}_t = \alpha F(z_t) s_t ^\lambda N_t ^\lambda A_t ^\phi \]
+\[ \dot{N}_t = (\bar{n}-\delta_t) N_t \]
+\[ \delta_t = \bar{\delta} \alpha s_t ^\lambda N_t ^\lambda A_t
+^{\phi-1} (1-s_t) \int_0 ^{z_t} zf(z)dz. \]
+\end{quote}}
+
+The optimal allocation can then be characterized as follows.
+
+\begin{proposition}
+\proptitle{\hyperlink{proof:swf}{Optimal Balanced Growth}}
+\label{prop:swf} \hypertarget{prop:swf}{}
+Under Assumption A and the optimal allocation, the economy exhibits an
+asymptotic balanced growth path as $t \rightarrow \infty$ such that
+\[ \frac{s_t}{1-s_t} \rightarrow \frac{\lambda \sigma g_A}
+{(1+\eta)(\rho-\bar{n}+(\gamma-1)g_c) +(1-\phi)g_A - \eta \sigma g_A} \]
+\[ z_t \rightarrow 0 \mbox{ (and therefore } \delta_t \rightarrow 0
+\mbox{)}  \]
+\[ \dot{z}_t/z_t \rightarrow - (\gamma-1) g_c  \]
+\[ \dot{c}_t/c_t \rightarrow g_c, \]
+where $g_c$ and $g_A$ are the same as in the competitive equilibrium.
+\end{proposition}
+
+The key properties of the competitive equilibrium carry over into the
+optimal allocation.  In particular, the danger threshold declines
+exponentially to zero at the rate $(\gamma-1) g_c$, and this
+technological bias slows the growth rate of the economy.  The long-run
+growth rate is the same as in the equilibrium allocation.
+
+
+\section{Numerical Examples}
+
+We now report a couple of numerical examples to illustrate how this
+economy behaves along the transition path. We make some attempt to
+choose plausible parameter values and to produce simulations that have a
+``realistic'' look to them. However, the model abstracts from a number
+of important forces shaping economic growth and mortality, so the
+examples should not be taken too literally. Mainly, they will illustrate
+the extent to which growth can be slowed by concerns about the dangers
+of certain technologies.
+
+The first example features sustained exponential growth ($\eta<\infty$).
+The second assumes a distribution $F(z)$ with an elasticity that rises
+to infinity as $z$ falls to zero. According to
+Proposition~\ref{prop:eta}, this example exhibits a growth rate that
+declines to zero, even though consumption itself rises indefinitely.
+
+\begin{table}[tp]
+\caption{Benchmark Parameter Values}
+\label{tab:params} %\vspace{.15in}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cl} \hline
+ Parameter Value & Comment   \\ \hline
+$\gamma=1.5$ & Slightly more curvature than log utility \\
+$\eta=1$ & $F(z)$ is an exponential distribution  \\
+$\beta=0.02$ & Government spends 2\% of consumption on ideas  \\
+$\lambda=1$, $\phi=1/2$ & Idea production function: $\dot{A}_t = \alpha F(z_t) A_t ^{1/2} L_{at}$  \\
+$\bar{n}=.01$ & Long-run population growth rate   \\
+$\sigma=2$ & Elasticity of consumption wrt ideas  \\
+$\rho=.05$ & Rate of time preference   \\
+$\bar\delta=50$ & Mortality rate intercept   \\
+\hline
+\end{tabular*}
+\tabnote{5.5in}{Note: These are the baseline parameter values for the
+  numerical examples.}  
+\end{table}
+
+\subsection{Benchmark Example}
+
+The basic parameterization of the benchmark case is described in
+Table~\ref{tab:params}. For the curvature of marginal utility, we choose
+$\gamma=1.5$; large literatures on intertemporal choice \cnp{Hall:IES},
+asset pricing \cnp{Lucas:risk}, and labor supply \cnp{Chetty2006}
+suggest that this is a reasonable value. For $F(z)$, we assume an
+exponential distribution so that $\eta=1$; we also assume this
+distribution has a mean of one. We set $\beta=.02$: government spending
+on ideas equals 2\% of aggregate consumption. For the idea production
+function, we choose $\lambda=1$ and $\phi=1/2$, implying that in the
+absence of declines in $z_t$, the idea production function itself
+exhibits productivity growth. Finally, we assume a constant population
+growth rate of 1\% per year. The other parameter values are relatively
+unimportant and are shown in the table. Other reasonable choices for
+parameter values will yield similar results qualitatively. The model is
+solved using a reverse shooting technique, discussed in more detail in
+Appendix~\ref{app:solve}.\hypertarget{APPB}{}
+
+Figure~\ref{fig:dynamics} shows an example of the equilibrium dynamics
+that occur in this economy for the benchmark case.
+\begin{figure}[t!p]
+\caption{Equilibrium Dynamics: Benchmark Case}
+\label{fig:dynamics}
+%  \centering \includegraphics[width=3.5in]{cost2b.ps} 
+\fignote{4.5in}{Note: Simulation results for the competitive equilibrium
+using the parameter values from Table~\ref{tab:params}.  Consumption
+growth settles down to a constant positive rate, substantially lower
+than what is feasible.  The danger threshold and mortality rate
+converge to zero.}
+\end{figure} 
+The economy features a steady-state growth rate of per capita
+consumption of 1.33\%. This constant growth occurs while the danger
+threshold and the mortality rate decline exponentially to zero; both
+$z_t$ and $\delta_t$ grow at -0.67\%.
+
+Several other features of the growth dynamics are worth noting. First,
+the particular initial conditions we've chosen have the growth rate of
+consumption declining along the transition path; a different choice
+could generate a rising growth rate, although declining growth appears
+to be more consistent with the value of life in the model (more on this
+below).
+
+Second, consider total factor productivity for the idea production
+function. With $\lambda=1$, TFP is $\alpha F(z_t) A_t ^\phi$. Because
+we've assumed $\phi=1/2$, this production function has the potential to
+exhibit positive TFP growth as knowledge spillovers rise over time.
+However, a declining danger threshold can offset this. In steady state,
+TFP growth for the idea production function is $\phi g_A + \eta
+g_z=-0.33\%$. That is, even though a given number of researchers are
+generating more and more candidate ideas over time, the number that get
+implemented is actually declining because of safety considerations.
+
+Finally, the steady-state growth rate of 1.33\% can be compared to an
+alternative path. It is feasible in this economy to let the
+technology-induced mortality rate fall to some arbitrarily low level ---
+such as 1 death per billion people --- and then to keep it constant at
+that rate forever by maintaining a constant technology cutoff $\bar{z}$.
+As this constant cutoff gets arbitrarily small, the steady state growth
+rate of the economy converges to $\lambda \sigma \bar{n}/(1-\phi)$ ---
+that is, to the rule-of-thumb growth rate from
+Proposition~\ref{prop:rule}. For our choice of parameter values, this
+feasible steady-state growth rate is 4.0\% per year. That is, concerns
+for safety make it optimal in this environment to slow growth
+considerably relative to what is possible in the steady state.
+
+The reason for this, of course, is the rising value of life, shown for
+this example in Figure~\ref{fig:v}.
+\begin{figure}[tp]
+\caption{The Value of Life: Benchmark Case}
+\label{fig:v}
+%  \centering \includegraphics[width=3.5in]{cost2c.ps} 
+\fignote{4.5in}{Note: Simulation results for the competitive equilibrium
+using the parameter values from Table~\ref{tab:params}.  The value of
+life rises faster than consumption.}
+\end{figure} 
+The value of life begins in period 0 at about 100 times annual
+consumption; if we think of per capita consumption as \$30,000 per year,
+this corresponds to a value of life of \$3 million, very much in the
+range considered in the literature
+\cnp{ViscusiAldy2003,AshenfelterGreenstone2004,MurphyTopel2005}. Over
+time, the value of life relative to consumption rises exponentially at a
+rate that converges to 0.67\%, the same rate at which mortality
+declines.
+
+
+\subsection{Numerical Example When $\eta=\infty$}
+
+One element of the model that is especially hard to calibrate is the
+distribution from which technological danger is drawn, $F(z)$. The
+previous example assumed an exponential distribution so that $\eta=1$;
+in particular, the elasticity of the distribution as $z$ approaches zero
+is finite. However, this need not be the case. Both the Fr\'{e}chet and
+the lognormal distributions feature an infinite elasticity. In
+Proposition~\ref{prop:eta}, we showed that this leads the growth rate of
+consumption to converge to zero asymptotically. For this example, we
+consider the Fr\'{e}chet distribution to illustrate this result:
+$F(z)=e^{-z^{-\psi}}$ and we set $\psi=1.1$.\footnote{We require
+  $\psi>1$ so that the mean (and hence conditional expectation) exist.
+  The elasticity of this cdf is $\eta(z)=\psi z^{-\psi}$, so a small
+  value of $\psi$ leads the elasticity to rise to infinity relatively
+  slowly.} Other parameter values are unchanged from the benchmark case
+shown in Table~\ref{tab:params}, except we now set $\bar{\delta}=1$,
+which is needed to put the value of life in the right ballpark.
+
+Figure~\ref{fig:dynFrech} shows the dynamics of the economy for this example.
+\begin{figure}[tp]
+\caption{Equilibrium Dynamics: Fr\'{e}chet Case}
+\label{fig:dynFrech}
+%  \centering \includegraphics[width=3.5in]{cost4b.ps}
+  \fignote{4.5in}{Note: Dynamics when $F(z)$ is Fr\'{e}chet, so
+    $\eta=\infty$: growth slows to zero asymptotically. See notes to
+    Figure~\ref{fig:dynamics}.}
+\end{figure} 
+The growth rate of consumption now converges to zero as $\eta(z)$ gets
+larger and larger, meaning that a given decline in the danger threshold
+eliminates more and more potential ideas. Interestingly, this rising
+elasticity means that the danger threshold itself declines much more
+gradually in this example.
+
+Figure~\ref{fig:vFrech} --- with its logarithmic scale --- suggests that
+this declining consumption growth rate occurs as consumption gets
+arbitrarily high.
+\begin{figure}[tp]
+\caption{Consumption and the Value of Life: Fr\'{e}chet Case}
+\label{fig:vFrech}
+%  \centering \includegraphics[width=3.5in]{cost4c.ps} 
+\fignote{4.5in}{Note: Dynamics when $F(z)$ is Fr\'{e}chet, so
+    $\eta=\infty$: consumption still rises to infinity. See notes to
+    Figure~\ref{fig:v}.}
+\end{figure} 
+The value of life still rises faster than consumption, but the increase
+is no longer exponential.
+
+\section{Discussion and Evidence}
+
+The key mechanism at work in this paper is that the marginal utility of
+consumption falls quickly, leading the value of life to rise faster than
+consumption. This tilts the allocation in the economy away from
+consumption growth and toward preserving lives. Exactly this same
+mechanism is at work in \cn{HallJones2007}, which studies health
+spending. In that paper, $\gamma>1$ leads to an income effect: as the
+economy gets richer over time (exogenously), it is optimal to spend an
+increasing fraction of income on health care in an effort to reduce
+mortality. The same force is at work here in a very different context.
+Economic growth combines with sharply diminishing marginal utility to
+make the preservation of life a luxury good. The novel finding is that
+this force has first-order effects on the determination of economic
+growth itself.
+
+
+\subsection{Empirical Evidence on the Value of Life}
+
+Direct evidence on how the value of life has changed over time is
+surprisingly difficult to come by. Most of the empirical work in this
+literature is cross-sectional in nature; see \cn{ViscusiAldy2003} and
+\cn{AshenfelterGreenstone2004}, for example.  Two studies that do
+estimate the value of life over time are \cn{CostaKahn2004} and
+\cn{HammittLiuLiu2000}. These studies find that the value of life rises
+roughly twice as fast as income, supporting the basic mechanism in this
+paper. 
+
+Less direct evidence may be obtained by considering our changing
+concerns regarding safety.  It is a common observation that parents
+today are much more careful about the safety of their children than
+parents a generation ago.  Perhaps that is because the world is a more
+dangerous place, but perhaps it is in part our sensitivity to that
+danger which has changed.  
+
+I am searching for formal data on how safety standards have changed over
+time and how they compare across countries. One source of information
+comes from looking at accidental deaths from drowning. Perhaps to a
+greater extent than for other sources of mortality, it does not seem
+implausible that advances in health technologies may have had a small
+effect on drowning mortality: if one is underwater for more than several
+minutes, there is not much that can be done. Nevertheless, there have
+been large reductions in the mortality rate from accidental drowning in
+the United States, as shown in Figure~\ref{fig:drown}.
+\begin{figure}[tp]
+\caption{Mortality Rate from Accidental Drowning}
+\label{fig:drown}
+%\centering \includegraphics[width=3.5in]{drowning.ps} 
+\fignote{4.5in}{Note: Taken from various issues of the National Center
+  for Health Statistics, Vital Statistics Data.  Breaks in the data
+  imply different sources and possibly differences in methodology.}
+\end{figure} 
+At least in part, these are arguably due to safety improvements.
+
+% Tom Philipson (5/31/08) suggests another possible data source:
+% spending on the FDA as a share of GDP (chad: or OSHA).  Problem: it's
+% very naive to equate this spending with safety?
+
+Safety standards also appear to differ significantly across countries,
+in a way that is naturally explained by the model. While more formal
+data is clearly desirable, different standards of safety in China and
+the United States have been vividly highlighted by recent events in the
+news. Eighty-one deaths in the United States have been linked to the
+contamination of the drug heparin in Chinese factories
+\cnp{MundyWSJ2008}. In the summer of 2007, 1.5 million toys manufactured
+for Mattel by a Chinese supplier were recalled because they were
+believed to contain lead paint \cnp{SpencerYeWSJ2008}. And in an article
+on the tragic health consequences for workers producing toxic cadmium
+batteries in China, the {\it Wall Street Journal} reports
+\begin{quote}
+As the U.S. and other Western nations tightened their regulation of
+cadmium, production of nickel-cadmium batteries moved to less-developed
+countries, most of it eventually winding up in China. ``Everything was
+transferred to China because no one wanted to deal with the waste from
+cadmium,'' says Josef Daniel-Ivad, vice president for research and
+development at Pure Energy Visions, an Ontario battery company. 
+\cnp{CaseyZamiskaWSJ2007}
+\end{quote}
+
+
+\subsection{The Environmental Kuznets Curve}
+
+Another interesting application of the ideas in this paper is to the
+environmental Kuznets curve. As documented by \cn{SeldenSong94} and
+\cn{GrossmanKrueger95}, pollution exhibits a hump-shaped relationship
+with income: it initially gets worse as the economy develops but then
+gets better.  To the extent that one of the significant costs of
+pollution is higher mortality --- as the Chinese cadmium factory reminds
+us --- the declines in pollution at the upper end of the environmental
+Kuznets curve are consistent with the mechanism in this paper.  As the
+economy gets richer, the value of life rises substantially and the
+economy features an increased demand for safety.
+
+In fact, the consequences for economic growth are also potentially
+consistent with the environmental Kuznets curve. One of the ways in
+which pollution has been mitigated in the United States is through the
+development of new, cleaner technologies. Examples include scrubbers
+that remove harmful particulates from industrial exhaust and catalytic
+converters that reduce automobile emissions. Researchers can spend their
+time making existing technologies safer or inventing new technologies.
+Rising concerns for safety lead them to divert effort away from new
+inventions, which reduces the output of new varieties and slows growth.
+
+
+\section{Conclusion}
+
+Safety is a luxury good. For a large class of standard preferences used
+in applied economics, the value of life rises faster than consumption.
+The marginal utility associated with more consumption on a given day
+runs into sharp diminishing returns, and adding additional days of life
+on which to consume is a natural, welfare-enhancing response. Economic
+growth therefore leads to a disproportionate concern for safety.
+
+This force is so strong, in fact, that concerns for safety eventually
+outweigh a society's demand for economic growth.  In the economy studied
+here, safety considerations lead to a conservative bias in technological
+change that slows growth considerably relative to what could otherwise
+be achieved.  Depending on exactly how the model is specified, this can
+take the form of an overall reduction in exponential growth to a lower
+but still positive rate.  Alternatively, the exponential growth rate
+itself may be slowed to zero.  
+
+From the standpoint of the growth literature, this is a somewhat
+surprising result. Some literatures focus on the importance of finding
+policies to increase the long-run growth rate; others emphasize the
+invariance of long-run growth to policies.  Hence, the result that
+concerns for safety lead to a substantial reduction in the optimal
+growth rate is noteworthy.  
+
+The finding can also be viewed from another direction, however. A
+literature on sustainability questions the wisdom of economic growth;
+for example, see \cn{Ehrlich68}, \cn{Meadowsetal72}, and \cn{Mishan93}.
+The model studied here permits very strong concerns for safety and human
+life. And while the consequences are slower rates of economic growth ---
+even rates that slow to zero asymptotically --- it is worth noting that
+the key driving force in the model is an income effect that operates
+only as consumption goes to infinity. That is, even the most aggressive
+slowing of growth found in this paper features unbounded growth in
+individual consumption; it is never the case that all growth should
+cease entirely.
+
+This paper suggests a number of different directions for future research
+on the economics of safety. It would clearly be desirable to have
+precise estimates of the value of life and how this has changed over
+time; in particular, does it indeed rise faster than income and
+consumption? More empirical work on how safety standards have changed
+over time --- and estimates of their impacts on economic growth ---
+would also be valuable. Finally, the basic mechanism at work in this
+paper over time also applies across countries. Countries at different
+levels of income may have very different values of life and therefore
+different safety standards. This may have interesting implications for
+international trade, standards for pollution and global warming, and
+international relations more generally.
+
+
+
+
+\appendix
+\section{Appendix: Proofs of the Propositions}
+\label{app:proofs}
+
+This appendix contains outlines of the proofs of the propositions
+reported in the paper.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{proof:rule}{} 
+\Proof{prop:rule}{BGP under the Rule of Thumb Allocation} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Equations~\eqref{eq:drule} and \eqref{eq:gNrule} follow immediately from
+the setup. The growth rate of ideas then comes from taking logs and
+derivatives of both sides of the following equation, evaluated along a
+balanced growth path, and using the fact that $\delta^* = \bar{\delta}
+g_A (1-\bar{s}) \Gamma(\bar{z})$:
+\[
+\growth{A} = \alpha F(z_t) \frac{\bar{s}^\lambda N_t^{\lambda}}{A_t ^{1-\phi}}.
+\]
+\hyperlink{prop:rule}{QED}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{proof:CE}{}
+\Proof{prop:CE}{Equilibrium Balanced Growth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Solving the optimization problems that help define the equilibrium and
+making some substitutions leads to the following seven key equations
+that pin down the equilibrium values of
+$\{c_t,s_t,v_t,z_t,A_t,\delta_t,N_t\}$:
+\begin{equation}
+\label{foc:c}
+\clr{ c_t = A_t ^\sigma (1-s_t)  }
+\end{equation}
+\begin{equation}
+\label{foc:s}
+\clr{ \frac{s_t}{1-s_t} = \beta - \frac{v_t \delta_t}{c_t} = \beta (1-\frac{\Gamma(z)}{z})  }
+\end{equation}
+\begin{equation}
+\label{foc:v}
+\clr{ v_t = \frac{u(c_t)/u'(c_t)}{\rho+\delta_t+\gamma g_{ct} - g_{vt}}  }
+\end{equation}
+\begin{equation}
+\label{foc:z}
+\clr{ z_t = \frac{\beta c_t}{v_t \bar\delta g_{At} (1-s_t)}  }
+\end{equation}
+\begin{equation}
+\label{foc:A}
+\clr{ \growth{A} = \alpha F(z_t) \frac{s_t ^\lambda N_t ^\lambda}{A_t ^{1-\phi}}  }
+\end{equation}
+\begin{equation}
+\label{foc:dlta}
+\clr{ \delta_t = \bar\delta g_{At} (1-s_t) \Gamma(z_t)  }
+\end{equation}
+\begin{equation}
+\label{foc:N}
+\clr{ \growth{N} = \bar{n} - \delta_t  }
+\end{equation}
+
+We begin by studying the value of life, in equation~\eqref{foc:v}. With
+our specification of utility, $u(c_t)/u'(c_t)=\bar{u} c_t ^\gamma +
+c_t/(1-\gamma)$. Since $\gamma>1$, the growth rate of the value of life
+must be equal to $\gamma g_c$ along an (asymptotic) balanced growth
+path.  Equation~\eqref{foc:v} then implies the last result in the
+proposition, namely that $u'(c_t) v_t \rightarrow \bar{u}/\rho$.
+
+The fact that $g_v=\gamma g_c$ immediately implies from \eqref{foc:z}
+that the danger cutoff $z_t$ converges to zero along a balanced growth
+path, because $v_t/c_t$ rises to infinity with $\gamma>1$. Similarly,
+$g_z=-(\gamma-1)g_c$. And since $z_t \rightarrow 0$,
+equation~\eqref{foc:dlta} implies that $\delta_t \rightarrow 0$ as well.
+
+To get the growth rate of the economy as a whole, recall that
+\[
+\growth{A} = \alpha F(z_t) \frac{\bar{s}^\lambda N_t^{\lambda}}{A_t ^{1-\phi}}.
+\]
+Taking logs and derivatives of this equation along the balanced growth
+path, and using the fact that $\eta \equiv \lim_{z \rightarrow 0} F'(z)
+z/F(z)$ is finite from \hyperlink{ASSUME}{Assumption A}, we have
+\[
+(1-\phi) g_A = \eta g_z +\lambda \bar{n}.
+\]
+The growth rate results of the proposition then follow quickly, after we
+note that $g_c =\sigma g_A$ and $g_z=-(\gamma-1)g_c$.  For example
+\[
+ g_A = \frac{\lambda \bar{n}}{1-\phi+\eta \sigma (\gamma-1)}.
+\]
+
+Finally, the share of labor devoted to research in steady state can be
+found from equation~\eqref{foc:s}. By L'hopital's rule, $\lim
+\Gamma(z)/z = \Gamma'(0)$. Using the definition of the conditional
+expectation, one can calculate that
+\[  \Gamma'(z) = \left(1-\frac{\Gamma(z)}{z} \right) \eta(z) \]
+where $\eta(z) \equiv zF'(z)/F(z)$. Taking the limit as $ z\rightarrow
+0$ and noting that $\eta$ is finite reveals that $\lim
+\Gamma(z)/z=\eta/(1+\eta)$.  Substituting this into~\eqref{foc:s} yields
+the asmptotic value for $s$. \hyperlink{prop:CE}{QED}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{proof:eta}{}
+\Proof{prop:eta}{Equilibrium Growth with $\eta=\infty$} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+First, we show $c_t \rightarrow \infty$, by contradiction. Suppose not.
+That is, suppose $c_t \rightarrow c^* \in (0,\infty)$. The contradiction
+arises because the model has a strong force for idea growth and
+therefore consumption growth. By~\eqref{foc:v}, $v_t \rightarrow v^*$
+and \eqref{foc:s} and \eqref{foc:z} imply that $s_t \rightarrow s^* \in
+(0,1)$ and $z_t \rightarrow z^*>0$. Studying the system of differential
+equations in \eqref{foc:A}, \eqref{foc:dlta}, and \eqref{foc:N} reveals
+that
+\[
+\growth{A} \rightarrow \frac{\lambda \bar{n}}{1-\phi + \bar{\delta} (1-s^*) \Gamma(z^*)} >0.
+\]
+But since $c_t=A_t ^\sigma (1-s_t)$, this means $c_t \rightarrow
+\infty$, which contradicts our original supposition that $c_t
+\rightarrow c^*$. Therefore this supposition was wrong, and $c_t$ does
+in fact go to $\infty$.
+
+Next, we show everything else, such as $g_{ct} \rightarrow 0$.  With
+$c_t \rightarrow \infty$ and $\gamma>1$, $v_t/c_t \rightarrow \infty$
+from \eqref{foc:v}, as the value of life rises faster than consumption.
+Then \eqref{foc:z} implies that
+\[
+\frac{v_t}{c_t} = \frac{\beta}{\bar\delta z_t g_{At} (1-s_t)}
+ = \frac{\beta (1+\beta(1-\Gamma(z_t)/z_t)}{\bar\delta z_t g_{At}}
+\]
+But then $v_t/c_t \rightarrow \infty$ if and only if $z_t g_{At}
+\rightarrow 0$.
+
+First, we show that $z_t$ has to go to zero. Why? Suppose not. That is,
+suppose $z_t \rightarrow z^*$ and $g_{At} \rightarrow 0$. From
+\eqref{foc:s}, $s_t \rightarrow s^* \in (0,1)$. And then from
+\eqref{foc:dlta}, it must be that $\delta \rightarrow 0$. But then
+population grows at rate $\bar{n}$ eventually and the law of motion for
+ideas \eqref{foc:A} would lead to exponential growth in $A_t$, which is
+a contradiction. Therefore $z_t$ has to go to zero.
+
+Is it possible that $g_{At}$ does not then also go to zero? No. Notice
+that $z_t \rightarrow 0$ as rapidly as consumption (and therefore $A_t$)
+go to infinity. But the fact that $\eta = \infty$ means that $F(z_t)$
+goes to zero faster than $N_t$ and $A_t$ are rising.
+
+The fact that $s_t \rightarrow 0$ comes from \eqref{foc:s} because, as
+we show next, $\lim_{z \rightarrow 0} \Gamma(z)/z = 1$ when
+$\eta=\infty$.  By L'hopital's rule, $\lim \Gamma(z)/z = \Gamma'(0)$.
+Using the definition of the conditional expectation, one can calculate
+that 
+\[  \Gamma'(z) = \left(1-\frac{\Gamma(z)}{z} \right) \eta(z) \]
+where $\eta(z) \equiv zF'(z)/F(z)$.  Since $\eta(z) \neq 0$, we can
+divide both sides by $\eta(z)$ and consider the limit as $z \rightarrow
+0$:
+\[ \lim \frac{\Gamma'(z)}{\eta(z)} = 1 - \lim \frac{\Gamma(z)}{z}. \]
+The left-hand size is zero since $\eta(z) \rightarrow \infty$ by
+assumption, which proves the result.  
+
+The fact that $z_t \rightarrow 0$, $g_{At} \rightarrow 0$, and $s_t
+\rightarrow 0$ imply that $\delta_t \rightarrow 0$ and $g_{ct}
+\rightarrow 0$.
+\hyperlink{prop:eta}{QED}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{proof:gamma}{}
+\Proof{prop:gamma}{Equilibrium Growth with $\gamma<1$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The equilibrium with $\gamma<1$ is characterized by the same seven
+equations listed above in the proof of Proposition~\ref{prop:CE},
+equations~\eqref{foc:c} through~\eqref{foc:N}. The proof begins in the
+same way, by studying the value of life in equation~\eqref{foc:v}. With
+our specification of utility, $u(c_t)/u'(c_t)=\bar{u} c_t ^\gamma +
+c_t/(1-\gamma)$. Since $\gamma<1$, the constant term disappears
+asymptotically and the growth rate of the value of life equals $g_c$
+along an (asymptotic) balanced growth path. Equation~\eqref{foc:v} then
+implies the last result in the proposition, giving the constant ratio of
+the value of life to consumption.
+
+The fact that $v_t/c_t$ converges to a constant means that $z_t$
+converges to a nonzero value, according to equation~\eqref{foc:z}.
+Similarly, $\delta_t$ does as well, according to
+equation~\eqref{foc:dlta}. The solution for the growth rate and the
+research share are found in ways similar to those in the
+\hyperlink{proof:CE}{proof} of Proposition~\ref{prop:CE}.
+\hyperlink{prop:gamma}{QED}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypertarget{proof:swf}{}
+\Proof{prop:swf}{Optimal Balanced Growth}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The Hamiltonian for the optimal growth problem is
+\[
+H=N_t u(c_t) + \mu_{1t} \alpha F(z_t) s_t ^\lambda N_t ^\lambda A_t^\phi 
+ + \mu_{2t} N_t \left( \bar{n}-\bar{\delta} \alpha F(z_t) s_t ^\lambda N_t ^\lambda A_t^{\phi-1} 
+ (1-s_t) \int_0 ^{z_t} zf(z)dz  \right).
+\]
+Applying the Maximum Principle, the first order necessary conditions are\\
+\begin{tabular*}{\textwidth}{cc}
+\clr{$H_s=0$:} & $N_t u'(c_t) A_t ^\sigma = \mu_{1t} \lambda
+\frac{\dot{A}_t}{s_t} - \mu_{2t} N_t ( \lambda \frac{\delta_t}{s_t} - \frac{\delta_t}{1-s_t})$\\
+\clr{$H_z=0$:} & $\mu_{1t}=\mu_{2t} N_t \bar\delta z_t \cdot \frac{1-s_t}{A_t}$\\
+\clr{Arbitrage($A_t$):} & $\rho=\frac{\dot\mu_{1t}}{\mu_{1t}} + \frac{1}{\mu_{1t}}
+\left( N_t u'(c_t) \sigma \frac{c_t}{A_t} + \mu_{1t} \phi \growth{A} -
+\mu_{2t} N_t (\phi-1) \frac{\delta_t}{A_t} \right)$\\
+\clr{Arbitrage($N_t$):} & $\rho=\frac{\dot\mu_{2t}}{\mu_{2t}} +
+\frac{1}{\mu_{2t}}
+\left( u(c_t)+\mu_{1t} \lambda
+\frac{\dot{A}_t}{N_t}+\mu_{2t}(\bar{n}-\delta_t)-\mu_{2t} N_t \lambda \frac{\delta_t}{N_t} \right)$
+\end{tabular*}
+together with two transversality conditions: $\lim_{t \rightarrow
+  \infty} \mu_{1t} A_t e^{-\rho t}=0$ and $\lim_{t \rightarrow
+  \infty} \mu_{2t} N_t e^{-\rho t}=0$.
+
+Combining these first order conditions (use the first and second to get
+an expression for $\mu_{2t}$ and substitute this into the arbitrage
+equation for $N_t$) and rearranging yields:
+\begin{equation}
+\frac{ \rho-g_{\mu2t}-(\bar{n}-\delta_t) + \lambda \delta_t - \lambda g_{At}
+  \bar\delta (1-s_t) z_t  }  %numerator
+{ \lambda \bar\delta g_{At} z_t \frac{1-s_t}{s_t} -
+  \frac{\delta_t}{1-s_t}
+  (\lambda \frac{1-s_t}{s_t}-1)  }  % denominator
+= \frac{u(c_t)}{u'(c_t)c_t} \cdot (1-s_t).
+\end{equation}
+This is the key equation for determining the asymptotic behavior of
+$z_t$. In particular, along a balanced growth path, the right-hand-side
+goes to infinity for $\gamma>1$. This requires that $z_t \rightarrow 0$
+so that the denominator of the left side goes to zero (since $\delta_t
+\rightarrow 0$ as well).  Moreover, with some effort, one can show that
+the denominator on the left side grows at the same rate as $z_t$ along
+the balanced growth path, which implies that $g_z=-(\gamma-1) g_c$ from
+the usual value-of-life argument used earlier.
+
+The result for the growth rate of $A_t$ and $c_t$ follows by the same
+arguments as in the proof of Proposition~\ref{prop:CE}.  Finally, one
+can combine the first order conditions to solve for the allocation of
+research. \hyperlink{prop:swf}{QED}.
+
+\section{Appendix: Solving the Model Numerically}
+\label{app:solve}
+
+The transition dynamics of the equilibrium allocation can be studied as
+a system of four differential equations in four ``state-like'' variables
+that converge to constant values: $\ell_t$, $m_t$, $\delta_t$, and
+$w_t$. These variables, their meaning, and their steady-state values are
+displayed in Table~\ref{tab:solve}.
+\begin{table}[tp]
+\caption{Key ``State-Like'' Variables for Studying Transition Dynamics}
+\label{tab:solve}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cp{2in}c} \hline
+ Variable & Meaning & Steady-State Value  \\ \hline
+$\ell_t \equiv \frac{v_t \delta_t}{c_t}$ & Value of life $\times$ mortality 
+  & $\ell^* = \beta \cdot \frac{\eta}{1+\eta}$ \\
+$m_t \equiv g_{At}$ & Growth rate of $A_t$ & $m^*=g_A$ \\
+$\delta_t$ & Mortality rate & $\delta^*=0$ \\
+$w_t \equiv \frac{u(c_t)}{u'(c_t) c_t} \cdot \frac{c_t}{v_t}$
+  & Value of a year of life relative to mortality price
+  & $w^*=\rho$ \\
+\hline
+\end{tabular*}
+\end{table}
+
+Letting a ``hat'' denote a growth rate, the laws of motion for these
+state-like variables are
+\begin{equation}
+\hat{\ell}_t = \frac{\rho+\delta_t-w_t+(\gamma-1)\sigma
+  m_t+\lambda(\bar{n}-\delta_t)-(1-\phi)m_t }  % numerator
+ {1+k_t
+   \left(\frac{\lambda}{\beta-\ell_t}-\gamma \right)  
+   +\frac{\eta(z_t)+\theta(z_t)}{1-\theta(z_t)} } % denominator
+\end{equation}
+\begin{equation}
+\hat{m}_t = -\left(\frac{\eta(z_t)}{1-\theta(z_t)}+
+  \frac{\lambda k_t}{\beta-\ell_t} \right) \hat{\ell}_t +
+  \lambda(\bar{n}-\delta_t)-(1-\phi)m_t
+\end{equation}
+\begin{equation}
+\hat{\delta}_t=\hat{m}_t+ \left( k_t-\frac{\theta(z_t)}{1-\theta(z_t)}
+      \right) \hat{\ell}_t
+\end{equation}
+\begin{equation}
+\hat{w}_t = \hat{\delta}_t-\hat{\ell}_t+\left(\gamma-1+\frac{\delta_t}{w_t
+  \ell_t} \right) \left( \sigma m_t+k_t \hat{\ell}_t  \right)
+\end{equation}
+where $\theta(z) \equiv z\Gamma'(z)/\Gamma(z)=\eta(z) (z/\Gamma(z)-1)$
+is the elasticity of the conditional expectation function and $k_t
+\equiv \ell_t/(1+\beta-\ell_t)$. The only other variable that must be
+obtained in order to solve these differential equations is $z_t$, and it
+can be gotten as follows. First, $s_t =
+(\beta-\ell_t)/(1+\beta-\ell_t)$. With $s_t$ in hand, $\Gamma(z_t)$ can
+be recovered from the state-like variables using the mortality rate:
+$\delta_t=\bar{\delta} m_t (1-s_t) \Gamma(z_t)$. Finally, $z_t =\beta
+\Gamma(z_t)/ \ell_t$.
+
+We solve the system of differential equations using ``reverse
+shooting''; see \citet[p. 355]{Judd98}.  That is, we start from the steady
+state, consider a small departure, and then run time backwards.  For the
+results using the exponential distribution, we set $T=600$; for the
+results using the Fr\'{e}chet distribution, we set $T=12150$.
+
+An interesting feature of the numerical results is that $\hat{\ell}_t
+\approx 0$ holds even far away from the steady state. The reason is that
+$\lim_{z \rightarrow 0} \theta(z)=1$: if $z$ changes by a small percent
+starting close to zero, the conditional expectation changes by this same
+percentage. But this means that $\hat{\ell}_t \approx 0$ since there is
+a $1/(1-\theta(z_t))$ term in the denominator. But since
+$z_t/\Gamma(z_t)=\beta/\ell_t$, if $\ell_t$ does not change by much,
+then $z_t$ will not change by much either. \hyperlink{APPB}{QED}.
+
+{\small
+\bibliography{Growth.bib}
+}
+
+\end{document}

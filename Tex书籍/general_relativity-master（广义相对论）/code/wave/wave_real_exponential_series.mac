@@ -1,0 +1,24 @@
+load(ctensor);
+ct_coords:[t,x,y,z];
+f : A*( exp(k*(t-z))  );
+c2 : 3/8; /* leaves A^4 */
+c3 : 25/416; /* leaves A^6 */
+c4 : 0;
+c5 : 15211/10729472; /* leaves A^8 */
+c6 : 0;
+c7 : 0;
+c8 : 17047683/285661462528; /* leaves A^10 */
+c9 : 0;
+c10 : 43709316301/2302431387975680; /* leaves A^12 */
+xx : -(1-f+c2*f^2-c3*f^3+c4*f^4+c5*f^5+c6*f^6+c7*f^7-c8*f^8+c9*f^9+c10*f^10);
+yy : -(1+f+c2*f^2+c3*f^3+c4*f^4-c5*f^5+c6*f^6+c7*f^7-c8*f^8+c9*f^9+c10*f^10);
+lg:matrix([1,0,0,0],
+          [0,xx,0,0],
+          [0,0,yy,0],
+          [0,0,0,-1]);
+cmetric();
+ricci(false);
+taylor(ric[1,1],A,0,12);
+taylor(ric[2,2],A,0,12);
+taylor(ric[3,3],A,0,12);
+taylor(ric[4,4],A,0,12);

@@ -1,0 +1,167 @@
+\usepackage{tabu} % 用tabu代替 array
+\usepackage{multirow}
+\usepackage{zhnumber}
+\usepackage{calc,marvosym,ifthen,fancybox,url,layout}
+\setcounter{tocdepth}{1}
+
+%设定标题
+\setcounter{secnumdepth}{5}
+\titleformat{\section}{\centering\sanhao}{\hei \biaotiNR\thesection}{1em}{\hei}
+\titleformat{\subsection}{\xiaosi}{\hskip -2pt \Roman{subsection}}{1em}{\hei}
+\titleformat{\subsubsection}{\xiaosi}{\hei\zhnumber{\arabic{subsubsection}}、}{1em}{\textbf}
+\titleformat{\paragraph}{\xiaosi}{\arabic{paragraph}、}{1em}{}
+\titleformat{\subparagraph}{\xiaosi}{(\arabic{subparagraph})}{1em}{}
+%调整标题间距
+\titlespacing{\subsection}{0pt}{*0}{*0}
+\titlespacing{\subsubsection}{0pt}{*0}{*0}
+\titlespacing{\section}{0pt}{*0}{*0}
+\titlespacing{\paragraph}{0pt}{*0}{*0}
+\titlespacing{\subparagraph}{0pt}{*0}{*0}
+ 
+ %给旁注加个黑原点
+\usepackage{wasysym}
+\let\marginparNR\marginpar
+\def\marginpar#1{\marginparNR{ \CIRCLE{}   #1  }}
+
+%调整列表前后的间距
+\makeatletter
+\let\orig@Enumerate=\enumerate
+\renewenvironment{enumerate}{\orig@Enumerate}{\vspace{-0.5cm}\endlist}
+\let\orig@Itemize=\itemize
+\renewenvironment{itemize}{\orig@Itemize}{\vspace{-0.5cm}\endlist}
+\makeatother
+
+%给目录进行设定
+\titlecontents{section}[0pt]{\addvspace{5pt}\filright}
+{ \biaotiNR \thecontentslabel \hspace{0.5em} }
+{}{\titlerule*[8pt]{.}\contentspage}
+
+
+%画边框
+%\def\boxhack{\leavevmode\vbox to0pt{\vss\rlap{\hskip 320pt
+%			\setlength{\unitlength}{1pt}\cornersize*{10pt}\thicklines\fancyoval(365,675)}\vskip -680pt}}
+%\def\boxhackb{\leavevmode\vbox to0pt{\vss\rlap{\hskip 80pt
+%			\setlength{\unitlength}{1pt}\cornersize*{10pt}\thicklines\fancyoval(100,675)}\vskip -680pt}}
+
+%用tikz画边框	
+\def\biankuang{\leavevmode\vbox to0pt{
+		\vss\rlap{\hskip 0.8cm
+			\tikz \draw(4,0)--(0,0)--(0,-23.7)--(16.7,-23.7)--(16.7,0)--(4,0)--(4,-23.7);		
+		}\vskip -24cm}}
+		
+\newcolumntype{M}[1]{>{\sihao\centering\arraybackslash}m{#1}}
+\newcolumntype{N}{@{}m{0pt}@{}}
+
+\newcommand{\ktmq}[1]{\gdef\ktmqNR{#1}}%课题名称
+\newcommand{\jxmb}[1]{\gdef\jxmbNR{#1}}%教学目标
+\newcommand{\jxnd}[1]{\gdef\jxndNR{#1}}%教学难点
+\newcommand{\jxzd}[1]{\gdef\jxzdNR{#1}}%教学重点
+\newcommand{\jjff}[1]{\gdef\jjffNR{#1}}%解决方法
+\newcommand{\jxhj}[1]{\gdef\jxhjNR{#1}}%教学后记
+
+\newcommand{\jc}[1]{\gdef\jcNR{#1}}%教材
+\newcommand{\cks}[1]{\gdef\cksNR{#1}}%参考书
+\newcommand{\jsxm}[1]{\gdef\jsxmNR{#1}}%教师姓名
+\newcommand{\jyszr}[1]{\gdef\jyszrNR{#1}}%教研室主任
+
+\newcommand{\skbc}[1]{\gdef\skbcNR{#1}}%授课班次
+\newcommand{\skrq}[1]{\gdef\skrqNR{#1}}%授课日期
+\newcommand{\biaoti}[1]{\gdef\biaotiNR{#1}}%标题头
+
+\newcounter{thesectionSY}
+
+\newcommand{\makeshouye}{
+	\setcounter{thesectionSY}{\thesection+1}
+	\restoregeometry	
+	\renewcommand{\headrulewidth}{0pt}
+	\pagestyle{fancy}
+	\fancyhead{}
+	\lhead{} 
+	\chead{
+		\begin{tabular}{@{\hspace{1.2cm}}M{7cm}@{\hspace{-0.4cm}}M{8cm}N}
+			\parbox{7cm}{\linespread{0.2}
+				\makebox[7cm][s]{\kai \sanhao 湖南九嶷职业技术学院}\\ 
+				\makebox[7cm][s]{\kai \sanhao 湖南潇湘技师学院}
+			}
+			&  \makebox[6cm][s]{\rule{0pt}{0.9cm}\yihao \hei 授课课时计划}\\
+		\end{tabular}
+	}
+	
+	\begin{tabular}{M{2.2cm}|M{7cm}|M{5.8cm}N}
+		\hline
+		\multirow{2}*{
+			\rule{0pt}{1.4cm}\parbox[b]{2.cm}{
+				\centering 课\hfill 程\hfill 章\hfill 节\\及\hfill 主\hfill 题}}& \hei \biaotiNR\thethesectionSY  &  ~授~课~教~师\hfill {\kai \sanhao \underline{\jsxmNR}}\hfill 签字~~~&\\[0.6cm] \cline{2-3}
+		
+		& \hei \ktmqNR &  ~教研室主任\hfill {\fangsong \sanhao \underline{\jyszrNR}}\hfill 签字~~~&\\[0.6cm]\hline
+		
+		\multicolumn{3}{l}{
+			\begin{minipage}[t][4cm][t]{15cm}	
+				\begin{minipage}[t]{2.5cm}
+					\vspace{6pt} \hfill \sihao 教学目标：
+				\end{minipage}\hspace{0.5cm}				
+				\begin{minipage}[t][4cm][t]{12cm}
+					\vspace{0pt}\sihao \setlength{\baselineskip}{12pt} 
+					\begin{enumerate}[1、]
+						\jxmbNR
+					\end{enumerate} 
+				\end{minipage} 
+			\end{minipage}
+		}\vspace{0.3cm} &\\ \hline
+		\multicolumn{3}{l}{
+			\begin{minipage}[t][6.5cm][t]{15cm}
+				\begin{minipage}[t]{2.5cm}
+					\vspace{5pt} \hfill \sihao 教学重点：
+				\end{minipage}\hspace{0.5cm}				
+				\begin{minipage}[t]{12cm}
+					\vspace{0pt} \sihao \setlength{\baselineskip}{12pt} 
+					\begin{enumerate}[1、] \jxzdNR \end{enumerate}
+					\vspace{7pt} 
+				\end{minipage}
+				\vspace{5pt} 
+				\begin{minipage}[t]{2.5cm}
+					\vspace{6pt} \hfill \sihao 教学难点：
+				\end{minipage}\hspace{0.5cm}		
+				\begin{minipage}[t]{12cm}
+					\vspace{0pt} \sihao \setlength{\baselineskip}{12pt} 
+					\begin{enumerate}[1、] \jxndNR \end{enumerate}
+					\vspace{0pt} 	
+				\end{minipage}
+				\begin{minipage}[t]{2.5cm}
+					\vspace{6pt} \hfill \sihao 解决方法：
+				\end{minipage}\hspace{0.5cm}		
+				\begin{minipage}[t]{12cm}
+					\vspace{6pt}\sihao \jjffNR
+				\end{minipage}
+				
+			\end{minipage}
+		} &\\  \hline
+		
+		\multirow{2}*{ 	\rule{0pt}{1.4cm}\parbox[b]{2.cm}{
+				\centering 教\hfill 材\hfill 和\\参\hfill 考\hfill 书 } } & \multicolumn{2}{c}{\sihao \jcNR } &\\[0.6cm] \cline{2-3}
+		&  \multicolumn{2}{c}{\sihao \cksNR } &\\[0.6cm] \hline
+		\multirow{2}*{\rule{0pt}{1.4cm}\parbox[b]{2.cm}{
+				\centering 授\hfill 课\hfill 班\hfill 次\\授\hfill 课\hfill 日\hfill 期 } } & \multicolumn{2}{c}{ \skbcNR } &\\[0.6cm] \cline{2-3}
+		&\multicolumn{2}{c}{ \skrqNR } &\\[0.6cm] \hline
+		
+		\multicolumn{3}{l}{
+			\begin{minipage}[t]{2.5cm}
+				\vspace{0pt} \hfill \sihao 教学后记：
+			\end{minipage}\hspace{0.5cm}				
+			\begin{minipage}[t][4.5cm][t]{12cm}
+				\vspace{0pt}\sihao \jxhjNR
+			\end{minipage} 
+		}\vspace{0.3cm} &\\ \hline	
+	\end{tabular}
+	\newpage
+\newgeometry{textwidth={\textwidth-150pt},top=2cm,bottom=2cm,right=2.5cm,includehead,includefoot,marginparsep=28pt,marginparwidth=85pt}
+	
+\reversemarginpar
+\fancyhead{} 
+\chead{\kai \yihao 教 \hspace{1cm} 案 \hspace{1cm} 纸 }
+%\lhead{\boxhack \boxhackb } %边框 
+\lhead{ \biankuang}%边框 
+		
+\section{ \ktmqNR }
+}
+

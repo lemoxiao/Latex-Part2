@@ -1,0 +1,45 @@
+% cgd-common.def : Required packages and common definitions
+% vim:ft=tex
+
+\RequirePackage{amstext,amsmath}
+% wasysym contains definition of \iint, \oint, etc, which conflicts with amsmath. 
+% must exclude these definitions.
+\RequirePackage[nointegrals]{wasysym}
+
+\RequirePackage{listings,fontspec,array,longtable,units,multirow,enumitem,tabu,fancyhdr}
+\RequirePackage{unicode-math}
+\RequirePackage[top=3cm,bottom=3cm,left=3cm,right=2.2cm,headheight=20pt]{geometry}
+\RequirePackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\RequirePackage[font=small,labelfont=bf]{caption}
+
+
+%%% environ package has a bug: 
+% \NewnewEnviron only works with env defined by \NewEnviron. As suggested in
+% http://tex.stackexchange.com/questions/9771/how-to-redefine-via-environ-package-the-pmatrix-environment
+% we define \OverwriteEnviron to fix this problem
+\RequirePackage{environ}
+\newcommand{\OverwriteEnviron}[1]{%
+  \expandafter\let\csname #1\endcsname\relax%
+  \expandafter\let\csname end#1\endcsname\relax%
+  \expandafter\let\csname env@#1@parse\endcsname\relax%
+  \expandafter\let\csname env@#1@save@env\endcsname\relax%
+  \expandafter\let\csname env@#1@process\endcsname\relax%
+  \NewEnviron{#1}%
+}
+
+\RequirePackage{keyval,xparse,etoolbox}
+\RequirePackage[svgnames]{xcolor}
+\RequirePackage{tcolorbox}
+\RequirePackage{units}
+\RequirePackage{subfig,tikz}
+\RequirePackage{tabularx}
+\RequirePackage{makeidx}
+
+
+\hypersetup{colorlinks,linkcolor={DarkBlue},citecolor={DarkRed},urlcolor={Blue}}
+
+\endinput
+

@@ -1,0 +1,41 @@
+% draws vectors to show vector ops in 2D
+% AJR 2015-11-28
+\def\vecopsHook{\node[left] at (axis cs:0,0) {$O$};}
+\def\vecopsSize{footnotesize}
+
+\newcommand{\twovec}[5]{% rotate label off a little
+  \pgfmathparse{#4+(#2)*0.6+(#3)*0.08}\let\h\pgfmathresult
+  \pgfmathparse{#5+(#3)*0.6-(#2)*0.08}\let\v\pgfmathresult
+  \addplot+[thick,quiver={u=#2,v=#3},-stealth,mark=empty] coordinates {(#4,#5)};
+  \addplot+[forget plot,mark=empty] coordinates {(#2*1.05+#4,#3*1.05+#5)};
+  \edef\mytempa{\noexpand
+  \node[] at (axis cs:\h,\v) {$#1$};
+  }\mytempa }
+
+\newcommand{\vecops}[5]{\begin{tikzpicture} 
+\begin{axis}[\vecopsSize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \vecopsHook
+  \twovec{\noexpand\uv}{#2}{#3}00
+  \twovec{\noexpand\vv}{#4}{#5}00
+  \ifcase#1%0 is u and v
+  \or%1 u+v
+  \addplot[forget plot,red,thick,quiver={u=#4,v=#5},-stealth]
+  coordinates {(#2,#3)};
+  \twovec{\noexpand\uv+\noexpand\vv}{#2+#4}{#3+#5}00
+  \or%2 v+u
+  \addplot[forget plot,blue,thick,quiver={u=#2,v=#3},-stealth]
+  coordinates {(#4,#5)};
+  \twovec{}{#2+#4}{#3+#5}00
+  \or%3 u-v
+  \twovec{\noexpand\uv-\noexpand\vv}{#2-#4}{#3-#5}{#4}{#5}
+  \or%4 v-u
+  \twovec{}{#4-#2}{#5-#3}{#2}{#3}
+  \or%5 u/2
+  \twovec{}{#2/2}{#3/2}00
+  \or%6 -v
+  \twovec{}{-#4}{-#5}00
+  \fi
+\end{axis}
+\end{tikzpicture}}

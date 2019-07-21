@@ -1,0 +1,1839 @@
+\chapter{Hamilton动力学}
+
+\section{正则方程}
+
+\subsection{Legendre变换·Hamilton函数}
+
+描述理想完整系统在有势力作用下的Lagrange方程为
+\begin{equation}
+	\frac{\mathrm{d}}{\mathrm{d} t} \frac{\pl L}{\pl \dot{q}_\alpha} - \frac{\pl L}{\pl q_\alpha} = 0 \quad (\alpha = 1,2,\cdots,s)
+	\label{chapter3:Lagrange方程-重写}
+\end{equation}
+其中Lagrange函数$L$依赖于变量$\mbf{q},\dot{\mbf{q}}$和$t$，即$L = L(\mbf{q},\dot{\mbf{q}},t)$。这些变量确定了时刻和相应时刻系统的状态，即各质点的位置和速度，因此变量$\mbf{q},\dot{\mbf{q}},t$称为{\bf Lagrange变量}。
+
+系统的状态也可以利用其它参数确定，可以取为$\mbf{q},\mbf{p},t$，其中$\mbf{p}$为广义动量，定义为
+\begin{equation}
+	p_\alpha = \frac{\pl L}{\pl \dot{q}_\alpha}(\mbf{q},\dot{\mbf{q}},t)\quad (\alpha=1,2,\cdots,s)
+	\label{chapter3:广义动量的定义式}
+\end{equation}
+变量$\mbf{q},\mbf{p},t$称为{\bf Hamilton变量}。
+
+在广义势系统中，Lagrange函数可以按广义速度的次数写为
+\begin{equation*}
+	L = L_2+L_1+L_0
+\end{equation*}
+其中$L_2=T_2$\footnote{参见第\ref{chapter2:subsection-系统动能的数学结构}节。}，因此必然有
+\begin{equation}
+	\frac{\pl^2 L}{\pl \dot{q}_\alpha\pl \dot{q}_\beta} = \frac{\pl^2 T_2}{\pl \dot{q}_\alpha\pl \dot{q}_\beta} = M_{\alpha\beta}
+\end{equation}
+其中$M_{\alpha\beta}$的定义见式\eqref{chapter2:以广义坐标表示的系统动能表达式中的系数}，再考虑到式\eqref{chapter2:定常系统动能T2的正定性推论}可得其Hesse行列式非零：
+\begin{equation}
+	\det\begin{pmatrix} \dfrac{\pl^2 L}{\pl \dot{q}_\alpha\pl \dot{q}_\beta} \end{pmatrix} \neq 0
+	\label{chapter3:Lagrange函数的Hesse行列式}
+\end{equation}
+式\eqref{chapter3:Lagrange函数的Hesse行列式}说明式\eqref{chapter3:广义动量的定义式}右端的Jacobi行列式非零，根据隐函数定理可知，其中的广义速度相对广义动量可解：
+\begin{equation}
+	\dot{q}_\alpha = \phi_\alpha(\mbf{q},\mbf{p},t)\quad (\alpha=1,2,\cdots,s)
+\end{equation}
+因此Lagrange变量可以用Hamilton变量表示，反之亦然。
+
+Hamilton提出了用变量$\mbf{q},\mbf{p},t$描述的运动方程，使得Lagrange方程\eqref{chapter3:Lagrange方程-重写}变为$2n$个具有对称形式的对于导数可解的一阶方程，这些方程称为{\bf Hamilton方程}或{\bf 正则方程}，变量$\mbf{q}$和$\mbf{q}$称为{\bf 正则共轭变量}或简称为{\bf 正则变量}。
+
+首先给出上文所述变量变换的数学表述。设给定函数$X(x_1,x_2,\cdots,x_n)$，其Hesse行列式非零：
+\begin{equation}
+	\det\begin{pmatrix} \dfrac{\pl^2 X}{\pl x_i\pl x_j}\end{pmatrix} \neq 0
+	\label{chapter3:Legendre变换-前提条件}
+\end{equation}
+则从变量$x_1,x_2,\cdots,x_n$到$y_1,y_2,\cdots,y_n$的变换由下面的公式定义：
+\begin{equation}
+	y_i = \frac{\pl X}{\pl x_i} \quad (i=1,2,\cdots,n)
+	\label{chapter3:Legendre变换-新变量定义}
+\end{equation}
+而函数$X(x_1,x_2,\cdots,x_n)$的{\bf Legendre变换}是指由此确定的新函数
+\begin{equation}
+	Y = Y(y_1,y_2,\cdots,y_n) = \sum_{i=1}^n y_ix_i - X(x_1,x_2,\cdots,x_n)
+	\label{chapter3:Legendre变换}
+\end{equation}
+此处等式\eqref{chapter3:Legendre变换}右端的变量$x_i$需要借助方程\eqref{chapter3:Legendre变换-新变量定义}用新变量$y_1,y_2,\cdots,y_n$表示出来\footnote{由式\eqref{chapter3:Legendre变换-前提条件}可知式\eqref{chapter3:Legendre变换-新变量定义}右端的Jacobi行列式非零，故式\eqref{chapter3:Legendre变换-新变量定义}对$x_i(i=1,2,\cdots,n)$是可解的。}。
+
+Legendre变换有逆变换，其逆变换也是Legendre变换。即再对函数$Y(y_1,y_2,\cdots,y_n)$做一次Legendre变换，令
+\begin{equation}
+	z_i = \frac{\pl Y}{\pl y_i}\quad (i=1,2,\cdots,n)
+	\label{chapter3:Legendre变换-逆变换的新变量定义}
+\end{equation}
+其中的函数$Y$由Legendre变换式\eqref{chapter3:Legendre变换}得到，此时有
+\begin{align*}
+	z_i & = \frac{\pl}{\pl y_i}\left(\sum_{j=1}^n y_jx_j - X\right) = x_i + \sum_{j=1}^n y_j\frac{\pl x_j}{\pl y_i} - \sum_{j=1}^n \frac{\pl X}{\pl x_j} \frac{\pl x_j}{\pl y_i} \\
+	& = x_i + \sum_{j=1}^n \left(y_j-\frac{\pl X}{\pl x_j}\right) \frac{\pl x_j}{\pl y_i} = x_i \quad (i=1,2,\cdots,n)
+\end{align*}
+这说明变换式\eqref{chapter3:Legendre变换-逆变换的新变量定义}再次将$y_1,y_2,\cdots,y_n$变回$x_1,x_2,\cdots,x_n$，同时
+\begin{equation}
+	Z = \sum_{i=1}^n z_iy_i - Y = \sum_{i=1}^n x_iy_i - \left(\sum_{i=1}^n y_ix_i - X\right) = X
+\end{equation}
+也将$Y$重新变为$X$。
+
+系统的Lagrange函数$L(\mbf{q},\dot{\mbf{q}},t)$对变量$\dot{\mbf{q}}$的Legendre变换为函数
+\begin{equation}
+	H(\mbf{q},\mbf{p},t) = \sum_{\alpha=1}^s p_\alpha\dot{q}_\alpha - L(\mbf{q},\dot{\mbf{q}},t)
+	\label{chapter3:Hamilton函数定义}
+\end{equation}
+其中变量$\dot{q}_\alpha(\alpha=1,2,\cdots,s)$需要借助方程\eqref{chapter3:广义动量的定义式}用$\mbf{q},\mbf{p},t$表示出来。这个函数$H$称为{\bf Hamilton函数}。
+
+\begin{example}[Legendre变换的几何意义]
+以单个变量的情形来考虑Legendre变换的几何意义。设变量为$x$，相应地有函数$X(x)$，要求这个函数是严格的凸（或凹）函数，这样即满足了式\eqref{chapter3:Legendre变换-前提条件}\footnote{这是由于函数具有连续的二阶导数，所以在一个点的邻域内满足式\eqref{chapter3:Legendre变换-前提条件}则必然有在该邻域内二阶导数都为正或负。}，由此定义新变量$y$为
+\begin{equation*}
+	y = \dif{X}{x}
+\end{equation*}
+便得到函数$X(x)$的Legendre变换：
+\begin{equation*}
+	Y = Y(y) = xy - X(x)
+\end{equation*}
+其中$x=x(y)$。从图形上来看，$y$对应于曲线$X(x)$在$x$点处切线的斜率，而$Y(y)$则为切线在纵轴上截距的负值（如图\ref{chapter3:figure-Legendre变换的几何意义}所示）。
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}[t]{0.45\textwidth}
+\centering
+\begin{asy}
+	size(200);
+	real a,b,h;
+	real f(real x){
+		return a*(x-b)^2+h;
+	}
+	real df(real x){
+		return 2*a*(x-b);
+	}
+	a = 0.3;
+	b = 1;
+	h = 0.5;
+	real x1,x2,y1,y2;
+	x1 = -1;
+	x2 = 3.5;
+	y1 = -1;
+	y2 = 2;
+	draw(Label("$x$",EndPoint),(x1,0)--(x2,0),Arrow);
+	draw((0,y1)--(0,y2),Arrow);
+	draw(graph(f,-0.5,3),linewidth(0.8bp));
+	real x0,y0,k;
+	real l(real x){
+		return y0+k*(x-x0);
+	}
+	x0 = 2.3;
+	y0 = f(x0);
+	k = df(x0);
+	draw(graph(l,0,3),linewidth(0.8bp));
+	real l1,l2;
+	l1 = 0.3;
+	l2 = 0.2;
+	draw(Label("$Y(y)$",MidPoint,W),(-l2,0)--(-l2,l(0)),Arrows);
+	draw((-l1,l(0))--(0,l(0)));
+	draw((0,l(0))--(x0,l(0))--(x0,y0),dashed);
+	label("$x$",(x0,0),SW);
+	l2 = 0.1;
+	draw(Label(scale(.85)*rotate(-90)*"$X(x)$",MidPoint,E),(x0+l2,y0)--(x0+l2,0),Arrows);
+	l2 = 0.5;
+	draw(Label(scale(.85)*rotate(-90)*"$xy$",Relative(0.3),E),(x0+l2,y0)--(x0+l2,l(0)),Arrows);
+	l1 = 0.6;
+	draw((x0,y0)--(x0+l1,y0));
+	draw((x0,l(0))--(x0+l1,l(0)));
+\end{asy}
+\caption{Legendre变换的几何意义}
+\label{chapter3:figure-Legendre变换的几何意义}\end{minipage}
+\hspace{0.5cm}
+\begin{minipage}[t]{0.45\textwidth}
+\centering
+\begin{asy}
+	size(200);
+	real a,b,h,x0;
+	real f(real x){
+		return a*(x-b)^2+h;
+	}
+	real df(real x){
+		return 2*a*(x-b);
+	}
+	real tanl(real x){
+		return f(x0)+df(x0)*(x-x0);
+	}
+	a = 0.3;
+	b = 1;
+	h = 0.5;
+	real x1,x2,y1,y2;
+	x1 = -1.2;
+	x2 = 3.2;
+	y1 = -1;
+	y2 = 2;
+	draw(Label("$x$",EndPoint),(x1,0)--(x2,0),Arrow);
+	draw((0,y1)--(0,y2),Arrow);
+	picture pic;
+	for(x0=-1;x0<=3;x0=x0+0.1){
+		draw(pic,graph(tanl,-1,3),linewidth(0.8bp));
+	}
+	path clp;
+	clp = box((x1,y1),(x2,y2));
+	clip(pic,clp);
+	add(pic);
+	draw(graph(f,-1,3),linewidth(0.8bp)+red);
+\end{asy}
+\caption{曲线作为切线的包络线}
+\label{chapter3:figure-曲线作为切线的包络线}
+\end{minipage}
+\end{figure}
+
+在变换前，用坐标$(x,X(x))$来描述曲线，曲线是一系列这样的坐标点的集合。变换后用切线的斜率$y$和截距$Y(y)$来描述曲线，曲线是各种斜率的切线的包络线（如图\ref{chapter3:figure-曲线作为切线的包络线}所示）。这两种表述是等价的，包含了相同的信息。
+\end{example}
+
+\subsection{Hamilton正则方程}
+
+Hamilton函数$H=H(\mbf{q},\mbf{p},t)$的全微分为
+\begin{equation}
+	\mathd H = \sum_{\alpha=1}^s \frac{\pl H}{\pl p_\alpha} \mathrm{d} p_\alpha + \sum_{\alpha=1}^s \frac{\pl H}{\pl q_\alpha} \mathrm{d} q_\alpha + \frac{\pl H}{\pl t} \mathrm{d} t
+	\label{chapter3:Hamilton函数的全微分1}
+\end{equation}
+另一方面，直接对式\eqref{chapter3:Hamilton函数定义}右端求全微分可得
+\begin{align}
+	\mathd H & = \sum_{\alpha=1}^s \dot{q}_\alpha\mathd p_\alpha + \sum_{\alpha=1}^s p_\alpha\mathd \dot{q}_\alpha - \left(\sum_{\alpha=1}^s \frac{\pl L}{\pl q_\alpha}\mathd q_\alpha + \sum_{\alpha=1}^s \frac{\pl L}{\pl \dot{q}_\alpha}\mathd \dot{q}_\alpha + \frac{\pl L}{\pl t} \mathd t\right) \nonumber \\
+	& = \sum_{\alpha=1}^s \left(p_\alpha - \frac{\pl L}{\pl \dot{q}_\alpha}\right) \mathd \dot{q}_\alpha + \sum_{\alpha=1}^s \dot{q}_\alpha\mathd p_\alpha - \sum_{\alpha=1}^s \frac{\pl L}{\pl \dot{q}_\alpha}\mathd \dot{q}_\alpha - \frac{\pl L}{\pl t} \mathd t \nonumber \\
+	& = \sum_{\alpha=1}^s \dot{q}_\alpha\mathd p_\alpha - \sum_{\alpha=1}^s \frac{\pl L}{\pl \dot{q}_\alpha}\mathd \dot{q}_\alpha - \frac{\pl L}{\pl t} \mathd t
+	\label{chapter3:Hamilton函数的全微分2}
+\end{align}
+对比式\eqref{chapter3:Hamilton函数的全微分1}和式\eqref{chapter3:Hamilton函数的全微分2}可得
+\begin{equation}
+	\frac{\pl H}{\pl q_\alpha} = -\frac{\pl L}{\pl q_\alpha},\quad \frac{\pl H}{\pl p_\alpha} = \dot{q}_\alpha\quad (\alpha=1,2,\cdots,s)
+	\label{chapter3:正则方程-初步}
+\end{equation}
+以及
+\begin{equation}
+	\frac{\pl H}{\pl t} = -\frac{\pl L}{\pl t}
+	\label{chapter3:正则方程-初步推论}
+\end{equation}
+根据Lagrange方程\eqref{chapter3:Lagrange方程-重写}和式\eqref{chapter3:广义动量的定义式}可得
+\begin{equation*}
+	\dot{p}_\alpha = \frac{\pl L}{\pl q_\alpha}\quad (\alpha=1,2,\cdots,s)
+\end{equation*}
+因此由式\eqref{chapter3:正则方程-初步}可得运动方程
+\begin{equation}
+\begin{cases}
+	\dot{q}_\alpha = \dfrac{\pl H}{\pl p_\alpha} \\[1.5ex]
+	\dot{p}_\alpha = -\dfrac{\pl H}{\pl q_\alpha} 
+\end{cases}
+(\alpha = 1,2,\cdots,s)
+\label{chapter3:Hamilton正则方程}
+\end{equation}
+这些方程称为{\bf Hamilton方程}或{\bf 正则方程}。%根据式\eqref{广义能量}，Hamilton函数$H = H(\mbf{q},\mbf{p},t)$即为以正则变量表示的广义能量。
+
+顺便我们根据式\eqref{chapter3:正则方程-初步推论}可知，如果系统的Lagrange函数不显含时间，则Hamilton函数也不显含时间，反之亦然。类似地，根据式\eqref{chapter3:正则方程-初步}可知，如果系统的Lagrange函数不显含某个广义坐标，则Hamilton函数也不显含这个广义坐标，反之亦然。
+
+由正则变量张成了一个$2s$维空间，称为{\heiti 相空间}。相空间中的点称为{\heiti 相点}，代表系统的力学状态。相点在相空间运动而描述的轨道称为{\heiti 相轨道}，反映了系统状态的演化。
+
+正则方程是由$2s$个一阶常微分方程构成的常微分方程组，决定了相点的速度。给定正则变量的$2s$个初始值，可以唯一确定正则变量的时间演化关系。
+
+% \subsection{守恒定律}
+
+% 根据正则方程，如果Hamilton函数中不显含坐标$q_\alpha$，则有
+% \begin{equation*}
+	% \dot{p}_\alpha = -\frac{\pl H}{\pl q_\alpha} = 0
+% \end{equation*}
+% 即有与该坐标共轭的动量$p_\alpha$守恒。如果Hamilton函数中不显含时间$t$，则有
+% \begin{equation*}
+	% \dot{H} = \frac{\pl H}{\pl t} = 0
+% \end{equation*}
+% 即有广义能量守恒。
+
+% 在Hamilton力学中，系统的对称性表现为$H$的变换不变性。
+
+\subsection{Hamilton函数的物理意义·广义能量积分}
+
+将Hamilton函数的形式\eqref{chapter3:Hamilton函数定义}与式\eqref{广义能量}对比，可知Hamilton函数$H = H(\mbf{q},\mbf{p},t)$即为以正则变量表示的广义能量。
+
+下面考虑Hamilton函数对时间的全导数，即
+\begin{align*}
+	\frac{\mathd H}{\mathd t} & = \sum_{\alpha=1}^s \dot{p}_\alpha\frac{\pl H}{\pl p_\alpha} + \sum_{\alpha=1}^s \dot{q}_\alpha\frac{\pl H}{\pl q_\alpha} + \frac{\pl H}{\pl t} = \sum_{\alpha=1}^s \left(\frac{\pl H}{\pl q_\alpha}\frac{\pl H}{\pl p_\alpha} - \frac{\pl H}{\pl p_\alpha}\frac{\pl H}{\pl q_\alpha}\right) + \frac{\pl H}{\pl t} = \frac{\pl H}{\pl t}
+\end{align*}
+即Hamilton函数对时间的全导数恒等于它对时间的偏导数
+\begin{equation}
+	\frac{\mathd H}{\mathd t} = \frac{\pl H}{\pl t}
+\end{equation}
+
+如果Hamilton函数不显含时间，则称系统是{\bf 广义保守的}。在这种情况下有$\ds \frac{\mathd H}{\mathd t} = \frac{\pl H}{\pl t} = 0$，因此在系统的运动过程中恒有
+\begin{equation}
+	H(\mbf{q},\mbf{p}) = E
+	\label{chapter3:广义能量积分}
+\end{equation}
+其中$E$为任意常数，式\eqref{chapter3:广义能量积分}称为{\bf 广义能量积分}。
+
+\begin{example}[一维谐振子]
+写出一维谐振子的正则方程和相空间轨迹。
+\end{example}
+\begin{solution}
+一维谐振子的Lagrange函数为
+\begin{equation*}
+	L = \frac12 m\dot{q}^2 - \frac12 kq^2
+\end{equation*}
+考虑$p = \dfrac{\pl L}{\pl \dot{q}} = m\dot{q}$，则有
+\begin{equation*}
+	\dot{q} = \frac{p}{m}
+\end{equation*}
+所以Hamilton函数为
+\begin{equation*}
+	H = p\dot{q} - L = \frac{p^2}{2m} + \frac12 kq^2
+\end{equation*}
+正则方程为
+\begin{equation*}
+	\begin{cases}
+		\dot{q} = \dfrac{\pl H}{\pl p} = \dfrac{p}{m} \\[1.5ex]
+		\dot{p} = -\dfrac{\pl H}{\pl q} = -kq
+	\end{cases}
+\end{equation*}
+消去广义动量$p$即可得到系统的动力学方程
+\begin{equation*}
+	m\ddot{q} + kq = 0
+\end{equation*}
+由于
+\begin{equation*}
+	\dot{H} = \frac{\pl H}{\pl t} = 0
+\end{equation*}
+所以$H = E(\text{常数})$，相空间轨迹即为
+\begin{equation*}
+	\frac{p^2}{2mE} + \frac{q^2}{2E/k} = 1
+\end{equation*}
+是一个椭圆。
+\end{solution}
+
+\begin{example}[电磁场中带电粒子的Hamilton函数]
+求电磁场中带电粒子的Hamilton函数。
+\end{example}
+\begin{solution}
+电磁场中带电粒子的Lagrange函数为
+\begin{equation*}
+	L(\mbf{r},\dot{\mbf{r}},t) = \frac12 m \dot{\mbf{r}}^2 + e\mbf{A}(\mbf{r},t) \cdot \dot{\mbf{r}} - e\phi(\mbf{r},t)
+\end{equation*}
+则有
+\begin{equation*}
+	\mbf{p} = \frac{\pl L}{\pl \dot{\mbf{r}}} = m\dot{\mbf{r}} + e\mbf{A}
+\end{equation*}
+所以
+\begin{equation*}
+	\dot{\mbf{r}} = \frac{\mbf{p} - e\mbf{A}}{m}
+\end{equation*}
+由此可得Hamilton函数
+\begin{equation*}
+	H = \mbf{p} \cdot \dot{\mbf{r}} - L = \frac{1}{2m} (\mbf{p}-e\mbf{A})^2 + e\phi
+\end{equation*}
+\end{solution}
+
+\subsection{正则方程的矩阵形式}
+
+记
+\begin{equation*}
+	\begin{array}{l}
+	\displaystyle \mbf{\xi} = \begin{pmatrix} \mbf{q} \\ \mbf{p} \end{pmatrix} = \begin{pmatrix} q_1 \\ \vdots \\ q_s \\ p_1 \\ \vdots \\ p_s \end{pmatrix},\quad \mbf{J} = \begin{pmatrix} \mbf{0} & \mbf{I} \\ -\mbf{I} & \mbf{0} \end{pmatrix} = \begin{pmatrix} 0 & \cdots & 0 & 1 & \cdots & 0 \\ \vdots & & \vdots & \vdots & & \vdots \\ 0 & \cdots & 0 & 0 & \cdots & 1 \\ -1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & & \vdots & \vdots & & \vdots \\ 0 & \cdots & -1 & 0 & \cdots & 0 \end{pmatrix} \\
+	\displaystyle \frac{\pl H}{\pl \mbf{\xi}} = \begin{pmatrix} \dfrac{\pl H}{\pl \mbf{q}} \\[1.5ex] \dfrac{\pl H}{\pl \mbf{p}} \end{pmatrix} = \begin{pmatrix} \dfrac{\pl H}{\pl q_1} \\[1.5ex] \vdots \\[1.5ex] \dfrac{\pl H}{\pl q_s} \\[1.5ex] \dfrac{\pl H}{\pl p_1} \\[1.5ex] \vdots \\[1.5ex] \dfrac{\pl H}{\pl p_s} \end{pmatrix}
+	\end{array}
+\end{equation*}
+则正则方程可以表示为
+\begin{equation}
+	\dot{\mbf{\xi}} = \mbf{J} \frac{\pl H}{\pl \mbf{\xi}}
+	\label{正则方程的辛形式}
+\end{equation}
+式\eqref{正则方程的辛形式}称为{\heiti 正则方程的矩阵形式}或{\heiti 正则方程的辛（sympletic）形式}。
+
+可通过直接计算的方式验证矩阵$\mbf{J}$满足如下性质：
+\begin{equation}
+	\mbf{J}^2 = -\mbf{I}_{2s},\quad \mbf{J}^{\mathrm{T}} = \mbf{J}^{-1} = -\mbf{J},\quad \det \mbf{J} = 1
+\end{equation}
+
+\subsection{Whittaker方程与Jacobi方程}
+
+设系统的运动由正则方程
+\begin{equation}
+\begin{cases}
+	\dot{p}_\alpha= \dfrac{\pl H}{\pl q_\alpha} \\[1.5ex]
+	\dot{q}_\alpha= -\dfrac{\pl H}{\pl p_\alpha}
+\end{cases}
+\label{chapter3:正则方程-重写}
+\end{equation}
+描述，如果系统的Hamilton函数不显含时间，则系统存在广义能量积分
+\begin{equation}
+	H(q_1,q_2,\cdots,q_s,p_1,p_2,\cdots,p_s) = E
+	\label{chapter3:广义能量积分-重写}
+\end{equation}
+其中$E$是由初始条件确定的常数$E=H(q_1^0,q_2^0,\cdots,q_s^0,p_1^0,p_2^0,\cdots,p_s^0)$。在相空间中，方程\eqref{chapter3:广义能量积分-重写}确定了一个曲面，系统的相点必然落在该曲面上。
+
+假设在相空间的某个区域内有$\dfrac{\pl H}{\pl p_1}\neq 0$，那么在该区域内式\eqref{chapter3:广义能量积分-重写}对于$p_1$可解，记作
+\begin{equation}
+	p_1 = -K(q_1,q_2,\cdots,q_s,p_2,p_3,\cdots,p_s,E)
+	\label{chapter3:惠特克方程的分离变量}
+\end{equation}
+由此可将正则方程\eqref{chapter3:正则方程-重写}分为两组
+\begin{equation}
+\begin{cases}
+	\ds \frac{\mathd q_1}{\mathd t} = \frac{\pl H}{\pl p_1},\quad \frac{\mathd p_1}{\mathd t} = -\frac{\pl H}{\pl q_1} \\[1.5ex]
+	\ds \frac{\mathd q_\alpha}{\mathd t} = \frac{\pl H}{\pl p_\alpha},\quad \frac{\mathd p_\alpha}{\mathd t} = -\frac{\pl H}{\pl q_\alpha}\quad (\alpha=2,3,\cdots,s)
+\end{cases}
+\label{chapter3:分组的正则方程}
+\end{equation}
+根据式\eqref{chapter3:分组的正则方程}可得
+\begin{equation}
+\begin{cases}
+	\ds \frac{\mathd q_\alpha}{\mathd q_1} = \frac{\dfrac{\pl H}{\pl p_\alpha}}{\dfrac{\pl H}{\pl p_1}} \\[3.0ex]
+	\ds \frac{\mathd p_\alpha}{\mathd q_1} = -\frac{\dfrac{\pl H}{\pl q_\alpha}}{\dfrac{\pl H}{\pl p_1}} 
+\end{cases}
+(\alpha = 2,3,\cdots,s)
+\label{chapter3:惠特克方程-中间结果1}
+\end{equation}
+将式\eqref{chapter3:广义能量积分-重写}两端对$p_\alpha(\alpha=2,3,\cdots,s)$求偏导数，并注意到式\eqref{chapter3:惠特克方程的分离变量}可得
+\begin{equation}
+	\frac{\pl H}{\pl p_\alpha}-\frac{\pl H}{\pl p_1}\frac{\pl K}{\pl p_\alpha} = 0
+	\label{chapter3:惠特克方程-中间结果2}
+\end{equation}
+由式\eqref{chapter3:惠特克方程-中间结果2}可将方程组\eqref{chapter3:惠特克方程-中间结果1}中的第一式改写为
+\begin{equation*}
+	\frac{\mathd q_\alpha}{\mathd q_1} = \frac{\pl K}{\pl p_\alpha}
+\end{equation*}
+同理，将式\eqref{chapter3:广义能量积分-重写}两端对$q_\alpha(\alpha=2,3,\cdots,s)$求偏导数，并注意到式\eqref{chapter3:惠特克方程的分离变量}可得
+\begin{equation}
+	\frac{\pl H}{\pl q_\alpha}-\frac{\pl H}{\pl p_1}\frac{\pl K}{\pl q_\alpha} = 0
+	\label{chapter3:惠特克方程-中间结果3}
+\end{equation}
+由式\eqref{chapter3:惠特克方程-中间结果3}可将方程组\eqref{chapter3:惠特克方程-中间结果1}中的第二式改写为
+\begin{equation*}
+	\frac{\mathd p_\alpha}{\mathd q_1} = -\frac{\pl K}{\pl q_\alpha}
+\end{equation*}
+综上有
+\begin{equation}
+\begin{cases}
+	\ds \frac{\mathd q_\alpha}{\mathd q_1} = \frac{\pl K}{\pl p_\alpha} \\[1.5ex]
+	\ds \frac{\mathd p_\alpha}{\mathd q_1} = -\frac{\pl K}{\pl q_\alpha}
+\end{cases}
+(\alpha=2,3,\cdots,s)
+\label{chapter3:惠特克方程}
+\end{equation}
+方程\eqref{chapter3:惠特克方程}描述系统在$H=E\,\text{（常数）}$时的运动，称为{\bf Whittaker方程}。如果将方程\eqref{chapter3:惠特克方程}中的函数$K$看作Hamilton函数，将坐标$q_1$看作时间，则Whittaker方程具有正则方程的形式。
+
+积分Whittaker方程\eqref{chapter3:惠特克方程}将得到
+\begin{equation}
+\begin{cases}
+	q_\alpha = q_\alpha(q_1,E,C_1,C_2,\cdots,C_{2n-2}) \\
+	p_\alpha = p_\alpha(q_1,E,C_1,C_2,\cdots,C_{2n-2})
+\end{cases}
+\label{chapter3:惠特克方程的解1}
+\end{equation}
+其中$C_1,C_2,\cdots,C_{2n-2}$为$2n-2$个积分常数。将Whittaker方程的解\eqref{chapter3:惠特克方程的解1}代入式\eqref{chapter3:惠特克方程的分离变量}中，可得
+\begin{equation}
+	p_1 = p_1(q_1,E,C_1,C_2,\cdots,C_{2n-2})
+	\label{chapter3:惠特克方程的解2}
+\end{equation}
+式\eqref{chapter3:惠特克方程的解1}和\eqref{chapter3:惠特克方程的解2}确定了系统在相空间中相轨迹的方程。再利用正则方程\eqref{chapter3:分组的正则方程}中的第一式即可得到$q_1$与时间的关系，进而得到系统运动与时间的关系。
+
+Whittaker方程\eqref{chapter3:惠特克方程}具有与Hamilton方程相同的结构，也可以写成类似Lagrange方程的形式。设函数$K$对$p_\alpha(\alpha=2,3,\cdots,s)$的Hesse行列式非零，对其做一次Legendre变换，记作
+\begin{equation}
+	P = P(q_2,q_3,\cdots,q_s,q_2',q_3',\cdots,q_s',q_1,E) = \sum_{\alpha=2}^s q_\alpha'p_\alpha-K
+\end{equation}
+其中$q_\alpha' = \dfrac{\mathd q_\alpha}{\mathd q_1}$，式中的$p_\alpha$需要从Whittaker方程\eqref{chapter3:惠特克方程}的前$n-1$个方程
+\begin{equation*}
+	q_\alpha' = \frac{\pl K}{\pl p_\alpha}\quad (\alpha=2,3,\cdots,s)
+\end{equation*}
+中解出，用$q_1,q_2,\cdots,q_s$和$q_2',q_3',\cdots,q_s'$表示出来。
+
+利用函数$P$可将Whittaker方程\eqref{chapter3:惠特克方程}表示为下面的等价形式
+\begin{equation}
+	\frac{\mathd}{\mathd t}\frac{\pl P}{\pl q_\alpha'} - \frac{\pl P}{\pl q_\alpha} = 0\quad (\alpha=2,3,\cdots,s)
+	\label{chapter3:Jacobi方程}
+\end{equation}
+方程\eqref{chapter3:Jacobi方程}称为Jacobi方程。如果将Jacobi方程中的函数$P$看作Lagrange函数，将坐标$q_1$看作时间，则Jacobi方程具有Lagrange方程的形式。
+
+下面讨论一下函数$P$的具体形式。考虑到$q_1'\equiv 1$以及式\eqref{chapter3:惠特克方程的分离变量}可得
+\begin{equation}
+	P = \sum_{\alpha=2}^sq_\alpha'p_\alpha+p_1 = \sum_{\alpha=1}^s q_\alpha'p_\alpha = \frac{1}{\dot{q}_1} \sum_{\alpha=1}^n p_\alpha\dot{q}_\alpha = \frac{1}{\dot{q}_1}(L+H)
+\end{equation}
+如果系统是保守的，那么$L=T-V, H=T+V$，由此可得
+\begin{equation}
+	P = \frac{2T}{\dot{q}_1}
+	\label{chapter3:Jacobi方程中Jacobi函数的结构1}
+\end{equation}
+而在保守系统中有
+\begin{equation}
+	T = T_2 = \frac12 \sum_{\alpha,\beta=1}^s M_{\alpha\beta}\dot{q}_\alpha\dot{q}_\beta = \dot{q}_1^2 \left(\frac12 \sum_{\alpha,\beta=1}^s M_{\alpha\beta}q'_\alpha q'_\beta\right)
+	\label{chapter3:Jacobi方程中Jacobi函数的结构2}
+\end{equation}
+记
+\begin{equation}
+	G = \sum_{\alpha,\beta=1}^s M_{\alpha\beta}q'_\alpha q'_\beta
+\end{equation}
+保守系统有能量积分$T+V=E$，将式\eqref{chapter3:Jacobi方程中Jacobi函数的结构2}代入，可得
+\begin{equation*}
+	\dot{q}_1 = \sqrt{\frac{E-V}{G}}
+\end{equation*}
+最后，根据式\eqref{chapter3:Jacobi方程中Jacobi函数的结构1}和\eqref{chapter3:Jacobi方程中Jacobi函数的结构2}可得在保守系统中，函数$P$的形式：
+\begin{equation}
+	P = 2\sqrt{(E-V)G}
+\end{equation}
+
+\subsection{数学摆和物理摆·单自由度保守系统的运动}\label{chapter3:subsection-数学摆和物理摆·单自由度保守系统的运动}
+
+\subsubsection{相平面与摆运动的定性图像}
+
+数学摆即单摆，其广义坐标选取和位形空间已在例\ref{chapter2:example-单摆}中讨论过，而单摆的微振动近似解则在例\ref{chapter5:example-单摆}中进行过详细讨论。
+
+在重力作用下绕固定水平轴转动的刚体称为{\bf 物理摆}或{\bf 复摆}。此处取空间系$OXYZ$使得$OZ$轴与刚体转动轴重合，$OY$轴竖直向下。再取本系统$Oxyz$，使刚体质心位于$Oy$轴上，而$Oz$轴与$OZ$轴重合（见第\ref{chapter6:subsection-运动方程与约束反力}节图\ref{chapter6:刚体的定轴转动与约束反力}）。如果记刚体质心到转轴的距离为$L$，刚体的自转角设为$\psi$，则$M_z=-mgL\sin\psi$，由刚体定轴转动的运动微分方程\eqref{chapter6:定轴转动刚体动力学方程的分量形式-6}可得物理摆的运动微分方程为
+\begin{equation}
+	\ddot{\psi}+\frac{mgL}{I_{33}}\sin\psi = 0
+	\label{chapter3:物理摆的运动微分方程}
+\end{equation}
+将方程\eqref{chapter3:物理摆的运动微分方程}与单摆的运动方程
+\begin{equation*}
+	\ddot{\theta} + \frac{g}{l} \sin\theta = 0
+\end{equation*}
+比较，可知物理摆的运动规律与摆长为$l=\dfrac{I_{33}}{mL}$的单摆相同，这个摆长称为物理摆的{\bf 等价摆长}。
+
+方程\eqref{chapter3:物理摆的运动微分方程}代表了一种特殊的单自由度系统，即单自由度保守系统，其运动方程可以统一表示为
+\begin{equation}
+	\ddot{x} = f(x)
+	\label{chapter3:单自由度保守系统的运动微分方程}
+\end{equation}
+其中$x$为广义坐标，则该系统的动能和势能可以如下确定
+\begin{equation}
+	T = \frac12 \dot{x}^2 ,\quad V = -\int f(x)\mathd x
+\end{equation}
+由此可得，系统的Hamilton函数为
+\begin{equation}
+	H(x,p_x) = \frac12 p_x^2 + V(x)
+\end{equation}
+由于Hamilton函数不显含时间，故系统有广义能量积分\footnote{对于保守系统即为机械能守恒。}
+\begin{equation}
+	H(x,p_x) = \frac12 p_x^2 + V(x) = E\quad \text{（常数）}
+	\label{chapter3:单自由度保守系统的广义能量积分}
+\end{equation}
+系统的正则方程为
+\begin{equation}
+\begin{cases}
+	\dot{x} = \dfrac{\pl H}{\pl p_x} = p_x \\[1.5ex]
+	\dot{p}_x = -\dfrac{\pl H}{\pl x} = f(x)
+\end{cases}
+\label{chapter3:单自由度保守系统的正则方程}
+\end{equation}
+如果将$p_x$简记为$y$，则称平面$Oxy$为方程\eqref{chapter3:单自由度保守系统的运动微分方程}的{\bf 相平面}，在函数$f(x)$确定的相平面的每个点上，正则方程\eqref{chapter3:单自由度保守系统的正则方程}给出一个以$\dot{x},\dot{y}$为分量的向量，该向量称为{\bf 相速度}\footnote{这里的相速度指的是相点的速度，与机械波的相速度是完全不相干的量。}。正则方程\eqref{chapter3:单自由度保守系统的正则方程}的解给出了相点在相平面上的运动，并且相点的运动速度等于该点所在位置的相速度。相点在相平面上的轨道称为相轨道，在特殊情况下，相轨道可以仅由一个点构成，这样的点称为{\bf 平衡位置}，在平衡位置处相速度等于零。
+
+利用运动方程的首次积分\eqref{chapter3:单自由度保守系统的广义能量积分}很容易得到相轨道，在每一条相轨道上机械能都是常数，所以每条相轨道对应一个能量条件$H(x,y)=E$。将首次积分\eqref{chapter3:单自由度保守系统的广义能量积分}改写为
+\begin{equation}
+	y^2 = 2(E-V(x))
+	\label{chapter3:单自由度保守系统的广义能量积分-改写}
+\end{equation}
+则可看出相轨道具有下列便于分析方程\eqref{chapter3:单自由度保守系统的运动微分方程}的性质：
+\begin{enumerate}
+\item 当给定$E$时，由于方程\eqref{chapter3:单自由度保守系统的广义能量积分-改写}的左端是非负的，因此相轨迹只能分布在相平面上满足不等式$V(x)\leqslant E$的区域内，这个区域称为{\bf 可能运动区域}。
+
+\item 由正则方程\eqref{chapter3:单自由度保守系统的正则方程}可知，平衡位置位于相平面的$x$轴上，并且在平衡位置$(x_*,0)$处，势能取极值，即$\dif{V}{x}(x_*)=0$。
+
+\item 如果$x=x_*$是函数$V(x)$的极小值点（即该点$\dfrac{\mathd^2 V}{\mathd x^2}(x_*)>0$），则相平面上的点$(x_*,0)$是中心型奇点；如果$x=x_*$是函数$V(x)$的极大值点（即该点$\dfrac{\mathd^2 V}{\mathd x^2}(x_*)<0$），则相平面上的点$(x_*,0)$是鞍型奇点。
+
+\item 相轨道相对于$x$轴对称。
+
+\item 在$x$轴上非平衡位置的点，经过该点的相轨道垂直于$x$轴。这是因为在这些点$\dot{x}=0$但$\dot{y}=f(x)\neq 0$。
+\end{enumerate}
+
+根据这些性质，只要画出函数$V(x)$的曲线就可以得到方程\eqref{chapter3:单自由度保守系统的运动微分方程}所描述运动的特性。
+
+\begin{figure}[htb]
+\centering
+\begin{asy}
+	import contour;
+	size(350);
+	//
+	real alpha,beta,Vm,V0,xm;
+	real V(real x){
+		return Vm*exp(alpha*x)*cos(beta*x)+V0;
+	}
+	Vm = 1.5;
+	V0 = 1.25;
+	alpha = -0.35;
+	beta = 2;
+	xm = 4.5;
+	path p = graph(V,0.1,xm);
+	draw(p,linewidth(0.8bp));
+	real x,y;
+	x = 5;
+	y = 3;
+	draw(Label("$x$",EndPoint),(0,0)--(x,0),Arrow);
+	draw(Label("$V(x)$",EndPoint,W),(0,0)--(0,y),Arrow);
+	real E1,E2,E3,E4;
+	real xmin,xmax;
+	xmin = (atan(alpha/beta)+pi)/beta;
+	xmax = (atan(alpha/beta)+2*pi)/beta;
+	E1 = V(xmin);
+	E2 = 1.1;
+	E3 = V(xmax);
+	E4 = 2.5;
+	draw(Label("$E_1$",BeginPoint),(0,E1)--(x,E1));
+	draw(Label("$E_2$",BeginPoint),(0,E2)--(x,E2));
+	draw(Label("$E_3$",BeginPoint),(0,E3)--(x,E3));
+	draw(Label("$E_4$",BeginPoint),(0,E4)--(x,E4));
+	real H(real x,real y){
+		return 0.5*y^2+V(x);
+	}
+	picture pic;
+	real xm,ym,h;
+	xm = 4.5;
+	ym = 2.5;
+	h = -2;
+	guide[][] g = contour(H,(0,-ym),(xm,ym),new real[]{E1,E2,E4},100);
+	draw(pic,g);
+	guide[][] g = contour(H,(0,-ym),(xm,ym),new real[]{E3},200);
+	draw(pic,g);
+	draw(pic,Label("$x$",EndPoint),(0,0)--(x,0),Arrow);
+	draw(pic,Label("$y$",EndPoint,W),(0,-ym)--(0,ym),Arrow);
+	dot(pic,"$E_1$",(xmin,0),S);
+	dot(pic,(xmax,0));
+	label(pic,"$E_2$",(2.4,0.25));
+	label(pic,"$E_2$",(xm,0.6),E);
+	label(pic,"$E_3$",(2.8,.65));
+	label(pic,"$E_3$",(xm,1.2),E);
+	label(pic,"$E_4$",(1.9,2.2));
+	label(pic,"$E_4$",(xm,1.65),E);
+	add(shift(0,h)*yscale(0.6)*pic);
+	pair P4;
+	P4 = intersectionpoint(p,(0,E4)--(x,E4));
+	draw(P4--(P4.x,h),dashed);
+	pair P3;
+	P3 = intersectionpoint(p,(0,E3)--(x,E3));
+	draw(P3--(P3.x,h),dashed);
+	pair[] P2;
+	P2 = intersectionpoints(p,(0,E2)--(x,E2));
+	draw(P2[0]--(P2[0].x,h),dashed);
+	draw(P2[1]--(P2[1].x,h),dashed);
+	draw(P2[2]--(P2[2].x,h),dashed);
+	draw((xmin,V(xmin))--(xmin,h),dashed);
+	draw((xmax,V(xmax))--(xmax,h),dashed);
+\end{asy}
+\caption{势能曲线与对应的相轨道}
+\label{chapter3:figure-势函数与对应的相轨道}
+\end{figure}
+
+图\ref{chapter3:figure-势函数与对应的相轨道}中给出了势能曲线与相对应的相轨道的例子。$E=E_1$是中心型平衡位置，这个平衡位置被封闭的相轨道包围。在$E>E_3$时，相轨道不封闭，$E=E_3$是鞍型平衡位置。当$E=E_3$时，相轨道在初始时刻起于鞍点附近，当$t\to\infty$时回到鞍点，这条曲线是围绕中心型平衡位置的封闭曲线族和相应于$E>E_3$的不封闭曲线族的分界线。这种分离不同性质相轨道区域的轨道称为{\bf 分离线}。
+
+通过摆\footnote{由于单摆和物理摆的运动方程是相同的，这里将它们统称为“摆”，并统一用等效摆长表示它们的运动方程。}的运动微分方程\eqref{chapter3:物理摆的运动微分方程}可知，摆的动能和势能分别为
+\begin{equation}
+	T = \frac12\dot{\psi}^2 ,\quad V = -\frac gl\cos\psi
+\end{equation}
+如果令$\omega_0^2=\dfrac gl$，则$V=-\omega_0^2\cos\psi$，则能量积分可以写作
+\begin{equation}
+	\frac12 \dot{\psi}^2 + V = E \quad\text{（常数）}
+	\label{chapter3:摆的能量积分}
+\end{equation}
+
+\begin{figure}[htb]
+\centering
+\begin{asy}
+	import contour;
+	size(400);
+	//
+	real omega,V_sy,sy;
+	real V(real x){
+		return -V_sy*omega^2*cos(x);
+	}
+	real x,y,xm,ym;
+	x = 12.5;
+	y = 3.5;
+	V_sy = 3.75;
+	xm = 3.75*pi;
+	omega = 0.8;
+	draw(Label("$\psi$",EndPoint),(-x,0)--(x,0),Arrow);
+	draw(Label("$V(\psi)$",EndPoint,W),(0,-y)--(0,y),Arrow);
+	path p;
+	p = graph(V,-xm,xm,1000);
+	draw(p,linewidth(0.8bp));
+	draw(Label("$E=-\omega_0^2$",BeginPoint,S),(-xm-0.25,-V_sy*omega^2)--(xm+0.25,-V_sy*omega^2));
+	draw(Label("$E=\omega_0^2$",BeginPoint,N),(-xm-0.25,V_sy*omega^2)--(xm+0.25,V_sy*omega^2));
+	picture pic;
+	sy = 1.25;
+	real H(real x,real y){
+		return 0.5*y^2-omega^2*cos(x);
+	}
+	real[] h = {0,omega^2+1.5};
+	ym = 3.25;
+	draw(pic,Label("$\psi$",EndPoint),(-x,0)--(x,0),Arrow);
+	draw(pic,Label("$\dot{\psi}$",EndPoint,W),(0,-ym)--(0,ym),Arrow);
+	guide[][] g = contour(H,(-xm,-ym),(xm,ym),new real[]{omega^2},200);
+	draw(pic,g,linewidth(0.8bp));
+	guide[][] g = contour(H,(-xm,-ym),(xm,ym),h,100);
+	draw(pic,g,linewidth(0.8bp));
+	real h = -9;
+	add(shift(0,h)*yscale(sy)*pic);
+	for(int i=-3;i<=3;i=i+2){
+	draw((-i*pi,V(-i*pi))--(-i*pi,h),dashed);
+	}
+	for(int i=-2;i<=2;i=i+4){
+	draw((-i*pi,0)--(-i*pi,h),dashed);
+	}
+	real a,b;
+	a = 1.5;
+	b = 0.85;
+	for(int i=-3;i<=3;i=i+1){
+		real pos = i*pi;
+		dot((pos,h));
+		if (i==0) continue;
+		unfill(shift(pos,0)*box((-a/2,0.01),(a/2,b)));
+		if (i==-1){
+			label("$-\pi$",(pos,b/2));
+			continue;
+		}
+		if (i==1){
+			label("$\pi$",(pos,b/2));
+			continue;
+		}
+		label("$"+string(i)+"\pi$",(pos,b/2));
+	}
+\end{asy}
+\caption{摆的势函数和相轨道}
+\label{chapter3:figure-摆的势函数和相轨道}
+\end{figure}
+
+势函数$V(\psi)$的曲线和相轨道如图\ref{chapter3:figure-摆的势函数和相轨道}所示。
+\begin{enumerate}
+\item 当$E<-\omega_0^2$时，运动是不可能的；
+
+\item 当$E=-\omega_0^2$时，摆处于平衡位置刚体的质心处于可能位置中的最低点。在相平面上，这些平衡位置在相平面上相应于点$\psi=2k\pi(k=0,\pm 1,\pm 2,\cdots), \dot{\psi}=0$。这些点是中心型的，它们被表示摆振动的封闭相轨道包围，摆振动相应于满足$-\omega_0^2<E<\omega_0^2$的$E$值；
+
+\item 当$E=\omega_0^2$时，有两种可能的运动：一种是对应于摆的平衡位置，刚体质心位于可能位置的最高点，这个平衡位置在相平面上相应于点$\psi=(2k+1)\pi(k=0,\pm 1,\pm 2,\cdots), \dot{\psi}=0$，这些点是鞍型的；另一种是刚体质心再$t\to\infty$时渐进地趋于最高位置，这种渐进运动在相平面上对应于连接鞍点的曲线，这些曲线是分离线；
+
+\item 当$E>\omega_0^2$时，刚体的运动是转动，对于这种运动，角度$\phi$的绝对值单调增加，这种运动对应于相平面上下两条非封闭曲线，分离线将振动和非振动区域分开。
+\end{enumerate}
+
+\subsubsection{摆运动方程的积分}\label{chapter3:subsubsection-摆运动方程的积分}
+
+根据式\eqref{chapter3:摆的能量积分}中$E$的不同取值进行分类讨论。
+\begin{enumerate}
+\item $-\omega_0^2<E<\omega_0^2$，这种情形对应摆的振动。设此时$E=-\omega_0^2\cos\beta$，其中$\beta$是任意无量纲常数，显然$\beta$的物理意义即为摆偏离竖直方向$\psi=0$的最大角度。此时能量积分式\eqref{chapter3:摆的能量积分}可以写作
+\begin{equation}
+	\dot{\psi}^2 = 2\omega_0^2(\cos\psi-\cos\beta)
+	\label{chapter3:摆的能量积分-摆动情形}
+\end{equation}
+记$k_1=\sin\dfrac{\beta}{2}$并做变量代换
+\begin{equation*}
+	\sin\dfrac{\psi}{2}=k_1\sin u
+\end{equation*}
+则能量积分\eqref{chapter3:摆的能量积分-摆动情形}具有如下形式
+\begin{equation}
+	\dot{u}^2 = \omega_0^2(1-k_1^2\sin^2u)
+\end{equation}
+如果$t=0$时取$\psi=0$，则有
+\begin{equation}
+	\omega_0t = \int_0^u \frac{\mathd \xi}{\sqrt{1-k_1^2\sin^2\xi}} = F(\sin u,k_1)
+\end{equation}
+所以有$\sin u = \sn \omega_0t$，即
+\begin{equation}
+	\psi = 2\arcsin(k_1\sn \omega_0t)
+\end{equation}
+由于椭圆正弦函数$\sn u$的周期为$4K(k_1)$，因此摆运动的周期为
+\begin{equation}
+	T = \frac{4K(k_1)}{\omega_0}
+\end{equation}
+其级数形式为
+\begin{equation}
+	T = \frac{2\pi}{\omega_0}\left(1+\frac14k_1^2+\frac{9}{64}k_1^4+\cdots\right)
+\end{equation}
+因此可知摆角不大时，周期的近似值为$T=\dfrac{2\pi}{\omega_0}=2\pi\sqrt{\dfrac lg}$，与微振动结果相同。
+
+\item $E>\omega_0^2$，这种情形对应摆的转动。记$t=0$时$\psi=0,\dot{\psi}=\dot{\psi}_0$，于是$E=\dfrac12\dot{\psi}_0^2-\omega_0^2$，此时能量积分式\eqref{chapter3:摆的能量积分}可以写作
+\begin{equation}
+	\dot{\psi} = \dot{\psi}_0\left(1-k_2^2\sin^2\dfrac{\psi}{2}\right)
+\end{equation}
+其中$k_2^2=\dfrac{4\omega_0^2}{\dot{\psi}_0^2}$。因为$E>\omega_0^2$，所以$\dot{\psi}_0^2>4\omega_0^2$，进而有$k_2^2<1$，由此可得
+\begin{equation}
+	\frac12 \dot{\psi}_0t=F\left(\sin\dfrac{\psi}{2},k_2\right) = \int_0^{\frac{\psi}{2}}\frac{\mathd\phi}{\sqrt{1-k_2^2\sin^2\phi}}
+\end{equation}
+由此可得
+\begin{equation}
+	\psi = 2\arcsin\left(\sn\dfrac{\dot{\psi}_0}{2}t\right) = 2\am\dfrac{\dot{\psi}_0}{2}t
+\end{equation}
+当初始角速度很大时，即$\dot{\psi}_0^2\gg\omega_0^2$，此时$k_2\to 0$，此时$\sn x\to \sin x$，因此$\am x=\arcsin (\sn x)\to x$，则近似地有$\psi=\dot{\psi}_0t$，摆动接近等速。
+
+\item $E=\omega_0^2$，这种情形对应摆的渐进运动。此时能量积分式\eqref{chapter3:摆的能量积分}可以写作
+\begin{equation}
+	\dot{\psi}^2=4\omega_0^2\cos^2\frac{\psi}{2}
+\end{equation}
+如果$t=0$时，$\psi=0,\dot{\psi}>0$，则有\footnote{最后一个等号可以通过导数相等和$0$点函数值相等来验证。}
+\begin{equation}
+	\psi = 2\arcsin(\tanh \omega_0t) = -\pi+4\arctan(\mathe^{\omega_0t})
+\end{equation}
+\end{enumerate}
+
+\section{Routh方程*}
+
+\subsection{Routh函数*}
+
+在对理想完整系统的Lagrange函数做Legendre变换的过程中，也可以只将Lagrange变量的一部分转化为Hamilton变量，这种Lagrange和Hamilton的组合变量称为{\bf Routh变量}，记作
+\begin{equation*}
+	q_i,\dot{q}_i;\quad q_\alpha,p_\alpha; \quad t\quad (i=1,2,\cdots,l;\,\,\alpha=l+1,\cdots,s)
+\end{equation*}
+其中$l$是小于$s$的任意固定整数。
+
+由于Lagrange函数对全体广义速度$\dot{q}_\alpha(\alpha=1,2,\cdots,s)$的Hesse行列式非零，因此Lagrange函数对$\dot{q}_\alpha(\alpha=l+1,\cdots,s)$的Hesse行列式也非零，即
+\begin{equation*}
+	\det\begin{pmatrix} \dfrac{\pl^2L}{\pl \dot{q}_\alpha\pl \dot{q}_\beta}\end{pmatrix} \neq 0 \quad (l+1\leqslant \alpha,\beta\leqslant s)
+\end{equation*}
+广义动量仍按照原方式定义：
+\begin{equation}
+	p_\alpha=\frac{\pl L}{\pl \dot{q}_\alpha} \quad (\alpha=l+1,\cdots,s)
+	\label{chapter3:Routh方程中广义动量的定义}
+\end{equation}
+由此，{\bf Routh函数}$R=R(q_1,\cdots,q_l,q_{l+1},\cdots,q_s,\dot{q}_1,\cdots,\dot{q}_l,p_{l+1},\cdots,p_s,t)$为Lagrange函数$L$对变量$\dot{q}_{l+1},\cdots,\dot{q}_s$的Legendre变换，即
+\begin{equation}
+	R = \sum_{\alpha=l+1}^sp_\alpha\dot{q}_\alpha-L
+	\label{chapter3:Routh函数的定义}
+\end{equation}
+其中右端的$\dot{q}_\alpha(\alpha=l+1,\cdots,s)$\footnote{包括Lagrange函数$L$中的$\dot{q}_\alpha$。}需要从方程\eqref{chapter3:Routh方程中广义动量的定义}中解出，用Routh坐标$q_i,q_\alpha,\dot{q}_i,p_\alpha,t$表示。
+
+\subsection{Routh方程*}
+
+Routh函数$R=R(q_1,\cdots,q_l,q_{l+1},\cdots,q_s,\dot{q}_1,\cdots,\dot{q}_l,p_{l+1},\cdots,p_s,t)$的全微分为
+\begin{equation}
+	\mathd R = \sum_{i=1}^l \left(\frac{\pl R}{\pl q_i}\mathd q_i + \frac{\pl R}{\pl \dot{q}_i}\mathd \dot{q}_i\right) + \sum_{\alpha=l+1}^s \left(\frac{\pl R}{\pl q_\alpha} \mathd q_\alpha + \frac{\pl R}{\pl p_\alpha} \mathd p_\alpha\right) + \frac{\pl R}{\pl t}
+	\label{chapter3:Routh函数的全微分1}
+\end{equation}
+另一方面，式\eqref{chapter3:Routh函数的定义}右端的全微分为
+\begin{align}
+	\mathd R & = -\sum_{i=1}^l \left(\frac{\pl L}{\pl q_i}\mathd q_i + \frac{\pl L}{\pl \dot{q}_i} \mathd \dot{q}_i\right) + \sum_{\alpha=l+1}^s \left[-\frac{\pl L}{\pl q_\alpha}\mathd q_\alpha + \dot{q}_\alpha\mathd p_\alpha + \left(p_\alpha-\frac{\pl L}{\pl \dot{q}_\alpha}\right) \mathd \dot{q}_\alpha\right] - \frac{\pl L}{\pl t}\mathd t \nonumber \\
+	& = \sum_{i=1}^l \left(-\frac{\pl L}{\pl q_i}\mathd q_i - \frac{\pl L}{\pl \dot{q}_i} \mathd \dot{q}_i\right) + \sum_{\alpha=l+1}^s \left(-\frac{\pl L}{\pl q_\alpha}\mathd q_\alpha + \dot{q}_\alpha\mathd p_\alpha\right) - \frac{\pl L}{\pl t}\mathd t 
+	\label{chapter3:Routh函数的全微分2}
+\end{align}
+比较式\eqref{chapter3:Routh函数的全微分1}和式\eqref{chapter3:Routh函数的全微分2}即可得到
+\begin{align}
+	\frac{\pl R}{\pl q_i} = -\frac{\pl L}{\pl q_i},\quad \frac{\pl R}{\pl \dot{q}_i} = -\frac{\pl L}{\pl \dot{q}_i}\quad (i=1,2,\cdots,l) \label{chapter3:Routh函数的全微分导出式1} \\
+	\frac{\pl R}{\pl q_\alpha} = -\frac{\pl L}{\pl q_\alpha},\quad \frac{\pl R}{\pl p_\alpha} = \dot{q}_\alpha\quad (\alpha=l+1,\cdots,s) \label{chapter3:Routh函数的全微分导出式2}
+\end{align}
+以及
+\begin{equation}
+	\frac{\pl R}{\pl t} = -\frac{\pl L}{\pl t}
+	\label{chapter3:Routh函数的全微分导出式3}
+\end{equation}
+将理想完整系统的Lagrange方程分为两组：
+\begin{align}
+	& \ddt \frac{\pl L}{\pl q_i} - \frac{\pl L}{\pl q_i} = 0\quad (i=1,2,\cdots,l) \label{chapter3:Routh方程节Lagrange方程分组1} \\
+	& \ddt \frac{\pl L}{\pl q_\alpha} - \frac{\pl L}{\pl q_\alpha} = 0\quad (\alpha=l+1,\cdots,l) \label{chapter3:Routh方程节Lagrange方程分组2}
+\end{align}
+由式\eqref{chapter3:Routh函数的全微分导出式1}和式\eqref{chapter3:Routh方程节Lagrange方程分组1}可得
+\begin{equation}
+	\ddt \frac{\pl R}{\pl q_i} - \frac{\pl R}{\pl q_i} = 0\quad (i=1,2,\cdots,l) 
+	\label{chapter3:Routh方程第一部分}
+\end{equation}
+而由式\eqref{chapter3:Routh方程中广义动量的定义}、\eqref{chapter3:Routh函数的全微分导出式2}和方程\eqref{chapter3:Routh方程节Lagrange方程分组2}可得
+\begin{equation}
+\begin{cases}
+	\dot{q}_\alpha = \dfrac{\pl R}{\pl p_\alpha} \\[1.5ex]
+	\dot{p}_\alpha = -\dfrac{\pl R}{\pl q_\alpha}
+\end{cases}
+(\alpha=l+1,\cdots,s)
+\label{chapter3:Routh方程第二部分}
+\end{equation}
+方程\eqref{chapter3:Routh方程第一部分}和\eqref{chapter3:Routh方程第二部分}构成了{\bf Routh方程}，它由$l$个具有Lagrange方程结构的二阶方程\eqref{chapter3:Routh方程第一部分}和$2(s-l)$个具有Hamilton方程结构的一阶方程构成。
+
+由式\eqref{chapter3:Routh函数的全微分导出式3}可以看出，如果系统的Lagrange函数不显含时间，则其Routh函数也不显含时间。将系统的Hamilton函数表示为
+\begin{equation}
+	H = \sum_{i=1}^l p_i\dot{q}_i + \sum_{\alpha=l+1}^s p_\alpha\dot{q}_\alpha-L = \sum_{i=1}^l p_i\dot{q}_i + R
+\end{equation}
+注意到$p_i = \dfrac{\pl L}{\pl \dot{q}_i} = -\dfrac{\pl R}{\pl \dot{q}_i}$，因此此时系统的广义能量积分可以表达为
+\begin{equation}
+	R - \sum_{i=1}^l \frac{\pl R}{\pl \dot{q}_i}\dot{q}_i = E
+	\label{chapter3:用Routh函数表示的广义能量积分}
+\end{equation}
+
+\subsection{利用Routh方程对带有循环坐标的系统降阶*}
+
+设$q_\alpha(\alpha=l+1,\cdots,s)$是理想完整系统的循环坐标，那么这个系统有$s-l$个首次积分
+\begin{equation}
+	p_\alpha=\frac{\pl L}{\pl \dot{q}_\alpha} = C_\alpha \quad \text{（常数）}\quad (\alpha=l+1,\cdots,s)
+	\label{chapter3:利用Routh方程降阶-广义动量积分}
+\end{equation}
+构造Routh函数
+\begin{equation}
+	R = \sum_{\alpha=l+1}^s C_\alpha \dot{q}_\alpha - L
+\end{equation}
+其中$\dot{q}_\alpha$需要利用式\eqref{chapter3:利用Routh方程降阶-广义动量积分}用$q_i,\dot{q}_i,C_\alpha,t$表示。在这种情况下，Routh函数不包含循环坐标相应的广义速度$\dot{q}_\alpha$，即
+\begin{equation}
+	R = R(q_i,\dot{q}_i,C_\alpha,t)\quad (i=1,2,\cdots,l;\,\,\alpha=l+1,\cdots,s)
+\end{equation}
+所以Routh方程的第一部分
+\begin{equation}
+	\ddt\frac{\pl R}{\pl \dot{q}_i} - \frac{\pl R}{\pl q_i} = 0\quad (i=1,2,\cdots,l)
+\end{equation}
+描述非循环坐标随时间的变化，可以独立于Routh方程的第二部分。Routh方程的第二部分
+\begin{equation}
+	\dif{q_\alpha}{t} = \frac{\pl R}{\pl C_\alpha},\quad \dif{p_\alpha}{t} = 0\quad (\alpha=l+1,\cdots,s)
+\end{equation}
+相应于循环坐标，由此便达到了将原系统降阶的目的。
+
+在实际应用的过程中，先根据Lagrange方程或Hamilton方程列出系统的运动方程，再利用相应的循环坐标所导出的首次积分式消元得到的结果，与利用Routh方程理论所得结果是相同的。但利用Routh方程理论可以省去很多不必要的复杂运算。
+
+\begin{example}[球面摆的运动]
+设球面摆上质点的质量为$m$，摆长为$l$，广义坐标取为以悬点为原点的球坐标系的极角$\theta$和方位角$\phi$，则其Lagrange函数为
+\begin{equation}
+	L = T-V = \frac12 ml^2(\dot{\theta}^2+\sin^2\theta\dot{\phi}^2) - mgl\cos\theta
+	\label{chapter3:例-球面摆的Lagrange函数}
+\end{equation}
+由于球面摆的Lagrange函数中不显含$\phi$，故$\phi$为循环坐标，其相应的首次积分为
+\begin{equation}
+	p_\phi = \frac{\pl L}{\pl \dot{\phi}} = ml^2 \sin^2\theta\dot{\phi} = ml^2\omega_0\alpha
+\end{equation}
+式中$\omega_0 = \sqrt{\dfrac gl}$，$\alpha$为任意无量纲积分常数。由此可得
+\begin{equation}
+	\dot{\phi} = \frac{\omega_0}{\sin^2\theta}\alpha
+	\label{chapter3:例-球面摆的方位角导数}
+\end{equation}
+所以此系统的Routh函数表示为
+\begin{equation}
+	R = p_\phi\dot{\phi} - L = -\frac12 ml^2 \dot{\theta}^2 + \frac{ml^2\omega_0^2\alpha^2}{2\sin^2 \theta}+mgl\cos \theta
+	\label{chapter3:例-球面摆的Routh函数}
+\end{equation}
+系统的Routh函数不显含时间，因此系统存在广义能量积分，根据式\eqref{chapter3:用Routh函数表示的广义能量积分}可得其广义能量积分为
+\begin{equation}
+	\frac12 ml^2 \dot{\theta}^2 + \frac{ml^2\omega_0^2\alpha^2}{2\sin^2 \theta}+mgl\cos \theta = \frac12 ml^2\omega_0^2\beta
+	\label{chapter3:例-球面摆的广义能量积分}
+\end{equation}
+其中$\beta$为任意无量纲积分常数。
+
+做变量代换$u=\cos\theta$，则由式\eqref{chapter3:例-球面摆的广义能量积分}可得
+\begin{equation}
+	\frac{1}{\omega_0^2}\dot{u}^2 = (1-u^2)(\beta-2u)-\alpha^2 =: G(u)
+	\label{chapter3:球面摆的G函数}
+\end{equation}
+记$G(u)=(1-u^2)(\beta-2u)-\alpha^2=0$的三个根为$u_1,u_2,u_3$，则$G(u)$也可以写作
+\begin{equation}
+	G(u) = 2(u-u_1)(u-u_2)(u-u_3)
+	\label{chapter3:球面摆的G函数-以根来表示}
+\end{equation}
+其图像如图\ref{chapter3:figure-函数G的图像}所示。
+
+\begin{figure}[htb]
+\centering
+\begin{asy}
+	size(250);
+	//
+	real alpha,beta;
+	real f(real u){
+		return (1-u*u)*(beta-2*u)-alpha*alpha;
+	}
+	real x1,x2,y1,y2;
+	x1 = -2;
+	x2 = 2;
+	y1 = -2;
+	y2 = 2;
+	draw(Label("$u$",EndPoint),(x1,0)--(x2,0),Arrow);
+	draw(Label("$G(u)$",EndPoint,W),(0,y1)--(0,y2),Arrow);
+	alpha = 0.8;
+	beta = 0.5;
+	picture pic;
+	path p = graph(f,x1,x2);
+	draw(pic,p,linewidth(0.8bp));
+	clip(pic,box((x1,y1),(x2,y2)));
+	add(pic);
+	real l = 0.05;
+	draw(Label("$-1$",EndPoint),(-1,0)--(-1,l));
+	draw(Label("$1$",EndPoint),(1,0)--(1,l));
+	pair P[];
+	P = intersectionpoints(p,(x1,0)--(x2,0));
+	label("$u_1$",P[0],dir(-60));
+	label("$u_2$",P[1],SSW);
+	label("$u_3$",P[2],SE);
+	real um = (beta-sqrt(beta^2+12))/6;
+	draw(Label("$u_*$",BeginPoint),(um,0)--(um,f(um)),dashed);
+\end{asy}
+\caption{函数$G(u)$的图像}
+\label{chapter3:figure-函数G的图像}
+\end{figure}
+
+显然有$G(+\infty)=+\infty, G(-\infty)=-\infty$，而且$G(\pm 1) = -\alpha^2 \leqslant 0$。因为$G(u)$是连续函数，故至少其至少有一个根不小于$1$，不妨记作$u_3$。由于$u=\cos\theta$，所以球面摆的解要求在$-1\leqslant u\leqslant 1$的范围内存在$G(u)\geqslant 0$的点。由此可知，函数$G(u)$在$-1\leqslant u\leqslant 1$有两个实根$u_1,u_2$和实根$u_3\geqslant 1$。
+
+因为在实际的运动中有$G(u)\geqslant 0$，所以只需考虑$u$在区间$u_1\leqslant u \leqslant u_2$内的解，这对应摆在运动中$\theta$的变化范围为$\theta_2\leqslant \theta\leqslant \theta_1$。
+
+下面来考虑系统在不同初始条件下的运动情况，这相应于考虑系统在不同常数$\alpha,\beta$下的运动情况。由于实际的解存在需要$u_1\geqslant -1$，因此必须有$G(-1)\leqslant 0$，即
+\begin{equation*}
+	2\beta+4-\alpha^2 \leqslant 0
+\end{equation*}
+由此可知，$\beta$的取值应该满足$\beta\geqslant -2$。如果$\beta=-2$，此时$\alpha=0$，方程\eqref{chapter3:例-球面摆的广义能量积分}为
+\begin{equation*}
+	\frac12 ml^2 \dot{\theta}^2 = -mgl(1+\cos\theta)
+\end{equation*}
+这个方程只有解$\theta=\pi$，即对应于摆的竖直平衡位置。
+
+函数$G(u)$有极大值点
+\begin{equation}
+	u = u_* = \frac16(\beta-\sqrt{\beta^2+12})
+\end{equation}
+此时
+\begin{equation}
+	G(u_*) = \frac{1}{54}\left[(\beta^2+12)^{\frac32}+36\beta-\beta^3\right]-\alpha^2 =: f(\beta)-\alpha^2
+\end{equation}
+其中
+\begin{equation*}
+	f(\beta) = \frac{1}{54}\left[(\beta^2+12)^{\frac32}+36\beta-\beta^3\right]
+\end{equation*}
+实际运动必须满足$G(u_*)\geqslant 0$，即
+\begin{equation}
+	0 \leqslant \alpha^2 \leqslant f(\beta)
+\end{equation}
+参数$\alpha^2,\beta$的允许区域为图\ref{chapter3:figure-球面摆参数的允许区域}中曲线$\alpha^2=f(\beta)$与横轴所夹的阴影区域（包括边界）。
+
+\begin{figure}[htb]
+\centering
+\begin{asy}
+	size(250);
+	//
+	real x1,x2,y1,y2;
+	x1 = -4;
+	x2 = 6;
+	y1 = -2;
+	y2 = 6;
+	real f(real x){
+		return ((x^2+12)^(3/2)+36*x-x^3)/54;
+	}
+	path p;
+	p = graph(f,-2,0.95*x2)--(0.95*x2,0)--cycle;
+	fill(p,0.75white);
+	draw(Label("$\beta$",EndPoint),(x1,0)--(x2,0),Arrow);
+	draw(Label("$\alpha^2$",EndPoint,W),(0,y1)--(0,y2),Arrow);
+	label("$O$",(0,0),SE);
+	label("$-2$",(-2,0),S);
+	draw(Label("$\alpha^2=f(\beta)$",Relative(0.7),Relative(W)),graph(f,-2,x2),linewidth(0.8bp));
+\end{asy}
+\caption{参数$\alpha^2,\beta$的允许区域}
+\label{chapter3:figure-球面摆参数的允许区域}
+\end{figure}
+
+为了对摆的运动分类，考虑下面三种可能的情况：
+\begin{enumerate}
+\item $\alpha=0$。由式\eqref{chapter3:例-球面摆的方位角导数}可知，此时$\phi=\phi_0\,\text{（常数）}$，此时球面摆即为在平面$\phi=\phi_0$上的单摆，关于单摆的运动，第\ref{chapter3:subsubsection-摆运动方程的积分}节中已进行过详细讨论。
+
+\item $0<\alpha^2<f(\beta)$，这种情况下角$\theta$在区间$\theta_2\leqslant \theta\leqslant \theta_2$内变化。在以悬挂点为中心半径为$l$的球面上，$\theta=\theta_1$和$\theta=\theta_2$画出两个圆，它们位于平面$z=z_1=l\cos\theta_1$和$z=z_2=l\cos\theta_2$内。质点在两个平面所夹的球面区域上运动，交替地与两个平面相切（如图\ref{chapter3:figure-球面摆的摆动}所示）。
+
+\begin{figure}[htb]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{asy}
+	size(200);
+	//
+	pair i,j,k;
+	real r,theta0,thetam,w,theta;
+	r = 1;
+	theta0 = pi/2+pi/8;
+	thetam = pi/12;
+	w = 9;
+	i = (-sqrt(2)/4,-sqrt(14)/12);
+	j = (sqrt(14)/4,-sqrt(2)/12);
+	k = (0,2*sqrt(2)/3);
+	pair spconvert(real r,real theta,real phi){
+		return r*sin(theta)*cos(phi)*i+r*sin(theta)*sin(phi)*j+r*cos(theta)*k;
+	}
+	pair thetaphi(real phi){
+		return spconvert(r,theta0-thetam*sin(w*r*sin(theta0)*phi),phi);
+	}
+	pair phicir(real phi){
+		return spconvert(r,theta,phi);
+	}
+	draw(Label("$z$",EndPoint),r*k--1.4*r*k,Arrow);
+	theta = theta0-thetam;
+	draw(graph(phicir,-1.25,1.95),dashed);
+	label("$z=z_2$",phicir(1.9),SE);
+	theta = theta0+thetam;
+	draw(graph(phicir,-1.15,1.75),dashed);
+	label("$z=z_1$",phicir(1.75),E);
+	draw(graph(thetaphi,-1.175,1.1,200),linewidth(0.8bp)+red);
+	draw(graph(thetaphi,-1.175,1.11,200),red,Arrow);
+	draw(scale(r)*unitcircle,linewidth(0.8bp));
+\end{asy}
+\caption{球面摆的摆动}
+\label{chapter3:figure-球面摆的摆动}
+\end{minipage}
+\hspace{0.1cm}
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{asy}
+	size(180);
+	//球面摆摆动轨迹的投影
+	real p,e,w;
+	pair tra(real theta){
+		real r = p/(1-e*cos(w*theta));
+		return (r*cos(theta),r*sin(theta));
+	}
+	p = 1;
+	e = 0.6;
+	w = 1.6;
+	real thetai,thetam,rmax,rmin;
+	thetai = 0.35;
+	thetam = 3.9*pi;
+	path q = graph(tra,thetai,thetam,400);
+	path qprime = graph(tra,thetai,thetam+0.01,200);
+	draw(q,linewidth(0.8bp));
+	add(arrow(qprime,invisible,FillDraw(black),Relative(0.2)));
+	add(arrow(qprime,invisible,FillDraw(black),Relative(0.55)));
+	add(arrow(qprime,invisible,FillDraw(black),Relative(0.8)));
+	add(arrow(qprime,invisible,FillDraw(black),EndPoint));
+	rmax = p/(1-e);
+	rmin = p/(1+e);
+	draw(circle((0,0),rmax));
+	draw(circle((0,0),rmin));
+	draw(Label(scale(0.75)*"$\rho_1$",MidPoint,Relative(W)),(0,0)--rmin*dir(110),Arrow);
+	draw(Label("$\rho_2$",Relative(0.6),Relative(W)),(0,0)--rmax*dir(0),Arrow);
+	draw((0,0)--(0,rmax+0.025),invisible);
+\end{asy}
+\caption{球面摆摆动轨迹在$Oxy$平面的投影}
+\label{chapter3:figure-球面摆摆动轨迹的投影}
+\end{minipage}
+\end{figure}
+
+这种情形下，点的中间位置总是位于过悬挂点$O$的水平面以下，即$z_1+z_2<0$或者$u_1+u_2<0$。在式\eqref{chapter3:球面摆的G函数}和式\eqref{chapter3:球面摆的G函数-以根来表示}中对比$u$一次项的系数可得
+\begin{equation*}
+	2(u_1u_2+u_2u_3+u_3u_1)=-2
+\end{equation*}
+即有$u_3=-\dfrac{1+u_1u_2}{u_1+u_2}$，由于$-1<u_1<u_2<1$，所以$u_1u_2>-1$，再考虑到$u_3>0$，即有$u_1+u_2<0$。
+
+式\eqref{chapter3:例-球面摆的方位角导数}说明角$\phi$或者单调增加（当$\alpha>0$时），或者单调减少（当$\alpha<0$时）。图\ref{chapter3:figure-球面摆摆动轨迹的投影}给出了图\ref{chapter3:figure-球面摆的摆动}描述的运动轨迹在$Oxy$平面上的投影，这时平面$z=z_1$和$z=z_2$都在悬挂点下方（此时$\alpha^2>\beta$并取$\alpha>0$）。这个投影交替地与半径为$\rho_1=l\sin\theta_1$和$\rho_2=l\sin\theta_2$的两个圆相切。
+
+作变量代换
+\begin{equation*}
+	u=u_1+(u_2-u_1)\sin^2v
+\end{equation*}
+方程\eqref{chapter3:球面摆的G函数}变为
+\begin{equation}
+	\dot{v}^2=\frac{\omega_0^2}{2}(u_3-u_1)(1-k^2\sin^2v)
+	\label{chapter3:摆动情形的球面摆运动微分方程}
+\end{equation}
+其中
+\begin{equation}
+	k^2=\frac{u_2-u_1}{u_3-u_1}\quad (0\leqslant k^2\leqslant 1)
+\end{equation}
+取$u=u_1$的时刻为初始时刻，则积分方程\eqref{chapter3:摆动情形的球面摆运动微分方程}可得
+\begin{equation}
+	\omega_0\sqrt{\frac{u_3-u_1}{2}}t = \int_0^v\frac{\mathd w}{\sqrt{1-k^2\sin^2w}} = F(\sin v,k)
+\end{equation}
+由此可得
+\begin{equation*}
+	\sin v = \sn \left(\omega_0\sqrt{\frac{u_3-u_1}{2}}t\right)
+\end{equation*}
+即
+\begin{equation}
+	u = u_1+(u_2-u_1)\sn^2\left(\omega_0\sqrt{\frac{u_3-u_1}{2}}t\right)=u_1+(u_2-u_1)\sn^2\tau
+\end{equation}
+其中$\tau=\omega_0\sqrt{\dfrac{u_3-u_1}{2}}t$。由于椭圆函数$\sn \tau$的周期为$4K(k)$，故$\sn^2\tau$的周期为$2K(k)$。由此可知，当$\tau=2nK(k)$时，有$u=\cos\theta=u_1$，当$\tau=(2n+1)K(k)$时，有$u=\cos\theta=u_2$，即角$\theta$在$\theta_1$和$\theta_2$之间周期振动，其振动周期为
+\begin{equation}
+	T = \frac{2\sqrt{2}K(k)}{\omega_0\sqrt{u_3-u_1}}
+\end{equation}
+当$\theta$作为时间的函数求出之后，积分方程\eqref{chapter3:例-球面摆的方位角导数}可得$\phi(t)$。
+
+需要注意的是，虽然球面摆$\theta$角的变化是周期的，但是由于在一个$\theta$的周期内，$\phi$角的改变量与$2\pi$的比值不一定是有理数，因此球面摆有可能永远也没有办法回到其初始位置。
+
+\item $\alpha^2=f(\beta)$。在这种情况下多项式$G(u)$的根$u_1=u_2=u_*<0$，问题变为圆锥摆。角$\theta$在运动过程中是常数$\theta=\theta_*=\arccos u_*>\dfrac{\pi}{2}$，质点沿着平面$z=z_*=l\cos\theta_*<0$内半径为$l\sin\theta_*$的圆周运动。
+\end{enumerate}
+\end{example}
+
+\section{非完整系统的运动方程*}
+
+\subsection{Lagrange乘子法求解线性非完整系统*}
+
+设非完整系统有$k$个完整约束和$k'$个线性不可积运动约束，由式\eqref{chapter2:完整约束的一般形式}和\eqref{chapter2:非完整约束的一般形式}给出：
+\begin{subnumcases}{}
+	f_j(\mbf{r}_1,\mbf{r}_2,\cdots,\mbf{r}_n,t)=0 \quad (j=1,2,\cdots,k) \label{chapter2:完整约束的一般形式-重写} \\
+	\sum_{i=1}^n \mbf{A}_{ji} \cdot \mbf{v}_i + A_{j0} = 0 \quad (j=1,2,\cdots,k') \label{chapter2:非完整约束的一般形式-重写}
+\end{subnumcases}
+根据完整约束引入广义坐标$q_\alpha(\alpha = 1,2,\cdots,s=3n-k)$消去完整约束，利用广义坐标
+可以将线性非完整约束\eqref{chapter2:非完整约束的一般形式-重写}表示为式\eqref{chapter2:用广义坐标表示的非完整约束}的形式：
+\begin{align}
+	\sum_{\alpha=1}^s B_{j\alpha}(\mbf{q},t) \dot{q}_\alpha + B_{j0}(\mbf{q},t) = 0 \quad (j=1,2,\cdots,k')
+	\label{chapter2:用广义坐标表示的非完整约束-重写}
+\end{align}
+其中的系数$B_{j\alpha}$和$B_{j0}$根据式\eqref{chapter2:用广义坐标表示的非完整约束-系数}得到，即
+\begin{equation}
+	B_{j\alpha}(\mbf{q},t) = \sum_{i=1}^n \mbf{A}_{ji} \cdot \frac{\pl \mbf{r}_i}{\pl q_\alpha}, \quad B_{j0}(\mbf{q},t) = \sum_{i=1}^n \mbf{A}_{ji} \cdot \frac{\pl \mbf{r}_i}{\pl t} + A_{j0}
+	\label{chapter2:用广义坐标表示的非完整约束-系数-重写}
+\end{equation}
+式\eqref{chapter2:用广义坐标表示的非完整约束-重写}可以用广义虚位移表示为式\eqref{chapter2:非完整约束的虚位移表示}，即
+\begin{align}
+	\sum_{\alpha=1}^s B_{j\alpha}(\mbf{q},t) \delta q_\alpha = 0 \quad (j=1,2,\cdots,k')
+	\label{chapter2:非完整约束的虚位移表示-重写}
+\end{align}
+根据广义坐标形式的动力学普遍方程\eqref{chapter2:广义坐标形式的动力学普遍方程}可有
+\begin{equation}
+	\sum_{\alpha=1}^s \left(\ddt\frac{\pl T}{\pl \dot{q}_\alpha} - \frac{\pl T}{\pl q_\alpha} - Q_\alpha\right) \delta q_\alpha = 0
+	\label{chapter2:非完整系统的动力学普遍方程}
+\end{equation}
+但此处式\eqref{chapter2:非完整系统的动力学普遍方程}中的$s$个广义虚位移之间并不是相互独立的，它们之间由$k'$个运动约束方程\eqref{chapter2:非完整约束的虚位移表示-重写}相联系。引入$k'$个不定乘子$\lambda_j(t)$，将其分别与方程\eqref{chapter2:非完整约束的虚位移表示-重写}相乘，并与广义坐标形式的动力学普遍方程\eqref{chapter2:非完整系统的动力学普遍方程}相减可得
+\begin{equation}
+	\sum_{\alpha=1}^s \left(\ddt\frac{\pl T}{\pl \dot{q}_\alpha} - \frac{\pl T}{\pl q_\alpha} - Q_\alpha - \sum_{j=1}^{k'} \lambda_j B_{j\alpha}\right) \delta q_\alpha = 0
+	\label{chapter2:非完整系统带有乘子的动力学普遍方程}
+\end{equation}
+在式\eqref{chapter2:非完整系统带有乘子的动力学普遍方程}中的$s$个广义虚位移中，只有$f=s-k'=3n-k-k'$个是相互独立的，而此处引入的$k'$个不定乘子是可以任意取值的，那么总是可以选择这样的不定乘子$\lambda_j(t)$，使得式\eqref{chapter2:非完整系统带有乘子的动力学普遍方程}中前$k'$个广义虚位移的系数为零，那么这样式\eqref{chapter2:非完整系统带有乘子的动力学普遍方程}就只剩下相互独立的$f=s-k'$个广义虚位移，它们的系数必须为零。综上可得非完整系统的运动微分方程为
+\begin{equation}
+\begin{cases}
+	\ds \ddt \frac{\pl T}{\pl \dot{q}_\alpha} - \frac{\pl T}{\pl q_\alpha} = Q_\alpha + \sum_{j=1}^{k'} \lambda_j B_{j\alpha}& (\alpha = 1,2,\cdots,s) \\[1.5ex]
+	\ds \sum_{\alpha=1}^s B_{j\alpha} \dot{q}_\alpha + B_{j0} = 0 & (j = 1,2,\cdots,k')
+\end{cases}
+\label{chapter2:非完整系统带有约束乘子的运动微分方程}
+\end{equation}
+如果系统有广义势$U=U(\mbf{q},\dot{\mbf{q}},t)$则有
+\begin{equation}
+	Q_\alpha = \ddt\frac{\pl U}{\pl \dot{q}_\alpha} - \frac{\pl U}{\pl q_\alpha}\quad (\alpha=1,2,\cdots,s)
+\end{equation}
+由此可将系统方程\eqref{chapter2:非完整系统带有约束乘子的运动微分方程}利用Lagrange函数改写为
+\begin{equation}
+\begin{cases}
+	\displaystyle \frac{\mathrm{d}}{\mathrm{d} t} \frac{\pl L}{\pl \dot{q}_\alpha} - \frac{\pl L}{\pl q_\alpha} = \sum_{j=1}^{k'} \lambda_j B_{j\alpha} & (\alpha = 1,2,\cdots,s) \\[1.5ex]
+	\displaystyle \sum_{\alpha=1}^s B_{j\alpha} \dot{q}_\alpha + B_{j0} = 0 & (j = 1,2,\cdots,k')
+\end{cases}
+\end{equation}
+
+\begin{example}[直立圆盘在水平面上的纯滚动]\label{chapter3:example-非完整系例题1}
+\begin{figure}[htb]
+\centering
+\begin{asy}
+	size(200);
+	//纯滚动直立圆盘
+	real hd,hdd;
+	pair O,x,y,z,i,j,k;
+	hd = 131+25/60;
+	hdd = 7+10/60;
+	O = (0,0);
+	x = 1.2*dir(90+hd);
+	y = 1.5*dir(-hdd);
+	z = 1.5*dir(90);
+	draw(Label("$x$",EndPoint),O--x,Arrow);
+	draw(Label("$y$",EndPoint),O--y,Arrow);
+	draw(Label("$z$",EndPoint),O--z,Arrow);
+	label("$O$",O,NW);
+	i = (-sqrt(2)/4,-sqrt(14)/12);
+	j = (sqrt(14)/4,-sqrt(2)/12);
+	k = (0,2*sqrt(2)/3);
+	
+	real x0,y0,r,phi;
+	pair P;
+	pair planecur(real xx){
+		real yy = y0+1*tan(xx-x0);
+		return xx*i+yy*j;
+	}
+	pair dplanecur(real xx){
+		real yy = 1/((cos(xx-x0))**2);
+		return xx*i+yy*j;
+	}
+	pair wheel(real theta){
+		real xx,yy,zz;
+		xx = x0+r*sin(theta)*cos(phi);
+		yy = y0+r*sin(theta)*sin(phi);
+		zz = r+r*cos(theta);
+		return xx*i+yy*j+zz*k;
+	}
+	real getphi(real xx){
+		real yy = 1/((cos(xx-x0))**2);
+		return atan(yy/xx);
+	}
+	x0 = 1;
+	y0 = 0.7;
+	r = 0.5;
+	phi = getphi(x0);
+	unfill(graph(wheel,0,2*pi)--cycle);
+	draw(graph(wheel,0,2*pi),linewidth(0.8bp));
+	draw(graph(planecur,x0-1,x0+1));
+	P = planecur(x0);
+	dot(P);
+	draw((P-0.7*dplanecur(x0))--(P+dplanecur(x0)),dashed);
+	draw(P--P+r*k--wheel(-1.2));
+	label("$(x,y)$",P+r*k,E);
+	label("$\theta$",P+r*k,WSW);
+	label("$\phi$",P-0.7*dplanecur(x0),2*S);
+	
+	//draw(O--(1.7,0),invisible);
+\end{asy}
+\caption{例\theexample}
+\label{第三章例8图}
+\end{figure}
+\end{example}
+\begin{solution}
+此非完整系统有完整约束
+\begin{equation*}
+	z-R = 0
+\end{equation*}
+以及非完整约束
+\begin{equation*}
+	\begin{cases}
+		\dot{x} - R\dot{\theta} \cos \phi = 0 \\
+		\dot{y} - R\dot{\theta} \sin \phi = 0
+	\end{cases}
+\end{equation*}
+由此可将广义坐标取为$x,y,\theta,\phi$，系统的Lagrange函数为
+\begin{equation*}
+	L = T = \frac12 m(\dot{x}^2+\dot{y}^2) + \frac12 I_1 \dot{\theta}^2 + \frac12 I_2 \dot{\phi}^2
+\end{equation*}
+考虑到
+\begin{align*}
+	& B_{11} = 1,\quad B_{12} = 0,\quad B_{13} = -R\cos \phi,\quad \bar{A}_{14} = 0 \\
+	& B_{21} = 0,\quad B_{22} = 1,\quad B_{23} = -R\sin \phi,\quad \bar{A}_{24} = 0
+\end{align*}
+由此可以写出系统方程为
+\begin{subnumcases}{}
+%\renewcommand{\theequation}{\theparentequation-\arabic{equation}}
+	m\ddot{x} = \lambda_1 \label{方程第1式} \\
+	m\ddot{y} = \lambda_2 \label{方程第2式} \\
+	I_1 \ddot{\theta} = -R(\lambda_1 \cos \phi + \lambda_2 \sin \phi) \label{方程第3式} \\
+	I_2 \ddot{\phi} = 0 \label{方程第4式} \\
+	\dot{x} - R\dot{\theta} \cos \phi = 0 \label{方程第5式} \\
+	\dot{y} - R\dot{\theta} \sin \phi = 0 \label{方程第6式} 
+\end{subnumcases}
+由式\eqref{方程第4式}可得
+\begin{equation*}
+	\phi = \omega_2 t + \phi_0
+\end{equation*}
+考虑$\text{式}\eqref{方程第1式} \times R\cos\phi + \text{式}\eqref{方程第2式} \times R\sin \phi + \text{式}\eqref{方程第3式}$可得
+\begin{equation}
+	mR(\ddot{x} \cos \phi+\ddot{y}\sin \phi) + I_1 \ddot{\theta} = 0
+	\label{方程第7式}
+\end{equation}
+再考虑$\cos \phi \times \dfrac{\mathrm{d}}{\mathrm{d} t}\text{式}\eqref{方程第5式} + \sin \phi \times \dfrac{\mathrm{d}}{\mathrm{d} t}\text{式}\eqref{方程第6式}$可得
+\begin{equation}
+	\ddot{x} \cos \phi+\ddot{y}\sin \phi - R\ddot{\theta} = 0
+	\label{方程第8式}
+\end{equation}
+由式\eqref{方程第7式}和式\eqref{方程第8式}可解得
+\begin{equation*}
+	\theta = \omega_1 t + \theta_0
+\end{equation*}
+于是根据式\eqref{方程第5式}和式\eqref{方程第6式}可得
+\begin{align*}
+	\begin{cases}
+		\dot{x} = R\omega_1 \cos(\omega_2 t + \phi_0) \\
+		\dot{y} = R\omega_1 \sin(\omega_2 t + \phi_0)
+	\end{cases}
+\end{align*}
+
+下面分两种情况讨论圆盘的运动，
+\begin{enumerate}
+\item $\omega_2 = 0$，系统的解为
+\begin{equation}
+\begin{cases}
+	x = R\omega_1 t \cos \phi_0 + x_0 \\
+	y = R\omega_1 t \sin \phi_0 + y_0 \\
+	\theta = \omega_1 t + \theta_0 \\
+	\phi = \phi_0 \\
+	\lambda_1 = 0 \\
+	\lambda_2 = 0
+\end{cases}
+\end{equation}
+可见，圆盘沿直线匀速滚动。运动过程自动保证约束条件，约束反力为零。
+\item $\omega_2 \neq 0$，系统的解为
+\begin{equation}
+\begin{cases}
+	\displaystyle x = \frac{R\omega_1}{\omega_2} \sin(\omega_2 t + \phi_0) - \frac{R\omega_1}{\omega_2} \sin \phi_0 + x_0 \\[1,5ex]
+	\displaystyle y = -\frac{R\omega_1}{\omega_2} \cos(\omega_2 t + \phi_0) + \frac{R\omega_1}{\omega_2} \cos \phi_0 + y_0 \\
+	\theta = \omega_1 t + \theta_0 \\
+	\phi = \omega_2 t + \phi_0 \\
+	\lambda_1 = -R\omega_1 \omega_2 \sin \phi \\
+	\lambda_2 = R\omega_1 \omega_2 \cos \phi
+\end{cases}
+\end{equation}	
+可见，圆盘沿圆周匀速滚动，纯滚动条件自动保证，约束反力垂直盘面，提供向心力。
+\end{enumerate}
+\end{solution}
+
+% \subsection{沃罗涅茨方程}
+
+% \subsection{卡普雷金方程}
+
+\subsection{Appell方程*}
+
+Appell\footnote{Paul Appell，阿佩尔，法国数学家。}提出了不包含约束乘子的运动方程，既适用于完整系统，也适用于有线性不可积运动约束的非完整系统。
+
+\subsubsection{伪坐标}
+
+Appell方程是利用称为{\bf 伪坐标}的更一般形式的坐标来表示的。设$f$为系统的自由度，考虑广义速度的$f$个相互独立的线性组合：
+\begin{equation}
+	\dot{\pi}_\nu = \sum_{\alpha=1}^s C_{\nu\alpha} \dot{q}_\alpha \quad (\nu=1,2,\cdots,f)
+	\label{chapter2:伪速度的定义}
+\end{equation}
+其中系数$C_{\nu\alpha}=C_{\nu\alpha}(\mbf{q},t)$。此处的$\dot{\pi}_\nu$是广义速度的某些线性组合，有完全确定的意义，但是符号$\pi_\nu$可能没有意义，因为式\eqref{chapter2:伪速度的定义}的右端可能不是关于广义坐标和时间的函数对时间的全导数。而符号$\ddot{\pi}_\nu$就用来表示式\eqref{chapter2:伪速度的定义}右端对时间的导数。我们称$\pi_\nu$为{\bf 伪坐标}，而$\dot{\pi}_\nu$和$\ddot{\pi}_\nu$分别称为{\bf 伪速度}和{\bf 伪加速度}。
+
+在定义伪速度时，需要选择系数$C_{\nu\alpha}$使得从$s=f+k'$个方程\eqref{chapter2:用广义坐标表示的非完整约束-重写}、\eqref{chapter2:伪速度的定义}中解$\dot{q}_\alpha(\alpha=1,2,\cdots,s)$时，系数行列式非零，求解之后可得
+\begin{equation}
+	\dot{q}_\alpha = \sum_{\nu=1}^f D_{\nu\alpha}\dot{\pi}_\nu+g_\alpha\quad (\alpha=1,2,\cdots,s)
+	\label{chapter2:用伪速度表示广义速度}
+\end{equation}
+式中$D_{i\alpha}$和$g_\alpha$是$\mbf{q}$和$t$的函数。伪速度$\dot{\pi}_\nu$可以任意取值，当它们是给定的时，可以通过式\eqref{chapter2:用伪速度表示广义速度}求解出所有的广义速度。
+
+根据式\eqref{chapter2:伪速度的定义}，形式上引入
+\begin{equation}
+	\delta \pi_\nu = \sum_{\alpha=1}^s C_{\nu\alpha}\delta q_\alpha \quad (\nu=1,2,\cdots,f)
+	\label{chapter2:伪虚位移的定义}
+\end{equation}
+量$\delta \pi_\nu$称为{\bf 伪虚位移}，式\eqref{chapter2:伪虚位移的定义}是它的定义式。注意，由于式\eqref{chapter2:伪速度的定义}的右端不一定是全微分，所以伪虚位移并不是真正的虚位移。利用方程\eqref{chapter2:非完整约束的虚位移表示-重写}和式\eqref{chapter2:伪虚位移的定义}求得用$\delta\pi_\nu(\nu=1,2,\cdots,f)$表示的$\delta q_\alpha$：
+\begin{equation}
+	\delta q_\alpha = \sum_{\nu=1}^f D_{\nu\alpha}\delta \pi_\nu\quad (\alpha=1,2,\cdots,s)
+	\label{chapter2:用伪虚位移表示广义虚位移}
+\end{equation}
+这里的$\delta\pi_\nu$可以任意取值。
+
+\subsubsection{Appell方程}
+
+为了得到Appell方程，首先需要将动力学普遍方程\eqref{chapter2:d'Alambert-Lagrange原理}用伪坐标表示出来。首先考虑动力学普遍方程中的第一项：
+\begin{equation}
+	\sum_{i=1}^n \mbf{F}_i\cdot \delta\mbf{r}_i = \sum_{\alpha=1}^s Q_\alpha\delta q_\alpha
+\end{equation}
+将式\eqref{chapter2:用伪虚位移表示广义虚位移}代入，可得
+\begin{equation}
+	\sum_{i=1}^n \mbf{F}_i\cdot \delta\mbf{r}_i = \sum_{\alpha=1}^s Q_\alpha \sum_{\nu=1}^f D_{\nu\alpha}\delta \pi_\nu = \sum_{\nu=1}^f \left(\sum_{\alpha=1}^s D_{\nu\alpha}Q_\alpha\right) \delta \pi_\nu = \sum_{\nu=1}^f \varPi_\nu \delta\pi_\nu
+	\label{chapter2:伪坐标下的动力学普遍方程-第一部分}
+\end{equation}
+式中
+\begin{equation}
+	\varPi_\nu = \sum_{\alpha=1}^s D_{\nu\alpha}Q_\alpha\quad (\nu = 1,2,\cdots,f)
+	\label{chapter3:对应于伪坐标的广义力}
+\end{equation}
+称为对应于伪坐标$\pi_\nu$的广义力。
+
+现在考虑动力学普遍方程中的第二项，由于
+\begin{equation}
+	\delta\mbf{r}_i = \sum_{\alpha=1}^s \frac{\pl \mbf{r}_i}{\pl q_\alpha}\delta q_\alpha
+	\label{chapter2:虚位移与广义虚位移之间的关系-重写}
+\end{equation}
+将式\eqref{chapter2:用伪虚位移表示广义虚位移}代入式\eqref{chapter2:虚位移与广义虚位移之间的关系-重写}中，可得
+\begin{equation}
+	\delta \mbf{r}_i = \sum_{\alpha=1}^s \frac{\pl \mbf{r}_i}{\pl q_\alpha} \sum_{\nu=1}^f D_{\nu\alpha}\delta\pi_\nu = \sum_{\nu=1}^f \left(\sum_{\alpha=1}^s \frac{\pl \mbf{r}_i}{\pl q_\alpha} D_{\nu\alpha}\right)\delta\pi_\nu = \sum_{\nu=1}^f \mbf{E}_{i\nu}\delta \pi_\nu
+	\label{chapter2:用伪虚位移表示系统各质点的虚位移}
+\end{equation}
+式中
+\begin{equation*}
+	\mbf{E}_{i\nu} = \sum_{\alpha=1}^s\frac{\pl \mbf{r}_i}{\pl q_\alpha}D_{\nu\alpha}\quad (i=1,2,\cdots,n; \nu=1,2,\cdots,f)
+\end{equation*}
+此处考虑将式\eqref{chapter2:用伪虚位移表示系统各质点的虚位移}用加速度$\mbf{a}_i$来表示。将等式\eqref{chapter2:用伪速度表示广义速度}两端对时间求导，然后将得到的$\ddot{q}_\alpha$代入加速度与广义加速度、广义速度的关系式\eqref{chapter2:各质点加速度与广义速度和广义加速度的关系}中，可得
+\begin{equation}
+	\mbf{a}_i = \sum_{\nu=1}^f \left(\sum_{\alpha=1}^s \frac{\pl \mbf{r}_i}{\pl q_\alpha}D_{\nu\alpha}\right) \ddot{\pi}_\nu + \mbf{H}_i = \sum_{\nu=1}^f \mbf{E}_{i\nu}\ddot{\pi}_\nu+\mbf{H}_i\quad (i=1,2,\cdots,n)
+\end{equation}
+此处$\mbf{H}_i$不依赖于$\ddot{\pi}_\nu$，由此可得
+\begin{equation}
+	\mbf{E}_{i\nu} = \frac{\pl \mbf{a}_i}{\pl \ddot{\pi}_\nu}\quad (i=1,2,\cdots,n; \nu=1,2,\cdots,f)
+	\label{chapter2:用伪虚位移表示系统各质点的虚位移-中间步骤}
+\end{equation}
+将式\eqref{chapter2:用伪虚位移表示系统各质点的虚位移-中间步骤}代入式\eqref{chapter2:用伪虚位移表示系统各质点的虚位移}中，可得虚位移$\delta \mbf{r}_i$可以用加速度和伪虚位移表示为：
+\begin{equation}
+	\delta \mbf{r}_i = \sum_{\nu=1}^f \frac{\pl \mbf{a}_i}{\pl \ddot{\pi}_\nu}\delta \pi_\nu
+	\label{chapter2:用伪虚位移表示系统各质点的虚位移-另一种形式}
+\end{equation}
+由此，动力学普遍方程的第二项可以写为
+\begin{align}
+	\sum_{i=1}^n m_i\mbf{a}_i\cdot\delta\mbf{r}_i & = \sum_{i=1}^n m_i\mbf{a}_i \cdot \sum_{\nu=1}^f \frac{\pl \mbf{a}_i}{\pl \ddot{\pi}_\nu}\delta \pi_\nu = \sum_{\nu=1}^f \left(\sum_{i=1}^n m_i\mbf{a}_i\cdot \frac{\pl \mbf{a}_i}{\pl \ddot{\pi}_\nu}\right) \delta \pi_\nu
+	\label{chapter2:Appell方程-中间过程1}
+\end{align}
+引入函数$S$为
+\begin{equation}
+	S = \frac12 \sum_{i=1}^n m_i\mbf{a}_i^2 
+	\label{chapter2:加速度能的定义}
+\end{equation}
+称为{\bf 加速度能}，在一般情况下，它是$q_1,\cdots,q_s, \dot{\pi}_1,\cdots,\dot{\pi}_f, \ddot{\pi}_1,\cdots,\ddot{\pi}_f$的函数。利用加速度能，可以将式\eqref{chapter2:Appell方程-中间过程1}表示为
+\begin{equation}
+	\sum_{i=1}^n m_i\mbf{a}_i\cdot\delta\mbf{r}_i = \sum_{\nu=1}^f \frac{\pl S}{\pl \ddot{\pi}_\nu} \delta\pi_\nu
+	\label{chapter2:伪坐标下的动力学普遍方程-第二部分}
+\end{equation}
+
+根据式\eqref{chapter2:伪坐标下的动力学普遍方程-第一部分}和式\eqref{chapter2:伪坐标下的动力学普遍方程-第二部分}，动力学普遍方程可以用伪坐标表示为
+\begin{equation}
+	\sum_{\nu=1}^f \left(\frac{\pl S}{\pl \ddot{\pi}_\nu} - \varPi_\nu\right) \delta\pi_\nu = 0
+\end{equation}
+因为伪虚位移$\delta\pi_\nu(\nu=1,2,\cdots,f)$可以任意取值，所以有
+\begin{equation}
+	\frac{\pl S}{\pl \ddot{\pi}_\nu} = \varPi_\nu \quad (\nu = 1,2,\cdots,f)
+	\label{chapter2:Appell方程}
+\end{equation}
+方程\eqref{chapter2:Appell方程}称为Appell方程，它们需要与非完整约束方程\eqref{chapter2:用广义坐标表示的非完整约束-重写}和伪速度定义式\eqref{chapter2:伪速度的定义}联立求解。即非完整系的运动微分方程为
+\begin{equation}
+\begin{cases}
+	\ds \frac{\pl S}{\pl \ddot{\pi}_\nu} = \varPi_\nu & (\nu = 1,2,\cdots,f) \\[1.5ex]
+	\ds \sum_{\alpha=1}^s B_{j\alpha}(\mbf{q},t) \dot{q}_\alpha + B_{j0}(\mbf{q},t) = 0 & (j=1,2,\cdots,k') \\[1.5ex]
+	\ds \dot{\pi}_\nu = \sum_{\alpha=1}^s C_{\nu\alpha} \dot{q}_\alpha & (\nu=1,2,\cdots,f)
+\end{cases}
+\end{equation}
+共有$k'+2f=s+f$个方程，共同决定$s+f$个位置函数即$s$个广义坐标$q_1,q_2,\cdots, q_s$和$f$个伪速度$\dot{\pi}_1,\dot{\pi}_2,\cdots,\dot{\pi}_f$。
+
+这里需要指出的一点是，Appell方程也可以应用于完整系。当其应用于完整系时，将伪速度取为广义速度，得到的方程只是Lagrange方程的另一种形式。
+
+为了得到Appell方程，需要根据式\eqref{chapter2:加速度能的定义}计算加速度能，并根据式\eqref{chapter3:对应于伪坐标的广义力}确定与伪坐标对应的广义力，这是十分繁琐的过程。
+
+\subsubsection{加速度能的计算·K\"onig定理的类比}
+
+设$\mbf{a}_C$是系统质心的绝对加速度，$\mbf{a}_i$是质点$m_i$的绝对加速度，而$\mbf{a}_i'$是该质点相对质心的加速度，那么对于每一个质点都有
+\begin{equation}
+	\mbf{a}_i = \mbf{a}_i'+\mbf{a}_C
+\end{equation}
+将其代入加速度能的定义式\eqref{chapter2:加速度能的定义}中，可得
+\begin{equation}
+	S = \frac12 \sum_{i=1}^n m_i\mbf{a}_i^2 = \frac12 \sum_{i=1}^n m_i\mbf{a}_C^2 + \sum_{i=1}^n m_i\mbf{a}_i' \cdot \mbf{a}_C + \frac12 \sum_{i=1}^n m_i\mbf{a}_i'^2
+\end{equation}
+由于$\ds \sum_{i=1}^n m_i = M$以及$\sum_{i=1}^n m_i\mbf{a}_i' = \mbf{0}$，可有
+\begin{equation}
+	S = \frac12 M\mbf{a}_C^2 + \frac12 \sum_{i=1}^n m_i\mbf{a}_i'^2 = S_C+S'
+	\label{chapter3:加速度能的柯尼希定理}
+\end{equation}
+即系统的加速度能等于位于质心的质量等于系统总质量的质点的加速度能与系统相对质心的加速度能之和。这个结论与动能的K\"onig定理（见式\eqref{Konig定理}）具有相同的形式。
+
+\subsubsection{定点运动刚体的加速度能}
+
+刚体的纯滚动是最常见的非完整约束。纯滚动下，刚体与滚动平面接触点的绝对速度等于零，这可以表示为
+\begin{equation}
+	\mbf{v}_C-R(\mbf{\omega}\times \mbf{n}) = \mbf{0}
+	\label{chapter3:刚体的纯滚动约束}
+\end{equation}
+式中$\mbf{v}_C$表示刚体质心的速度，$\mbf{n}$为滚动面在接触点处的法向单位矢量，$R$为刚体质心到接触点的距离。在很多情况下，角速度矢量并不能表示为某个函数对时间的全导数，因此纯滚动约束方程\eqref{chapter3:刚体的纯滚动约束}通常是不可积运动约束\footnote{需要指出的是，虽然约束\eqref{chapter3:刚体的纯滚动约束}是非完整的，但它仍然是一个理想约束。}。
+
+将刚体的本系统记作$Oxyz$，坐标原点为刚体的固定点$O$，坐标轴分别为刚体对$O$点的三个惯性主轴。设$\mbf{\omega}$为刚体的角速度，在本系统中，其分量分别为$\omega_1,\omega_2,\omega_3$。根据式\eqref{刚体上任意一点的加速度}可得，刚体上任意一点的加速度为
+\begin{equation}
+	\mbf{a} = \dot{\mbf{\omega}} \times \mbf{r} + \mbf{\omega} \times \left(\mbf{\omega} \times \mbf{r}\right) = \dot{\mbf{\omega}} \times \mbf{r} + (\mbf{\omega}\cdot\mbf{r})\mbf{\omega} - \omega^2 \mbf{r}
+\end{equation}
+所以加速度在本系统中的三个分量分别为
+\begin{equation}
+\begin{cases}
+	a_1 = -x(\omega_2^2+\omega_3^2)+y(\omega_2\omega_1-\dot{\omega}_3)+z(\omega_1\omega_3+\dot{\omega}_2) \\
+	a_2 = -y(\omega_3^2+\omega_1^2)+z(\omega_3\omega_2-\dot{\omega}_1)+x(\omega_2\omega_1+\dot{\omega}_3) \\
+	a_3 = -z(\omega_1^2+\omega_2^2)+x(\omega_1\omega_3-\dot{\omega}_2)+y(\omega_3\omega_2+\dot{\omega}_1) \\
+\end{cases}
+\label{chapter3:定点运动刚体各点加速度在本系统内的分量}
+\end{equation}
+加速度能在刚体上则可以表示为
+\begin{equation*}
+	S = \frac12 \int_V \rho (a_1^2+a_2^2+a_3^2)\mathd V
+\end{equation*}
+将式\eqref{chapter3:定点运动刚体各点加速度在本系统内的分量}代入并注意到，在主轴系中有
+\begin{align*}
+	& I_1 = \int_V \rho(y^2+z^2)\mathd V, \quad I_2 = \int_V \rho(z^2+x^2)\mathd V, \quad I_3 = \int_V \rho(x^2+y^2)\mathd V \\
+	& \int_V \rho yz\mathd V = \int_V \rho zx\mathd V = \int_V \rho xy\mathd V = 0
+\end{align*}
+可得
+\begin{equation}
+	S = \frac12 (I_1\omega_1^2 + I_2\omega_2^2 + I_3\omega_3^2) + (I_3-I_2)\omega_2\omega_3\dot{\omega}_1 + (I_1-I_3)\omega_3\omega_1\dot{\omega}_2 + (I_2-I_1)\omega_1\omega_2\dot{\omega}_3
+	\label{chapter3:定点运动刚体的加速度能}
+\end{equation}
+
+\begin{example}[利用Appell方程获得Euler动力学方程]
+将伪速度取为角动量的三个分量\footnote{根据Euler运动学方程，这样定义出的伪速度确实是广义速度的线性组合，而且它们之间是线性无关的。}，即$\dot{\pi}_1=\omega_1, \dot{\pi}_2=\omega_2, \dot{\pi}_3=\omega_3$。这里需要获得与伪坐标对应的广义力，记$\mbf{\pi} = \begin{pmatrix} \pi_1 \\ \pi_2 \\ \pi_3 \end{pmatrix}$，并考虑
+\begin{equation*}
+	\mathd \mbf{r} = \mbf{\omega}\times \mbf{r}\mathd t = \mathd \mbf{\pi} \times \mbf{r}
+\end{equation*}
+其中最后一个等号是形式上的，所以有
+\begin{equation*}
+	\int_V \mbf{f} \mathd V\cdot \mathd \mbf{r} = \int_V (\mbf{f}\cdot \mathd \mbf{r}) \mathd V = \int_V \mbf{f}\cdot (\mathd \mbf{\pi} \times \mbf{r}) \mathd V = \int_V \mathd \mbf{\pi} \cdot (\mbf{r}\times \mbf{f})\mathd V = \int_V \mbf{r}\times \mbf{f}\mathd V \cdot \mathd \mbf{\pi}
+\end{equation*}
+即有
+\begin{equation*}
+	\mbf{F} \cdot \mathd \mbf{r} = \mbf{M}_O \cdot \mathd \mbf{\pi}
+\end{equation*}
+根据等时变分运算与微分运算的相似性，可以直接得到
+\begin{equation*}
+	\mbf{F}\cdot \delta\mbf{r} = \mbf{M}_O\cdot \delta \mbf{\pi}
+\end{equation*}
+由此可得相应于伪坐标$\pi_i$的广义力即为
+\begin{equation*}
+	\varPi_1 = M_1,\quad \varPi_2 = M_2,\quad \varPi_3 = M_3
+\end{equation*}
+然后根据加速度能\eqref{chapter3:定点运动刚体的加速度能}和Appell方程\eqref{chapter2:Appell方程}可以直接得到Euler动力学方程。
+\end{example}
+
+\begin{example}[利用Appell方程重新求解例\ref{chapter3:example-非完整系例题1}]
+系统的非完整约束可以表示为
+\begin{equation*}
+\begin{cases}
+	\dot{x} = R\dot{\theta}\cos\phi \\
+	\dot{y} = R\dot{\theta}\sin\phi
+\end{cases}
+\end{equation*}
+圆盘的加速度能可以利用式\eqref{chapter3:加速度能的柯尼希定理}来计算，即
+\begin{equation*}
+	S = \frac12 m(\ddot{x}^2+\ddot{y}^2) + \frac12 (I_1\ddot{\theta}^2 + I_2\ddot{\phi}^2)
+\end{equation*}
+其中$I_1=\dfrac12 mR^2$为圆盘绕过其中心并与盘面垂直轴自转时的转动惯量，$I_2=\dfrac14mR^2$为圆盘绕过其中心的竖直轴旋转时的转动惯量。
+
+将伪速度取为$\dot{\pi}_1 = \dot{\theta}, \dot{\pi}_2 = \dot{\phi}$，则有
+\begin{equation*}
+\begin{cases}
+	\ddot{x} = R(\ddot{\theta}\cos\phi - \dot{\theta}\dot{\phi}\sin\phi) \\
+	\ddot{y} = R(\ddot{\theta}\sin\phi + \dot{\theta}\dot{\phi}\cos\phi)
+\end{cases}
+\end{equation*}
+由此可得加速度能为
+\begin{equation*}
+	S = \frac12 mR^2(\ddot{\theta}^2 + \dot{\theta}^2\dot{\phi}^2) + \frac12 \left(\frac12 mR^2\ddot{\theta}^2 + \dfrac14mR^2\ddot{\phi}^2\right) = \frac34mR^2\ddot{\theta}^2 + \frac18mR^2\ddot{\phi}^2 + \frac12 mR^2 \dot{\theta}^2\dot{\phi}^2
+\end{equation*}
+再考虑到圆盘所受的主动力只有重力，所有主动力都不做功，因此有$\varPi_1=\varPi_2=0$。所以，根据Appell方程\eqref{chapter2:Appell方程}可得
+\begin{equation*}
+\begin{cases}
+	\ddot{\theta} = 0 \\
+	\ddot{\phi} = 0
+\end{cases}
+\end{equation*}
+这与例\ref{chapter3:example-非完整系例题1}所得到的结果相同。
+\end{example}
+
+\section{Poisson括号}
+
+\subsection{Poisson括号的定义}
+
+对两个系统状态函数$f = f(\mbf{q},\mbf{p},t)$和$g = g(\mbf{q},\mbf{p},t)$，定义
+\begin{equation}
+	[f,g] = \sum_{\alpha=1}^s \left(\frac{\pl f}{\pl q_\alpha} \frac{\pl g}{\pl p_\alpha} - \frac{\pl g}{\pl q_\alpha} \frac{\pl f}{\pl p_\alpha}\right) = \sum_{\alpha=1}^s \begin{vmatrix} \dfrac{\pl f}{\pl q_\alpha} & \dfrac{\pl f}{\pl p_\alpha} \\[1.5ex] \dfrac{\pl g}{\pl q_\alpha} & \dfrac{\pl g}{\pl p_\alpha} \end{vmatrix} = \sum_{\alpha=1}^s \frac{\pl (f,g)}{\pl (q_\alpha,p_\alpha)}
+\end{equation}
+称为{\heiti Poisson括号}。
+\begin{equation}
+	[q_\alpha,q_\beta] = 0,\quad [p_\alpha,p_\beta] = 0,\quad [q_\alpha,p_\beta] = \delta_{\alpha\beta}
+	\label{基本Poisson括号}
+\end{equation}
+称为{\heiti 基本Poisson括号}，这里$\delta_{\alpha\beta}$是Kronecker符号，定义为
+\begin{equation*}
+	\delta_{\alpha\beta} = \begin{cases} 1, & \alpha=\beta \\ 0, & \alpha\neq\beta \end{cases}
+\end{equation*}
+根据Poisson括号的定义，容易得到
+\begin{equation}
+	[q_\alpha, f] =\frac{\pl f}{\pl p_\alpha},\quad [p_\alpha,f] = -\frac{\pl f}{\pl q_\alpha}
+\end{equation}
+
+\subsection{Poisson括号的性质}
+
+利用Poisson括号的定义和行列式的性质很容易得到Poisson括号的以下性质：
+\begin{enumerate}
+	\item 反对称性：
+	\begin{equation}
+		[f,g] = -[g,f]
+		\label{chapter9:Poisson括号的反对称性}
+	\end{equation}
+	特别地，可有$[f,f] = 0$；
+	\item 线性性：
+	\begin{equation}
+		[f,C_1 g+C_2 h] = C_1[f,g] + C_2[f,h],\quad \forall \, C_1,C_2 \in \mathbb{R}
+		\label{chapter9:Poisson括号的线性性}
+	\end{equation}
+	\item 结合性：
+	\begin{equation}
+		[f,gh] = [f,g]h+g[f,h]
+		\label{chapter9:Poisson括号的结合性}
+	\end{equation}
+	\item Leibniz性：
+	\begin{equation}
+		\frac{\pl}{\pl x} [f,g] = \left[\frac{\pl f}{\pl x},g\right] + \left[f,\frac{\pl g}{\pl x}\right],\quad x \in \{\mbf{q},\mbf{p},t\}
+		\label{chapter9:Poisson括号的Leibniz性}
+	\end{equation}
+	\item Jacobi恒等式：
+	\begin{equation}
+		\big[f,[g,h]\big] + \big[g,[h,f]\big] + \big[h,[f,g]\big] = 0
+		\label{chapter9:Poisson括号的Jacobi恒等式}
+	\end{equation}
+\end{enumerate}
+
+\iffalse
+\begin{example}
+计算Poisson括号$[L_y,L_z], [L_z,L_x], [L_x,L_y]$和$[L_x,L^2], [L_y,L^2], [L_z,L^2]$，这里$L_x, L_y, L_z$是质点角动量矢量$\mbf{L}$的三个分量，$L^2$是质点角动量大小的平方。
+\end{example}
+\begin{solution}
+首先，根据角动量的定义$\mbf{L}=\mbf{r}\times \mbf{p}$可得
+\begin{equation*}
+\begin{cases}
+	L_x = yp_z-zp_y \\
+	L_y = zp_x-xp_z \\
+	L_z = xp_y-yp_x
+\end{cases}
+\end{equation*}
+利用Poisson括号的性质\eqref{chapter9:Poisson括号的线性性}可得
+\begin{align*}
+	[L_y,L_z] & = [zp_x-xp_z,xp_y-yp_x] = [zp_x,xp_y]-[xp_z,xp_y]-[zp_x,yp_x]+[xp_z,yp_x]
+\end{align*}
+再利用性质\eqref{chapter9:Poisson括号的结合性}可将上式中的第一项改写为
+\begin{equation*}
+	[zp_x,xp_y] = xz[p_x,p_y] + x[z,p_y]p_x + z[p_x,x]p_y + [z,x]p_xp_y
+\end{equation*}
+根据基本Poisson括号\eqref{基本Poisson括号}可得，上式的四项中第三项等于$-1$，其余三项都等于零，所以有
+\begin{equation*}
+	[zp_x,xp_y] = -zp_y
+\end{equation*}
+同理可得
+\begin{equation*}
+	[xp_z,xp_y] = 0,\quad [zp_x,yp_x] = 0,\quad [xp_z,yp_x] = yp_z
+\end{equation*}
+所以
+\begin{equation*}
+	[L_y,L_z] = yp_z-zp_y = L_x
+\end{equation*}
+同理
+\begin{equation*}
+	[L_z,L_x] = L_y,\quad [L_x,L_y] = L_z
+\end{equation*}
+
+下面计算$[L_x,L^2]$：
+\begin{align*}
+	[L_x,L^2] & = [L_x,L_x^2+L_y^2+L_z^2] = [L_x,L_x^2] + [L_x,L_y^2] + [L_x,L_z^2] \\
+	& = L_x[L_x,L_x] + [L_x,L_x]L_x + L_y[L_x,L_y] + [L_x,L_y]L_y + L_z[L_x,L_z] + [L_x,L_z]L_z \\
+	& = 0+0+L_yL_z+L_zL_y-L_zL_y-L_yL_z = 0
+\end{align*}
+同理可得
+\begin{equation*}
+	[L_y,L^2] = 0,\quad [L_z,L^2] = 0
+\end{equation*}
+\end{solution}\fi
+
+\subsection{正则方程的Poisson括号形式}
+
+设有函数$f = f(\mbf{q},\mbf{p},t)$，考虑
+\begin{equation}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = \frac{\pl f}{\pl t} + \sum_{\alpha=1}^s \left(\frac{\pl f}{\pl q_\alpha} \dot{q}_\alpha + \frac{\pl f}{\pl p_\alpha} \dot{p}_\alpha\right) = \frac{\pl f}{\pl t} + \sum_{\alpha=1}^s \left(\frac{\pl f}{\pl q_\alpha} \frac{\pl H}{\pl p_\alpha} - \frac{\pl f}{\pl p_\alpha} \frac{\pl H}{\pl q_\alpha}\right)
+\end{equation}
+此处利用了Hamilton正则方程，由此得到
+\begin{equation}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = \frac{\pl f}{\pl t} + [f,H]
+\end{equation}
+如果函数$f$不显含时间，即$\dfrac{\pl f}{\pl t} = 0$，则有
+\begin{equation}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = [f,H]
+	\eqref{chapter3:不显含时间的力学量对时间导数的Poisson括号表示}
+\end{equation}
+分别将函数$f$取为$q_\alpha$和$p_\alpha$可得{\heiti 正则方程的Poisson括号形式}
+\begin{equation}
+	\begin{cases}
+		\dif{q_\alpha}{t} = [q_\alpha,H] \\[1.5ex]
+		\dif{p_\alpha}{t} = [p_\alpha,H]
+	\end{cases}
+\end{equation}
+将函数$f$取为$H$则得到
+\begin{equation}
+	\dot{H} = \frac{\pl H}{\pl t}
+\end{equation}
+
+如果将$[f,H]$记作$\hat{H} f$，此处$\hat{H}$称为{\heiti 算子}，它代表一种操作——即求该函数与Hamilton函数的Poisson括号。如果$f$不显含时间，可有
+\begin{equation*}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = [f,H] = \hat{H}f
+\end{equation*}
+依次可有
+\begin{align*}
+	\frac{\mathrm{d}^2 f}{\mathrm{d} t^2} & = \frac{\mathrm{d}}{\mathrm{d} t}[f,H] = [\hat{H}f,H] = \hat{H} (\hat{H} f) = \hat{H}^2 f \\
+	& \vdots \\
+	\frac{\mathrm{d}^n f}{\mathrm{d} t^n} & = \frac{\mathrm{d}}{\mathrm{d} t}\left(\frac{\mathrm{d}^{n-1}f}{\mathrm{d} t^{n-1}}\right) = [\hat{H}^{n-1}f,H] = \hat{H} (\hat{H}^{n-1} f) = \hat{H}^n f
+\end{align*}
+如果不考虑收敛的问题，任何正则变量的函数可以用Taylor级数表示为
+\begin{align*}
+	f(\mbf{q}(t),\mbf{p}(t)) = \sum_{n=0}^\infty \frac{1}{n!} \frac{\mathrm{d}^n f}{\mathrm{d} t^n}(0) t^n = \sum_{n=0}^\infty \frac{t^n}{n!} \hat{H}^n f(0) = \mathrm{e}^{t\hat{H}} f(0)
+\end{align*}
+由此，可以得到运动的算子形式解。
+
+\begin{example}
+利用算子形式求解一维谐振子，其Hamilton函数为
+\begin{equation*}
+	H = \frac{p^2}{2m} + \frac12 m\omega^2 q^2
+\end{equation*}
+\end{example}
+\begin{solution}
+根据基本Poisson括号\eqref{基本Poisson括号}可得
+\begin{equation*}
+	[q,q] = 0,\quad [p,p] = 0,\quad [q,p] = 1
+\end{equation*}
+可得
+\begin{align*}
+	[q,H] & = \frac{1}{2m}[q,p^2] + \frac12 m\omega^2 [q,q^2] = \frac{1}{2m} \bigg([q,p]p+p[q,p]\bigg) = \frac{p}{m} \\
+	[p,H] & = \frac{1}{2m}[p,p^2] + \frac12 m\omega^2 [p,q^2] = \frac12 m\omega^2 \bigg([p,q]q+q[p,q]\bigg) = -m\omega^2 q
+\end{align*}
+由此可以依次计算
+\begin{align*}
+	\hat{H}q & = [q,H] = \frac{p}{m} \\
+	\hat{H}^2q & = \frac{1}{m}[p,H] = -\omega^2 q \\
+	\hat{H}^3q & = -\omega^2[q,H] = -\omega^2\frac{p}{m} \\
+	\hat{H}^4q & = -\frac{\omega^2}{m}[p,H] = (-\omega^2)^2 q \\
+	& \vdots \\
+	\hat{H}^{2m-1} q & = (-\omega^2)^{m-1} \frac{p}{m} \\
+	\hat{H}^{2m} q & = (-\omega^2)^m q \\
+	& \vdots 
+\end{align*}
+故有
+\begin{align*}
+	q(t) & = \left[\sum_{m=0}^\infty \frac{t^{2m}}{(2m)!} \hat{H}^{2m} + \sum_{m=1} \frac{t^{2m-1}}{(2m-1)!} \hat{H}^{2m-1}\right] q(0) \\
+	& = \sum_{m=0}^\infty \frac{(-1)^m(\omega t)^{2m}}{(2m)!} q(0) + \sum_{m=1}^\infty \frac{(-1)^{m-1}(\omega t)^{2m-1}}{(2m-1)!} \frac{p(0)}{m\omega} \\
+	& = q(0) \cos \omega t + \frac{p(0)}{m\omega} \sin \omega t
+\end{align*}
+\end{solution}
+
+\subsection{Poisson定理·系统的可积性}
+
+系统力学状态随时间演变时不变的力学量称为{\heiti 运动积分}，即运动积分需要满足
+\begin{equation}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = \frac{\pl f}{\pl t} + [f,H] = 0
+\end{equation}
+
+\begin{theorem}[Poisson定理]
+两个运动积分的Poisson括号仍为运动积分，即如果有
+\begin{equation}
+	\dfrac{\mathrm{d} f}{\mathrm{d} t} = 0,\quad \dfrac{\mathrm{d} g}{\mathrm{d} t} = 0
+\end{equation}
+则有
+\begin{equation}
+	\frac{\mathrm{d}}{\mathrm{d} t} [f,g] = 0
+\end{equation}
+即$[f,g]$也是运动积分。
+\end{theorem}
+\begin{proof}
+由于
+\begin{equation*}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = \frac{\pl f}{\pl t} + [f,H] = 0
+\end{equation*}
+所以有$\dfrac{\pl f}{\pl t} = -[f,H]$，同理可有$\dfrac{\pl g}{\pl t} = -[g,H]$。由此可有
+\begin{align*}
+	\frac{\mathrm{d}}{\mathrm{d} t} [f,g] & = \frac{\pl}{\pl t}[f,g] + \big[[f,g],H\big] = \left[\frac{\pl f}{\pl t},g\right] + \left[f,\frac{\pl g}{\pl t}\right] + \big[[f,g],H\big] \\
+	& = \big[-[f,H],g\big] + \big[f,-[g,H]\big] + \big[[f,g],H\big] \\
+	& = -\big[f,[g,H]\big] - \big[g,[H,f]\big] - \big[H,[f,g]\big] = 0 \qedhere
+\end{align*}
+\end{proof}
+
+\begin{example}[角动量的Poisson括号]\label{chapter9:角动量的Poisson括号}
+角动量可以表示为
+\begin{equation*}
+	\mbf{L} = \mbf{r} \times \mbf{p} = \begin{vmatrix} \mbf{e}_1 & \mbf{e}_2 & \mbf{e}_3 \\ x & y & z \\ p_x & p_y & p_z \end{vmatrix}
+\end{equation*}
+所以
+\begin{align*}
+	[L_x,L_y] & = [yp_z-zp_y,zp_x-xp_z] = [yp_z,zp_x] + [zp_y,xp_z] \\
+	& = y[p_z,z]p_x + x[z,p_z] p_y = xp_y-yp_x = L_z
+\end{align*}
+同理可有
+\begin{equation*}
+	[L_y,L_z] = L_x,\quad [L_z,L_x] = L_y
+\end{equation*}
+考虑
+\begin{align*}
+	[L_z,L^2] & = [L_z,L_x^2] + [L_z,L_y^2] + [L_z,L_z^2] \\
+	& = [L_z,L_x]L_x + L_x[L_z,L_x] + [L_z,L_y]L_y + L_y[L_z,L_y] \\
+	& = L_yL_x + L_xL_y - L_xL_y - L_yL_x = 0
+\end{align*}
+同理可有
+\begin{equation*}
+	[L_x,L^2] = [L_y,L^2] = [L_z,L^2] = 0
+\end{equation*}
+由此可得，若角动量任意两分量守恒，则第三分量亦守恒。角动量三分量变化不独立，这与两次异轴转动可合成绕第三轴转动的事实相照应。
+\end{example}
+
+对于有$s$个自由度的力学系统，如果可以找到$s$个相互独立的运动积分$\phi_1,\phi_2,\cdots,\phi_s$，且满足
+\begin{equation}
+	[\phi_\alpha,\phi_\beta] = 0\quad (\alpha,\beta = 1,2,\cdots,s)
+\end{equation}
+这样的系统称为{\bf 可积系统}，此时称$\phi_1,\phi_2,\cdots,\phi_s$是相互{\bf 对合}的。这个结论是Liouville首先证明的，故也称为{\bf Liouville定理}，相应地上述可积性称为{\bf Liouville可积性}。
+
+Poisson定理似乎表明，总是可以根据两个已知的运动积分找到另一个运动积分。但是，很多情况下这并不能得到有意义的结果，得到的Poisson括号经常是常数或者是已知运动积分的函数。例如例\ref{chapter9:角动量的Poisson括号}说明，如果$L_z$和$L^2$都是运动积分，则根据Poisson定理，$[L_z,L^2]=0$也是运动积分，但是用$0$作为运动积分并没有意义。
+
+如果希望从两个已知的运动积分得到更多运动积分，甚至得到可积系统的全部运动积分，需要最初的两个已知运动积分中至少有一个能够刻画出给定问题的局部特征，能够完全反映该问题的物理本质。如果最初的两个已知的运动积分都是由所有系统都成立的动力学定理获得的，则一般不能有效地应用Poisson定理。
+
+\subsection{量子Poisson括号}
+
+量子Poisson括号定义为
+\begin{equation}
+	[f,g]_{-} = fg - gf
+\end{equation}
+在量子力学中，将正则方程中的Possion括号$[f,g]$替换为$\dfrac{1}{\mathrm{i}\hbar} [f,g]_{-}$的过程，称为{\heiti 正则量子化}。力学量的乘积一般非对易，可用算符或矩阵表示。
+
+基本Poisson括号表示为
+\begin{equation}
+	[q_i,p_j]_{-} = \mathrm{i} \hbar \delta_{ij},\quad [q_i,q_j]_{-} = 0,\quad [p_i,p_j]_{-} = 0,\quad i,j=1,2,3
+\end{equation}
+可有{\heiti Heisenberg方程}
+\begin{equation}
+	\frac{\mathrm{d} f}{\mathrm{d} t} = \frac{\pl f}{\pl t} + \frac{1}{\mathrm{i} \hbar} [f,H]_{-}
+\end{equation}
+取宏观极限
+\begin{equation*}
+	\lim_{\hbar \to 0} \frac{1}{\mathrm{i} \hbar} [f,g]_{-} = [f,g]
+\end{equation*}
+时，动力学过渡为经典力学。

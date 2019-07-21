@@ -1,0 +1,1619 @@
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '03',
+    %q{Differential Geometry},
+    'ch:differential-geometry'
+  )
+%>
+
+
+General relativity is described mathematically in the language of \emph{differential geometry}. Let's take those two
+terms in reverse order.
+
+The \emph{geometry} of spacetime is non-Euclidean, not just in the sense that the 3+1-dimensional geometry of
+Lorentz frames is different than that of 4 interchangeable Euclidean dimensions, but also in the sense that
+parallels do not behave in the way described by E5 or A1-A3. In a Lorentz frame, which describes space without
+any gravitational fields, particles whose world-lines are initially parallel will continue along their parallel
+world-lines forever. But in the presence of gravitational fields, initially parallel world-lines of free-falling particles
+will in general diverge, approach,
+or even cross. Thus, neither the existence nor the uniqueness of parallels can be assumed. We can't describe this
+lack of parallelism as arising from the curvature of the world-lines, because we're using the world-lines of
+free-falling particles as our definition of a ``straight'' line. Instead, we describe the effect as coming
+from the curvature of spacetime itself. The Lorentzian geometry is a description of the case in which this
+curvature is negligible.\index{curvature!of spacetime}
+
+What about the word \emph{differential}? The equivalence principle states that even in the presence of gravitational
+fields, local Lorentz frames exist. How local is ``local?'' If we use a microscope to zoom in on smaller and smaller
+regions of spacetime, the Lorentzian approximation becomes better and better. Suppose we want to do experiments in
+a laboratory, and we want to ensure that when we compare some physically observable quantity against predictions
+made based on the Lorentz geometry, the resulting discrepancy will not be too large. If the acceptable error is
+$\epsilon$, then we should be able to get the error down that low if we're willing to make the size of our
+laboratory no bigger than $\delta$. This is clearly very similar to the Weierstrass style of defining limits
+and derivatives in calculus. In calculus, the idea expressed by differentiation is that every smooth curve can be
+approximated locally by a line; in general relativity, the equivalence principle tells us that curved spacetime
+can be approximated locally by flat spacetime. But consider that no practitioner of calculus habitually solves
+problems by filling sheets of scratch paper with epsilons and deltas. Instead, she uses the Leibniz notation,
+in which $\der y$ and $\der x$ are interpreted as infinitesimally small numbers.
+You may be inclined, based on your previous training, to dismiss infinitesimals as neither rigorous nor necessary.
+In 1966, Abraham Robinson\index{Robinson, Abraham} demonstrated that concerns about rigor had been unfounded; we'll come back
+to this point in section \ref{sec:models}. Although it is true that any calculation written using infinitesimals can also
+be carried out using limits, the following example shows how much more well suited the infinitesimal language is to
+differential geometry.
+
+\begin{eg}{Areas on a sphere}
+The area of a region S in the Cartesian plane can be calculated as $\int_S \der A$, where $\der A=\der x\der y$
+is the area of an infinitesimal rectangle of width $\der x$ and height $\der y$. A curved surface such as a
+sphere does not admit a global Cartesian coordinate system in which the constant coordinate curves are both
+uniformly spaced and perpendicular to one another. For example, lines of longitude on the earth's surface
+grow closer together as one moves away from the equator. Letting $\theta$ be the angle with respect to the
+pole, and $\phi$ the azimuthal angle, the approximately rectangular patch bounded by $\theta$, $\theta+\der\theta$,
+$\phi$, and $\phi+\der\phi$ has width $r\sin\theta\der\theta$ and height $r\der\phi$,
+giving $\der A=r^2\sin\theta\der\theta\der\phi$. If you look at the corresponding derivation in an elementary
+calculus textbook that strictly eschews infinitesimals, the technique is to start from scratch with Riemann sums.
+This is extremely laborious, and moreover must be carried out again for every new case. In differential geometry,
+the curvature of the space varies from one point to the next, and clearly we don't want to reinvent the wheel with
+Riemann sums an infinite number of times, once at each point in space.
+\end{eg}
+
+<% begin_sec("Tangent vectors") %>\label{tangent-vector-intuitive}
+It's not immediately clear what a vector means in the context
+of curved spacetime.  The freshman physics notion of a vector carries all kinds of baggage, including
+ideas like rotation of vectors and a magnitude that is positive for nonzero vectors. We also used to
+assume the ability to represent vectors as arrows, i.e., geometrical figures of finite size that could be
+transported to other places --- but in a curved geometry, it is not in general possible to transport a
+figure to another location without distorting its shape, so there is no notion of congruence.
+For this reason, it's better to visualize vectors as tangents to the underlying space, as
+in figure \figref{tangent-vector}.
+Intuitively, we want to think of these vectors as arrows that are infinitesimally small, so that
+they fit on the curved surface without having to be bent. In the pictures, we simply scale them up to make
+them visible without an infinitely powerful microscope, and this scaling only makes them \emph{appear} to rise out
+of the space in which they live.
+
+A more formal definition of the notion of a tangent vector is given on
+p.~\pageref{subsec:tangent-space}.\index{tangent vector}
+<% marg(40) %>
+<%
+  fig(
+    'tangent-vector',
+    %q{A vector can be thought of as lying in the plane tangent to a certain point.}
+  )
+%>
+<% end_marg %>
+
+<% end_sec %>
+
+<% begin_sec("Affine notions and parallel transport",4) %>
+
+<% begin_sec("The affine parameter in curved spacetime: a rough sketch") %>
+We want to be able to measure things in curved spacetime. There turn out to be two complementary systems of
+measurement we can apply: affine measure and metric measure.
+Affine measure in a flat geometry was introduced in
+section \ref{subsec:parallelism-and-measurement}, p.~\pageref{subsec:parallelism-and-measurement}.
+Surprisingly, it turns out to be quite easy to generalize this to the curved case.
+Our construction of the affine parameter with a scaffolding of parallelograms
+depended on the existence and uniqueness of parallels expressed by axiom A1 on p.~\pageref{affine-axioms}, so we might
+imagine that there was no point in trying to generalize the construction to curved spacetime. But the equivalence principle tells
+us that spacetime is locally affine to some approximation. Concretely, clock-time is one example of an affine parameter, and the
+curvature of spacetime clearly can't prevent us from building a clock and releasing it on a free-fall trajectory.
+
+More generally, we can use the fact that every segment of a geodesic is geometrically similar to every other segment.
+For example, consider an arc of the earth's equator spanning one degree of longitude. That arc could be slid along
+the equator to a different location, then expanded to cover 3 degrees of longitude. The two arcs are similar.
+
+\begin{eg}{Geodesics are special}
+The following three non-examples show that this is a special property of geodesics.
+
+The property is not enjoyed by
+a non-geodesic curve. A segment of a pentagon that encompasses one of the vertices is not
+similar to some other segment that is straight.
+
+Another non-example involving non-geodesics is the curve that we get in 1+1-dimensional spacetime
+by joining together the positive $x$ axis and the positive $t$ axis. We can never take a one-year
+segment of the $t$ axis and, through any combination of boosts and rotations, make it coincide with
+a one-light-year piece of the $x$ axis. The original segment is timelike, and any boost or rotation will
+preserve its timelike character.
+
+Furthermore, it is not true in general, when curvature exists,
+that we can take any geometrical figure, transport it wherever we like, and also scale it as we like.
+For example, Euclidean geometry is a good approximation on small portions of the Earth's spherical
+surface, so a roadmap can be made in the shape of a rectangle with four right-angle corners. However,
+it is not possible to scale up such a rectangle; to map a large portion of the world, we have to
+introduce distortions of the type used in map projections.
+\end{eg}
+
+Because geodesics have this special property, we can slide any portion of a geodesic to anywhere else
+on the geodesic and employ it as a standard of measure. This gives us a complete system of measurement
+along that geodesic, and it works regardless of whether the geodesic is timelike, lightlike, or spacelike.
+But as in flat geometry, affine measurement does not allow us to compare lengths
+along one geodesic to lengths along another.
+
+<% end_sec %>
+
+<% begin_sec("The affine parameter in more detail") %>
+When we originally defined affine measure in
+section \ref{subsec:parallelism-and-measurement}, p.~\pageref{subsec:parallelism-and-measurement},
+for a flat space, we did it through the explicit construction of a scaffolding.
+An important example of the differential, i.e., local, nature of our geometry
+is the generalization of the scaffolding construction from 
+to a context broader than affine geometry.
+
+To generalize the recipe for the construction (figure \figref{affine-par-in-curved-spacetime}), the first obstacle is the ambiguity of the 
+instruction to construct parallelogram $01\zu{q}_0\zu{q}_1$, which requires us to draw $1\zu{q}_1$ parallel to
+$0\zu{q}_0$. Suppose we construe this as an instruction to make the two segments initially parallel, i.e.,
+parallel as they depart the line at 0 and 1. By the time they get to $\zu{q}_0$ and $\zu{q}_1$, they may be converging
+or diverging. 
+
+Because parallelism is only approximate here,
+there will be a certain amount of error in the construction of the affine parameter. One way of detecting such an
+error is that lattices constructed with different initial distances will get out of step with one another.
+For example, we can define $\frac{1}{2}$ as before by requiring that the lattice constructed with initial segment
+$0\frac{1}{2}$ line up with the original lattice at 1. We will find, however, that they do \emph{not} quite line up at
+other points, such as 2. Let's use this discrepancy $\epsilon=2-2'$ as a numerical measure of the error.
+It will depend on both $\delta_1$, the distance 01, and on $\delta_2$, the
+distance between 0 and $\zu{q}_0$. Since $\epsilon$ vanishes for either $\delta_1=0$ or $\delta_2=0$, and since the equivalence
+principle guarantees smooth behavior on small scales, the leading term in the error will in general
+be proportional to the product $\delta_1\delta_2$. In the language of infinitesimals, we can replace $\delta_1$ and $\delta_2$
+with infinitesimally short distances, which for simplicity we assume to be equal, and which we call $\der\lambda$.
+Then the affine parameter $\lambda$ is defined as $\lambda=\int \der\lambda$, where the error of order $\der\lambda^2$
+is, as usual, interpreted as the negligible discrepancy between the integral and its approximation as a Riemann sum.
+<% marg(50) %>
+<%
+  fig(
+    'affine-par-in-curved-spacetime',
+    %q{Construction of an affine parameter in curved spacetime.}
+  )
+%>
+<% end_marg %>
+
+
+<% end_sec %> % affine param
+
+<% begin_sec("Parallel transport") %>\index{parallel transport}
+If you were alert, you may have realized that I cheated you at a crucial point in this construction.
+We were to make $1\zu{q}_1$ and $0\zu{q}_0$ ``initially parallel'' as they left 01.
+How should we even define this idea of ``initially parallel?'' We could try to do it by making
+angles $\zu{q}_001$ and $\zu{q}_112$ equal, but this doesn't quite work, because it doesn't
+specify whether the angle is to the left or the right on the two-dimensional plane of the page.
+In three or more dimensions, the issue becomes even more serious. The construction workers building
+the lattice need to keep it all in one plane, but how do they do that in curved spacetime?
+
+A mathematician's answer would be that our geometry lacks some additional structure called a \emph{connection},\index{connection}
+which is a rule that specifies how one locally flat neighborhood is to be joined seamlessly onto another
+locally flat neighborhood nearby. If you've ever bought two maps and tried to tape them together to make a
+big map, you've formed a connection. If the maps were on a large enough scale, you also probably noticed that
+this was impossible to do perfectly, because of the curvature of the earth.
+
+Physically, the idea is that in flat spacetime, it is possible to construct inertial guidance systems like the ones discussed on
+page \pageref{types-of-gyroscopes}. Since they are possible in flat spacetime, they are also possible
+in locally flat neighborhoods of spacetime, and they can then be carried from
+one neighborhood to another.
+
+In three space dimensions, a gyroscope's angular momentum vector maintains its direction, and
+we can orient other vectors, such as $1\zu{q}_1$, relative to it.
+Suppose for concreteness that the construction of the affine parameter above is being carried out in three
+space dimensions. We place a gyroscope at 0, orient its axis along $0\zu{q}_0$, slide it along the line to 1,
+and then construct $1\zu{q}_1$ along that axis.
+
+In 3+1 dimensions, a gyroscope only does part of the job. We now have to maintain the direction of
+a four-dimensional vector. Four-vectors will not be discussed in detail until section \ref{sec:four-vectors},
+but similar devices can be used to maintain their orientations in spacetime.
+These physical devices are ways of defining
+a mathematical notion known as \emph{parallel transport},\index{parallel transport}
+which allows us to take a vector from one point to another in space. 
+In general, specifying a notion of parallel transport is equivalent to specifying a connection.
+
+Parallel transport is path-dependent, as shown in figure \figref{path-dependence-of-parallel-transport}.
+
+<% marg(60) %>
+<%
+  fig(
+    'path-dependence-of-parallel-transport',
+    %q{Parallel transport is path-dependent. On the surface of this sphere, parallel-transporting a vector along ABC gives
+           a different answer than transporting it along AC.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'affine-not-geodesic',
+    %q{Bad things happen if we try to construct an affine parameter along a curve that isn't a geodesic.
+         This curve is similar to path ABC in figure \figref{path-dependence-of-parallel-transport}.
+         Parallel transport doesn't preserve the vectors' angle relative to the curve, as it would with
+         a geodesic. The errors in the construction blow up in a way that wouldn't happen if the curve
+         had been a geodesic. The fourth dashed parallel flies off wildly around the back of the sphere, wrapping around and meeting
+         the curve at a point, 4, that is essentially random.}
+  )
+%>
+<% end_marg %>
+
+<% begin_sec("Affine parameters defined only along geodesics") %>
+In the context of flat spacetime, the affine parameter was defined only along lines, not arbitrary curves, and
+could not be compared between lines running in different directions. In curved spacetime, the same limitation is
+present, but with ``along lines'' replaced by ``along geodesics.'' Figure \figref{affine-not-geodesic} shows what goes wrong if we try to apply
+the construction to a world-line that isn't a geodesic. One definition of a geodesic is that it's the
+course we'll end up following if we navigate by keeping a fixed bearing relative to an inertial guidance
+device such as gyroscope; that is,
+the tangent to a geodesic, when parallel-transported farther along the geodesic, is still tangent.
+A non-geodesic curve lacks this property, and the effect on the construction of the affine parameter is that
+the segments $n\zu{q}_n$ drift more and more out of alignment with the curve.
+
+<% end_sec %> % only along geodesics
+
+<% end_sec %> % parallel transport
+
+<% end_sec %>
+
+
+
+<% begin_sec("Models",nil,'models') %>
+
+A typical first reaction to the phrase ``curved spacetime'' --- or even ``curved space,'' for that matter ---
+is that it sounds like nonsense. How can featureless, empty space itself be curved or distorted? The concept
+of a distortion would seem to imply taking all the points and shoving them around in various directions as in a Picasso painting, so
+that distances between points are altered. But if space has no identifiable
+dents or scratches, it would seem impossible to determine which old
+points had been sent to which new points, and the distortion would have no observable effect at all.
+Why should we expect to be able to build differential geometry on such a logically dubious foundation?
+Indeed, historically, various mathematicians have had strong doubts about the logical self-consistency of
+both non-Euclidean geometry and infinitesimals. And even if an authoritative source assures you that the
+resulting system is self-consistent, its mysterious and abstract nature would seem to make it difficult
+for you to develop any working picture of the theory that could play the role that mental sketches of graphs
+play in organizing your knowledge of calculus.
+
+<% marg(0) %>
+<%
+  fig(
+    'levi-civita-portrait',
+    %q{Tullio Levi-Civita (1873-1941) worked on models of number systems possessing infinitesimals and on differential
+               geometry. He invented the tensor notation, which Einstein learned from his textbook. He was appointed to prestigious endowed chairs at
+               Padua and the University of Rome, but was fired in 1938 because
+               he was a Jew and an anti-fascist.}
+  )
+%>\index{Levi-Civita, Tullio}
+<% end_marg %>
+
+\emph{Models} provide a way of dealing with both the logical issues and the conceptual ones.
+Figure \figref{affine-par-in-curved-spacetime} on page \pageref{fig:affine-par-in-curved-spacetime} ``pops''
+off of the page, presenting a strong psychological impression of a curved surface rendered in perspective.
+This suggests finding an actual mathematical object, such as a curved surface, that satisfies all
+the axioms of a certain logical system, such as non-Euclidean geometry. Note that the model may contain
+extrinsic elements, such as the existence of a third dimension, that are not connected to the system
+being modeled. 
+
+Let's focus first on consistency. In general, what can we say about the self-consistency of a mathematical system?
+To start with, we can never prove anything about the consistency or lack of consistency of something that
+is not a well-defined formal system, e.g., the Bible. Even Euclid's \emph{Elements}, which was a model of
+formal rigor for thousands of years, is loose enough to allow considerable ambiguity. If you're inclined
+to scoff at the silly Renaissance mathematicians who kept trying to prove the parallel postulate E5 from
+postulates E1-E4, consider the following argument. Suppose that we replace E5 with $\zu{E}5'$, which states that
+parallels \emph{don't} exist: given a line and a point not on the line, no line can ever be drawn through the point
+and parallel to the given line. In the new system of plane geometry $\zu{E}'$ consisting of E1-E4 plus $\zu{E}5'$, we can prove a
+variety of theorems, and one of them is that there is an upper limit on the area of any figure. This imposes
+a limit on the size of circles, and that appears to contradict E3, which says we can construct a circle with
+any radius. We therefore conclude that $\zu{E}'$ lacks self-consistency. Oops! As your high school geometry text
+undoubtedly mentioned in passing, $\zu{E}'$ is a perfectly respectable system called elliptic geometry.\index{elliptic geometry}\index{geometry!elliptic}
+So what's wrong with this supposed proof of its lack of self-consistency? The issue is the exact statement of E3.
+E3 does not say that we can construct a circle given any real number as its radius. Euclid could not have intended any
+such interpretation, since he had no notion of
+real numbers. To Euclid, geometry was primary, and numbers were geometrically constructed objects, being represented
+as lengths, angles, areas, and volumes. A literal translation of Euclid's statement of the
+axiom is ``To describe a circle with any center and distance.''\footnote{Heath, pp. 195-202} ``Distance'' means
+a line segment. There is therefore no contradiction in $\zu{E}'$, because $\zu{E}'$ has a limit on the lengths of line segments.
+
+Now suppose that such ambiguities have been eliminated from the system's basic definitions and axioms.
+In general, we expect it to be easier to prove an inconsistent system's inconsistency than to demonstrate the
+consistency of a consistent one. In the former case, we can start cranking out theorems, and if we can
+find a way to prove both proposition P and its negation $\neg\zu{P}$, then obviously something is wrong
+with the system. One might wonder whether such a contradiction could remain contained within one corner
+of the system, like nuclear waste. It can't. Aristotelian logic allows proof by contradiction: if we prove both P and
+$\neg\zu{P}$ based on certain assumptions, then our assumptions must have been wrong. If we can prove
+both P and $\neg\zu{P}$ \emph{without} making any assumptions, then proof by contradiction allows us
+to establish the truth of \emph{any} randomly chosen proposition. Thus a single contradiction
+is sufficient, in Aristotelian logic, to invalidate the entire system. This goes by the Latin
+rubric \emph{ex falso quodlibet}, meaning ``from a falsehood, whatever you please.'' Thus any
+contradiction proves the inconsistency of the entire system.
+
+Proving consistency is harder. If you're mathematically sophisticated, you may be tempted to leap
+directly to G\"{o}del's theorem,\index{G\"{o}del's theorem}\index{G\"{o}del, Kurt}
+and state that nobody can ever prove the self-consistency of a
+mathematical system. This would be a misapplication of G\"{o}del. G\"{o}del's theorem
+only applies to mathematical systems that meet certain technical criteria, and some of the interesting
+systems we're dealing with don't meet those criteria; in particular, G\"{o}del's theorem doesn't
+apply to Euclidean geometry, and Euclidean geometry was proved self-consistent by Tarski and
+his students around 1950.\index{Tarski, Alfred}
+Furthermore, we usually don't require an absolute proof of self-consistency. Usually we're
+satisfied if we can prove that a certain system, such as elliptic geometry, is at least as self-consistent
+as another system, such as Euclidean geometry. This is called equiconsistency.\index{equiconsistency} The general technique for
+proving equiconsistency of two theories is to show that a model of one can be constructed within the other.\index{model!mathematical}
+
+Suppose, for example, that we construct a geometry in which the space of points is the surface of a sphere, and lines are understood
+to be the geodesics, i.e., the great circles whose centers coincide at the sphere's center. This geometry, called
+spherical geometry,\index{geometry!spherical}\index{spherical geometry} is useful in cartography and navigation.
+It is non-Euclidean, as we can demonstrate by exhibiting at least one proposition that is false in Euclidean geometry.
+For example, construct a triangle on the earth's surface with one corner at the north pole, and the other two at the
+equator, separated by 90 degrees of longitude. The sum of its interior angles is 270 degrees, contradicting
+Euclid, book I, proposition 32. Spherical geometry must therefore violate at least one of the axioms E1-E5, and indeed it violates
+both E1 (because no unique line is determined by two antipodal points such as the north and south poles) and E5
+(because parallels don't exist at all).
+
+A closely related construction gives a model of elliptic
+geometry, in which E1 holds, and only E5 is thrown overboard. To accomplish this, we model a point using a diameter
+of the sphere,\footnote{The term ``elliptic'' may be somewhat misleading here. The model is still constructed from
+a sphere, not an ellipsoid.} and a line as the set of all diameters lying in a certain plane. This has the effect of identifying
+antipodal points, so that there is now no violation of E1. Roughly speaking, this is like lopping off half of the sphere, but
+making the edges wrap around.
+Since this model of elliptic geometry is embedded within
+a Euclidean space, all the axioms of elliptic geometry can now be proved as theorems in Euclidean geometry.
+If a contradiction arose from them, it would imply a contradiction in the axioms of Euclidean geometry. We conclude
+that elliptic geometry is equiconsistent with Euclidean geometry. This was known long before Tarski's 1950 proof of
+Euclidean geometry's self-consistency, but since nobody was losing any sleep over hidden contradictions in Euclidean 
+geometry, mathematicians stopped wasting their time looking for contradictions in elliptic geometry.
+
+\begin{eg}{Infinitesimals}\label{infinitesimals}
+Consider the following axiomatically defined system of numbers:
+\begin{enumerate}
+\item It is a field, i.e., it has addition, subtraction, multiplication, and division with the usual properties.
+\item It is an ordered geometry in the sense of O1-O4 on p.~\pageref{ordered-geometry-axioms}, and the ordering relates to addition and multiplication in the usual way.
+\item Existence of infinitesimals: There exists a positive number $d$ such that $d<1$, $d<1/2$, $d<1/3$, \ldots
+\end{enumerate}
+A model of this system can be constructed within the real number system by defining $d$ as the identity function
+$d(x)=x$ and forming the set of functions of the form $f(d)=P(d)/Q(d)$,
+where $P$ and $Q$ are polynomials with real coefficients.
+The ordering of functions $f$ and $g$ is defined according to the sign of $\lim_{x\rightarrow 0^+}f(x)-g(x)$.
+Axioms 1-3 can all be proved from the real-number axioms. Therefore this system, which includes infinitesimals, is equiconsistent with the reals. More elaborate
+constructions can extend this to systems that have more of the properties of the reals, and
+a browser-based calculator that implements such a system is available at \url{lightandmatter.com/calc/inf}.
+Abraham Robinson extended this in 1966 to all of analysis,\index{Robinson!Abraham}
+and thus there is nothing intrinsically nonrigorous about doing analysis in the style of
+Gauss and Euler, with symbols like $\der x$ representing infinitesimally small
+quantities.\footnote{More on this topic is available in, for example, Keisler's \emph{Elementary Calculus: An Infinitesimal Approach},
+Stroyan's \emph{A Brief Introduction to Infinitesimal Calculus}, or my own \emph{Calculus}, all of which are
+available for free online.}
+\end{eg}
+
+Besides proving consistency, these models give us insight into what's going on. The model of elliptic geometry
+suggests an insight into the reason that there is an upper limit on lengths and areas: it is because the space
+wraps around on itself. The model of infinitesimals suggests a fact that is not immediately obvious from the axioms:
+the infinitesimal quantities compose a hierarchy, so that for example $7d$ is in finite proportion to
+$d$, while $d^2$ is like a ``lesser flea'' in Swift's doggerel: ``Big fleas have little fleas/ On their backs to ride 'em,/
+and little fleas have lesser fleas,/And so, ad infinitum.''
+
+Spherical and elliptic geometry are not valid models of a general-relativistic spacetime, since they are locally Euclidean rather than
+Lorentzian, but they still provide us with enough conceptual guidance to come up with some ideas that might never have occurred to us otherwise: 
+\begin{itemize}
+\item In spherical geometry, we can have a two-sided polygon called a lune\index{lune} that encloses a nonzero area. In general relativity, a lune
+              formed by the world-lines of two particles represents motion in which the particles separate but are later reunited, presumably
+              because of some mass between them that created a gravitational field. An example is gravitational lensing.
+<% marg(20) %>
+<%
+  fig(
+    'einsteins-ring',
+    %q{An Einstein's ring is formed when there is a chance alignment of a distant source with a closer gravitating body. Here,
+           a quasar, MG1131+0456, is seen as a ring due to focusing of light by an unknown object, possibly a supermassive
+           black hole. Because the entire arrangement lacks perfect axial symmetry, the ring is nonuniform; most of its brightness
+           is concentrated in two lumps on opposite sides. This type of gravitational lensing is direct evidence for the curvature of space predicted by gravitational
+           lensing. The two geodesics form a lune, which is a  figure that cannot exist in Euclidean geometry.}
+  )
+%>
+<% end_marg %>
+\item Both spherical models wraps around on themselves, so that they are not topologically equivalent to infinite planes.
+              We therefore form a conjecture there may be a link between curvature, which is a local property, and topology, which is global.
+              Such a connection is indeed observed in relativity. For example, cosmological solutions of the equations of general relativity
+              come in two flavors. One type has enough matter in it to produce more than a certain critical amount of curvature, and this
+              type is topologically closed. It describes a universe that has finite spatial volume, and that will only exist for a finite time
+              before it recontracts in a Big Crunch.\index{Big Crunch} The other type, corresponding to the universe we actually inhabit,
+              has infinite spatial volume, will exist for infinite time, and is topologically open.
+\item There is a distance scale set by the size of the sphere, with its inverse being a measure of curvature. In general relativity, we expect
+              there to be a similar way to measure curvature numerically, although the curvature may vary from point to point.
+\end{itemize}
+
+Self-check: Prove from the axioms $\zu{E}'$ that elliptic geometry, unlike spherical geometry, cannot have a lune with two distinct
+vertices. Convince yourself nevertheless, using the spherical model of $\zu{E}'$, that it is possible in elliptic geometry for two lines
+to enclose a region of space, in the sense that from any point P in the region, a ray emitted in any direction must intersect one of
+the two lines. Summarize these observations with a characterization of lunes in elliptic geometry versus lunes in spherical geometry.
+
+<% end_sec %>
+
+<% begin_sec("Intrinsic quantities") %>\label{sec:intrinsic-quantities}
+
+Models can be dangerous, because they can tempt us to impute physical reality to features that are purely extrinsic,
+i.e., that are only present in that particular model. This is as opposed to intrinsic features, which are present
+in all models, and which are therefore logically implied by the axioms of the system itself.\index{intrinsic quantity}\index{extrinsic quantity}
+The existence of lunes is clearly an intrinsic feature of non-Euclidean geometries, because intersection of lines
+was defined before any model has even been proposed.
+
+\begin{eg}{Curvature in elliptic geometry}\label{eg:elliptic-geom-intrinsic-curvature}
+What about curvature? In the spherical model
+of elliptic geometry, the size of the sphere is an inverse measure of curvature. Is this a valid intrinsic
+quantity, or is it extrinsic?\index{curvature!intrinsic versus extrinsic} It seems suspect, because it is a feature of the model. If we try to define
+``size'' as the radius $R$ of the sphere, there is clearly reason for concern, because this seems to refer to
+the center of the sphere, but existence of a three-dimensional Euclidean space inside and outside the surface is
+clearly an extrinsic feature of the model. There is, however, a way in which a creature confined to the surface
+can determine $R$, by constructing geodesic and an affine parameter along that geodesic, and measuring the distance $\lambda$
+accumulated until the geodesic returns to the initial point. Since antipodal points are identified, $\lambda$ equals half
+the circumference of the sphere, not its whole circumference, so $R=\lambda/\pi$, by wholly intrinsic methods.
+\end{eg}
+
+\begin{eg}{Extrinsic curvature}\label{eg:extrinsic-curvature}\label{blurtzy}%2nd version of label is necessary in order to avoid an error in the caption to fig:pythagorean
+Euclid's axioms E1-E5 refer to explicit constructions. If a two-dimensional being can
+physically verify them all as descriptions of the two-dimensional space she inhabits, then she knows that her space is
+Euclidean, and that propositions such as the Pythagorean theorem are physically valid in her universe.
+But the diagram in \subfigref{pythagorean}{1} illustrating illustrating the proof of the Pythagorean theorem in Euclid's \emph{Elements} (proposition I.47) is equally
+valid if the page is rolled onto a cylinder, 2, or formed into a wavy corrugated shape, 3.
+These types of curvature, which can be achieved without tearing or crumpling the surface, are extrinsic
+rather than intrinsic. Of the curved surfaces in figure \figref{pythagorean}, only the sphere, 4, has intrinsic curvature;
+the diagram can't be plastered onto the sphere without folding or cutting and pasting.
+\end{eg}
+
+<%
+  fig(
+    'pythagorean',
+    %q{Example \ref{blurtzy}.},
+    {
+      'width'=>'fullpage',
+    }
+  )
+%>
+
+Self-check: How would the ideas of example \ref{eg:extrinsic-curvature} apply to a cone?
+
+Example \ref{eg:extrinsic-curvature} shows that it can be difficult to sniff out bogus extrinsic features that seem intrinsic,
+and example \ref{eg:elliptic-geom-intrinsic-curvature} suggests the desirability of developing methods of calculation that never refer to
+any extrinsic quantities, so that we never have to worry whether a symbol like $R$ staring up at us
+from a piece of paper is intrinsic. This is why it is unlikely to be helpful to a student of general
+relativity to pick up a book on differential geometry that was written without general relativity
+specifically in mind. Such books have a tendency to casually mix together intrinsic and extrinsic
+notation. For example, a vector cross product $\vc{a}\times\vc{b}$ refers to a vector poking out of
+the plane occupied by $\vc{a}$ and $\vc{b}$, and the space outside the plane may be extrinsic;
+it is not obvious how to generalize this operation to the 3+1 dimensions of relativity (since the
+cross product is a three-dimensional beast), and even if it were, we could not be assured that it
+would have any intrinsically well defined meaning.
+
+<% begin_sec("Coordinate independence") %>
+To see how to proceed in creating a manifestly intrinsic notation, consider the two types of
+intrinsic observations that are available in general relativity:\label{intrinsic-measurements-in-gr}
+\begin{itemize}
+\item 1. We can tell whether events and world-lines are \emph{incident}: whether or not
+two lines intersect, two events coincide, or an event lies on a certain line.
+\end{itemize}
+Incidence measurements, for example detection of gravitational lensing, are global, but they are the \emph{only}
+global observations we can do.\footnote{Einstein referred to incidence measurements as ``determinations of space-time
+coincidences.'' For his presentation of this idea, see p.~\pageref{einstein-incidence}.} If we were limited entirely to incidence, spacetime would be described by
+the austere system of projective geometry,\index{projective geometry} a geometry without parallels or measurement.
+In projective geometry, all propositions are essentially statements about combinatorics, e.g., that it is impossible to
+plant seven trees so that they form seven lines of three trees each.
+
+But:
+\begin{itemize}
+\item 2. We can also do measurements in local Lorentz frames.
+\end{itemize}
+This gives us more power, but not as much as we might expect. Suppose we define a coordinate such as $t$ or $x$.
+In Newtonian mechanics, these coordinates would form a predefined background, a preexisting stage for the actors.
+In relativity, on the other hand, consider a completely arbitrary change of coordinates of the form $x \rightarrow x'=f(x)$, where $f$
+is a smooth one-to-one function. For example, we could have $x \rightarrow x+px^3+q\sin(rx)$ (with $p$ and $q$ chosen small enough so that
+the mapping is always one-to-one). Since the mapping is one-to-one, the new coordinate system preserves all the incidence
+relations. Since the mapping is smooth, the new coordinate system is still compatible with the existence of local Lorentz frames.
+The difference between the two coordinate systems is therefore entirely extrinsic, and we conclude that a manifestly
+intrinsic notation should avoid any explicit reference to a coordinate system. That is, if we write a calculation in which
+a symbol such as $x$ appears, we need to make sure that nowhere in the notation is there any hidden assumption that $x$
+comes from any particular coordinate system. For example, the equation should still be valid if the generic symbol $x$
+is later taken to represent the distance $r$ from some center of symmetry.
+This coordinate-independence property is also known as 
+general covariance,
+and this type of smooth change of coordinates is also 
+called a diffeomorphism.\index{general covariance}\index{coordinate independence}\index{coordinate transformation}\index{diffeomorphism}\label{diffeomorphism}
+
+\begin{eg}{The Dehn twist}\index{Dehn twist}
+As an exotic example of a change of coordinates, take a torus and label it with coordinates $(\theta,\phi)$, where $\theta+2\pi$ is
+taken to be the same as $\theta$, and similarly for $\phi$. Now subject it to the coordinate transformation T defined by $\theta\rightarrow\theta+\phi$,
+which is like opening the torus, twisting it by a full circle, and then joining the ends back together. T is known as the ``Dehn twist,''
+and it is different from most of the coordinate transformations we do in relativity because it can't be done smoothly, i.e., there is no
+continuous function $f(x)$ on $0\le x\le 1$ such that every value of $f$ is a smooth coordinate transformation, $f(0)$ is the identity transformation,
+and $f(1)=T$.
+\end{eg}
+<% begin_sec("Frames moving at $c$?") %>\label{sec:frames-at-c}
+A good application of these ideas is to the question of what
+the world would look like in a frame of reference moving at the
+speed of light.
+This question has a long and honorable history. As a young student,
+Einstein tried to imagine what an electromagnetic wave would look
+like from the point of view of a motorcyclist riding alongside it.
+We now know, thanks to Einstein himself, that it really doesn't
+make sense to talk about such observers.
+
+The most straightforward argument is based on the positivist idea
+that concepts only mean something if you can define how to measure
+them operationally. If we accept this philosophical stance (which is
+by no means compatible with every concept we ever discuss in
+physics), then we need to be able to physically realize this frame in
+terms of an observer and measuring devices. But we can't. It would
+take an infinite amount of energy to accelerate Einstein and his
+motorcycle to the speed of light.
+<% marg(-5) %>
+<%
+  fig(
+    'frame-at-c',
+    %q{A series of Lorentz boosts acts on a square.}
+  )
+%>
+<% end_marg %>
+
+Since arguments from positivism can often kill off perfectly
+interesting and reasonable concepts, we might ask whether there are
+other reasons not to allow such frames. There are.
+Recall that we placed two technical conditions on coordinate transformations:
+they are supposed to be smooth and one-to-one. The smoothness condition
+is related to the inability to boost Einstein's motorcycle into the
+speed-of-light frame by any continuous, classical process. (Relativity
+is a classical theory.) But independent of that, we have a problem
+with the one-to-one requirement. Figure \figref{frame-at-c}
+shows what happens if we do a series of Lorentz boosts to higher and
+higher velocities. It should be clear that if we could do a boost up to
+a velocity of $c$, we would have effected a coordinate transformation that
+was not one-to-one. Every point in the plane would be mapped onto a single
+lightlike line.
+<% end_sec %> % Frames moving at c?
+
+<% end_sec %> % Coordinate independence
+<% end_sec %>
+<% begin_sec("The metric",nil,'metric') %>
+Consider a coordinate
+$x$ defined along a certain curve, which is not necessarily a geodesic. For concreteness, imagine this curve
+to exist in two spacelike dimensions, which we can visualize as the surface of a sphere embedded in Euclidean
+3-space. These concrete features are not strictly necessary, but they drive home the point that we should
+not expect to be able to define $x$ so that it varies at a steady rate with elapsed distance; for example,
+we know that it will not be possible to define a two-dimensional Cartesian grid on the surface of
+a sphere. In
+the figure, the tick marks are therefore not evenly spaced. This is perfectly all right, given the coordinate
+invariance of general relativity. Since the incremental changes in $x$ \emph{are}
+equal, I've represented them below the curve as little vectors of equal length. They are the wrong length
+to represent distances along the curve, but this wrongness is an inevitable fact of life in relativity.
+
+Now suppose we want to integrate the arc length of a segment of this curve. The little vectors are
+infinitesimal. In the integrated length, each little vector should contribute some amount, which is a scalar.
+This scalar is not simply the magnitude of the vector,
+$\der s \ne \sqrt{\der\vc{x}\cdot\der\vc{x}}$, since the vectors are the wrong length. 
+Figure \figref{metric-motivation}
+is clearly reminiscent of the geometrical picture of vectors and dual vectors developed
+on p.~\pageref{visualize-vectors-and-duals}.
+But the purely affine
+notion of vectors and their duals is not enough to define the length of a vector in general; it is only
+sufficient to define a length relative to other lengths along the same geodesic.
+When vectors lie along different geodesics, we need to be able to specify the additional conversion
+factor that allows us to compare one to the other. The piece of machinery that allows us to do
+this is called a \emph{metric}.\index{metric}\label{metric-introduced}
+
+<% marg(300) %>
+<%
+  fig(
+    'metric-motivation',
+    %q{The tick marks on the line define a coordinate measured along the line. It is not possible
+             to set up such a coordinate system globally so that the coordinate is uniform everywhere.
+             The arrows represent changes in the value of the coordinate; since the changes in the coordinate
+             are all equal, the arrows are all the same length.}
+  )
+%>
+<% end_marg %>
+
+Fixing a metric allows us to define the proper
+scaling of the tick marks relative to the arrows at a given point, i.e., in the birdtracks
+notation it gives us a natural way of taking a displacement vector such as __birdvec(s),
+with the arrow pointing into the symbol, and making a corresponding dual vector
+__birddualvec(s), with the arrow coming out. This is a little like cloning a person but making
+the clone be of the opposite sex. Hooking them up like __birdscalarproduct(s,s) then tells us
+the squared magnitude of the vector. For example, if __birdvec(\der x) is an infinitesimal timelike displacement,
+then __birdscalarproduct(\der x,\der x) is the squared time interval $\der x^2$ measured by a clock traveling
+along that displacement in spacetime. (Note that in the notation $\der x^2$, it's clear that $\der x$ is a
+scalar, because unlike __birdvec(\der x) and __birddualvec(\der x) it doesn't have any arrow coming in or
+out of it.)
+Figure \figref{dual} shows the resulting picture.
+
+<%
+  fig(
+    'dual',
+    %q{%
+      The vectors __birdvec(\der x) and __birddualvec(\der x) are duals of each other. 
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+    }
+  )
+%>
+
+In the abstract index notation introduced on p.~\pageref{abstract-index-notation},
+the vectors __birdvec(\der x) and __birddualvec(\der x) are written
+$\der x^a$ and $\der x_a$. When a specific coordinate system has been fixed,
+we write these with concrete, Greek indices, $\der x^\mu$ and $\der x_\mu$.
+In an older and conceptually incompatible notation and terminology due to Sylvester (1853),
+one refers to $\der x^\mu$ as a contravariant vector, and $\der x_\mu$ as covariant. The confusing
+terminology is summarized on p.~\pageref{vec-covec-summary}.
+\index{covariant vector}\index{contravariant vector}\index{vectors and dual vectors}
+
+The assumption that a metric exists is
+nontrivial. There is no metric in Galilean spacetime, for example, since in the limit $c\rightarrow\infty$
+the units used to measure timelike and spacelike displacements
+are not comparable.\index{metric!none in Galilean spacetime}\label{no-galilean-metric}
+Assuming the existence of a metric is equivalent to assuming that the universe
+holds at least one physically manipulable clock or ruler that can be moved over long distances and
+accelerated as desired. In the distant future, large and causally isolated regions of the cosmos may
+contain only massless particles such as photons, which cannot be used to build clocks (or, equivalently,
+rulers); the
+physics of these regions will be fully describable without a metric.
+If, on the other hand, our world contains not just zero or one but two or more clocks, then the metric
+hypothesis requires that these clocks maintain a consistent relative rate when accelerated along the same
+world-line. This consistency is what allows us to think of relativity as a theory of space and time
+rather than a theory of clocks and rulers.
+There are other relativistic theories of gravity besides general relativity, and some
+of these violate this hypothesis.
+
+Given a $\der x^\mu$, how do we find its dual $\der x_\mu$, and vice versa? In one dimension, we simply need to introduce
+a real number $g$ as a correction factor. If one of the vectors is shorter than it should be in a certain region,
+the correction factor serves to compensate by making its dual proportionately longer. The two possible mappings
+(covariant to contravariant and contravariant to covariant) are accomplished with factors of $g$ and $1/g$.
+The number $g$ is the metric,
+and it encodes all the information about distances. For example, if $\phi$ represents longitude measured
+at the arctic circle, then the metric is the only source for the datum that a displacement $\der\phi$
+corresponds to 2540 km per radian.
+
+Now let's generalize to more than one dimension. Because globally Cartesian coordinate systems can't be
+imposed on a curved space, the constant-coordinate lines will in general be neither evenly spaced nor
+perpendicular to one another. If we construct a local set of basis vectors lying along the intersections of the constant-coordinate
+surfaces, they will not form an orthonormal set. We would like to have an expression of the form
+$\der s^2=\Sigma\der x^\mu \der x_\mu$ for the squared arc length, and using the Einstein summation
+notation this becomes
+\begin{equation*}
+  \der s^2=\der x^\mu \der x_\mu\eqquad.
+\end{equation*}
+
+<% begin_sec("The Euclidean metric") %>
+
+For Cartesian coordinates in a Euclidean plane, where one doesn't normally bother with
+the distinction between covariant and contravariant vectors,
+this expression for $\der s^2$ is simply the Pythagorean theorem, summed over two values of $\mu$ for the two coordinates:
+\begin{equation*}
+  \der s^2 = \der x^\mu \der x_\mu = \der x^2 + \der y^2
+\end{equation*}
+The symbols $\der x$, $\der s^0$, $\der x^0$, and $\der x_0$ are all synonyms, and likewise for 
+$\der y$, $\der s^1$, $\der x^1$, and $\der x_1$. (Because notations such as $\der s^1$ force the reader
+to keep track of which digits have been assigned to which letters, it is better practice to
+use notation such as $\der y$ or $\der s^y$; the latter notation could in principle be confused with
+one in which $y$ was a variable taking on values such as 0 or 1, but in reality we understand it from
+context, just as we understand that the $d$'s in $\der y/\der x$ are not referring to some variable $d$
+that stands for a number.)
+
+In the non-Euclidean case, the Pythagorean theorem is false;
+$\der x^\mu$ and $\der x_\mu$ are no longer synonyms, so their product is no
+longer simply the square of a distance. To see this more explicitly, let's write the expression so that
+only the covariant quantities occur. By local flatness, the relationship between the covariant and
+contravariant vectors is linear, and the most general relationship of this kind is given by making
+the metric a symmetric matrix $g_{\mu\nu}$. Substituting $\der x_\mu=g_{\mu\nu}x^\nu$, we have
+\begin{equation*}
+  \der s^2=g_{\mu\nu} \der x^\mu \der x^\nu\eqquad,
+\end{equation*}
+where there are now implied sums over both $\mu$ and $\nu$. Notice how implied sums occur only when
+the repeated index occurs once as a superscript and once as a subscript; other combinations are
+ungrammatical.
+
+Self-check: Why does it make sense to demand that the metric be symmetric?
+
+On p.~\pageref{vector-vs-scalar} we encountered the distinction among scalars, vectors, and dual
+vectors. These are specific examples of \emph{tensors},\index{tensor} which
+can be expressed in the birdtracks notation as objects with $m$ arrows coming in and $n$ coming out,
+or. In index notation, we have $m$ superscripts and $n$ subscripts. A scalar has $m=n=0$. A dual vector has
+$(m,n)=(0,1)$, a vector $(1,0)$, and the metric $(0,2)$. We refer to the number of indices as the
+rank of the tensor.\index{rank of a tensor}\index{tensor!rank} Tensors are discussed in more detail, and defined
+more rigorously, in chapter \ref{ch:tensors}. For our present purposes, it is important to note that just because
+we write a symbol with subscripts or superscripts, that doesn't mean it deserves to be called a tensor. This point
+can be understood in the more elementary context of Newtonian scalars and vectors. For example, we can define
+a Euclidean ``vector'' $\vc{u}=(m,T,e)$, where $m$ is the mass of the moon, $T$ is the temperature in
+Chicago, and $e$ is the charge of the electron. This creature $\vc{u}$ doesn't deserve to be called a vector,
+because it doesn't behave as a vector under rotation. 
+The general philosophy is that a tensor is something that has certain properties under changes of coordinates.
+For example, we've already seen on p.~\pageref{scaling-vectors-and-duals}
+the different scaling behavior of tensors with ranks $(1,0)$, $(0,0)$, and $(0,1)$.
+\label{tensor-intro}
+
+When discussing the symmetry of rank-2 tensors, it is convenient to introduce
+the following notation:\index{tensor!symmetric}\index{tensor!antisymmetric}\index{symmetrization}\index{antisymmetrization}\label{symmetry-notation}
+\begin{align*}
+  T_{(ab)} &= \frac{1}{2}\left(T_{ab}+T_{ba}\right) \\
+  T_{[ab]} &= \frac{1}{2}\left(T_{ab}-T_{ba}\right) 
+\end{align*}
+Any $T_{ab}$ can be split into symmetric and antisymmetric parts. This is similar to writing an arbitrary
+function as a sum of and odd function and an even function.
+The metric has only a symmetric part: $g_{(ab)}=g_{ab}$, and $g_{[ab]}=0$. This notation is generalized to ranks greater than 2 on page
+\pageref{symmetry-more-than-rank-two}.
+
+Self-check: Characterize an antisymmetric rank-2 tensor in two dimensions.
+
+\begin{eg}{A change of scale}\label{eg:change-of-scale}
+\egquestion How is the effect of a uniform rescaling of coordinates represented in $g$?
+
+\eganswer If we change our units of measurement so that $x^\mu \rightarrow \alpha x^\mu$,
+while demanding that $\der s^2$ come out the same, then we need $g_{\mu\nu} \rightarrow \alpha^{-2}g_{\mu\nu}$.
+
+Comparing with p.~\pageref{scaling-vectors-and-duals}, we deduce the general rule that a
+tensor of rank $(m,n)$ transforms under scaling by picking up a
+factor of $\alpha^{m-n}$.
+\end{eg}
+
+\begin{eg}{Polar coordinates}\label{eg:metric-in-polar-coords}
+Consider polar coordinates $(r,\theta)$ in a Eu\-clidean plane. The const\-ant-coordinate curves
+happen to be orthogonal everywhere, so the off-diagonal elements of the metric $g_{r\theta}$
+and $g_{\theta r}$ vanish. Infinitesimal coordinate changes $\der r$ and $\der \theta$ correspond to
+infinitesimal displacements $\der r$ and $r\der\theta$ in orthogonal directions, so by
+the Pythagorean theorem, $\der s^2=\der r^2 + r^2\der \theta^2$, and we read off the
+elements of the metric $g_{rr}=1$ and $g_{\theta\theta}=r^2$.
+\end{eg}
+
+Notice how in example \ref{eg:metric-in-polar-coords} we started from the generally valid relation $\der s^2=g_{\mu\nu} \der x^\mu \der x^\nu$,
+but soon began writing down facts like  $g_{\theta\theta}=r^2$ that were only valid in this particular
+coordinate system. To make it clear when this is happening, we maintain the distinction between abtract
+Latin indices and concrete Greek indices introduced on p.~\pageref{abstract-index-notation}.
+For example, we can write the general expression for squared differential arc length with Latin indices,
+\begin{equation*}
+  \der s^2=g_{ij} \der x^i \der x^j\eqquad,
+\end{equation*}
+because it holds regardless of the coordinate system, whereas the vanishing of the off-diagonal
+elements of the metric in Euclidean polar coordinates has to be written as $g_{\mu\nu}=0$ for $\mu \ne \nu$,
+since it would in general be false if we used a different coordinate system to describe the same Euclidean plane.
+\index{abstract index notation}
+
+\begin{eg}{Oblique Cartesian coordinates}\label{eg:oblique-cartesian}
+\egquestion Oblique Cartesian coordinates are like
+normal Cartesian coordinates in the plane, but their axes are at at
+an angle $\phi \ne \pi/2$ to one another. Find the metric in these coordinates. The space is globally Euclidean.
+
+\eganswer Since the coordinates differ from Cartesian coordinates only in the angle between the axes, not in their
+scales, a displacement $\der x^i$ along either axis, $i=1$ or 2, must give $\der s=\der x$, so for the diagonal
+elements we have $g_{11}=g_{22}=1$. The metric is always symmetric, so
+$g_{12}=g_{21}$. To fix these off-diagonal elements, consider a displacement by $\der s$ in the
+direction perpendicular to axis 1. This changes the coordinates by $\der x^1=-\der s \cot\phi$ and
+$\der x^2 = \der s \csc\phi$. We then have
+\begin{align*}
+  \der s^2 &= g_{ij} \der x^i \der x^j \\
+           &= \der s^2 (\cot^2\phi+\csc^2\phi-2g_{12}\cos\phi\csc\phi) \\
+  g_{12}   &= \cos\phi\eqquad.
+\end{align*}
+\end{eg}
+<% marg(50) %>
+<%
+  fig(
+    'oblique',
+    %q{Example \ref{eg:oblique-cartesian}.}
+  )
+%>
+<% end_marg %>
+
+\begin{eg}{Area}
+In one dimension, $g$ is a single number, and lengths are given by $\der s=\sqrt{g}\der x$.
+The square root can also be understood through example \ref{eg:change-of-scale} on
+page \pageref{eg:change-of-scale}, in which we saw that
+a uniform rescaling $x \rightarrow \alpha x$ is reflected in $g_{\mu\nu} \rightarrow \alpha^{-2}g_{\mu\nu}$.
+
+In two-dimensional Cartesian coordinates, multiplication of the width and height of a rectangle
+gives the element of area $\der A=\sqrt{g_{11}g_{22}}\der x^1\der x^2$. Because the coordinates
+are orthogonal, $g$ is diagonal, and the factor of $\sqrt{g_{11}g_{22}}$ is identified as the
+square root of its determinant, so $\der A=\sqrt{|g|}\der x^1\der x^2$. Note that the scales on
+the two axes are not necessarily the same, $g_{11}\ne g_{22}$.
+
+The same expression for the element of area holds even if the coordinates are not orthogonal.
+In example \ref{eg:oblique-cartesian}, for instance, we have $\sqrt{|g|}=\sqrt{1-\cos^2\phi}=\sin\phi$,
+which is the right correction factor corresponding to the fact that $\der x^1$ and $\der x^2$ form
+a parallelepiped rather than a rectangle.
+\end{eg}
+
+\begin{eg}{Area of a sphere}
+For coordinates $(\theta,\phi)$ on the surface of a sphere of radius $r$, we have,
+by an argument similar to that of example \ref{eg:metric-in-polar-coords} on page \pageref{eg:metric-in-polar-coords},
+$g_{\theta\theta}=r^2$, $g_{\phi\phi}=r^2\sin^2\theta$, $g_{\theta\phi}=0$.
+The area of the sphere is
+\begin{align*}
+  A &= \int \der A \\
+    &= \int \int \sqrt{|g|}\der \theta\der\phi \\
+    &= r^2 \int \int \sin\theta \der \theta\der\phi \\
+    &= 4\pi r^2
+\end{align*}
+\end{eg}
+
+\begin{eg}{Inverse of the metric}\label{eg:inverse-of-metric}
+\egquestion Relate $g^{ij}$ to $g_{ij}$.
+
+\eganswer The notation is intended to treat covariant and contravariant vectors completely symmetrically.
+The metric with lower indices $g_{ij}$ can be interpreted as a change-of-basis transformation from a
+contravariant basis to a covariant one, and if the symmetry of the notation is to be maintained,
+$g^{ij}$ must be the corresponding inverse matrix, which changes from the covariant basis to the
+contravariant one. The metric must always be invertible.
+\end{eg}
+
+In the one-dimensional case, p. \pageref{metric-introduced}, the metric at any given point was simply
+some number $g$, and we used factors of $g$ and $1/g$ to convert back and forth between covariant
+and contravariant vectors. Example \ref{eg:inverse-of-metric} makes it clear how to generalize this
+to more dimensions:
+\begin{align*}
+  x_a &= g_{ab}x^b \\
+  x^a &= g^{ab}x_b
+\end{align*}
+This is referred to as raising and lowering
+indices.\index{indices!raising and lowering}\index{raising an idex}\index{lowering an index}
+There is no need to memorize the positions of the indices in these rules; they are the only ones
+possible based on the grammatical rules, which are that summation only occurs over top-bottom pairs,
+and upper and lower indices have to match on both sides of the equals sign.
+This whole system, introduced by Einstein, is called ``index-gymnastics''
+notation.\index{index gymnastics notation}
+
+\begin{eg}{Raising and lowering indices on a rank-two tensor}\label{eg:rank-two-indices}
+In physics we encounter various examples of matrices, such as the moment of inertia tensor
+from classical mechanics. These have two indices, not just one like a vector. Again, the rules
+for raising and lowering indices follow directly from grammar. For example,
+\begin{equation*}
+  A\indices{^a_b} = g^{ac}A_{cb}
+\end{equation*}
+and
+\begin{equation*}
+  A_{ab} = g_{ac}g_{bd}A^{cd}\eqquad.
+\end{equation*}
+\end{eg}
+
+\begin{eg}{A matrix operating on a vector}\label{eg:mixed-indices}
+The row and column vectors from linear algebra are the covariant and contravariant vectors in our
+present terminology. (The convention is that covariant vectors are row vectors and contravariant ones
+column vectors, but I don't find this worth memorizing.) What about matrices? A matrix acting on
+a column vector gives another column vector, $\vc{q}=U\vc{p}$. Translating this into index-gymnastics
+notation, we have
+\begin{equation*}
+  q^a = U\indices{^\ldots_\ldots}p^b\eqquad,
+\end{equation*}
+where we want to figure out the correct placement of the indices on $U$. Grammatically, the only possible
+placement is
+\begin{equation*}
+  q^a = U\indices{^a_b}p^b\eqquad.
+\end{equation*}
+This shows that the natural way to represent a column-vector-to-column-vector linear operator is
+as a rank-2 tensor with one upper index and one lower index.
+
+In birdtracks notation, a rank-2 tensor is something that has two arrows connected to it.
+Our example becomes
+$\rightarrow q = \rightarrow U \rightarrow p$. That the result is itself an upper-index
+vector is shown by the fact that the right-hand-side taken as a whole has a single external arrow 
+coming into it.\index{birdtracks notation!rank-2 tensor}
+\end{eg}
+<% end_sec %>
+
+The distinction between vectors and their duals may
+seem irrelevant if we can always raise and lower indices at will. We can't always do that, however,
+because in many perfectly ordinary situations there is no
+metric. See example \ref{eg:systems-without-a-metric}, p.~\pageref{eg:systems-without-a-metric}.
+
+<% begin_sec("The Lorentz metric") %>
+
+In a locally Euclidean space, the Pythagorean theorem allows us to express the metric in local Cartesian
+coordinates in the simple form $g_{\mu\mu}=+1$, $g_{\mu\nu}=0$, i.e., $g=\operatorname{diag}(+1,+1,\ldots,+1)$.
+This is not the appropriate metric for a locally Lorentz space. The axioms of Euclidean geometry
+E3 (existence of circles) and E4 (equality of right angles) describe the theory's invariance under rotations,
+and the Pythagorean theorem is consistent with this, because it gives the same answer for the length of
+a vector even if its components are reexpressed in a new basis that is rotated with respect to the original
+one. In a Lorentzian geometry, however, we care about invariance under Lorentz boosts, which do not preserve the quantity $t^2+x^2$.
+It is not circles in the $(t,x)$ plane that are invariant, but light cones, and this is described
+by giving $g_{tt}$ and $g_{xx}$ opposite signs and equal absolute values. A lightlike vector $(t,x)$, with $t=x$, therefore
+has a magnitude of exactly zero,
+\begin{equation*}
+  s^2 = g_{tt}t^2+g_{xx}x^2 = 0\eqquad,
+\end{equation*}
+and this remains true after the Lorentz boost $(t,x) \rightarrow (\gamma t,\gamma x)$. It is a matter of convention
+which element of the metric to make positive and which to make negative. In this book, I'll use $g_{tt}=+1$ and $g_{xx}=-1$,
+so that $g=\operatorname{diag}(+1,-1)$. This has the advantage that any line segment representing the timelike world-line of a physical object
+has a positive squared magnitude; the forward flow of time is represented as a positive number, in keeping with the
+philosophy that relativity is basically a theory of how causal relationships work. With this sign convention, spacelike vectors have positive
+squared magnitudes,  timelike ones  negative.
+The same convention is followed,
+for example, by Penrose. The opposite version, with $g=\operatorname{diag}(-1,+1)$ is used by authors such as Wald and Misner, Thorne, and
+Wheeler.
+
+Our universe does not have just one spatial dimension, it has three, so the full metric in a Lorentz
+frame is given by \linebreak $g=\operatorname{diag}(+1,-1,-1,-1)$.
+
+\begin{eg}{Mixed covariant-contravariant form of the metric}\label{eg:mixed-metric}
+In example \ref{eg:rank-two-indices} on p.~\pageref{eg:rank-two-indices}, we saw how to raise and lower
+indices on a rank-two tensor, and example \ref{eg:mixed-indices} showed that it is sometimes natural
+to consider the form in which one index is raised and one lowered. The metric itself is a rank-two tensor,
+so let's see what happens when we compute the mixed form $g\indices{^a_b}$ from the lower-index form.
+In general, we have
+\begin{equation*}
+  A\indices{^a_b} = g^{ac}A_{cb}\eqquad,
+\end{equation*}
+and substituting $g$ for $A$ gives
+\begin{equation*}
+  g\indices{^a_b} = g^{ac}g_{cb}\eqquad.
+\end{equation*}
+But we already know that $g^{\ldots}$ is simply the inverse matrix of $g_{\ldots}$ (example \ref{eg:inverse-of-metric},
+p.~\pageref{eg:inverse-of-metric}), which means that $g\indices{^a_b}$ is simply the identity matrix. 
+That is, whereas a quantity like $g_{ab}$ or $g^{ab}$ carries all the information about our
+system of measurement at a given point, $g\indices{^a_b}$ carries no information at all.
+Where $g_{ab}$ or $g^{ab}$ can have both positive and negative elements, elements that have units,
+and off-diagonal elements, $g\indices{^a_b}$ is just a generic symbol carrying no information other than
+the dimensionality of the space.
+
+The metric tensor is so commonly used that it is simply left out of birdtrack diagrams.
+Consistency is maintained because
+because $g\indices{^a_b}$ is the identity matrix, so $\rightarrow g \rightarrow$
+is the same as $\rightarrow \rightarrow$.\index{birdtracks notation!metric omitted in}
+\end{eg}
+
+<% end_sec %>
+
+<% begin_sec("Isometry, inner products, and the Erlangen Program") %>
+In Euclidean geometry, the dot product of vectors $\vc{a}$ and $\vc{b}$ is given by
+$g_{xx}a_xb_x+g_{yy}a_yb_y+g_{zz}a_zb_z=a_xb_x+a_yb_y+a_zb_z$, and in the special case
+where $\vc{a}=\vc{b}$ we have the squared magnitude. 
+In the tensor notation, $a^\mu b_\nu=a^1b_1+a^2b_2+a^3b_3$.
+Like magnitudes, dot products are invariant under rotations. This is because knowing
+the dot product of vectors $\vc{a}$ and $\vc{b}$ entails knowing the value of $\vc{a}\cdot\vc{b}=|\vc{a}||\vc{a}|\cos\theta_{\vc{a}\vc{b}}$,
+and Euclid's E4 (equality of right angles) implies that the angle $\theta_{\vc{a}\vc{b}}$ is invariant.
+the same axioms also entail invariance of dot products under translation; Euclid waits only until the
+second proposition of the \emph{Elements} to prove that line segments can be copied from one location
+to another. This seeming triviality is actually false as a description of physical
+space, because it amounts to a statement that space has the same properties everywhere.
+
+The set of all transformations that can be built out of successive translations, rotations, and
+reflections is called the group of isometries.\index{isometry} It can also be defined as the
+group\footnote{In mathematics, a group is defined
+as a binary operation that has an identity, inverses, and associativity. For example, addition of
+integers is a group. In the present context, the members of the group are not numbers but the
+transformations applied to the Euclidean plane. The group operation on transformations $T_1$ and
+$T_2$ consists of finding the transformation that results from doing one and then the other, i.e.,
+composition of functions.} that preserves dot products, or the group\index{group} that preserves congruence of triangles.
+
+In Lorentzian geometry, we usually avoid the Euclidean term dot product and
+refer to the corresponding operation by the more general term inner product.\index{inner product}
+In a specific coordinate system
+we have $a^\mu b_\nu=a^0b_0-a^1b_1-a^2b_2-a^3b_3$. The inner product is invariant under Lorentz
+boosts, and also under the Euclidean isometries. The group found by
+making all possible combinations of continuous transformations\footnote{The discontinuous
+transformations of spatial reflection and time reversal are not included in the definition of the
+Poincar\'{e} group, although they do preserve inner products. General relativity has symmetry
+under spatial reflection (called P for parity), time reversal (T), and charge inversion (C), but the standard
+model of particle physics is only invariant under the composition of all three, CPT, not under any
+of these symmetries individually.}\index{parity}\index{time reversal}\index{charge inversion}
+from these two sets is called the Poincar\'{e} group.\index{Poincar\'{e} group}
+The Poincar\'{e} group is not the symmetry group of all of spacetime, since curved spacetime has
+different properties in different locations. The equivalence principle tells us, however, that
+space can be approximated locally as being flat, so the Poincar\'{e} group is locally valid, just as
+the Euclidean isometries are locally valid as a description of geometry on the Earth's curved surface.
+
+\begin{eg}{The triangle inequality}\index{triangle inequality}
+In Euclidean geometry, the triangle inequality $|\vc{b}+\vc{c}|<|\vc{b}|+|\vc{c}|$ follows from
+\begin{equation*}
+ (|\vc{b}|+|\vc{c}|)^2-(\vc{b}+\vc{c})\cdot(\vc{b}+\vc{c})=2(|\vc{b}||\vc{c}|-\vc{b}\cdot\vc{c}) \ge 0\eqquad.
+\end{equation*}
+The reason this quantity always comes out positive is that for two vectors of fixed magnitude, the
+greatest dot product is always achieved in the case where they lie along the same direction.
+
+In Lorentzian geometry, the situation is different. Let $\vc{b}$ and $\vc{c}$ be timelike vectors, so that
+they represent possible world-lines. Then the relation $\vc{a}=\vc{b}+\vc{c}$ suggests the existence of two
+observers who take two different paths from one event to another. A goes by a direct route while B takes
+a detour. The magnitude of each timelike vector represents the time elapsed on a clock carried by the
+observer moving along that vector. The triangle equality is now reversed, becoming $|\vc{b}+\vc{c}|>|\vc{b}|+|\vc{c}|$.
+The difference from the Euclidean case arises because inner products are no longer necessarily maximized if vectors
+are in the same direction.
+E.g., for two lightlike vectors, $b^ic_j$ vanishes entirely if $\vc{b}$ and $\vc{c}$
+are parallel.
+For timelike vectors, parallelism actually minimizes the inner product rather 
+than maximizing it.\footnote{Proof: Let $\vc{b}$ and $\vc{c}$ be parallel and timelike, and directed
+forward in time. Adopt a frame of reference in which
+every spatial component of each vector vanishes.
+This entails no loss of generality, since inner products are
+invariant under such a transformation.
+Since the time-ordering is also preserved under transformations in the Poincar\'{e} group, each is still directed forward in time,
+not backward.
+Now let  $\vc{b}$ and $\vc{c}$ be pulled away
+from parallelism, like opening a pair of scissors in the $x-t$ plane. This reduces $b_tc_t$, while causing
+$b_xc_x$ to become negative. Both effects increase the inner product.}
+\end{eg}
+
+In his 1872 inaugural address at the University of Erlangen, Felix Klein used the idea of
+groups of transformations to lay out a general classification scheme, known as the Erlangen program,\index{Erlangen program}
+for all the different types of geometry. Each geometry is described by the group of transformations, called the principal group,\index{principal group}
+that preserves the truth of geometrical statements. Euclidean geometry's principal group consists of the
+isometries combined with arbitrary changes of scale, since there is nothing in Euclid's axioms that
+singles out a particular distance as a unit of measurement. In other words, the principal group
+consists of the transformations that preserve similarity, not just those that preserve congruence.
+Affine geometry's principal group is the transformations that preserve parallelism; it includes shear transformations,
+and there is therefore no invariant notion of angular measure or congruence.
+Unlike Euclidean and affine geometry, elliptic geometry does not have scale invariance. This is because
+there is a particular unit of distance that has special status; as we saw in example
+\ref{eg:elliptic-geom-intrinsic-curvature} on page \pageref{eg:elliptic-geom-intrinsic-curvature},
+a being living in an elliptic plane can determine, by entirely intrinsic methods, a distance scale
+$R$, which we can interpret in the hemispherical model as the radius of the sphere.
+General relativity breaks this symmetry even more severely. Not only is there a scale associated
+with curvature, but the scale is different from one point in space to another.
+
+
+<% end_sec %> % Isometry, inner products, and the Erlangen Program
+
+<% begin_sec("Einstein's carousel") %>\label{sec:carousel}
+<% begin_sec("Non-Euclidean geometry observed in the rotating frame") %>\index{rotating frame of reference}
+The following example was historically important, because Einstein used it to convince himself that general relativity should be
+described by non-Euclidean geometry.\footnote{The example is described in Einstein's paper ``The Foundation of the General Theory of Relativity.''
+An excerpt, which includes the example, is given on p.~\pageref{einstein-foundation}.} Its interpretation is also fairly subtle, and the early relativists
+had some trouble with it.
+<% marg(50) %>
+<%
+  fig(
+    'carousel',
+    %q{Observer A, rotating with the carousel, measures an azimuthal distance with a ruler.}
+  )
+%>
+<% end_marg %>
+
+Suppose that observer A is on a spinning carousel while observer B stands on the ground.
+B says that A is accelerating, but by the equivalence principle A can say that she is at rest in a
+gravitational field, while B is free-falling out from under her. B measures the radius and circumference
+of the carousel, and finds that their ratio is $2\pi$. A carries out similar measurements, but when she
+puts her meter-stick in the azimuthal direction it becomes Lorentz-contracted by the factor $\gamma=(1-\omega^2r^2)^{-1/2}$, so she finds that the
+ratio is greater than $2\pi$. In A's coordinates, the spatial geometry is non-Euclidean, and the metric
+differs from the Euclidean one found in example \ref{eg:metric-in-polar-coords} on page \pageref{eg:metric-in-polar-coords}.
+
+Observer A feels a force that B considers to be fictitious,
+but that, by the equivalence principle, A can say is a perfectly real gravitational force. According to A, an observer
+like B is free-falling away from the center of the disk under the influence of this gravitational field.
+A also observes that the spatial geometry of
+the carousel is non-Euclidean. Therefore it seems reasonable to conjecture that gravity can be described by
+non-Euclidean geometry, rather than as a physical force in the Newtonian sense.
+
+At this point, you know as much about this example as Einstein did in 1912, when he began using it as the seed from which
+general relativity sprouted, collaborating with his old schoolmate, mathematician Marcel Grossmann, who knew about
+differential geometry.
+% see http://philsci-archive.pitt.edu/archive/00002123/01/annalen.pdf , p. 11, for historical significance of example
+The remainder of subsection \ref{sec:carousel}, which you may want to skip on a first reading,
+goes into more detail on the interpretation and mathematical description of the rotating frame of reference.
+Even more detailed treatments are given by Gr\o{}n\footnote{Relativistic description of a rotating disk, Am. J. Phys. 43 (1975) 869}
+and Dieks.\footnote{Space, Time, and Coordinates in a Rotating World, \url{http://www.phys.uu.nl/igg/dieks}}.
+<% end_sec %> % Non-Euclidean geometry observed in the rotating frame
+
+<% begin_sec("Ehrenfest's paradox") %>\label{sec:ehrenfest-paradox}
+Ehrenfest\footnote{P. Ehrenfest, Gleichf\"ormige Rotation starrer K\"orper und Relativit\"atstheorie, Z. Phys. 10 (1909) 918,
+available in English translation at \url{en.wikisource.org}.}
+described the following paradox.\index{Ehrenfest's paradox} Suppose that observer B, in the lab frame, measures the radius of the disk to be
+$r$ when the disk is at rest, and $r'$ when the disk is spinning. B can also measure the corresponding circumferences
+$C$ and $C'$. Because B is in an inertial frame, the spatial geometry does not appear non-Euclidean according to measurements carried
+out with his meter sticks,
+and therefore the Euclidean relations $C=2\pi r$ and $C'=2\pi r'$ both hold. The radial lines are perpendicular
+to their own motion, and they therefore have no length contraction, $r=r'$, implying $C=C'$. The outer edge of the disk, however,
+is everywhere tangent to its own direction of motion, so it is Lorentz contracted, and therefore $C'<C$.
+The resolution of the paradox is that it rests on the incorrect assumption that a rigid disk can be made to rotate.\index{rotation!rigid}\index{rigid-body rotation}
+If a perfectly rigid disk was initially not rotating, one would have to distort it in
+order to set it into rotation, because once it was rotating its outer edge would no longer have a length equal to
+$2\pi$ times its radius. Therefore if the disk is perfectly rigid, it can never be rotated.
+As discussed on page \pageref{eg:newtonian-black-hole},
+relativity does not allow the existence of infinitely rigid or infinitely strong materials. If it did, then
+one could violate causality. If a perfectly rigid disk existed, vibrations in the disk would propagate at
+infinite velocity, so tapping the disk with a hammer in one place would result in the transmission of
+information at $v>c$ to other parts of the disk, and then there would exist frames of reference in which
+the information was received before it was transmitted. The same applies if the hammer tap is used to impart
+rotational motion to the disk.
+<% marg(70) %>
+<%
+  fig(
+    'einstein-ehrenfest-piano',
+    %q{Einstein and Ehrenfest.}
+  )
+%>
+<% end_marg %>
+
+Self-check: What if we build the disk by assembling the building
+materials so that they are already rotating properly before they are joined together?
+
+
+<% end_sec %> % Ehrenfest's paradox
+<% begin_sec("The metric in the rotating frame") %>
+What if we try to get around these problems by applying torque uniformly all over the disk, so that the
+rotation starts smoothly and simultaneously everywhere? We then run into issues identical to the ones raised
+by Bell's spaceship paradox (p. \pageref{eg:bell-spaceship-paradox}). In fact, Ehrenfest's paradox is nothing
+more than Bell's paradox wrapped around into a circle. The same question of time synchronization comes up.
+
+To spell this out mathematically, let's find the metric according to observer A
+by applying the change of coordinates $\theta'=\theta-\omega t$.
+First we take the Euclidean metric of example \ref{eg:metric-in-polar-coords} on page \pageref{eg:metric-in-polar-coords} and rewrite it as
+a (globally) Lorentzian metric in spacetime for observer B,
+\begin{equation}
+  \der s^2=\der t^2 - \der r^2 - r^2\der \theta^2\eqquad.
+\end{equation}
+Applying the transformation into A's coordinates, we find
+\begin{equation}\label{eq:rotating-lab-metric}
+  \der s^2=(1-\omega^2 r^2)\der t^2 - \der r^2 - r^2\der \theta'^2 - 2\omega r^2\der\theta'\der t\eqquad.
+\end{equation}
+%%%%%%%%% See carousel1.mac. Checked that it comes out flat.
+Recognizing $\omega r$ as the velocity of one frame relative to another, and
+$(1-\omega^2 r^2)^{-1/2}$ as $\gamma$, we see that we do have a relativistic time dilation effect in the $\der t^2$ term.
+But the $\der r^2$
+and $\der \theta'^2$ terms look Euclidean. Why don't we see any Lorentz contraction of the length scale
+in the azimuthal direction?
+
+The answer is that coordinates in general relativity are arbitrary, and
+just because we can write down a certain set of coordinates, that doesn't mean they have any special
+physical interpretation. The coordinates $(t,r,\theta')$ do not correspond physically to the quantities
+that A would measure with clocks and meter-sticks. The tip-off is the $\der\theta'\der t$ cross-term.
+Suppose that A sends two cars driving around the circumference of
+the carousel, one clockwise and one counterclockwise, from the same point. If $(t,r,\theta')$ coordinates
+corresponded to clock and meter-stick measurements, then we would expect that when the cars met up again
+on the far side of the disk, their dashboards would show equal values of the arc length $r\theta'$ on their odometers and equal
+proper times $\der s$ on their clocks. But this is not the case, because the sign of the $\der\theta'\der t$ term is
+opposite for the two world-lines. The same effect occurs if we send beams of light in both directions around the
+disk, and this is the Sagnac effect (p. \pageref{sagnac}).\index{Sagnac effect}
+
+This is a symptom of the fact that the coordinate $t$ is not properly synchronized between different places
+on the disk. We already know that we should not expect to be able to find a universal time coordinate that
+will match up with every clock, regardless of the clock's state of motion. Suppose we set ourselves a more modest goal.
+Can we find a universal time coordinate that will match up with every clock, provided that the clock
+is at rest relative to the rotating disk? 
+<% end_sec %> % The metric in the rotating frame
+
+<% begin_sec("The spatial metric and synchronization of clocks") %>\label{sec:synchronization-on-carousel}
+A trick for improving the situation is to eliminate the $\der\theta'\der t$ cross-term by
+completing the square in the metric [\ref{eq:rotating-lab-metric}]. The result is
+\begin{equation*}
+  \der s^2=(1-\omega^2 r^2)\left[\der t+\frac{\omega r^2}{1-\omega^2 r^2}\der\theta'\right]^2 - \der r^2 - \frac{r^2}{1-\omega^2r^2}\der \theta'^2\eqquad.
+\end{equation*}
+The interpretation of the quantity in square brackets is as follows. Suppose that two observers situate themselves on the
+edge of the disk, separated by an infinitesimal angle $\der\theta'$. They then synchronize their clocks by exchanging
+light pulses. The time of flight, measured in the lab frame, for each light pulse is the solution of the equation 
+$\der s^2=0$, and the only difference between the clockwise result $\der t_1$ and the counterclockwise one $\der t_2$ arises from the sign of $\der\theta'$. The quantity in
+square brackets is the same in both cases, so the amount by which the clocks must be adjusted is $\der t=(\der t_2-\der t_1)/2$, or
+\begin{equation*}
+  \der t = \frac{\omega r^2}{1-\omega^2 r^2}\der\theta' .
+\end{equation*}
+Substituting this into the metric, we are left with the purely spatial metric
+\begin{equation}\label{eq:rotating-spatial}
+  \der s^2= - \der r^2 - \frac{r^2}{1-\omega^2r^2}\der \theta'^2\eqquad.
+\end{equation}
+The factor of
+$(1-\omega^2r^2)^{-1}=\gamma^2$ in the $\der \theta'^2$ term is simply the expected Lorentz-contraction factor.
+In other words, the circumference is, as expected, greater than $2\pi r$ by a factor of $\gamma$.
+
+Does the metric [\ref{eq:rotating-spatial}] represent the same
+non-Euclidean spatial geometry that A, rotating with the disk, would determine by meter-stick measurements?
+Yes and no. It \emph{can} be interpreted as the one that A would determine by radar measurements.
+That is, if A measures a round-trip travel time $\der t$ for a light signal between points separated by
+coordinate distances $\der r$ and $\der\theta'$, then A can say that the spatial separation is $\der t/2$,
+and such measurements will be described correctly by [\ref{eq:rotating-spatial}].
+Physical meter-sticks, however, present some problems. Meter-sticks rotating with the disk are subject to
+Coriolis and centrifugal forces, and this problem can't be avoided simply by making the meter-sticks
+infinitely rigid, because infinitely rigid objects are forbidden by relativity. In fact, these forces
+will inevitably be strong enough to destroy any meter stick that is brought out to $r=1/\omega$, where
+the speed of the disk becomes equal to the speed of light.
+
+It might appear that we could now define a global coordinate
+\begin{equation*}
+  T = t + \frac{\omega r^2}{1-\omega^2 r^2}\theta'\eqquad,
+\end{equation*}
+interpreted as a time coordinate that was synchronized in
+a consistent way for all points on the disk. The trouble with this interpretation becomes evident when we
+imagine driving a car around the circumference of the disk, at a speed slow enough so that there is negligible
+time dilation of the car's dashboard clock relative to the clocks tied to the disk. Once the car gets back to
+its original position, $\theta'$ has increased by $2\pi$, so it is no longer possible for the car's clock
+to be synchronized with the clocks tied to the disk. We conclude that it is not possible to synchronize clocks
+in a rotating frame of reference; if we try to do it, we will inevitably have to have a discontinuity somewhere.
+This problem is present even locally, as demonstrated by the possibility of measuring the Sagnac effect with
+apparatus that is small compared to the disk. The only reason we were able to get away with time synchronization
+in order to establish the metric [\ref{eq:rotating-spatial}] is that all the physical manifestations of the
+impossibility of synchronization, e.g., the Sagnac effect, are proportional to the area of the region in which
+synchronization is attempted. Since we were only synchronizing two nearby points, the area enclosed by the light
+rays was zero.
+
+\begin{eg}{GPS}\label{eg:gps-rotating-frame}
+As a practical example, the GPS system\index{GPS!frames of reference used in} is designed mainly to allow people to find their positions
+relative to the rotating surface of the earth (although it can also be used by space vehicles). That
+is, they are interested in their $(r,\theta',\phi)$ coordinates. The frame of reference defined by these
+coordinates is referred to as ECEF, for Earth-Centered, Earth-Fixed.
+
+The system requires synchronization of the atomic clocks carried aboard the satellites, and this synchronization
+also needs to be extended to the (less accurate) clocks built into the receiver units. It is impossible to carry
+out such a synchronization globally in the rotating frame in order to create coordinates $(T,r,\theta',\phi)$.
+If we tried, it would result in discontinuities 
+(see problem \ref{hw:gps-t-discontinuity}, p.~\pageref{hw:gps-t-discontinuity}). Instead, the GPS system handles clock synchronization
+in coordinates $(t,r,\theta',\phi)$, as in equation [\ref{eq:rotating-lab-metric}]. These are known as the
+Earth-Centered Inertial (ECI) coordinates. The $t$ coordinate in this
+system is not the one that users at neighboring points on the earth's surface would establish if they carried
+out clock synchronization using electromagnetic signals. It is simply the time coordinate of the nonrotating
+frame of reference tied to the earth's center. Conceptually, we can imagine this time coordinate as one that
+is established by sending out an electromagnetic ``tick-tock'' signal from the earth's center, with each
+satellite correcting the phase of the signal based on the propagation time inferred from its own $r$. In reality,
+this is accomplished by communication with a master control station in Colorado Springs, which communicates with
+the satellites via relays at Kwajalein, Ascension Island, Diego Garcia, and Cape Canaveral.
+\end{eg}
+
+\begin{eg}{Einstein's goof, in the rotating frame}\label{eg:einstein-goof-rot}
+Example \ref{eg:einstein-goof} on p.~\pageref{eg:einstein-goof} recounted Einstein's famous mistake in
+predicting that a clock at the pole would experience a time dilation relative to a clock at the equator,
+and the empirical test of this fact by Alley et al.~using atomic clocks.
+The perfect cancellation of gravitational and kinematic time dilations might seem fortuitous, but it fact
+it isn't. When we transform into the frame rotating along with the earth, there is no longer any kinematic
+effect at all, because neither clock is moving. In this frame, the surface of the earth's oceans is
+an equipotential, so the gravitational time dilation vanishes as well, assuming both clocks are at sea
+level. In the transformation to the rotating frame, the metric picks up a $\der\theta'\der t$ term, but
+since both clocks are fixed to the earth's surface, they have $\der\theta'=0$, and there is no Sagnac effect.
+\end{eg}
+
+<% end_sec %> % The spatial metric and synchronization of clocks
+<% begin_sec("Impossibility of rigid rotation, even with external forces") %>\label{no-born-rigidity}
+The determination of the spatial metric with rulers at rest relative to the disk is appealing because of its
+conceptual simplicity compared to complicated procedures involving radar, and this was presumably why Einstein
+presented the concept using ruler measurements in his 1916 paper laying out the general theory of relativity.\footnote{The
+paper is reproduced in the back of the book, and the relevant part is on p.~\pageref{einstein-foundations-carousel}.}
+In an effort to recover this simplicity, we could propose using external forces to compensate for the centrifugal
+and Coriolis forces to which the rulers would be subjected, causing them to stay straight and maintain their correct
+lengths. Something of this kind is carried out with the large mirrors of some telescopes, which have active systems
+that compensate for gravitational deflections and other effects. The first issue to worry about is that one would
+need some way to monitor a ruler's length and straightness. The monitoring system would presumably be based on
+measurements with beams of light, in which case the physical rulers themselves would become superfluous.
+
+In addition,
+we would need to be able to manipulate the rulers in order to place them where we wanted them, and these manipulations
+would include angular accelerations. If such a thing was possible, then it would also amount to a loophole in the
+resolution of the Ehrenfest paradox. Could Ehrenfest's rotating disk be accelerated and decelerated with help
+from external forces, which would keep it from contorting into a potato chip? The problem we run into with such
+a strategy is one of clock synchronization. When it was time to impart an angular acceleration to the disk, all
+of the control systems would have to be activated simultaneously. But we have already seen that global clock
+synchronization cannot be realized for an object with finite area, and therefore there is a logical contradiction
+in this proposal. This makes it impossible to apply rigid angular acceleration to the disk, but not necessarily the rulers, which could
+in theory be one-dimensional.
+<% end_sec %>
+<% end_sec %> % Einstein's carousel
+
+<% end_sec %> % the metric
+
+<% begin_sec("The metric in general relativity") %>
+So far we've considered a variety of examples in which the metric is predetermined. This is not the
+case in general relativity. For example, Einstein published general relativity in 1915, but it was not until
+1916 that Schwarzschild found the metric for a spherical, gravitating body such as the sun or the earth.
+
+When masses are present,
+finding the metric is analogous to finding the electric field made
+by charges, but the interpretation is more difficult. In the electromagnetic case, the field is
+found on a preexisting background of space and time. In general relativity, there is no preexisting
+geometry of spacetime. The metric tells us how to find distances in terms of our coordinates, but the
+coordinates themselves are completely arbitrary. So what does the metric even mean?
+This was an issue that caused Einstein great distress and confusion, and at one point, in 1914, it even led
+him to publish an incorrect, dead-end theory of gravity in which he abandoned coordinate-independence.
+
+With the benefit of hindsight, we can consider these issues in terms of the general description of measurements
+in relativity given on page \pageref{intrinsic-measurements-in-gr}:
+
+\begin{enumerate}
+\item We can tell whether events and world-lines are incident.
+\item We can do measurements in local Lorentz frames.
+\end{enumerate}
+
+<% begin_sec("The hole argument") %>\label{sec:hole-argument}
+The main factor that led Einstein to his false start is known as the hole argument.\index{hole argument}
+Suppose that we know about the distribution of matter throughout all of spacetime,
+including a particular region of finite size --- the ``hole'' --- which contains no matter. By analogy with other classical field
+theories, such as electromagnetism, we expect that the metric will be a solution to some kind of
+differential equation, in which matter acts as the source term. We find
+a metric $g(\vc{x})$ that solves the field equations for this set of sources, where $\vc{x}$ is some set of coordinates.
+Now if the field equations are coordinate-independent, we can introduce a new set of coordinates $\vc{x}'$, which is
+identical to $\vc{x}$ outside the hole, but differs from it on the inside. If we reexpress the metric in terms of
+these new coordinates as $g'(\vc{x}')$, then we are guaranteed that $g'(\vc{x}')$ is also a solution. But furthermore,
+we can substitute $\vc{x}$ for $\vc{x}'$, and $g'(\vc{x})$ will still be a solution. For outside the hole there is no
+difference between the primed and unprimed quantities, and inside the hole there is no mass distribution that
+has to match the metric's behavior on a point-by-point basis.
+<% marg(50) %>
+<%
+  fig(
+    'hole-argument',
+    %q{Einstein's hole argument.}
+  )
+%>
+<% end_marg %>
+
+We conclude that in any coordinate-invariant
+theory, it is impossible to uniquely determine the metric inside such a hole. Einstein initially decided that
+this was unacceptable, because it showed a lack of determinism; in a classical theory such as general
+relativity, we ought to be able to predict the evolution of the fields, and it would seem that there is
+no way to predict the metric inside the hole. He eventually realized that this was an incorrect interpretation.
+The only type of global
+observation that general relativity lets us do is measurements of the incidence of world-lines.
+Relabeling all the points inside the hole doesn't change any of the incidence relations. For example,
+if two test particles sent into the region collide at a point $\vc{x}$ inside the hole, then
+changing the point's name to $\vc{x}'$ doesn't change the observable fact that they collided.
+
+<% end_sec %> % The hole argument
+<% marg(-100) %>
+<%
+  fig(
+    'machian-planets',
+    %q{A paradox? Planet A has no equatorial bulge, but B does. What cause produces this effect? Einstein
+         reasoned that the cause couldn't be B's rotation, because each planet rotates relative to the other.}
+  )
+%>
+<% end_marg %>
+<% begin_sec("A Machian paradox") %>\label{einstein-two-planets}
+
+Another type of argument that made Einstein suffer is also resolved by a correct understanding of measurements,
+this time the use of measurements in local Lorentz frames. The earth is in hydrostatic equilibrium, and its
+equator bulges due to its rotation. Suppose that the universe was empty except for two planets, each rotating
+about the line connecting their centers.\footnote{The example is described in Einstein's paper ``The Foundation of the General Theory of Relativity.''
+An excerpt, which includes the example, is given on p.~\pageref{einstein-foundation}.} Since there are no stars or other external points of reference,
+the inhabitants of each planet have no external reference points against which to judge their rotation or lack
+of rotation. They can only determine their rotation, Einstein said, relative to the other planet. Now suppose
+that one planet has an equatorial bulge and the other doesn't. This seems to violate determinism, since there is
+no cause that could produce the differing effect. The people on either planet can consider themselves
+as rotating and the other planet as stationary, or they can describe the situation the other way around.
+Einstein believed that this argument proved that there could be no difference between the sizes of the
+two planets' equatorial bulges.
+
+The flaw in Einstein's argument was that measurements in local Lorentz frames do allow one to make a distinction
+between rotation and a lack of rotation. For example, suppose that scientists on planet A notice that their
+world has no equatorial bulge, while planet B has one. They send a space probe with a clock to B, let it stay
+on B's surface for a few years, and then order it to return. When the clock is back in the lab, they compare
+it with another clock that stayed in the lab on planet A, and they find that less time has elapsed according to the one
+that spent time on B's surface. They conclude that planet B is rotating more quickly than planet A, and that the motion of B's surface
+was the cause of the observed time dilation. This resolution of the apparent paradox depends specifically on the Lorentzian
+form of the local geometry of spacetime; it is not available in, e.g., Cartan's curved-spacetime description of
+Newtonian gravity (see page \pageref{cartan-newtonian}).\index{Cartan!curved-spacetime theory of Newtonian gravity}
+
+Einstein's original, incorrect use of this example sprang from his interest in the ideas of the physicist and
+philosopher Ernst Mach. Mach had a somewhat ill-defined idea that since motion is only a well-defined notion
+when we speak of one object moving relative to another object, the inertia of an object must be caused by the
+influence of all the other matter in the universe. Einstein referred to this as Mach's principle.\index{Mach's principle}
+Einstein's false starts in constructing general relativity were frequently related to his attempts to make
+his theory too ``Machian.'' Section \ref{sec:brans-dicke} on p.~\pageref{sec:brans-dicke} discusses
+an alternative, more Machian theory of gravity proposed by Brans and Dicke in 1951.
+<% end_sec %> % A Machian paradox
+<% end_sec %> % The metric in general relativity
+<% begin_sec("Interpretation of coordinate independence") %>
+This section discusses some of the issues that arise in the interpretation of coordinate independence. It can be
+skipped on a first reading.
+<% begin_sec("Is coordinate independence obvious?") %>
+One often hears statements like the following from relativists: ``Coordinate independence isn't really a physical principle.
+It's merely an obvious statement about the relationship between mathematics and the physical universe. Obviously the universe
+doesn't come equipped with coordinates. We impose those coordinates on it, and the way in which we do so can never be dictated
+by nature.'' The impressionable reader who is tempted to say, ``Ah, yes, that \emph{is} obvious,'' should consider that it was
+far from obvious to Newton (``Absolute, true and mathematical time, of itself, and
+from its own nature flows equably without regard to anything external \ldots''), nor was it obvious to Einstein.
+Levi-Civita\index{Levi-Civita, Tullio} nudged Einstein in the direction of coordinate independence in 1912. Einstein
+tried hard to make a coordinate-independent theory, but for reasons described in section \ref{sec:hole-argument} (p.~\pageref{sec:hole-argument}),
+he convinced himself that that was a dead end. In 1914-15 he published theories that were not coordinate-independent, which
+you will hear relativists describe as ``obvious'' dead ends because they lack any geometrical interpretation. It seems to me that it takes a highly
+refined intuition to regard as intuitively ``obvious'' an issue that Einstein struggled with like Jacob
+wrestling with Elohim.
+<% end_sec %> % Is coordinate independence obvious?
+
+<% begin_sec("Is coordinate independence trivial?") %>\label{covariance-trivial}
+It has also been alleged that coordinate independence is trivial. To gauge the justice of this complaint,
+let's distinguish between two reasons for caring about coordinate independence:
+\begin{enumerate}
+\item Coordinate independence tells us that when we solve problems, we should avoid writing down any equations
+         in notation that isn't manifestly intrinsic, and avoid interpreting those equations as if the coordinates had
+         intrinsic meaning. Violating this advice doesn't guarantee that you've made a mistake, but it makes it
+         much harder to tell whether or not you have.
+\item Coordinate independence can be used as a criterion for judging whether a particular theory is likely to be
+         successful.
+\end{enumerate}
+Nobody questions the first justification. The second is a little trickier. Laying out the general
+theory systematically in a 1916 paper,\footnote{see p.~\pageref{einstein-covariance}} Einstein wrote
+``The general laws of nature are to be expressed by equations which
+hold good for all the systems of coordinates, that is, are
+covariant with respect to any substitutions whatever (generally covariant).''
+In other words, he was explaining why, with hindsight, his 1914-1915 coordinate-dependent theory had to be a dead end.
+
+The only trouble with this is that Einstein's way of posing the criterion didn't quite hit the nail on the head mathematically.
+As Hilbert famously remarked, ``Every boy in the streets of G\"ottingen understands more
+about four-dimensional geometry than Einstein. Yet, in spite of that, Einstein did the work and not the mathematicians.''
+What Einstein had in mind was that a theory like Newtonian mechanics not only lacks coordinate independence,
+but would also be impossible to put into a coordinate-independent form without making it look hopelessly
+complicated and ugly, like putting lipstick on a pig. But Kretschmann showed in 1917 that any theory could be
+put in coordinate independent form, and Cartan demonstrated in 1923 that this could be done for Newtonian mechanics
+in a way that didn't come out particularly ugly. Physicists today are more apt to pose the distinction in terms
+of ``background independence'' (meaning that a theory should not be phrased in terms of an assumed geometrical
+background) or lack of a ``prior geometry'' (meaning that the curvature of spacetime should come from the solution of field
+equations rather than being imposed by fiat).\index{background independence}\index{prior geometry}
+But these concepts as well have resisted precise mathematical 
+formulation.\footnote{Giulini, ``Some remarks on the notions of general covariance and background independence,'' \url{arxiv.org/abs/gr-qc/0603087v1}}
+My feeling is that this general idea of coordinate independence or background independence is like the equivalence principle: a crucial conceptual
+principle that doesn't lose its importance just because we can't put it in a mathematical box with a ribbon and a bow.
+For example, string theorists take it as a serious criticism of their theory that it is not manifestly background independent,
+and one of their goals is to show that it has a background independence that just isn't obvious on the surface.
+<% end_sec %> % Is coordinate independence trivial?
+
+<% begin_sec("Coordinate independence as a choice of gauge") %>
+It is instructive to consider coordinate independence from the point of view of a field theory. Newtonian gravity can be described
+in three equivalent ways: as a gravitational field $\vc{g}$, as a gravitational potential $\phi$, or as a set of
+gravitational field lines. The field lines are never incident on one another, and locally the field satisfies Poisson's equation.
+<% marg(80) %>
+<%
+  fig(
+    'star-magnetic-field-lines',
+    %q{Since magnetic field lines can never intersect, a magnetic field pattern contains coordinate-independent information
+       in the form of the knotting of the lines.
+       This figure shows the magnetic field pattern of the star SU Aurigae, as measured by Zeeman-Doppler imaging (Petit at al.).
+       White lines represent magnetic field lines that close upon themselves in the immediate vicinity of the star;
+       blue lines are those that extend out into the interstellar medium.}
+  )
+%>
+<% end_marg %>
+
+The electromagnetic field has polarization
+properties different from those of the gravitational field,
+so we describe it using either the two fields $(\vc{E},\vc{B})$, a pair of potentials,\footnote{There is the familiar
+electrical potential $\phi$, measured in volts, but also a vector potential $\vc{A}$, which you may or may not have encountered.
+Briefly, the electric field is given not by $-\nabla\phi$ but by $-\nabla\phi-\partial\vc{A}/\partial t$,
+while the magnetic field is the curl of $\vc{A}$. This is introduced at greater
+length in section \ref{subsec:em-four-vector} on page \pageref{subsec:em-four-vector}.}\label{em-gauge-first-mentioned}
+or two sets of field
+lines. There are similar incidence conditions and local field equations (Maxwell's equations).
+
+Gravitational fields in relativity have polarization properties unknown to Newton, but the situation is qualitatively
+similar to the two foregoing cases. Now consider the analogy between electromagnetism and relativity.
+In electromagnetism, it is the fields that are
+directly observable, so we expect the potentials to have some extrinsic properties. We can, for example, redefine
+our electrical ground, $\Phi \rightarrow \Phi+C$, without any observable consequences.
+As discussed in more detail in section \ref{sec:covariant-derivative-in-em} on page \pageref{sec:covariant-derivative-in-em}, it is even possible to modify the
+electromagnetic potentials in an entirely arbitrary and nonlinear way that changes from point to point in spacetime. This
+is called a gauge transformation.\index{gauge transformation}
+In relativity,
+the gauge transformations are the smooth coordinate transformations. These gauge transformations distort the
+field lines without making them cut through one another.
+
+<% end_sec %> % Coordinate independence as a choice of gauge
+<% end_sec %> % Interpretation of coordinate independence
+<% begin_hw_sec %>
+
+<% begin_hw('cylinder-spacetime') %>
+Consider a spacetime that is locally exactly like the standard Lorentzian spacetime described in ch.~\ref{ch:flat}, but that
+has a global structure differing in the following way from the one we have implicitly assumed. This spacetime has global
+property G: Let two material particles
+have world-lines that coincide at event A, with some nonzero relative velocity; then there may be some event B in the future
+light-cone of A at which the particles' world-lines coincide again. This sounds like a description of something that
+we would expect to happen in curved spacetime, but let's see whether that is necessary. We want to know whether this violates 
+the flat-space properties L1-L5 on page \pageref{lorentz-geometry-postulates}, if those properties are taken as local.\\
+(a) Demonstrate that it does not violate them, by using a model in which space ``wraps around'' like a cylinder.\hwendpart
+(b) Now consider the possibility of interpreting L1-L5 as \emph{global} statements.
+Do spacetimes with property G always violate L3 if L3 is taken globally?
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('lorentz-si') %>
+Usually in relativity we pick units in which $c=1$. Suppose, however, that we want to use SI units. The
+convention is that coordinates are written with upper indices, so that, fixing the usual Cartesian
+coordinates in 1+1 dimensions of spacetime, an infinitesimal displacement
+between two events is notated $(\der s^t,\der s^x)$. In SI units,
+the two components of this vector have different units, which may seem strange but is perfectly legal.
+Describe the form of the metric, including the units of its elements. Describe the lower-index
+vector $\der s_a$.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('ungrammatical') %>
+(a) Explain why the following expressions ain't got good grammar:
+$U_{aa}$, $x^a y^a$, $p^a-q_a$. (Recall our notational convention that Latin indices represent
+abstract indices, so that it would not make sense, for example, to interpret $U_{aa}$ as $U$'s
+$a$th diagonal element rather than as an implied sum.)\\
+(b) Which of these could also be nonsense in terms of units?
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('lat-lon-force') %>
+Suppose that a mountaineer describes her location using coordinates $(\theta,\phi,h)$,
+representing colatitude, longitude, and altitude. Infer the units of the components of
+$\der s^a$ and of the elements of $g_{ab}$ and $g^{ab}$. Given that the units of mechanical
+work should be newton-meters 
+(cf \ref{eg:force-is-lower-index}, p.~\pageref{eg:force-is-lower-index}), infer
+the components of a force vector $F_a$
+and its upper-index version $F^a$.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('burke-three-d') %>
+Generalize figure \subfigref{vector-measuring-covector}{2}
+on p.~\pageref{fig:vector-measuring-covector} to three dimensions.
+\hwsoln
+<% end_hw %>
+
+\pagebreak
+
+<% begin_hw('burke-addition') %>
+Suppose you have a collection of pencils, some of which have been sharpened more times than others so that
+they they're shorter. You toss them all on the floor in random orientations, and you're then allowed to slide
+them around but not to rotate them. Someone asks you to make up a definition of whether or not a given
+set of three pencils ``cancels.'' If all pencils are treated equally (i.e., order doesn't matter),
+and if we respect the rotational invariance of Euclidean geometry, then you will be forced to reinvent
+vector addition and define cancellation of pencils $\vc{p}$, $\vc{q}$, and $\vc{r}$ as $\vc{p}+\vc{q}+\vc{r}=0$.
+Do something similar with ``pencil'' replaced by ``an oriented pairs of lines as in figure
+\subfigref{vector-measuring-covector}{2}
+on p.~\pageref{fig:vector-measuring-covector}.
+<% end_hw %>
+
+<% begin_hw('contraction-of-metric') %>
+Describe the quantity $g\indices{^a_a}$. (Note the repeated index.)
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('gps-t-discontinuity') %>
+Example \ref{eg:gps-rotating-frame} on page \pageref{eg:gps-rotating-frame} discusses the discontinuity that
+would result if one attempted to define a time coordinate for the GPS system that was synchronized globally
+according to observers in the rotating frame, in the sense that neighboring observers could verify the
+synchronization by exchanging electromagnetic signals. Calculate this discontinuity at the equator, and
+estimate the resulting error in position that would be experienced by GPS users.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('carousel-paradox') %>
+Resolve the following paradox. 
+
+Equation [\ref{eq:rotating-spatial}] on page \pageref{eq:rotating-spatial} claims to give the metric obtained by an
+observer on the surface of a rotating disk. This metric is shown to lead to a non-Euclidean value for the ratio of the
+circumference of a circle to its radius, so the metric is clearly non-Euclidean.
+Therefore a local observer should be able to detect violations of the Pythagorean theorem.
+
+And yet this metric was originally derived by a series of changes of coordinates, starting from
+the Euclidean metric in polar coordinates, as derived in example \ref{eg:metric-in-polar-coords} on page \pageref{eg:metric-in-polar-coords}.
+Section \ref{sec:intrinsic-quantities} (p. \pageref{sec:intrinsic-quantities}) argued that
+the intrinsic measurements available in relativity are not capable of detecting an arbitrary smooth, one-to-one change of coordinates.
+This contradicts our earlier conclusion that there are locally detectable violations of the Pythagorean theorem.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('carousel-metric') %>
+This problem deals with properties of the metric [\ref{eq:rotating-spatial}] on page \pageref{eq:rotating-spatial}.
+(a) A pulse of collimated light is emitted from the
+center of the disk in a certain direction. Does the spatial track of the pulse form a geodesic of this metric?
+(b) Characterize the behavior of the geodesics near $r=1/\omega$. 
+(c) An observer at rest with respect to the
+surface of the disk proposes to verify the non-Euclidean nature of the metric by doing local tests
+in which right triangles are formed out of laser beams, and violations of the Pythagorean theorem
+are detected. Will this work?
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('penrose-generalization') %>
+In the early decades of relativity, many physicists were in the habit of speaking as if the Lorentz
+transformation described what an observer would actually ``see'' optically, e.g., with an eye or a camera.
+This is not the case, because there is an additional effect due to optical aberration: observers in different
+states of motion disagree about the direction from which a light ray originated. This is analogous to the
+situation in which a person driving in a convertible observes raindrops falling from the sky at an angle,
+even if an observer on the sidewalk sees them as falling vertically. In 1959, Terrell and Penrose independently
+provided correct analyses,\footnote{
+James Terrell, ``Invisibility of the Lorentz Contraction,'' Physical Review 116 (1959) 1045. 
+Roger Penrose, ``The Apparent Shape of a Relativistically Moving Sphere,'' Proceedings of the Cambridge Philosophical Society 55 (1959) 139.
+}
+showing that in reality an object may appear contracted, expanded, or rotated, depending on whether it is approaching the
+observer, passing by, or receding.\index{Terrell, James}\index{Penrose, Roger}\index{aberration}\index{optical effects}
+The case of a sphere is especially interesting. Consider the following four cases:
+
+\begin{itemize}
+\item[A] The sphere is not rotating. The sphere's center is at rest. The observer is moving in a straight line.
+
+\item[B] The sphere is not rotating, but its center is moving in a straight line. The observer is at rest.
+
+\item[C] The sphere is at rest and not rotating. The observer moves around it in a circle whose center coincides with that of the sphere.
+
+\item[D] The sphere is rotating, with its center at rest. The observer is at rest.
+\end{itemize}
+
+Penrose showed that in case A, the outline of the sphere is still seen to be a circle, although regions on the sphere's surface appear distorted.
+
+What can we say about the generalization to cases B, C, and D?
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('dispersion') %>
+This problem involves a relativistic particle of mass $m$ which is also a wave, as described by quantum mechanics.
+Let $c=1$ and $\hbar=1$ throughout. Starting from the de Broglie
+relations $E=\omega$ and $p=k$, where $k$ is the wavenumber, find the dispersion
+relation connecting $\omega$ to $k$. Calculate the group velocity, and verify that
+it is consistent with the usual relations $p=m\gamma v$ and $E=m\gamma$ for $m>0$.
+What goes wrong if you instead try to associate $v$ with the phase velocity?
+\hwsoln
+<% end_hw %>
+
+
+<% end_hw_sec %>
+
+<% end_chapter %>

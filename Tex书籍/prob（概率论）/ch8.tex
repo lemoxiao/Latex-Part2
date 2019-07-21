@@ -1,0 +1,936 @@
+% This chapter was modified on 1/12/05.
+%\setcounter{chapter}{7}
+\chapter{Law of Large Numbers}\label{chp 8} 
+
+\section[Discrete Random Variables]{Law of Large Numbers for Discrete Random Variables}
+\label{sec 8.1}
+We are now in a position to prove our first fundamental theorem of probability.  
+We have seen that an intuitive way to view the probability of a certain outcome is as the 
+frequency with which that outcome occurs in the long run, when the experiment is repeated a large 
+number of times.  We have also defined probability mathematically as a value of a distribution 
+function for the random variable representing the experiment.   The Law of Large Numbers, which is
+a theorem proved about the mathematical model of probability, shows that this model is consistent 
+with the frequency interpretation of probability.  This theorem is sometimes called the \emx {law
+of averages.}  To find out what would happen if this law were not true, see the article  by 
+Robert M. Coates.\index{COATES, R. M.}\footnote{R.~M.~Coates, ``The Law," \emx {The World of
+Mathematics,} ed. James R. Newman (New York: Simon and Schuster, 1956.}
+
+\subsection*{Chebyshev Inequality}
+To discuss the Law of Large Numbers, we first need an important inequality
+called the \emx {Chebyshev Inequality.}
+
+\begin{theorem}{\bf (Chebyshev Inequality)}\index{Chebyshev Inequality}
+Let $X$ be a discrete random variable with expected value $\mu = E(X)$, and let $\epsilon
+> 0$ be any positive real number.  Then
+$$
+P(|X - \mu| \geq \epsilon) \leq \frac {V(X)}{\epsilon^2}\ .
+$$
+\proof
+Let $m(x)$ denote the distribution function of $X$.  Then the probability that $X$
+differs from $\mu$ by at least $\epsilon$ is given by
+$$P(|X - \mu| \geq \epsilon) = \sum_{|x - \mu| \geq \epsilon} m(x)\ .$$
+We know that 
+$$V(X) = \sum_x (x - \mu)^2 m(x)\ ,$$
+and this is clearly at least as large as
+$$\sum_{|x - \mu| \geq \epsilon} (x - \mu)^2 m(x)\ ,$$
+since all the summands are positive and we have restricted the range of summation in the
+second sum.  But this last sum is at least
+\begin{eqnarray*}
+\sum_{|x - \mu| \geq \epsilon} \epsilon^2 m(x) &=& 
+\epsilon^2 \sum_{|x - \mu| \geq \epsilon} m(x) \\
+&=& \epsilon^2 P(|X - \mu| \geq \epsilon)\ .\\
+\end{eqnarray*}
+So,
+$$ P(|X - \mu| \geq \epsilon) \leq \frac {V(X)}{\epsilon^2}\ .
+$$
+\end{theorem}
+Note that $X$ in the above theorem can be any discrete random variable, and
+$\epsilon$ any positive number.
+
+\begin{example}
+Let $X$ by any random variable with $E(X) = \mu$ and $V(X) = \sigma^2$.  Then,
+if $\epsilon = k\sigma$, Chebyshev's Inequality states that
+$$
+P(|X - \mu| \geq k\sigma) \leq \frac {\sigma^2}{k^2\sigma^2} = \frac 1{k^2}\ .
+$$
+Thus, for any random variable, the probability of a deviation from the mean of
+more than~$k$ standard deviations is ${} \leq 1/k^2$.  If, for example,
+$k = 5$, $1/k^2 = .04$.
+\end{example}
+
+Chebyshev's Inequality is the best possible inequality in the sense that, for
+any $\epsilon > 0$, it is possible to give an example of a random variable for
+which Chebyshev's Inequality is in fact an equality.  To see this, given
+$\epsilon > 0$, choose $X$ with distribution
+$$
+p_X = \pmatrix{
+-\epsilon & +\epsilon \cr
+1/2 & 1/2 \cr}\ .
+$$
+Then $E(X) = 0$, $V(X) = \epsilon^2$, and
+$$
+P(|X - \mu| \geq \epsilon) = \frac {V(X)}{\epsilon^2} = 1\ .
+$$
+
+We are now prepared to state and prove the Law of Large Numbers.
+
+\subsection*{Law of Large Numbers}
+\begin{theorem}{\bf (Law of Large Numbers)}\index{Law of Large Numbers}
+Let $X_1$,~$X_2$, \dots,~$X_n$ be an independent trials process, with
+finite expected value $\mu = E(X_j)$ and finite variance $\sigma^2 =
+V(X_j)$.  Let $S_n = X_1 + X_2 +\cdots+ X_n$.  Then for
+any $\epsilon > 0$, 
+$$ P\left( \left| \frac {S_n}n - \mu \right| \geq \epsilon
+\right) \to 0
+$$
+as $n \rightarrow \infty$.
+Equivalently,
+$$
+P\left( \left| \frac {S_n}n - \mu \right| < \epsilon \right) \to 1
+$$
+as $n \rightarrow \infty$.
+\proof
+Since $X_1$,~$X_2$, \dots,~$X_n$ are independent and have the same distributions,
+we can apply Theorem~\ref{thm 6.9}.  We obtain
+$$
+V(S_n) = n\sigma^2\ ,
+$$
+and
+$$
+V (\frac {S_n}n) = \frac {\sigma^2}n\ .
+$$
+Also we know that
+$$
+E (\frac {S_n}n) = \mu\ .
+$$
+By Chebyshev's Inequality, for any $\epsilon > 0$,
+$$
+P\left( \left| \frac {S_n}n - \mu \right| \geq \epsilon \right) \leq \frac
+{\sigma^2}{n\epsilon^2}\ .
+$$
+Thus, for fixed $\epsilon$,
+$$
+P\left( \left| \frac {S_n}n - \mu \right| \geq \epsilon \right) \to 0
+$$
+as $n \rightarrow \infty$, or equivalently,
+$$
+P\left( \left| \frac {S_n}n - \mu \right| < \epsilon \right) \to 1
+$$
+as $n \rightarrow \infty$.
+\end{theorem}
+
+\subsection*{Law of Averages}
+Note that $S_n/n$ is an average of the individual outcomes, and one often
+calls the Law of Large Numbers the ``law of averages." It is a striking fact
+that we can start with a random experiment about which little can be predicted
+and, by taking averages, obtain an experiment in which the outcome can be
+predicted with a high degree of certainty.  The Law of Large Numbers, as we
+have stated it, is often called the ``Weak Law of Large Numbers" to
+distinguish it from the ``Strong Law of Large Numbers" described in
+Exercise~\ref{exer 8.1.16}.
+
+Consider the important special case of Bernoulli trials with probability~$p$
+for success.  Let $X_j = 1$ if the $j$th outcome is a success and~0 if it is a
+failure.  Then $S_n = X_1 + X_2 +\cdots+ X_n$ is the number of successes in $n$
+trials and $\mu = E(X_1) = p$.  The Law of Large Numbers states that for any
+$\epsilon > 0$
+$$
+P\left( \left| \frac {S_n}n - p \right| < \epsilon \right) \to 1
+$$
+as $n \rightarrow \infty$.  The above statement says that, in a large number of repetitions
+of a Bernoulli experiment, we can expect the proportion of times the event will
+occur to be near $p$.  This shows that our mathematical model of probability
+agrees with our frequency interpretation of probability.  
+
+\subsection*{Coin Tossing}
+Let us consider the special case of tossing a coin $n$ times with $S_n$ the
+number of heads that turn up.  Then the random variable $S_n/n$ represents the
+fraction of times heads turns up and will have values between 0~and~1.  The Law
+of Large Numbers predicts that the outcomes for this random variable will, for
+large~$n$, be near 1/2.
+
+In Figure~\ref{fig 8.1}, we have plotted the distribution for this example for increasing values of
+~$n$. We have marked the outcomes between .45~and~.55 by dots at the top of the
+spikes.  We see that as
+$n$ increases the distribution gets more and more concentrated around~.5 and a larger
+and larger percentage of the total area is contained within the interval
+$(.45,.55)$, as predicted by the Law of Large Numbers.
+
+\putfig{5.0truein}{PSfig8-1}{Bernoulli trials distributions.}{fig 8.1} 
+
+
+\subsection*{Die Rolling}
+\begin{example}
+Consider $n$ rolls of a die.  Let $X_j$ be the outcome of the $j$th roll.  Then
+$S_n = X_1 + X_2 +\cdots+ X_n$ is the sum of the first $n$ rolls.  This is an
+independent trials process with $E(X_j) = 7/2$.  Thus, by the Law of Large
+Numbers, for any $\epsilon > 0$
+$$
+P\left( \left| \frac {S_n}n - \frac 72 \right| \geq \epsilon \right) \to 0
+$$
+as $n \rightarrow \infty$.  An equivalent way to state this is that, for any $\epsilon > 0$,
+$$
+P\left( \left| \frac {S_n}n - \frac 72 \right| < \epsilon \right) \to 1
+$$
+as $n \rightarrow \infty$.
+\end{example}
+
+\subsection*{Numerical Comparisons}
+It should be emphasized that, although Chebyshev's Inequality proves the Law of Large
+Numbers, it is actually a very crude inequality for the probabilities involved.  However,
+its strength lies in the fact that it is true for any random variable at all, and it allows
+us to prove a very powerful theorem.
+\par
+In the following example, we compare the estimates given by Chebyshev's Inequality with the
+actual values.
+\begin{example}
+Let $X_1$,~$X_2$, \dots,~$X_n$ be a Bernoulli trials process with
+probability~.3 for success and~.7 for failure.  Let $X_j = 1$ if the $j$th
+outcome is a success and~0 otherwise.  Then, $E(X_j) = .3$ and $V(X_j) =
+(.3)(.7) = .21$.  If
+$$
+A_n = \frac {S_n}n = \frac {X_1 + X_2 +\cdots+ X_n}n
+$$
+is the \emx {average} of the $X_i$, then $E(A_n) = .3$ and $V(A_n) =
+V(S_n)/n^2 = .21/n$.  Chebyshev's Inequality states that if, for example,
+$\epsilon = .1$,
+$$
+P(|A_n - .3| \geq .1) \leq \frac {.21}{n(.1)^2} = \frac {21}n\ .
+$$
+Thus, if $n = 100$,
+$$
+P(|A_{100} - .3| \geq .1) \leq .21\ ,
+$$
+or if $n = 1000$,
+$$
+P(|A_{1000} - .3| \geq .1) \leq .021\ .
+$$
+These can be rewritten as
+ \begin{eqnarray*}
+P(.2 < A_{100} < .4) &\geq& .79\ , \\
+P(.2 < A_{1000} < .4) &\geq& .979\ .
+\end{eqnarray*} 
+These values should be compared with the actual values, which are (to six decimal
+places)
+\begin{eqnarray*}
+P(.2 < A_{100} < .4) &\approx& .962549 \\
+P(.2 < A_{1000} < .4) &\approx& 1\ .\\
+\end{eqnarray*}
+The program {\bf Law}\index{Law (program)} can be used to carry out the above calculations in a
+systematic way.
+\end{example}
+
+
+\subsection*{Historical Remarks}
+The Law of Large Numbers was first proved by the Swiss mathematician James
+Bernoulli\index{BERNOULLI, J.|(} in the fourth part of his work \emx {Ars Conjectandi} published
+posthumously in~1713.\footnote{J. Bernoulli, \emx {The Art of Conjecturing
+IV,} trans.~Bing Sung, Technical Report No.~2, Dept.\ of Statistics, Harvard
+Univ., 1966}  As often happens with a first proof, Bernoulli's proof was much
+more difficult than the proof we have presented using Chebyshev's inequality. 
+Chebyshev developed his inequality to prove a general form of the Law of Large
+Numbers (see Exercise~\ref{exer 8.1.13}).  The inequality itself appeared
+much earlier in a work by Bienaym\'e,\index{BIENAYM\'E, I.} and in discussing its history
+Maistrov\index{MAISTROV, L.} remarks that it was referred to as the Bienaym\'e-Chebyshev
+Inequality for a long time.\footnote{L. E. Maistrov, \emx {Probability Theory: A Historical
+Approach,} trans.\ and ed.~Samual Kotz, (New York: Academic Press, 1974),
+p.~202}
+
+In \emx {Ars Conjectandi} Bernoulli provides his reader with a long discussion
+of the meaning of his theorem with lots of examples.  In modern notation he has
+an event that occurs with probability~$p$ but he does not know $p$.  He wants
+to estimate $p$ by the fraction $\bar{p}$ of the times the event occurs
+when the experiment is repeated a number of times.  He discusses in detail the
+problem of estimating, by this method, the proportion of white balls in an urn
+that contains an unknown number of white and black balls.  He would do this by
+drawing a sequence of balls from the urn, replacing the ball drawn after each
+draw, and estimating the unknown proportion of white balls in the urn by the
+proportion of the balls drawn that are white.  He shows that, by choosing $n$
+large enough he can obtain any desired accuracy and reliability for the
+estimate.  He also provides a lively discussion of the applicability of his
+theorem to estimating the probability of dying of a particular disease, of
+different kinds of weather occurring, and so forth.
+
+In speaking of the number of trials necessary for making a judgement, Bernoulli
+observes that the ``man on the street" believes the ``law of averages."
+
+\begin{quote}
+Further, it cannot escape anyone that for judging in this way about any event
+at all, it is not enough to use one or two trials, but rather a great number of
+trials is required.  And sometimes the stupidest man---by some instinct of
+nature \emx {per se} and by no previous instruction (this is truly amazing)---
+knows for sure that the more observations of this sort that are taken, the less
+the danger will be of straying from the mark.\footnote{Bernoulli, op.\ cit., p.~38.}
+\end{quote}
+
+\noindent But he goes on to say that he must contemplate another possibility.
+
+\begin{quote}
+Something futher must be contemplated here which perhaps no one has thought
+about till now.  It certainly remains to be inquired whether after the number
+of observations has been increased, the probability is increased of attaining
+the true ratio between the number of cases in which some event can happen and
+in which it cannot happen, so that this probability finally exceeds any given
+degree of certainty; or whether the problem has, so to speak, its own
+asymptote---that is, whether some degree of certainty is given which one can
+never exceed.\footnote{ibid., p.~39.}
+\end{quote}
+
+\noindent Bernoulli recognized the importance of this theorem, writing:
+
+\begin{quote}
+Therefore, this is the problem which I now set forth and make known after I
+have already pondered over it for twenty years.  Both its novelty and its very
+great usefullness, coupled with its just as great difficulty, can exceed in
+weight and value all the remaining chapters of this thesis.\footnote{ibid.,
+p.~42.}
+\end{quote}
+
+\noindent Bernoulli concludes his long proof with the remark:
+
+\begin{quote}
+Whence, finally, this one thing seems to follow: that if observations of all
+events were to be continued throughout all eternity, (and hence the ultimate
+probability would tend toward perfect certainty), everything in the world would
+be perceived to happen in fixed ratios and according to a constant law of
+alternation, so that even in the most accidental and fortuitous occurrences we
+would be bound to recognize, as it were, a certain necessity and, so to speak,
+a certain fate.
+
+I do now know whether Plato wished to aim at this in his doctrine of the
+universal return of things, according to which he predicted that all things
+will return to their original state after countless ages have
+past.\footnote{ibid., pp.~65--66.}
+\end{quote}\index{BERNOULLI, J.|)}
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 8.1.1} A fair coin is tossed 100 times.  The expected number of
+heads is~50, and the standard deviation for the number of heads is $(100 \cdot
+1/2 \cdot 1/2)^{1/2} = 5$.  What does Chebyshev's Inequality tell you about the
+probability that the number of heads that turn up deviates from the expected
+number 50 by three or more standard deviations (i.e., by at least 15)?
+
+\i\label{exer 8.1.100} Write a program that uses the function 
+$\mbox {binomial}(n,p,x)$ to compute the exact probability that you estimated in
+Exercise~\ref{exer 8.1.1}.  Compare the two results.
+
+\i\label{exer 8.1.101} Write a program to toss a coin 10{,}000 times.  Let $S_n$ be the
+number of heads in the first $n$ tosses.  Have your program print out, after every
+1000 tosses, $S_n - n/2$.  On the basis of this simulation, is it correct to
+say that you can expect heads about half of the time when you toss a coin a
+large number of times?
+
+\i\label{exer 8.1.102} A 1-dollar bet on craps has an expected winning of $-.0141$.  What
+does the Law of Large Numbers say about your winnings if you make a large number of
+1-dollar bets at the craps table?  Does it assure you that your losses will be
+small?  Does it assure you that if $n$ is very large you will lose?
+
+\i\label{exer 8.1.103} Let $X$ be a random variable with $E(X) =0$ and $V(X) = 1$.  What
+integer value~$k$ will assure us that $P(|X| \geq k) \leq .01$?
+
+\i\label{exer 8.1.6} Let $S_n$ be the number of successes in $n$ Bernoulli
+trials with probability~$p$ for success on each trial.  Show, using Chebyshev's
+Inequality, that for any $\epsilon > 0$
+$$
+P\left( \left| \frac {S_n}n - p \right| \geq \epsilon \right) \leq \frac {p(1 -
+p)}{n\epsilon^2}\ .
+$$
+
+\i\label{exer 8.1.7} Find the maximum possible value for $p(1 - p)$ if $0 < p
+< 1$.  Using this result and Exercise~\ref{exer 8.1.6}, show that the estimate
+$$
+P\left( \left| \frac {S_n}n - p \right| \geq \epsilon \right) \leq \frac
+1{4n\epsilon^2}
+$$
+is valid for any $p$.
+
+\i\label{exer 8.1.104} A fair coin is tossed a large number of times.  Does the Law of Large
+Numbers assure us that, if $n$ is large enough, with $\mbox {probability} >
+.99$ the number of heads that turn up will not deviate from $n/2$ by more than
+100?
+
+\i\label{exer 8.1.105} In Exercise~\ref{sec 6.2}.\ref{exer 6.2.16}, you showed that, for the
+hat check problem, the number $S_n$ of people who get their own hats back has $E(S_n) =
+V(S_n) = 1$.  Using Chebyshev's Inequality, show that $P(S_n \geq 11) \leq .01$
+for any $n \geq 11$.
+
+\i\label{exer 8.1.106} Let $X$ by any random variable which takes on values 0,~1,~2,
+\dots,~$n$ and has $E(X) = V(X) = 1$.  Show that, for any positive integer $k$,
+$$
+P(X \geq k + 1) \leq \frac 1{k^2}\ .
+$$
+
+\i\label{exer 8.1.107} We have two coins: one is a fair coin and the other is a coin that
+produces heads with probability 3/4.  One of the two coins is picked at random,
+and this coin is tossed $n$ times.  Let $S_n$ be the number of heads that turns
+up in these $n$ tosses.  Does the Law of Large Numbers allow us to predict the
+proportion of heads that will turn up in the long run?  After we have observed
+a large number of tosses, can we tell which coin was chosen?  How many tosses
+suffice to make us 95~percent sure?
+
+\i\label{exer 8.1.13} (Chebyshev\index{CHEBYSHEV, P. L.}\footnote{P. L. Chebyshev, ``On Mean
+Values," \emx {J.\ Math.\ Pure.\ Appl.,} vol.~12 (1867), pp.~177--184.})  Assume
+that $X_1$,~$X_2$, \dots,~$X_n$ are independent random variables with possibly
+different distributions and let $S_n$ be their sum.  Let $m_k = E(X_k)$,
+$\sigma_k^2 = V(X_k)$, and $M_n = m_1 + m_2 +\cdots+ m_n$.  Assume that
+$\sigma_k^2 < R$ for all~$k$.  Prove that, for any $\epsilon > 0$,
+$$
+P\left( \left| \frac {S_n}n - \frac {M_n}n \right| < \epsilon \right) \to 1
+$$
+as $n \rightarrow \infty$.
+
+\i\label{exer 8.1.108}  A fair coin is tossed repeatedly.  Before each toss, you are allowed
+to decide whether to bet on the outcome.  Can you describe a betting system with infinitely
+many bets which will enable you, in the long run, to win more than half of your bets? 
+(Note that we are disallowing a betting system that says to bet until you are ahead, then
+quit.) Write a computer program that implements this betting system.  As stated above, your
+program must decide whether to bet on a particular outcome before that outcome is determined.
+For example, you might select only outcomes that come after
+there have been three tails in a row.  See if you can get more than 50\% heads
+by your ``system."
+
+\istar\label{exer 8.1.109} Prove the following analogue of Chebyshev's Inequality:
+$$
+P(|X - E(X)| \geq \epsilon) \leq \frac 1\epsilon E(|X - E(X)|)\ .
+$$
+
+\istar\label{exer 8.1.16} We have proved a theorem often called the ``Weak Law of
+Large Numbers."  Most people's intuition and our computer simulations suggest
+that, if we toss a coin a sequence of times, the proportion of heads will really
+approach 1/2; that is, if $S_n$ is the number of heads in $n$ times, then we
+will have
+$$
+A_n = \frac {S_n}n \to \frac 12
+$$
+as $n \to \infty$.  Of course, we cannot be sure of this since we are not able
+to toss the coin an infinite number of times, and, if we could, the coin could
+come up heads every time.  However, the ``Strong Law of Large Numbers,"\index{Strong Law of 
+Large\\ Numbers} proved in more advanced courses, states that
+$$
+P\left( \frac {S_n}n \to \frac 12 \right) = 1\ .
+$$
+Describe a sample space $\Omega$ that would make it possible for us to talk
+about the event
+$$
+E = \left\{\, \omega : \frac {S_n}n \to \frac 12\, \right\}\ .
+$$
+Could we assign the equiprobable measure to this space?  
+\choice{}{(See
+Example~\ref{exam 2.2.12}.)} 
+
+\istar\label{exer 8.1.16.5} 
+In this exercise, we shall construct an example of a sequence of random
+variables that satisfies the weak law of large numbers, but not the strong
+law. The distribution of $X_i$ will have to depend on $i$, because
+otherwise both laws would be satisfied.  (This problem was communicated to us
+by David Maslen.)
+\vskip .1in
+Suppose we have an infinite sequence of mutually independent events $A_1,
+A_2, \ldots$. Let $a_i = P(A_i)$, and let $r$ be a positive integer.
+
+\begin{enumerate}
+\item Find an expression of the probability that none of the $A_i$ with
+$i>r$ occur.
+
+\item Use the fact that $x-1 \leq e^{-x}$ to show that
+$$
+P(\mbox{No\ $A_i$\ with\ $i > r$\ occurs}) \leq e^{-\sum_{i=r}^{\infty}
+a_i}
+$$
+\item (The first Borel-Cantelli lemma)  Prove that if $\sum_{i=1}^{\infty} a_i$ diverges, then
+$$
+P(\mbox{infinitely\ many\ $A_i$\ occur}) = 1.
+$$
+\vskip .1in
+\noindent
+Now, let $X_i$ be a sequence of mutually independent random variables such
+that for each positive integer $i \geq 2$,
+$$
+P(X_i = i) = \frac{1}{2i\log i}, \quad P(X_i = -i) =
+\frac{1}{2i\log i}, \quad P(X_i =0) = 1 - \frac{1}{i \log i}.
+$$
+When $i=1$ we let $X_i=0$ with probability $1$.  As usual we let $S_n = X_1
++ \cdots + X_n$.  Note that the mean of each $X_i$ is $0$.
+\item Find the variance of $S_n$.
+\item Show that the sequence $\langle X_i \rangle$ satisfies the Weak
+Law of Large Numbers, i.e. prove that for any $\epsilon > 0$
+$$
+P\biggl(\biggl|{\frac{S_n}{n}}\biggr| \geq \epsilon\biggr) \rightarrow 0\ ,
+$$
+as $n$ tends to infinity.
+\vskip .1in
+\noindent
+We now show that $\{ X_i \}$ does not satisfy the Strong Law of
+Large Numbers.  Suppose that $S_n / n \rightarrow 0$. Then because
+$$
+\frac{X_n}{n} = \frac{S_n}{n} - \frac{n-1}{n} \frac{S_{n-1}}{n-1}\ ,
+$$
+we know that $X_n / n \rightarrow 0$. From the definition of limits, we
+conclude that the inequality $|X_i| \geq \frac{1}{2} i$ can only be
+true for finitely many $i$.
+\item Let $A_i$ be the event $|X_i| \geq \frac{1}{2} i$. Find
+$P(A_i)$. Show that $\sum_{i=1}^{\infty} P(A_i)$ diverges (use the 
+Integral Test).
+\item Prove that $A_i$ occurs for infinitely many $i$.
+\item Prove that 
+$$
+P\biggl(\frac{S_n}{n} \rightarrow 0\biggr) = 0,
+$$
+and hence that the Strong Law of Large Numbers fails for the sequence
+$\{ X_i \}$.
+
+\end{enumerate}
+\istar\label{exer 8.1.110} Let us toss a biased coin that comes up heads with probability~$p$
+and assume the validity of the Strong Law of Large Numbers as described
+in Exercise~\ref{exer 8.1.16}.  Then, with probability~1, $$
+\frac {S_n}n \to p
+$$
+as $n \to \infty$.  If $f(x)$ is a continuous function on the unit interval,
+then we also have
+$$
+f\left( \frac {S_n}n \right) \to f(p)\ .
+$$
+
+Finally, we could hope that
+$$
+E\left(f\left( \frac {S_n}n \right)\right) \to E(f(p)) = f(p)\ .
+$$
+Show that, if all this is correct, as in fact it is, we would have proven that
+any continuous function on the unit interval is a limit of polynomial
+functions.  This is a sketch of a probabilistic proof of an important theorem 
+in mathematics called the \emx {Weierstrass approximation theorem.}\index{Weierstrass
+Approximation Theorem}
+\end{LJSItem}
+
+
+\choice{}{\section[Continuous Random Variables]{Law of Large Numbers for Continuous Random
+Variables}
+\label{sec 8.2}
+In the previous section we discussed in some detail the Law of Large Numbers
+for discrete probability distributions.  This law has a natural analogue for
+continuous probability distributions, which we consider somewhat more briefly
+here.
+
+\subsection*{\bf Chebyshev Inequality} \hfill\break\index{Chebyshev Inequality}
+Just as in the discrete case, we begin our discussion with the Chebyshev
+Inequality.
+
+\begin{theorem}{\bf (Chebyshev Inequality)} \index{Chebyshev Inequality}
+Let $X$ be a continuous random variable with density function $f(x)$.  Suppose $X$ has a 
+finite expected value $\mu = E(X)$ and finite variance $\sigma^2 = V(X)$.  Then for any
+positive number $\epsilon > 0$ we have
+$$
+P(|X - \mu| \geq \epsilon) \leq \frac {\sigma^2}{\epsilon^2}\ .
+$$
+\end{theorem}
+
+The proof is completely analogous to the proof in the discrete case, and we omit it.
+\par
+Note that this theorem says nothing if $\sigma^2 = V(X)$ is infinite.
+
+
+\begin{example}
+Let $X$ be any continuous random variable with $E(X) = \mu$ and $V(X) =
+\sigma^2$.  Then, if $\epsilon = k\sigma = k$ standard deviations
+for some integer~$k$, then
+$$
+P(|X - \mu| \geq k\sigma) \leq \frac {\sigma^2}{k^2\sigma^2} = \frac 1{k^2}\ ,
+$$
+just as in the discrete case.
+\end{example}
+
+\subsection*{Law of Large Numbers}
+With the Chebyshev Inequality we can now state and prove the Law of Large
+Numbers for the continuous case.
+
+\begin{theorem}{\bf (Law of Large Numbers)}\index{Law of Large Numbers}
+Let $X_1$,~$X_2$, \dots,~$X_n$ be an independent trials process with a
+continuous density function~$f$, finite expected value~$\mu$, and finite
+variance~$\sigma^2$.  Let $S_n = X_1 + X_2 +\cdots+ X_n$ be the sum of the
+$X_i$.  Then for any real number $\epsilon > 0$ we have
+$$
+\lim_{n \to \infty} P\left( \left| \frac {S_n}n - \mu \right| \geq \epsilon
+\right) = 0\ ,
+$$
+or equivalently,
+$$
+\lim_{n \to \infty} P\left( \left| \frac {S_n}n - \mu \right| < \epsilon
+\right) = 1\ .
+$$
+\end{theorem}
+
+Note that this theorem is not necessarily true if $\sigma^2$ is infinite
+(see Example~\ref{exam 8.2.5}).
+
+As in the discrete case, the Law of Large Numbers says that the average value
+of $n$ independent trials tends to the expected value as $n \to \infty$, in the
+precise sense that, given $\epsilon > 0$, the probability that the average
+value and the expected value differ by more than $\epsilon$ tends to~0 as $n
+\to \infty$.
+
+Once again, we suppress the proof, as it is identical to the proof in the discrete case.
+\subsection*{Uniform Case}
+\begin{example}
+Suppose we choose at random $n$ numbers from the interval $[0,1]$ with
+uniform distribution.  Then if $X_i$ describes the $i$th choice, we have
+\begin{eqnarray*}
+          \mu & = & E(X_i) = \int_0^1 x\, dx = \frac 12\ , \\
+     \sigma^2 & = & V(X_i) = \int_0^1 x^2\, dx - \mu^2 \\
+              & = & \frac 13 - \frac 14 = \frac 1{12}\ .
+\end{eqnarray*}
+Hence,
+\begin{eqnarray*}
+E \left( \frac {S_n}n \right)  & = & \frac 12\ , \\
+V \left( \frac {S_n}n \right)  & = & \frac 1{12n}\ ,
+\end{eqnarray*}
+and for any $\epsilon > 0$,
+$$
+P \left( \left| \frac {S_n}n - \frac 12 \right| \geq \epsilon \right) \leq \frac
+1{12n \epsilon^2}\ .
+$$
+
+This says that if we choose $n$ numbers at random from $[0,1]$, then the
+chances are better than $1 - 1/(12n\epsilon^2)$ that the difference $|S_n/n -
+1/2|$ is less than~$\epsilon$.  Note that $\epsilon$ plays the role of the
+amount of error we are willing to tolerate: If we choose $\epsilon = 0.1$, say,
+then the chances that $|S_n/n - 1/2|$ is less than~0.1 are better than $1 -
+100/(12n)$.  For $n = 100$, this is about .92, but if $n = 1000$, this is better
+than .99 and if $n = 10{,}000$, this is better than .999.
+\putfig{5.0truein}{PSfig8-2}{Illustration of Law of Large Numbers --- uniform case.}{fig 8.2}
+
+We can illustrate what the Law of Large Numbers says for this example
+graphically.  The density for $A_n = S_n/n$ is determined by
+$$
+f_{A_n}(x) = nf_{S_n}(nx)\ .
+$$
+
+We have seen in Section~\ref{sec 7.2}, that we can compute the density
+$f_{S_n}(x)$ for the sum of $n$ uniform random variables.  In Figure~\ref{fig 8.2} we have
+used this to plot the density for $A_n$ for various values of~$n$.  We have
+shaded in the area for which $A_n$ would lie between .45~and~.55.  We see that as
+we increase $n$, we obtain more and more of the total area inside the shaded
+region.  The Law of Large Numbers tells us that we can obtain as much of the
+total area as we please inside the shaded region by choosing $n$ large enough
+(see also Figure~\ref{fig 8.1}).
+\end{example}
+
+\subsection*{Normal Case}
+\begin{example}
+Suppose we choose $n$ real numbers at random,
+using a normal distribution with mean~0 and variance~1.  Then
+\begin{eqnarray*}
+         \mu &=& E(X_i) = 0\ , \\
+    \sigma^2 &=& V(X_i) = 1\ .
+\end{eqnarray*}
+Hence,
+\begin{eqnarray*}
+E \left( \frac {S_n}n \right) &=& 0\ , \\
+V \left( \frac {S_n}n \right) &=& \frac 1n\ ,
+\end{eqnarray*}
+and, for any $\epsilon > 0$,
+$$
+P\left( \left| \frac {S_n}n - 0 \right| \geq \epsilon \right) \leq \frac
+1{n\epsilon^2}\ .
+$$
+In this case it is possible to compare the Chebyshev estimate for $P(|S_n/n -
+\mu| \geq \epsilon)$ in the Law of Large Numbers with exact values, since we
+know the density function for $S_n/n$ exactly (see Example~\ref{exam 7.12}). 
+The comparison is shown in Table~\ref{table 8.1}, for $\epsilon = .1$.  The data
+in this table was produced by the program {\bf LawContinuous}.\index{LawContinuous (program)}
+\begin{table}
+\centering
+\begin{tabular}{r|r|r}
+$n$ & $P(|S_n/n| \ge .1)$ & Chebyshev \\
+\hline
+100 & .31731 & 1.00000 \\
+200 & .15730 & .50000 \\
+300 & .08326 & .33333 \\
+400 & .04550 & .25000 \\
+500 & .02535 & .20000 \\
+600 & .01431 & .16667 \\
+700 & .00815 & .14286 \\
+800 & .00468 & .12500 \\
+900 & .00270 & .11111 \\
+1000 & .00157 & .10000 \\
+\hline
+\end{tabular}
+\caption{Chebyshev estimates.}
+\label{table 8.1}
+\end{table}
+We see here that the Chebyshev estimates are in general \emx {not} very 
+accurate.
+\end{example}
+
+\subsection*{Monte Carlo Method}
+Here is a somewhat more interesting example.
+
+\begin{example}
+Let $g(x)$ be a continuous function defined for $x \in [0,1]$ with values in
+$[0,1]$.  In Section~\ref{sec 2.1}, we showed how to estimate the area of
+the region under the graph of $g(x)$ by the Monte Carlo method, that is, by
+choosing a large number of random values for $x$~and~$y$ with uniform
+distribution and seeing what fraction of the points $P(x,y)$ fell inside the
+region under the graph (see Example~\ref{exam 2.1.2}).
+\par
+Here is a better way to estimate the same area (see Figure~\ref{fig 8.3}).  Let us choose a
+large number of independent values $X_n$ at random from $[0,1]$ with uniform
+density, set $Y_n = g(X_n)$, and find the average value of the $Y_n$.  Then
+this average is our estimate for the area.  To see this, note that if the
+density function for~$X_n$ is uniform,
+\begin{eqnarray*}
+\mu & = & E(Y_n) = \int_0^1 g(x) f(x)\, dx \\
+    & = & \int_0^1 g(x)\, dx \\
+    & = & \mbox {average\ value\ of\ }  g(x)\ ,
+\end{eqnarray*}
+while the variance is
+$$
+\sigma^2 = E((Y_n - \mu)^2) = \int_0^1 (g(x) - \mu)^2\, dx < 1\ ,
+$$
+since for all $x$ in $[0, 1]$, $g(x)$ is in $[0, 1]$, hence $\mu$ is in $[0, 1]$, and
+so $|g(x) - \mu| \le 1$.  Now let $A_n = (1/n)(Y_1 + Y_2 +\cdots+ Y_n)$.  Then by Chebyshev's
+Inequality, we have
+$$
+P(|A_n - \mu| \geq \epsilon) \leq \frac {\sigma^2}{n\epsilon^2} < \frac
+1{n\epsilon^2}\ .
+$$
+
+\putfig{3truein}{PSfig8-3}{Area problem.}{fig 8.3} 
+
+This says that to get within $\epsilon$ of the true value for $\mu = \int_0^1
+g(x)\, dx$ with probability at least $p$, we should choose $n$ so that
+$1/n\epsilon^2 \leq 1 - p$ (i.e., so that $n \geq 1/\epsilon^2(1 - p)$).  Note
+that this method tells us how large to take $n$ to get a desired accuracy.
+\end{example}
+
+The Law of Large Numbers requires that the variance $\sigma^2$ of the original
+underlying density be finite: $\sigma^2 < \infty$.  In cases where this fails
+to hold, the Law of Large Numbers may fail, too.  An example follows.
+
+\subsection*{Cauchy Case}
+\begin{example}\label{exam 8.2.5}
+Suppose we choose $n$ numbers from $(-\infty,+\infty)$ with a Cauchy density
+with parameter $a = 1$.  We know that for the Cauchy density the expected value
+and variance are undefined (see Example~\ref{exam 6.23}).  In this case, the
+density function for
+$$
+A_n = \frac {S_n}n
+$$
+is given by (see Example~\ref{exam 7.9})
+$$
+f_{A_n}(x) = \frac 1{\pi(1 + x^2)}\ ,
+$$
+that is, \emx {the density function for $A_n$ is the same for all $n$.}  In this
+case, as $n$ increases, the density function does not change at all, and the
+Law of Large Numbers does not hold.
+\end{example}
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 8.2.1} Let $X$ be a continuous random variable with mean $\mu =
+10$ and variance $\sigma^2 = 100/3$.  Using Chebyshev's Inequality, find an upper
+bound for the following probabilities.
+\begin{enumerate}
+\item $P(|X - 10| \geq 2)$.
+
+\item $P(|X - 10| \geq 5)$.
+
+\item $P(|X - 10| \geq 9)$.
+
+\item $P(|X - 10| \geq 20)$.
+\end{enumerate}
+
+\i\label{exer 8.2.2} Let $X$ be a continuous random variable with values
+unformly distributed over the interval $[0,20]$.
+\begin{enumerate}
+\item Find the mean and variance of $X$.
+
+\item Calculate $P(|X - 10| \geq 2)$, $P(|X - 10| \geq 5)$, $P(|X - 10| \geq
+9)$, and $P(|X - 10| \geq 20)$ exactly.  How do your answers compare with those
+of Exercise~\ref{exer 8.2.1}?  How good is Chebyshev's Inequality in this case?
+\end{enumerate}
+
+\i\label{exer 8.2.3} Let $X$ be the random variable of Exercise~\ref{exer
+8.2.2}.
+\begin{enumerate}
+\item Calculate the function $f(x) = P(|X - 10| \geq x)$.
+
+\item Now graph the function $f(x)$, and on the same axes, graph the
+Chebyshev function $g(x) = 100/(3x^2)$.  Show that $f(x) \leq g(x)$ for all~$x >
+0$, but that $g(x)$ is not a very good approximation for~$f(x)$.
+\end{enumerate}
+
+\i\label{exer 8.2.100} Let $X$ be a continuous random variable with values exponentially
+distributed over $[0,\infty)$ with parameter $\lambda = 0.1$.
+\begin{enumerate}
+\item Find the mean and variance of $X$.
+
+\item Using Chebyshev's Inequality, find an upper bound for the following
+probabilities: $P(|X - 10| \geq 2)$, $P(|X - 10| \geq 5)$, $P(|X - 10| \geq
+9)$, and $P(|X - 10| \geq 20)$.
+
+\item Calculate these probabilities exactly, and compare with the bounds in
+(b).
+\end{enumerate}
+\i\label{exer 8.2.101} Let $X$ be a continuous random variable with values normally
+distributed over $(-\infty,+\infty)$ with mean $\mu = 0$ and variance $\sigma^2 = 1$.
+\begin{enumerate}
+\item Using Chebyshev's Inequality, find upper bounds for the following
+probabilities: $P(|X| \geq 1)$, $P(|X| \geq 2)$, and $P(|X| \geq 3)$.
+
+\item The area under the normal curve between $-1$~and~1 is .6827, between
+$-2$~and~2 is .9545, and between $-3$~and~3 it is .9973 (see the table in
+Appendix~A).  Compare your bounds in (a) with
+these exact values.  How good is Chebyshev's Inequality in this case?
+\end{enumerate}
+
+\i\label{exer 8.2.102} If $X$ is normally distributed, with mean~$\mu$ and
+variance~$\sigma^2$, find an upper bound for the following probabilities, using Chebyshev's
+Inequality.
+\begin{enumerate}
+\item $P(|X - \mu| \geq \sigma)$.
+
+\item $P(|X - \mu| \geq 2\sigma)$.
+
+\item $P(|X - \mu| \geq 3\sigma)$.
+
+\item $P(|X - \mu| \geq 4\sigma)$.
+\end{enumerate}
+\noindent Now find the exact value using the program {\bf NormalArea}\index{NormalArea (program)}
+or the normal table in Appendix~A, and compare.
+
+\i\label{exer 8.2.103} If $X$ is a random variable with mean~$\mu \ne 0$ and variance~$\sigma^2$,
+define the \emx {relative deviation} $D$ of $X$ from its mean by
+$$
+D = \left| \frac {X - \mu}\mu \right|\ .
+$$
+\begin{enumerate}
+\item Show that $P(D \geq a) \leq \sigma^2/(\mu^2a^2)$.
+
+\item If $X$ is the random variable of Exercise~\ref{exer 8.2.1}, find an
+upper bound for $P(D \geq .2)$, $P(D \geq .5)$, $P(D \geq .9)$, and $P(D \geq
+2)$.
+\end{enumerate}
+
+\i\label{exer 8.2.104} Let $X$ be a continuous random variable and define the {\em
+standardized version} $X^*$ of~$X$ by:
+$$
+X^* = \frac {X - \mu}\sigma\ .
+$$
+\begin{enumerate}
+\item Show that $P(|X^*| \geq a) \leq 1/a^2$.
+
+\item If $X$ is the random variable of Exercise~\ref{exer 8.2.1}, find
+bounds for $P(|X^*| \geq 2)$, $P(|X^*| \geq 5)$, and $P(|X^*| \geq 9)$.
+\end{enumerate}
+
+\i\label{exer 8.2.105}
+\begin{enumerate} 
+\item Suppose a number $X$ is chosen at random from $[0,20]$ with uniform
+probability.  Find a lower bound for the probability that $X$ lies between
+8~and~12, using Chebyshev's Inequality.
+
+\item Now suppose 20 real numbers are chosen independently from $[0,20]$
+with uniform probability.  Find a lower bound for the probability that their
+average lies between 8~and~12.
+
+\item Now suppose 100 real numbers are chosen independently from
+$[0,20]$.  Find a lower bound for the probability that their average lies
+between 8~and~12.
+\end{enumerate}
+
+\i\label{exer 8.2.106} A student's score on a particular calculus final is a random variable
+with values of $[0,100]$, mean~70, and variance~25.
+\begin{enumerate}
+\item Find a lower bound for the probability that the student's score will
+fall between 65~and~75.
+
+\item If 100 students take the final, find a lower bound for the probability
+that the class average will fall between 65~and~75.
+\end{enumerate}
+
+\i\label{exer 8.2.107} The Pilsdorff beer company runs a fleet of trucks along the 100~mile
+road from Hangtown to Dry Gulch, and maintains a garage halfway in between. 
+Each of the trucks is apt to break down at a point $X$~miles from Hangtown,
+where $X$ is a random variable uniformly distributed over $[0,100]$.
+\begin{enumerate}
+\item Find a lower bound for the probability $P(|X - 50| \leq 10)$.
+
+\item Suppose that in one bad week, 20 trucks break down.  Find a lower bound
+for the probability $P(|A_{20} - 50| \leq 10)$, where $A_{20}$ is the average
+of the distances from Hangtown at the time of breakdown.
+\end{enumerate}
+
+\i\label{exer 8.2.12} A share of common stock in the Pilsdorff beer company
+has a price $Y_n$ on the $n$th business day of the year.  Finn observes that the
+price change $X_n = Y_{n + 1} - Y_n$ appears to be a random variable with mean
+$\mu = 0$ and variance $\sigma^2 =1/4$.  If $Y_1 = 30$, find a lower bound for
+the following probabilities, under the assumption that the $X_n$'s are mutually independent.
+\begin{enumerate}
+\item $P(25 \leq Y_2 \leq 35)$.
+
+\item $P(25 \leq Y_{11} \leq 35)$.
+
+\item $P(25 \leq Y_{101} \leq 35)$.
+\end{enumerate}
+
+\i\label{exer 8.2.108} Suppose one hundred numbers $X_1$,~$X_2$, \dots,~$X_{100}$ are chosen
+independently at random from $[0,20]$.  Let $S = X_1 + X_2 +\cdots+ X_{100}$
+be the sum, $A = S/100$ the average, and $S^* = (S - 1000)/(10/\sqrt3)$ the
+standardized sum.  Find lower bounds for the probabilities
+\begin{enumerate}
+\item $P(|S - 1000| \leq 100)$.
+
+\item $P(|A - 10| \leq 1)$.
+
+\item $P(|S^*| \leq \sqrt3)$.
+\end{enumerate}
+
+\i\label{exer 8.2.14} Let $X$ be a continuous random variable normally
+distributed on $(-\infty,+\infty)$ with mean~0 and variance~1.  Using the normal
+table provided in Appendix~A, or the program {\bf NormalArea},
+find values for the function $f(x) = P(|X| \geq x)$ as $x$ increases from
+0~to~4.0 in steps of~.25.  Note that for $x \geq 0$ the table gives
+$ NA(0,x) = P(0 \leq X \leq x)$ and thus $P(|X| \geq x) = 2(.5 - NA(0,x)$.
+Plot by hand
+the graph of~$f(x)$ using these values, and the graph of the Chebyshev function
+$g(x) = 1/x^2$, and compare (see Exercise~\ref{exer 8.2.3}).
+
+\i\label{exer 8.2.109} Repeat Exercise~\ref{exer 8.2.14}, but this time with mean~10 and
+variance~3.  Note that the table in Appendix~A presents values for
+a standard normal variable.  Find the standardized version $X^*$ for~$X$, find
+values for $f^*(x) = P(|X^*| \geq x)$ as in Exercise~\ref{exer 8.2.14}, and
+then rescale these values for $f(x) = P(|X -10| \geq x)$.  Graph and compare
+this function with the Chebyshev function $g(x) = 3/x^2$.
+
+\i\label{exer 8.2.110} Let $Z = X/Y$ where $X$~and~$Y$ have normal densities with mean~0 and
+standard deviation~1.  Then it can be shown that $Z$ has a Cauchy density.
+\begin{enumerate}
+\item Write a program to illustrate this result by plotting a bar graph of
+1000 samples obtained by forming the ratio of two standard normal outcomes. 
+Compare your bar graph with the graph of the Cauchy density.  Depending upon which
+computer language you use, you may or may not need to tell the computer how to simulate a
+normal random variable.  A method for doing this was described in Section~\ref{sec 5.2}.
+
+\item We have seen that the Law of Large Numbers does not apply to the
+Cauchy density (see Example~\ref{exam 8.2.5}).  Simulate a large number of
+experiments with Cauchy density and compute the average of your results.  Do
+these averages seem to be approaching a limit?  If so can you explain why this
+might be?
+\end{enumerate}
+
+\i\label{exer 8.2.111} Show that, if $X \geq 0$, then $P(X \geq a) \leq E(X)/a$.
+
+\i\label{exer 8.2.112} (Lamperti\footnote{Private communication.})
+\index{LAMPERTI, J.} Let $X$ be a non-negative random
+variable.  What is the best upper bound you can give for $P(X \geq a)$ if you know
+\begin{enumerate}
+\item $E(X) = 20$.
+
+\item $E(X) = 20$ and $V(X) = 25$.
+
+\item $E(X) = 20$, $V(X) = 25$, and $X$ is symmetric about its mean.
+\end{enumerate}
+\end{LJSItem}}

@@ -1,0 +1,92 @@
+%!TEX root = ../larxxia.tex
+
+\chapter{Eigenvalues and eigenvectors of symmetric matrices}
+\label{ch:eesm}
+
+\minitoc
+
+\index{symmetric matrix|(}
+
+Recall (\autoref{sec:amwm}) that a \idx{symmetric matrix}~\(A\) is a square matrix such that \(\tr A=A\)\,, that is, \(a_{ij}=a_{ji}\)\,.
+For example, of the following two matrices, the first is symmetric, but the second is not:
+\begin{equation*}
+\begin{bmatrix} -2&4&0
+\\4&2&-3
+\\0&-3&1 \end{bmatrix};\qquad
+\begin{bmatrix} -1&3&0
+\\1&1&0
+\\0&-3&1 \end{bmatrix}.
+\end{equation*}
+
+\begin{example} \label{eg:symsigns}
+Compute some \svd{}s of random symmetric matrices, \(A=\usv\), observe in the \svd{}s that the columns of~\(U\) are always \(\pm\)~the columns of~\(V\) (well, almost always).
+\begin{solution} 
+Repeat as often us you like for any size of square matrix that you like  (one example is recorded here to two decimal places).  
+\begin{enumerate}
+\item Generate in \script\ some random symmetric matrix by adding a \idx{random matrix} to its transpose with \verb|A=randn(5); A=A+A'| (\autoref{tbl:mtlbops}):
+\setbox\ajrqrbox\hbox{\qrcode{% svd symmetric
+A=randn(5); A=A+A'
+[U,S,V]=svd(A)
+}}%
+\marginpar{\usebox{\ajrqrbox\\[2ex]}}%
+\begin{verbatim}
+A =
+  -0.45  -0.18   1.59  -0.96  -0.54
+  -0.18  -0.24  -1.04   0.14   0.80
+   1.59  -1.04  -2.87  -0.40   1.11
+  -0.96   0.14  -0.40  -0.26  -1.90
+  -0.54   0.80   1.11  -1.90   1.64
+\end{verbatim}
+This matrix is symmetric as \(a_{ij}=a_{ji}\)\,.
+\item Find an \svd\ via \verb|[U,S,V]=svd(A)|
+\begin{verbatim}
+U =
+  -0.41  -0.09  -0.28  -0.67   0.55
+   0.25  -0.11  -0.05   0.53   0.80
+   0.82  -0.19  -0.40  -0.36  -0.07
+  -0.15   0.51  -0.80   0.27  -0.11
+  -0.27  -0.83  -0.36   0.25  -0.22
+S =
+   4.28      0      0      0      0
+      0   3.12      0      0      0
+      0      0   1.65      0      0
+      0      0      0   1.14      0
+      0      0      0      0   0.51
+V =
+   0.41  -0.09   0.28  -0.67  -0.55
+  -0.25  -0.11   0.05   0.53  -0.80
+  -0.82  -0.19   0.40  -0.36   0.07
+   0.15   0.51   0.80   0.27   0.11
+   0.27  -0.83   0.36   0.25   0.22
+\end{verbatim}
+Observe the second and fourth columns of \(U\) and~\(V\) are identical, and the other pairs have opposite signs.
+\end{enumerate}
+Repeat for different random symmetric matrices and observe \(\uv_j=\pm \vv_j\) for all columns~\(j\) (almost always).
+\end{solution}
+\end{example}
+
+\index{symmetric matrix}Why, for symmetric matrices, are the columns of~\(U\) (almost) always \(\pm\)~the columns of~\(V\)?
+The answer is connected to the following rearrangement of an \svd.  
+Because \(A=\usv\), post-multiplying by~\(V\) gives \(AV=US\tr VV=US\)\,, and so, equating corresponding columns on both sides of \(AV=US\)\,, the \(j\)th~column is \(A\vv_j=\sigma_j\uv_j\)\,.
+\autoref{eg:symsigns} observes for symmetric~\(A\) that \(\uv_j=\pm\vv_j\) (almost always) so this last equation becomes \(A\vv_j=(\pm \sigma_j)\vv_j\).
+This equation is of the important form \(A\vv=\lambda\vv\)\,.
+This form is important because it is the mathematical expression of the following geometric question: for what vectors~\vv\ does multiplication by~\(A\) just stretch\slash shrink~\vv\ by some scalar~\(\lambda\)?
+
+\begin{comment}
+Dynamics of two masses on a spring (relate to molecular vibrations), and seek solutions in~\(\cos(ft)\) for eigenvalue \(\lambda=f^2\).  
+As done for three masses in \autoref{eg:eig3vib}.  Say symmetry from equal and opposite, claim holds even for gigantic structures with millions of interacting components.
+\end{comment}
+
+
+\paragraph{Solid modelling} Lean with a hand on a table\slash wall: the force changes depending upon the orientation of the surface.  
+Similarly inside any solid: the internal forces\({}=A\vv\) where \(\vv\)~is the orthogonal \idx{unit vector} to the internal `surface'.  
+Matrix~\(A\) is always symmetric.  
+To know whether a material will break apart under pulling, or to crumble under compression,  we need to know where the extreme forces are.  
+They are found as solutions to \(A\vv=\lambda\vv\) where \vv~gives the direction and \(\lambda\)~the strength of the force.
+To understand the potential failure of the material we need to solve equations in the form \(A\vv=\lambda\vv\)\,.
+
+
+
+
+\endinput
+

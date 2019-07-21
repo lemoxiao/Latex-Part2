@@ -1,0 +1,70 @@
+\documentclass{BHCexam}
+\usepackage{pgf}
+\begin{document}
+\begin{tikzpicture}[scale=0.8,thick]
+\def\a{5}%长半轴
+\def\b{3}%短半轴
+\def\c{4}%焦半轴
+\def\ptsize{2.0pt} %点的半径
+ 
+%x 轴 和 y轴
+\path[name path=xaxis,thick,draw,->](-6,0)--(6,0) node[right] {$x$};
+\path[name path=yaxis,thick,draw,->](0,-6)--(0,6) node[above,right] {$y$};
+%x 轴 与 y 轴的交点
+\path [name intersections={of = xaxis and yaxis}];
+\coordinate[label=below right:$O$] (O) at (intersection-1);
+%画一个椭圆
+ \draw [name path = myellipse ] (intersection-1) ellipse (\a cm and \b cm);
+ %椭圆与x 轴交点
+\path [name intersections={of = xaxis and myellipse}];
+\coordinate[label=below right:$A_2$] (a2) at (intersection-1);
+\coordinate[label=below left:$A_1$] (a1) at (intersection-2);
+%椭圆与y 轴交点
+\path [name intersections={of = yaxis and myellipse}];
+\coordinate[label=above right:$B_2$] (b2) at (intersection-1);
+\coordinate[label=below right:$B_1$] (b1) at (intersection-2);
+%焦点
+ \coordinate[label=below :$F_1$] (f1) at (-\c,0);
+ \coordinate[label=below :$F_2$] (f2) at (\c,0);
+ %a b c 的几何意义
+ \draw (b2) --(f2) node[midway,above] {$a$};
+ \draw (b2) --(O) node[midway,left] {$b$};
+ \draw (O) --(f2) node[midway,below] {$c$};
+ %阴影部分填充
+ \fill [pattern =north west lines,pattern color = black!70](b2)--(O)--(f2)--cycle;
+ %画点
+ \foreach \p in {O,a1,a2,b1,b2,f1,f2}
+        \fill (\p) circle (\ptsize);
+ %在图像右侧再画一个焦点在y轴上的椭圆
+\begin{scope}[xshift=13cm]
+\path[name path=xaxis,thick,draw,->](-6,0)--(6,0) node[right] {$x$};
+\path[name path=yaxis,thick,draw,->](0,-6)--(0,6) node[above,right] {$y$};
+\path [name intersections={of = xaxis and yaxis}];
+\coordinate[label=below right:$O$] (O) at (intersection-1);
+%画一个椭圆
+ \draw [name path = myellipse ] (intersection-1) ellipse (\b cm and \a cm);
+  
+\path [name intersections={of = xaxis and myellipse}];
+\coordinate[label=below right:$B_2$] (a2) at (intersection-1);
+\coordinate[label=below left:$B_1$] (a1) at (intersection-2);
+ 
+\path [name intersections={of = yaxis and myellipse}];
+\coordinate[label=above right:$A_2$] (b2) at (intersection-1);
+\coordinate[label=below right:$A_1$] (b1) at (intersection-2);
+ 
+ \coordinate[label=left :$F_1$] (f1) at (0,-\c);
+ \coordinate[label=left :$F_2$] (f2) at (0,\c);
+  
+ \draw (a2) --(f2) node[midway,above] {$a$};
+ \draw (a2) --(O) node[midway,below] {$b$};
+ \draw (O) --(f2) node[midway,left] {$c$};
+  
+ \fill [pattern =north west lines,pattern color = black!70](a2)--(O)--(f2)--cycle;
+  
+ \foreach \p in {O,a1,a2,b1,b2,f1,f2}
+        \fill (\p) circle (\ptsize);
+ 
+\end{scope}
+  
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,194 @@
+%\setcounter{chapter}{0}
+%\renewcommand{\thechapter}{\Alph{chapter}}
+
+% \appendix
+
+% \titleformat{\chapter}[hang]{\hwyk\LARGE}
+% {}{0mm}{\hspace{-0.4cm}\myappendix}
+ 
+% \titleformat{\section}[hang]{\hwyk\LARGE}
+% {}{0mm}{\hspace{-0.5cm}\appendixsection}
+
+% \titleformat{\subsection}[hang]{\hwyk\large}
+% {}{0mm}{\hspace{-0.5cm}\appendixsubsection}
+
+% \titleformat{\subsubsection}[hang]{\hwyk\large}
+% {}{0mm}{\hspace{-0.5cm}\appendixsubsubsection}
+
+\chapter{Legendre椭圆积分与Jacobi椭圆函数}\label{椭圆积分与Jacobi椭圆函数}
+
+\section{Legendre椭圆积分}
+
+定义函数\footnote{本节提到的三类椭圆积分在不同的文献上可能会有不同的形式。}
+\begin{equation}
+	F(k,x) = \int_0^x \frac{\mathrm{d}t}{\sqrt{(1-t^2)(1-k^2t^2)}} = \int_0^{\arcsin x} \frac{\mathrm{d}\phi}{\sqrt{1-k^2\sin^2\phi}}
+	\label{第一类椭圆积分-定义}
+\end{equation}
+为{\bf 第一类椭圆积分}，其中参数$k$称为椭圆积分的{\bf 模}。当$x=1$时，记
+\begin{equation}
+	K(k) = \int_0^1 \frac{\mathrm{d}t}{\sqrt{(1-t^2)(1-k^2t^2)}} = \int_0^{\frac{\pi}{2}} \frac{\mathrm{d}\phi}{\sqrt{1-k^2\sin^2\phi}}
+	\label{chp6:第一类完全椭圆积分-定义}
+\end{equation}
+称为{\bf 第一类完全椭圆积分}。
+
+第一类椭圆积分可以用级数表示为
+\begin{align}
+	F(k,x) & = \int_0^{\arcsin x} \left[1+\sum_{n=1}^\infty \frac{(2n-1)!!}{(2n)!!}k^{2n}\sin^{2n}\phi\right]\mathrm{d}\phi \nonumber \\
+	& = \arcsin x + \sum_{n=1}^\infty \frac{(2n-1)!!}{(2n)!!}k^{2n}\int_0^{\arcsin x} \sin^{2n}\phi \mathrm{d}\phi
+	\label{chp6:第一类椭圆积分-级数表示}
+\end{align}
+由此可得第一类完全椭圆积分的级数表示为
+\begin{align}
+	K(k) & = \arcsin 1 + \sum_{n=1}^\infty \frac{(2n-1)!!}{(2n)!!}k^{2n}\int_0^{\frac{\pi}{2}} \sin^{2n}\phi \mathrm{d}\phi \nonumber \\
+	& = \frac{\pi}{2}\left[1+\sum_{n=1}^\infty \left(\frac{(2n-1)!!}{(2n)!!}\right)^2k^{2n}\right]
+	\label{chp6:第一类完全椭圆积分-级数表示}
+\end{align}
+
+定义函数
+\begin{equation}
+	E(k,x) = \int_0^x \sqrt{\frac{1-k^2t^2}{1-t^2}}\mathrm{d}t = \int_0^{\arcsin x} \sqrt{1-k^2\sin^2\phi}\mathrm{d}\phi
+	\label{第二类椭圆积分-定义}
+\end{equation}
+为{\bf 第二类椭圆积分}。当$x=1$时，记
+\begin{equation}
+	E(k) = \int_0^1 \sqrt{\frac{1-k^2t^2}{1-t^2}}\mathrm{d}t = \int_0^{\frac{\pi}{2}} \sqrt{1-k^2\sin^2\phi}\mathrm{d}\phi
+	\label{第二类完全椭圆积分-定义}
+\end{equation}
+称为{\bf 第二类完全椭圆积分}。
+
+第二类椭圆积分可以用级数表示为
+\begin{align}
+	E(k,x) & = \int_0^{\arcsin x} \left[1-\sum_{n=1}^\infty \frac{1}{2n-1}\frac{(2n-1)!!}{(2n)!!}k^{2n}\sin^{2n}\phi\right]\mathrm{d}\phi \nonumber \\
+	& = \arcsin x - \sum_{n=1}^\infty \frac{1}{2n-1}\frac{(2n-1)!!}{(2n)!!}k^{2n}\int_0^{\arcsin x} \sin^{2n}\phi \mathrm{d}\phi
+	\label{第二类椭圆积分-级数表示}
+\end{align}
+由此可得第二类完全椭圆积分的级数表示为
+\begin{align}
+	E(k) & = \arcsin 1 - \sum_{n=1}^\infty \frac{1}{2n-1}\frac{(2n-1)!!}{(2n)!!}k^{2n}\int_0^{\frac{\pi}{2}} \sin^{2n}\phi \mathrm{d}\phi \nonumber \\
+	& = \frac{\pi}{2}\left[1-\sum_{n=1}^\infty \frac{1}{2n-1}\left(\frac{(2n-1)!!}{(2n)!!}\right)^2k^{2n}\right]
+	\label{chp6:第二类完全椭圆积分-级数表示}
+\end{align}
+
+根据第一类和第二类椭圆积分的定义式\eqref{第一类椭圆积分-定义}和\eqref{第二类椭圆积分-定义}可得第一类和第二类椭圆积分对$k$的导数：
+\begin{align}
+	\dfrac{\pl F}{\pl k}(k,x) & = \frac{1}{k'^2}\left(\frac{E(k,x)-k'^2F(k,x)}{k}-\frac{kx\sqrt{1-x^2}}{1-k^2x^2}\right) \label{Appendix-A:第一类不完全椭圆积分的导数} \\
+	\dfrac{\pl E}{\pl k}(k,x) & = \frac{E(k,x)-F(k,x)}{k} \label{Appendix-A:第二类不完全椭圆积分的导数} 
+\end{align}
+其中$k'^2=1-k^2$，$k'$称为{\bf 补模}。
+
+如果在等式\eqref{Appendix-A:第一类不完全椭圆积分的导数}和\eqref{Appendix-A:第二类不完全椭圆积分的导数}中令$x=1$可得两类完全椭圆积分对$k$的导数：
+\begin{align}
+	\dfrac{\pl K}{\pl k}(k) & = \frac{E(k)-k'^2K(k)}{kk'^2} \label{Appendix-A:第一类完全椭圆积分的导数} \\
+	\dfrac{\pl E}{\pl k}(k) & = \frac{E(k)-K(k)}{k} \label{Appendix-A:第二类完全椭圆积分的导数}
+\end{align}
+
+定义函数
+\begin{align}
+	\varPi(h,k,x) & = \int_0^x \frac{\mathrm{d}t}{(1+ht^2)\sqrt{(1-t^2)(1-k^2t^2)}} \nonumber \\
+	& = \int_0^{\arcsin x} \frac{\mathrm{d}\phi}{(1+h\sin^2\phi)\sqrt{1-k^2\sin^2\phi}}
+\end{align}
+为{\bf 第三类椭圆积分}。当$x=1$时，记
+\begin{equation}
+	\varPi(h,k) = \int_0^1 \frac{\mathrm{d}t}{(1+ht^2)\sqrt{(1-t^2)(1-k^2t^2)}} = \int_0^{\frac{\pi}{2}} \frac{\mathrm{d}\phi}{(1+h\sin^2\phi)\sqrt{1-k^2\sin^2\phi}}
+\end{equation}
+称为{\bf 第三类完全椭圆积分}。
+
+\section{Jacobi椭圆函数}
+
+第一类椭圆积分\eqref{第一类椭圆积分-定义}
+\begin{equation*}
+	x = \int_0^s \frac{\mathrm{d}t}{\sqrt{(1-t^2)(1-k^2t^2)}}
+\end{equation*}
+的反函数记作
+\begin{equation}
+	s = \sn x
+\end{equation}
+称为{\bf 椭圆正弦函数}。
+
+令
+\begin{equation}
+	\sin \phi = \sn x
+\end{equation}
+则称$\phi$为{\bf 椭圆振幅函数}，记作$\phi = \am x$。
+
+定义
+\begin{equation}
+	\cn x = \cos \phi = \sqrt{1-\sn^2 x}
+\end{equation}
+称为{\bf 椭圆余弦函数}。定义
+\begin{equation}
+	\tn x = \tan \phi = \frac{\sn x}{\cn x} = \frac{\sn x}{\sqrt{1-\sn^2 x}}
+\end{equation}
+称为{\bf 椭圆正切函数}。定义
+\begin{equation}
+	\dn x = \sqrt{1-k^2\sn^2x}
+\end{equation}
+称为{\bf 椭圆幅度函数}。
+
+其中函数$\sn x, \cn x$和$\tn x$是周期为$4K(k)$的周期函数，而$\dn x$是周期为$2K(k)$的周期函数。它们的图像如图\ref{appendixA:椭圆函数的图像}所示。
+
+\begin{figure}[htb]
+\centering
+\begin{asy}
+	import gsl;
+	size(350);
+	picture pic;
+	real k;
+	real sn(real x){
+		return sncndn(x,k^2)[0];
+	}
+	real cn(real x){
+		return sncndn(x,k^2)[1];
+	}
+	real dn(real x){
+		return sncndn(x,k^2)[2];
+	}
+	real x,y,K;
+	k = 0.5;
+	K = F(pi/2,k);
+	x = 7.5;
+	y = 1.25;
+	draw(pic,Label("$x$",EndPoint,N),(0,0)--(x,0),Arrow);
+	draw(pic,Label("$y$",EndPoint,W),(0,-y)--(0,y),Arrow);
+	draw(pic,Label("$\mathrm{sn}\,x$",Relative(0.45),NE),graph(sn,0,4*K));
+	draw(pic,Label("$\mathrm{cn}\,x$",Relative(0.375),SW),graph(cn,0,4*K));
+	draw(pic,Label("$\mathrm{dn}\,x$",Relative(0.75),S),graph(dn,0,4*K),linewidth(0.8bp));
+	label(pic,"$O$",(0,0),W);
+	draw(pic,(0,-1)--(x-0.5,-1));
+	draw(pic,(0,1)--(x-0.5,1));
+	label(pic,"$-1$",(0,-1),W);
+	label(pic,"$1$",(0,1),W);
+	label(pic,"$K$",(K,0),SW);
+	label(pic,"$2K$",(2*K,0),SW);
+	label(pic,"$3K$",(3*K,0),SE);
+	label(pic,"$4K$",(4*K,0),SE);
+	add(xscale(0.5)*pic);
+\end{asy}
+\caption{椭圆函数的图像（$k=\dfrac12$）}
+\label{appendixA:椭圆函数的图像}
+\end{figure}
+
+当$k\to 0$时，根据式\eqref{第一类椭圆积分-定义}可得
+\begin{equation*}
+	F(0,s) = \int_0^s \frac{\mathrm{d}t}{\sqrt{1-t^2}} = \arcsin s
+\end{equation*}
+由此，当$k\to 0$时，有
+\begin{equation}
+	\sn x \to \sin x
+\end{equation}
+根据其余椭圆函数的定义，当$k\to 0$时，有
+\begin{equation}
+	\cn x \to \cos x,\quad \dn x \to 1
+\end{equation}
+
+Jacobi椭圆函数满足如下很容易验证的恒等式：
+\begin{align}
+	& \sn^2x+\cn^2x=1 \\
+	& \dn^2x+k^2\sn^2x=1
+\end{align}
+以及如下的导数关系
+\begin{align}
+	\difOp{x}\sn x & = \cn x\cdot \dn x \\
+	\difOp{x}\cn x & = -\sn x\cdot \dn x \\
+	\difOp{x}\dn x & = -k^2\sn x\cdot \cn x
+\end{align}

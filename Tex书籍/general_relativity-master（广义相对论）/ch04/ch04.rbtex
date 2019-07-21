@@ -1,0 +1,1529 @@
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '04',
+    %q{Tensors},
+    'ch:tensors'
+  )
+%>
+
+We now have enough machinery to be able to calculate quite a bit of interesting physics, and to be sure
+that the results are actually meaningful in a relativistic context. The strategy is to identify relativistic
+quantities that behave as Lorentz scalars and Lorentz vectors, and then combine them in various ways.
+The notion of a tensor has been introduced on page \pageref{tensor-intro}. 
+A Lorentz scalar is a tensor of rank 0, and a Lorentz vector is a rank-1 tensor.
+
+<% begin_sec("Lorentz scalars") %>
+A Lorentz scalar is a quantity that remains invariant under both spatial rotations and Lorentz boosts.
+Mass is a Lorentz scalar.\footnote{Some older books define mass as transforming according to $m \rightarrow \gamma m$,
+which can be made to give a self-consistent theory, but is ugly.} Electric charge is also a Lorentz scalar, as demonstrated
+to extremely high precision by experiments measuring the electrical neutrality of atoms and molecules to a relative precision of better than
+$10^{-20}$; the electron in a hydrogen atom has typically velocities of about $1/100$, and those in heavier elements
+such as uranium are highly relativistic, so any violation of Lorentz invariance would give the atoms a nonvanishing
+net electric charge.
+
+The time measured by a clock traveling along a particular world-line from one event to another
+is something that all observers will agree upon; they will simply note the mismatch with their own clocks. It is therefore
+a Lorentz scalar. This
+clock-time as measured by a clock attached to the moving body in question is often referred to as proper time,\index{proper time}
+``proper'' being used here in the somewhat archaic sense of ``own'' or ``self,'' as in ``The Vatican does not lie
+within Italy proper.'' Proper time, which we notate $\tau$, can only be defined for timelike world-lines, since
+a lightlike or spacelike world-line isn't possible for a material clock.
+
+More generally,
+when we express a metric as $\der s^2=\ldots$, the quantity $\der s$ is a Lorentz scalar. In the special
+case of a timelike world-line, $\der s$ and $\der\tau$ are the same thing. (In books that use
+a $-+++$ metric, one has $\der s=-\der\tau$.)
+
+Even more generally, affine parameters, which exist independent of any metric at all, are scalars.
+As a trivial example, if $\tau$ is a particular object's proper time, then $\tau$ is a valid affine
+parameter, but so is $2\tau+7$. Less trivially, a photon's proper time is always zero, but
+one can still define an affine parameter along its trajectory. We will need such an affine parameter,
+for example, in section \ref{sec:deflection-of-light}, page \pageref{sec:deflection-of-light}, when
+we calculate the deflection of light rays by the sun, one of the early classic experimental tests of general relativity.
+
+Another example of a Lorentz scalar is the pressure of a perfect fluid, which is often assumed
+as a description of matter in cosmological models.
+
+\begin{eg}{Infinitesimals and the clock ``postulate''}\index{clock ``postulate''}
+At the beginning of chapter \ref{ch:differential-geometry}, I motivated the use of infinitesimals
+as useful tools for doing differential geometry in curved spacetime. Even in the context of special
+relativity, however, infinitesimals can be useful. One way of expressing the proper
+time accumulated on a moving clock is
+\begin{align*}
+  s &= \int \der s \\
+    &= \int \sqrt{g_{ij} \der x^i \der x^j} \\
+    &= \int \sqrt{1-\left(\frac{\der x}{\der t}\right)^2-\left(\frac{\der y}{\der t}\right)^2-\left(\frac{\der z}{\der t}\right)^2} \der t\eqquad,
+\end{align*}
+which only contains an explicit dependence on the clock's velocity, not its acceleration.
+This is an example of the clock ``postulate'' referred to in the remark at the end of homework problem \ref{hw:clock-postulate}
+on page \pageref{hw:clock-postulate}. Note that the clock postulate only applies in the limit of a small clock.
+This is represented in the above equation by the use of infinitesimal quantities like $\der x$.
+\end{eg}
+<% end_sec %>
+
+<% begin_sec("Four-vectors") %>\label{sec:four-vectors}\index{four-vector}
+
+<% begin_sec("The velocity and acceleration four-vectors") %>\label{sec:v-four-vector}\index{four-vector!velocity}\index{velocity four-vector}
+Our basic Lorentz vector is the spacetime displacement $\der x^i$. Any other quantity that has the same behavior
+as $\der x^i$ under rotations and boosts is also a valid Lorentz vector. Consider a particle moving through space,
+as described in a Lorentz frame. Since the particle may be subject to nongravitational forces, the Lorentz frame
+cannot be made to coincide (except perhaps momentarily) with the particle's rest frame.
+If $\der x^i$ is not lightlike, then the corresponding infinitesimal proper time interval $\der\tau$ is
+nonzero. As with Newtonian three-vectors, dividing a four-vector by a Lorentz scalar produces another
+quantity that transforms as a four-vector, so
+dividing the infinitesimal displacement
+by a nonzero infinitesimal proper time interval, we have
+the four-velocity vector $v^i=\der x^i/\der\tau$,\index{velocity vector}
+whose components in a Lorentz coordinate system
+are $(\gamma,\gamma u^1,\gamma u^2,\gamma u^3)$, where $(u^1,u^2,u^3)$
+is the ordinary three-component velocity vector as defined in classical
+mechanics. The four-velocity's squared magnitude $v^iv_i$ is
+always exactly 1, even though the particle is not moving at the speed of light. (If it were moving at the
+speed of light, we would have $\der\tau=0$, and $v$ would be undefined.)
+
+When we hear something referred to as a ``vector,''
+we usually take this is a statement that it not only transforms as a vector, but also that it adds as a vector.
+But we have already seen in section \ref{sec:velocity-addition} on page \pageref{sec:velocity-addition} that even collinear
+velocities in relativity do not add linearly; therefore they clearly cannot add linearly when dressed in the clothing of four-vectors.
+We've also seen in section \ref{sec:boosts-causing-rotations} that the combination of
+non-collinear boosts is noncommutative, and is generally equivalent to a boost plus a spatial rotation; this is also not
+consistent with linear addition of four-vectors. At the risk of beating a dead horse, a four-velocity's squared magnitude is
+always 1, and this is not consistent with being able to add four-velocity vectors.
+
+\begin{eg}{A zero velocity vector?}\label{eg:zero-v-vector}
+\egquestion Suppose an object has a certain four-velocity $v^i$ in a certain frame of reference. Can we transform into a different
+frame in which the object is at rest, and its four-velocity is zero?
+
+\eganswer No. In general, the Lorentz transformation preserves the magnitude of vectors, so it can never transform a vector with
+a zero magnitude into one with nonzero magnitude. Since this is a material object
+(not a ray of light) we can transform into a frame in which the object is at rest,
+but an object at rest does not have a vanishing four-velocity. It has a four-velocity
+of $(1,0,0,0)$.
+\end{eg}
+
+Example \ref{eg:zero-v-vector} suggests a nice way of thinking about velocity vectors, which is that every
+velocity vector represents a potential observer.
+An observer is a material object, and therefore has a timelike velocity vector. This observer writes her own
+velocity vector as  $(1,0,0,0)$, i.e., as the unit vector in the timelike direction. Often when we see an expression
+involving a velocity vector, we can interpret it as describing a measurement taken by a specific observer.
+
+\begin{eg}{Orthogonality as simultaneity}\index{orthogonality}
+In a space where the inner product can be negative, orthogonality doesn't mean what our euclidean intuition thinks it
+means. For example, a lightlike vector can be orthogonal to itself --- a situation that never occurs in a euclidean space.
+
+Suppose we have a timelike vector $\vc{t}$ and a spacelike one $\vc{x}$. What would it mean for $\vc{t}$
+and $\vc{x}$ to be orthogonal, with $\vc{t}\cdot\vc{x}=0$? Since $\vc{t}$ is timelike, we can make a unit
+vector $\hat{\vc{t}}=\vc{t}/|\vc{t}|$ out of it, and interpret $\hat{\vc{t}}$
+as the velocity vector of some hypothetical observer. We then know that in that observer's frame, $\hat{\vc{t}}$
+is simply a unit vector along the time axis. It now becomes clear that $\vc{x}$ must be parallel to the x axis,
+i.e., it represents a displacement between two events that this observer considers to be simultaneous.
+
+This is an example of the idea that expressions involving velocity vectors can be interpreted as measurements taken
+by a certain observer. The expression $\vc{t}\cdot\vc{x}=0$ can be interpreted as meaning that
+according to an observer whose world-line is tangent to $\vc{t}$, $\vc{x}$ represents a relationship of simultaneity.
+\end{eg}
+
+The four-acceleration is found by taking a second derivative with respect to proper time.\index{four-vector!acceleration}\index{acceleration four-vector}
+Its squared magnitude is
+only approximately equal to minus the squared magnitude of the Newtonian acceleration three-vector, in the limit of small velocities.
+
+\begin{eg}{Constant acceleration}\label{eg:hyperbolic-motion}
+\egquestion Suppose a spaceship moves so that the acceleration is judged to be the constant value $a$ by an observer on board. Find the
+motion $x(t)$ as measured by an observer in an inertial frame.
+
+\eganswer Let $\tau$ stand for the ship's proper time, and let dots indicate derivatives with respect to $\tau$.
+The ship's velocity has magnitude 1, so
+\begin{equation*}
+  \dot{t}^2-\dot{x}^2 = 1\eqquad.
+\end{equation*}
+An observer who is instantaneously at rest with respect to the ship judges is to have a four-acceleration $(0,a,0,0)$
+(because the low-velocity limit applies).
+The observer in the $(t,x)$ frame agrees on the magnitude of this vector, so
+\begin{equation*}
+  \ddot{t}^2-\ddot{x}^2=-a^2\eqquad.
+\end{equation*}
+The solution of these differential equations is $t=\frac{1}{a}\sinh a\tau$, \linebreak[4] $x=\frac{1}{a}\cosh a\tau$, and eliminating
+$\tau$ gives
+\begin{equation*}
+  x = \frac{1}{a}\sqrt{1+a^2t^2}\eqquad.
+\end{equation*}
+As $t$ approaches infinity, $\der x/\der t$ approaches the speed of light.
+\end{eg}
+
+<% end_sec %> % v and a
+
+<% begin_sec("The momentum four-vector") %>\label{sec:momentum-four-vector}\index{momentum four-vector}\index{four-vector!momentum}
+<% begin_sec("Definition for a material particle") %>
+If we hope to find something
+that plays the role of momentum in relativity, then the
+momentum three-vector probably needs to be generalized to some
+kind of four-vector. If so, then the law of conservation of momentum will be valid regardless of one's
+frame of reference, which is necessary.\footnote{We are not guaranteed that this is the right way to proceed,
+since the converse is not true: some three-vectors such as the
+electric and magnetic fields are embedded in rank-2 tensors in more complicated ways than this.
+See section \ref{sec:e-and-b-not-four-vectors}, p.~\pageref{sec:e-and-b-not-four-vectors}.}
+
+If we are to satisfy the correspondence principle then the relativistic definition of momentum should probably
+look as much as possible like the nonrelativistic one.
+In subsection \ref{sec:v-four-vector}, we defined the velocity four-vector in the case of
+a particle whose $\der x^i$ is not lightlike.
+Let's assume for the moment that it makes sense to think of mass as a scalar.
+As with Newtonian three-vectors, multiplying a Lorentz scalar by a four-vector vector produces another
+quantity that transforms as a four-vector.
+We therefore conjecture that the four-momentum of a material particle can be defined
+as $p^i=mv^i$, which in Lorentz coordinates is
+$(m\gamma,m\gamma v^1,m\gamma v^2,m\gamma v^3)$. There is no \emph{a priori} guarantee that this is right, but it's
+the most reasonable thing to guess. It needs to be checked against experiment, and also for consistency with
+the other parts of our theory.
+
+The spacelike components look like the classical momentum vector
+multiplied by a factor of $\gamma$, the interpretation being that to an observer in this frame, the moving particle's
+inertia is increased relative to its value in the particle's rest frame. Such an effect is indeed observed experimentally.
+This is why particle accelerators are so big and expensive.
+As the particle approaches the speed of light, $\gamma$ diverges, so greater and greater forces are needed in order
+to produce the same acceleration. In relativistic scattering processes with material particles,
+we find empirically that
+the four-momentum we've defined is conserved, which confirms that our conjectures above are valid,
+and in particular that the quantity we're calling $m$ can be treated as a Lorentz scalar, and this is
+what all physicists do today. The reader is cautioned, however, that up until about 1950, it was common
+to use the word ``mass'' for the combination $m\gamma$ (which is what occurs in the Lorentz-coordinate
+form of the momentum vector), while referring to $m$ as the ``rest mass.'' This archaic terminology is
+only used today in some popular-level books and low-level school textbooks.
+<% end_sec %> % Definition for a material particle
+
+<% begin_sec("Equivalence of mass and energy") %>
+The momentum four-vector has locked within it the reason for Einstein's famous
+$E=mc^2$, which in our relativistic units becomes simply $E=m$. To see why, consider the experimentally measured
+inertia of a physical object made out of atoms. The subatomic particles are all moving, and many of the velocities,
+e.g., the velocities of the electrons, are quite relativistic. This has the effect of increasing the experimentally
+determined inertial mass of the whole object, by a factor of $\gamma$ averaged over all the particles ---
+even though the masses of the individual particles are invariant Lorentz scalars.
+(This same increase must also be observed for the gravitational mass, based on the equivalence principle
+as verified by E\"{o}tv\"{o}s experiments.)
+
+Now if the object is heated, the velocities will increase on the average,
+resulting in a further increase in its mass. Thus, a certain amount of heat energy is equivalent to a certain amount
+of mass. But if heat energy contributes to mass, then the same must be true for other forms of energy. For example,
+suppose that heating leads to a chemical reaction, which converts some heat into electromagnetic binding energy.
+If one joule of binding energy did not convert to the same amount of mass as one joule of heat, then this would
+allow the object to spontaneously change its own mass, and then by conservation of momentum it would have to
+spontaneously change its own velocity, which would clearly violate the principle of relativity. We conclude that
+mass and energy are equivalent, both inertially and gravitationally. In relativity, neither is separately conserved;
+the conserved quantity is their sum, referred to as the mass-energy, $E$.\index{mass-energy}
+An alternative derivation, by Einstein, is given
+in example \ref{eg:einstein-mc2} on page \pageref{eg:einstein-mc2}.
+<% end_sec %> % Equivalence of mass and energy
+
+<% begin_sec("Energy is the timelike component of the four-momentum") %>
+The Lorentz transformation of a zero vector is always zero. This means that the momentum
+four-vector of a material object can't equal zero in the object's rest frame, since then
+it would be zero in all other frames as well. So for an object of mass $m$, let its
+momentum four-vector in its rest frame be $(f(m),0,0,0)$, where $f$ is some function that
+we need to determine, and $f$ can depend only on $m$ since there is no other property of
+the object that can be dynamically relevant here. Since conservation laws are additive, $f$ has to
+be $f(m)=km$ for some universal constant $k$. In where $c=1$, $k$ is unitless.
+Since we want to recover the
+appropriate Newtonian limit for massive bodies, and since $v_t=1$ in that limit, we need $k=1$.
+Transforming the momentum four-vector from the particle's rest frame into some other frame,
+we find that the timelike component is no longer $m$. We interpret this as the relativistic mass-energy, $E$.
+
+Since the momentum four-vector was obtained from the magni\-tude-1 velocity four-vector through multiplication by $m$,
+its squared magnitude $p^ip_i$ is equal to the square of the particle's mass.
+Writing $p$ for the magnitude of the momentum three-vector, and $E$ for the mass-energy, we
+find the useful relation $m^2=E^2-p^2$.
+We take this to be the relativistic \emph{definition} the mass of any particle, including one
+whose $\der x^i$ is lightlike.\index{mass!defined}
+<% end_sec %> % Energy is the timelike component of the four-momentum
+
+<% begin_sec("Particles traveling at $c$") %>
+The definition of four-momentum as $p^i=mv^i$ only works for particles that move at less than $c$. For those
+that move at $c$, the four-velocity is undefined.
+As we'll see in example \ref{eg:massless-at-c-proofs} on p.~\pageref{eg:massless-at-c-proofs}, this
+class of particles is exactly those that are massless. As shown on p.~\pageref{light-has-momentum-1},
+the three-momentum of a light wave is given by $p=E$.\label{light-has-momentum-2}
+The fact that this momentum is nonzero implies that for light $p^i=mv^i$ represents an indeterminate form.
+The fact that this momentum equals $E$ is consistent with our definition of mass as $m^2=E^2-p^2$.
+<% end_sec %> % Particles traveling at $c$
+
+<% begin_sec("Mass is not additive") %>
+Since the momentum four-vector $p^a$ is additive, and our definition of mass as
+$p^ap_a$ depends on the vector in a nonlinear way, it follows that mass is not additive
+(even for particles that are not interacting but are simply considered collectively).
+<% end_sec %> % Mass is not additive
+
+\begin{eg}{Mass of two light waves}
+Let the momentum of a certain light wave be $(p_t,p_x)=(E,E)$,
+and let another such wave have momentum $(E,-E)$. The total momentum is
+$(2E,0)$. Thus this pair of massless particles has a collective mass of $2E$.
+\end{eg}
+
+\begin{eg}{Massless particles travel at $c$}\label{eg:massless-at-c-proofs}\label{c-is-speed-of-massless-particles}
+We demonstrate this by showing that if we suppose the opposite, then
+there are two different consequences, either of which would be physically unacceptable.
+
+When a particle does have a nonvanishing mass, we have
+\begin{equation*}
+\lim_{E/m\rightarrow\infty} |v| \quad = \quad  \lim_{E/m\rightarrow\infty} \frac{|p|}{E} \quad = \quad 1\eqquad.
+\end{equation*}
+Thus if we had
+a massless particle with $|v|\ne 1$, its behavior would be different from the limiting behavior of
+massive particles. But this is physically unacceptable because then
+we would have a magic method for detecting arbitrarily small masses such
+as $10^{-10000000000}$ kg. We don't actually know that the photon, for example, is \emph{exactly}
+massless; see example \ref{eg:photon-mass} on p.~\pageref{eg:photon-mass}.
+
+Furthermore, suppose that a massless particle had $|v|<1$ in the frame of some observer. Then some
+other observer could be at rest relative to the particle. In such a frame,
+the particle's three-momentum $\mathbf{p}$ is zero by symmetry, since there is no preferred
+direction for it. Then $E^2=p^2+m^2$ is zero as well, so the particle's entire energy-momentum
+four-vector is zero. But a four-vector that vanishes in one frame also vanishes in every
+other frame. That means we're talking about a particle that can't undergo scattering, emission, or
+absorption, and is therefore undetectable by any experiment. This is physically unacceptable because
+we don't consider phenomena (e.g., invisible fairies) to be of physical interest if they are
+undetectable even in principle.
+\end{eg}
+
+
+\begin{eg}{Gravitational redshifts}\label{eg:pound-rebka}
+Since a photon's energy $E$ is equivalent to a certain gravitational mass $m$, photons that rise or fall in a gravitational
+field must lose or gain energy, and this should be observed as a redshift or blueshift in the frequency.
+We expect the change in gravitational potential energy to be $E\Delta \phi$, giving a corresponding opposite change in the photon's
+energy, so that $\Delta E/E=\Delta \phi$. In metric units, this becomes $\Delta E/E=\Delta \phi/c^2$, and in the
+field near the Earth's surface we have $\Delta E/E=gh/c^2$.
+This is the same result that was found in section \ref{sec:gravitational-redshifts} based only on the equivalence
+principle, and verified experimentally by Pound and Rebka as described in section \ref{sec:pound-rebka}.
+\end{eg}
+
+
+
+\begin{eg}{Constraints on polarization}\label{eg:polzn-constraints}\index{polarization!of light}\index{transverse polarization!of light}
+We observe that electromagnetic waves are always polarized transversely, never longitudinally.
+Such a constraint can only apply to a wave that propagates at $c$. If it applied to a wave that
+propagated at less than $c$, we could move into a frame of reference in which the wave was at rest.
+In this frame, all directions in space would be equivalent, and there would be no way to decide which
+directions of polarization should be permitted. For a wave that propagates at $c$, there is no frame
+in which the wave is at rest (see p.~\pageref{sec:frames-at-c}).
+\end{eg}
+
+\begin{eg}{Relativistic work-energy theorem}
+In Einstein's original 1905 paper on relativity, he assumed without providing any justification that
+the Newtonian work-energy relation $W=Fd$ was valid relativistically. One way of justifying this is
+that we can construct a simple machine with a mechanical advantage $A$ and a reduction of motion by $1/A$,
+with these ratios being exact 
+relativistically.\footnote{For an explicit example,
+see \url{bit.ly/1aUXIa8}.} % http://physics.stackexchange.com/a/78147/4552
+One can then calculate, as Einstein did,
+\begin{equation*}
+  W = \int \frac{\der p}{\der t} \der x = \int \frac{\der p}{\der v}\frac{\der x}{\der t}\der v = m(\gamma-1)\eqquad,
+\end{equation*}
+which is consistent with our result for $E$ as a function of $\gamma$ if we equate it to $E(\gamma)-E(1)$.
+\end{eg}
+
+\begin{eg}{The Dirac sea}\label{eg:dirac-sea}\index{Dirac sea}\index{Gell-Mann, Murray}
+A great deal of physics can be derived from the T.H.~White's principle that ``whatever is not forbidden in compulsory'' --- originally
+intended for ants but applied to particles by Gell-Mann.
+In quantum mechanics, any process that is not forbidden by a conservation law is supposed to occur. 
+The relativistic relation $E=\pm\sqrt{p^2+m^2}$ has two roots, a
+positive one and a negative one.
+The positive-energy and negative-energy states are separated by a no-man's land of width $2m$, so no continuous classical
+process can lead from one side to the other. But quantum-mechanically,
+if an electron exists with energy $E=+\sqrt{p^2+m^2}$, it should be able to make a quantum leap into a state with
+$E=-\sqrt{p^2+m^2}$, emitting the energy difference of $2E$ in the form of photons. Why doesn't 
+this happen? One explanation is that the states with $E<0$ are all already occupied. This is the ``Dirac sea,'' which
+we now interpret as being full of electrons. A vacancy in the sea manifests itself as an antielectron.
+\end{eg}
+
+\begin{eg}{Massive neutrinos}\label{eg:massive-neutrinos}
+Neutrinos were long thought to be massless, but are now believed to have masses in the eV range.
+If they had been massless, they would always have had to propagate at the speed of light. Although
+they are now thought to have mass, that mass is six orders of magnitude less than the MeV energy scale
+of the nuclear reactions in which they are produced, so all neutrinos observed in experiments are
+moving at velocities very close to the speed of light.\index{neutrino}
+\end{eg}
+
+\begin{eg}{No radioactive decay of massless particles}\label{eg:photon-decay}
+A photon cannot decay into an electron and a positron, $\gamma \rightarrow e^++e^-$,
+in the absence of a charged particle to interact with.
+To see this, consider the process in the frame of reference
+in which the electron-positron pair has zero total momentum. In this frame, the photon must have had zero (three-)momentum,
+but a photon with zero momentum must have zero energy as well. This means that conservation of 
+relativistic \emph{four}-momentum
+has been violated: the timelike component of the four-momentum is the mass-energy, and it has increased
+from 0 in the initial state to at least $2mc^2$ in the final state.
+
+To demonstrate the consistency of the theory, we can arrive at the same conclusion by
+a different method. Whenever a particle has a small mass (small compared to its energy, say),
+it must travel at close to $c$. It must therefore have a very large time dilation, and will
+take a very long time to undergo radioactive decay. In the limit as the mass approaches zero,
+the time required for the decay approaches infinity. Another way of saying this is that
+the rate of radioactive decay must be fixed in terms of proper time, but there is no such
+thing as proper time for a massless particle. Thus it is not only this specific process
+that is forbidden, but any radioactive decay process involving a massless particle.
+
+There are various loopholes in this argument. The
+question is investigated more thoroughly by Fiore and Modanese.\footnote{\url{http://arxiv.org/abs/hep-th/9508018}}
+\end{eg}
+
+\begin{eg}{Massive photons}\index{photon!mass}\label{eg:photon-mass}
+Continuing in the same vein as example \ref{eg:massive-neutrinos}, we can consider the possibility that
+the photon has some nonvanishing mass. A 2003 experiment by
+Luo et al.\footnote{Luo et al., ``New Experimental Limit on the Photon Rest Mass with a Rotating Torsion Balance,'' Phys. Rev. Lett. 90 (2003) 081801.
+The interpretation of such experiments is difficult, and this paper attracted a series of comments. A weaker but more universally accepted
+bound is $8\times10^{-52}\ \kgunit$, Davis, Goldhaber, and Nieto, Phys. Rev. Lett. 35 (1975) 1402.}
+has placed a limit of about $10^{-54}\ \kgunit$ on this mass. This is incredibly small, but
+suppose that future experimental work using improved techniques shows that the mass is less than this, but actually nonzero.
+A naive reaction to this scenario is that it would shake relativity to its core, since relativity is based
+upon the assumption that the speed of light is a constant, whereas for a massive particle it need not be
+constant. But this is a misinterpretation of the role of $c$ in relativity. As should be clear
+from the approach taken in section \ref{sec:lorentz-geometry}, $c$ is primarily a geometrical property of
+spacetime, not a property of light.
+
+In reality, such a discovery would be more of a problem for particle physicists than for relativists, as we can
+see by the following sketch of an argument. Imagine two charged particles, at rest, interacting via an electrical attraction.
+Quantum mechanics describes this as an exchange of photons. Since the particles are at rest, there is no source of energy,
+so where do we get the energy to make the photons? The Heisenberg uncertainty principle, $\Delta E\Delta t \gtrsim h$, allows us to steal this energy,
+provided that we give it back within a time $\Delta t$. This time limit imposes a limit on the distance the photons can travel,
+but by using photons of low enough energy, we can make this distance limit as large as we like, and there is therefore no
+limit on the range of the force. But suppose that the photon has a mass. Then there is
+a minimum mass-energy $mc^2$ required in order to create a photon, the maximum time is $h/mc^2$, and the maximum
+range is $h/mc$. Refining these crude arguments a little, one finds that exchange of zero-mass particles gives
+a force that goes like $1/r^2$, while a nonzero mass results in $e^{-\mu r}/r^2$, where $\mu^{-1}=\hbar/mc$.
+For the photon, the best current mass limit corresponds to $\mu^{-1} \gtrsim 10^{11}\ \munit$, so the deviation
+from $1/r^2$ would be difficult to measure in earthbound experiments.
+
+Now Gauss's law is a specific characteristic
+of $1/r^2$ fields. It would be violated slightly if photons had mass. We would have to modify Maxwell's equations, and
+it turns out\footnote{Goldhaber and Nieto, "Terrestrial and Extraterrestrial Limits on The Photon Mass," Rev. Mod. Phys. 43 (1971) 277}
+that the necessary change to Gauss's law would be of the form $\nabla\cdot \vc{E} = (\ldots) \rho-(\ldots)\mu^2 \Phi$,
+where $\Phi$ is the electrical potential, and (\ldots) indicates factors that depend on the choice of units. 
+This tells us that $\Phi$, which in classical electromagnetism can only be measured
+in terms of differences between different points in space, can now be measured in absolute terms. Gauge symmetry has
+been broken. But gauge symmetry is indispensible in creating well-behaved relativistic field theories, and
+this is the reason that, in general, particle physicists have a hard time with
+forces arising from the exchange of massive particles. The hypothetical Higgs particle, which may be observed at the Large Hadron
+Collider in the near future, is essentially a mechanism for wriggling out of this difficulty in the case of the massive W and Z particles
+that are responsible for the weak nuclear force; the mechanism cannot, however, be extended to allow a massive photon.
+\end{eg}
+
+\begin{eg}{Dust and radiation in cosmological models}\label{eg:dust-and-radiation-cosm}\index{dust}
+In cosmological models, one needs an equation of state that relates the pressure $P$ to the mass-energy density $\rho$.
+The pressure is a Lorentz scalar. The mass-energy density is not (since mass-energy is just the timelike component
+of a particular vector), but in a coordinate system without any net flow of mass, we can approximate it as one.
+
+The early universe was dominated by radiation. A photon in a box
+contributes a pressure on each wall that is proportional to $|p^\mu|$, where $\mu$ is a spacelike index.
+In thermal equilibrium, each of these three degrees of freedom carries an equal amount of energy, and since
+momentum and energy are equal for a massless particle, the average momentum along each axis is equal to $\frac{1}{3}E$.
+The resulting equation of state is $P=\frac{1}{3}\rho$. As the universe expanded, the wavelengths of the
+photons expanded in proportion to the stretching of the space they occupied, resulting in $\lambda \propto a^{-1}$, where
+$a$ is a distance scale describing the universe's intrinsic curvature at a fixed time.
+Since the number density of photons is diluted in proportion to $a^{-3}$, and the mass per photon varies as $a^{-1}$,
+both $\rho$ and $P$ vary as $a^{-4}$.
+
+Cosmologists refer to noninteracting, nonrelativistic materials as ``dust,'' which could mean many things, including
+hydrogen gas, actual dust, stars, galaxies, and some forms of dark matter. For dust, the momentum is negligible compared to the mass-energy,
+so the equation of state is $P=0$, regardless of $\rho$. The mass-energy density is dominated simply by the mass of
+the dust, so there is no red-shift scaling of the $a^{-1}$ type. The mass-energy density scales as $a^{-3}$. Since
+this is a less steep dependence on $a$ than the $a^{-4}$, there was a point, about a  thousand years after the Big Bang,
+when matter began to dominate over radiation. At this point, the rate of expansion of the universe made a transition to
+a qualitatively different behavior resulting from the change in the equation of state.
+
+In the present era, the universe's equation of state is dominated by neither dust nor radiation but by the cosmological
+constant (see page \pageref{sec:cosmological-constant}). Figure \figref{equation-of-state} shows the evolution of the
+size of the universe for the three different regimes. Some of the simpler cases are derived in sections
+\ref{sec:vacuum-dominated} and \ref{sec:matter-dominated}, starting on page \pageref{sec:vacuum-dominated}.
+
+\end{eg}
+<% marg(70) %>
+<%
+  fig(
+    'equation-of-state',
+    %q{Example \ref{eg:dust-and-radiation-cosm}.}
+  )
+%>
+<% end_marg %>
+% I constructed figure using t^1/2, t^2/3, and e^t, which is correct for k=0 universes.
+
+<% end_sec %> % momentum 4-vector
+
+<% begin_sec("The frequency vector and the relativistic Doppler shift") %>\label{sec:doppler}\index{frequency vector}\index{Doppler shift}
+The frequency vector was introduced in example \ref{eg:affine-waves} on p.~\pageref{eg:affine-waves}.
+In the spirit of index-gymnastics notation,
+frequency is to time as the wavenumber\index{wavenumber} $k=1/\lambda$ is to space, so when treating waves relativistically it is
+natural to conjecture that there is a four-frequency $f_a$ made by assembling $(f,\vc{k})$, which behaves as a Lorentz vector. This is correct, since
+we already know that $\partial_a$ transforms as a covariant vector, and for a scalar wave of the form
+$A=A_\zu{o}\exp\left[2\pi i f_ax^a\right]$ the partial derivative operator is identical to multiplication by $2\pi f_a$.
+
+As an application, consider the relativistic Doppler shift of a light wave. For simpicity, let's restrict ourselves to
+one spatial dimension.
+For a light wave, $f=k$, so the frequency vector in 1+1 dimensions is simply $(f,f)$. Putting this through a Lorentz
+transformation, we find
+\begin{equation*}
+  f' = (1+v)\gamma f = \sqrt{\frac{1+v}{1-v}} f\eqquad,
+\end{equation*}
+where the second form displays more clearly the symmetic form of the relativistic relationship, such that
+interchanging the roles of source and observer is equivalent to flipping the sign of $v$. That is, the relativistic
+version only depends on the \emph{relative} motion of the source and the observer, whereas the Newtonian one
+also depends on the source's motion relative to the medium (i.e., relative to the preferred frame in which the
+waves have the ``right'' velocity). In Newtonian mechanics, we have
+$f'=(1+v)f$ for a moving observer. Relativistically, there is also a time dilation of the oscillation of the source,
+providing an additional factor of $\gamma$.
+
+This analysis is extended to 3+1 dimensions in problem \ref{hw:doppler-three-d}.
+
+\begin{eg}{Ives-Stilwell experiments}\index{Ives-Stilwell experiments}
+The relativistic Doppler shift differs from the nonrelativistic one by the time-dilation factor $\gamma$, so that
+there is still a shift even when the relative motion of the source and the observer is perpendicular to the direction
+of propagation. This is called the transverse Doppler shift. Einstein suggested this early on as a test of relativity.
+However, such experiments are difficult to carry out with high precision, because they are sensitive to any error
+in the alignment of the 90-degree angle. Such experiments were eventually performed, with results that confirmed
+relativity,\footnote{See, e.g., Hasselkamp, Mondry, and Scharmann, Zeitschrift f\"ur Physik A: Hadrons and Nuclei 289 (1979) 151.}
+but one-dimensional measurements provided both the earliest tests of the relativistic Doppler shift and the most precise
+ones to date. The first such test was done by Ives and Stilwell in 1938, using the following trick. The relativistic
+expression $S_v = \sqrt{(1+v)/(1-v)}$ for the Doppler shift has the property that $S_vS_{-v}=1$, which differs from the
+nonrelativistic result of $(1+v)(1-v)=1-v^2$. One can therefore accelerate an ion up to a relativistic speed, measure
+both the forward Doppler shifted frequency $f_f$ and the backward one  $f_b$, and compute $\sqrt{f_ff_b}$. According
+to relativity, this should exactly equal the frequency $f_\zu{o}$ measured in the ion's rest frame.
+
+In a particularly exquisite modern version of the Ives-Stilwell idea,\footnote{G.~Saathoff et al., ``Improved Test
+of Time Dilation in Relativity,'' Phys. Rev. Lett. 91 (2003) 190403. A publicly available description of the
+experiment is given in Saathoff's PhD thesis, \url{www.mpi-hd.mpg.de/ato/homes/saathoff/diss-saathoff.pdf}.} 
+Saathoff et al.~circulated $\zu{Li}^+$ ions at $v=.064$ in a storage ring. An electron-cooler technique was
+used in order to reduce the variation in velocity among ions in the beam. Since the identity $S_vS_{-v}=1$
+is independent of $v$, it was not necessary to measure $v$ to the same incredible precision as the frequencies;
+it was only necessary that it be stable and well-defined. The natural line width was 7 MHz, and other experimental
+effects broadened it further to 11 MHz. By curve-fitting the line, it was possible to achieve results good to
+a few tenths of a MHz. The resulting frequencies, in units of MHz, were:
+
+\begin{tabular}{rl}
+$f_f$ & =          $582490203.44 \pm .09$ \\
+$f_b$ & =          $512671442.9  \pm 0.5$ \\
+$\sqrt{f_ff_b}$ &= $546466918.6  \pm 0.3$ \\
+$f_\zu{o}$ &=      $546466918.8  \pm 0.4$ (from previous experimental work) 
+\end{tabular}
+
+\noindent The spectacular agreement with theory has made this experiment a lightning rod for
+anti-relativity kooks.
+
+If one is searching for small deviations from the predictions of special relativity, a natural place to look
+is at high velocities. Ives-Stilwell experiments have been performed at velocities as high as $0.84$, and
+they confirm special relativity.\footnote{MacArthur et al., Phys. Rev. Lett. 56 (1986) 282 (1986)}
+\end{eg}
+
+\begin{eg}{Einstein's derivation of $E=mc^2$}\label{eg:einstein-mc2}
+On page \pageref{sec:momentum-four-vector}, we showed that the celebrated $E=mc^2$ follows directly from
+the form of the Lorentz transformation. An alternative derivation was given by Einstein in one of his
+classic 1905 papers laying out the theory of special relativity; the paper is short, and is reproduced 
+in English translation on page \pageref{einstein-paper-mc2} of this book. Having laid the groundwork
+of four-vectors and relativistic Doppler shifts, we can give an even shorter version of Einstein's
+argument. The discussion is also streamlined by restricting the discussion to 1+1 dimensions and by
+invoking photons.
+
+Suppose that a lantern, at rest in the lab frame, is floating weightlessly in outer space, and
+simultaneously emits two pulses of light in opposite directions, each with energy $E/2$ and frequency $f$.
+By symmetry, the momentum of the pulses cancels, and the lantern remains at rest. An observer in motion at
+velocity $v$ relative to the lab sees the frequencies of the beams shifted to $f'=(1\pm v)\gamma f$.
+The effect on the energies of the beams can be found purely classically, by transforming the electric and magnetic fields
+to the moving frame, but as a shortcut we can apply the quantum-mechanical relation $E_{ph}=hf$ for the energies
+of the photons making up the beams. The result is that the moving observer finds the total energy of the beams to be
+not $E$ but $(E/2)(1+v)\gamma +(E/2)(1-v)\gamma=E\gamma$.
+
+Both observers agree that the lantern had to use up some
+of the energy stored in its fuel in order to make the two pulses. But the moving observer says that in addition to this
+energy $E$, there was a further energy $E(\gamma-1)$. Where could this energy have come from? It must have come from
+the kinetic energy of the lantern. The lantern's velocity remained constant throughout the
+experiment, so this decrease in kinetic energy seen by the moving observer 
+must have come from a decrease in the lantern's inertial mass --- hence the title of Einstein's paper,
+``Does the inertia of a body depend upon its energy content?''
+
+To figure out how much mass the lantern has lost, we have to decide how we can even define mass in this new
+context. In Newtonian mechanics, we had $K=(1/2)mv^2$, and by the correspondence principle this must still
+hold in the low-velocity limit. Expanding $E(\gamma-1)$ in a Taylor series, we find that it
+equals $E(v^2/2)+\ldots$, and in the low-velocity limit this must be the same as $\Delta K=(1/2)\Delta m v^2$,
+so $\Delta m=E$. Reinserting factors of $c$ to get back to nonrelativistic units, we have
+$E=\Delta m c^2$.
+\end{eg}
+
+<% end_sec %> % frequency four-vector
+
+<% begin_sec("A non-example: electric and magnetic fields") %>\label{sec:e-and-b-not-four-vectors}
+It is fairly easy to see that the electric and magnetic fields cannot be the spacelike parts of two four-vectors.
+Consider the arrangement shown in figure \subfigref{b-field}{1}. We have
+two infinite trains of moving charges superimposed on the same line, and a single charge alongside the line.
+Even though the line charges formed by the two trains
+are moving in opposite directions, their currents don't cancel. A negative charge moving
+to the left makes a current that goes to the right, so in frame 1,
+the total current is twice that contributed by either line charge.
+
+In frame 1 the charge densities of the two line charges cancel out,
+and the electric field experienced by the lone charge is therefore zero.
+Frame 2 shows what we'd see if we were observing all this from a frame of reference moving
+along with the lone charge.
+Both line charges are in motion in both frames of reference, but in frame 1, the
+line charges were moving at equal speeds, so their Lorentz contractions were equal, and their
+charge densities canceled out. In frame 2, however, their speeds are unequal. The positive
+charges are moving more slowly than in frame 1, so in frame 2 they are less contracted.
+The negative charges are moving more quickly, so their contraction is greater now.
+Since the charge densities don't cancel, there is an electric field in frame 2, which
+points into the wire, attracting the lone charge. 
+<% marg(60) %>
+<%
+  fig(
+    'b-field',
+    %q{Magnetism is a purely relativistic effect.}
+  )
+%>
+<% end_marg %>
+
+We appear to have a logical contradiction here, because an observer in frame 2 predicts that
+the charge will collide with the wire, whereas in frame 1 it looks as though it should
+move with constant velocity parallel to the wire.
+Experiments show that the charge does collide with the wire, so to maintain the Lorentz-invariance
+of electromagnetism, we are forced to invent a new kind of interaction, one between moving
+charges and other moving charges, which causes the acceleration in frame 2. This
+is the magnetic interaction, and if we hadn't known about it already, we would have been forced
+to invent it. That is, magnetism is a purely relativistic effect. The reason a relativistic effect
+can be strong enough to stick a magnet to a refrigerator is that it breaks the delicate cancellation
+of the extremely large electrical interactions between electrically neutral objects.
+
+Although the example shows that the electric and magnetic fields do transform when we change
+from one frame to another, it is easy to show that they do not transform as the spacelike
+parts of a relativistic four-vector.
+This is because transformation between frames 1 and 2 is along the axis parallel to the wire, but it affects the components of the fields perpendicular to the wire.
+The electromagnetic field actually transforms as a rank-2 tensor.
+
+
+<% end_sec %> % A non-example: electric and magnetic fields
+
+<% begin_sec("The electromagnetic potential four-vector",nil,'em-four-vector') %>\index{electromagnetic potential four-vector}
+An electromagnetic quantity that \emph{does} transform as a four-vector is the potential.
+On page \pageref{em-gauge-first-mentioned}, I mentioned the fact, which may or may not already be familiar to you,
+that whereas the Newtonian gravitational field's polarization properties allow it to be described using a single
+scalar potential $\phi$ or a single vector field $\vc{g}=-\nabla\phi$, the pair of electromagnetic fields
+$(\vc{E},\vc{B})$ needs a pair of potentials, $\Phi$ and $\vc{A}$. It's easy to see that $\Phi$ can't be a Lorentz scalar.
+Electric charge $q$ is a scalar, so if $\Phi$ were a scalar as well, then the product $q\Phi$ would be a scalar.
+But this is equal to the energy of the charged particle, which is only the timelike component of the energy-momentum
+four-vector, and therefore not a Lorentz scaler itself. This is a contradiction, so $\Phi$ is not a scalar.
+
+To see how to fit $\Phi$ into relativity, consider the nonrelativistic quantum mechanical relation $q\Phi=hf$ for a charged particle
+in a potential $\Phi$. Since $f$ is the timelike component of a four-vector in relativity, we need $\Phi$ to be the timelike
+component of some four vector, $A_b$. For the spacelike part of this four-vector, let's write $\vc{A}$, so that $A_b=(\Phi,\vc{A})$.
+We can see by the following argument that this mysterious $\vc{A}$ must have something to do with the magnetic field.
+<% marg(0) %>
+<%
+  fig(
+    'least-action',
+    %q{The charged particle follows a trajectory that extremizes $\int f_b\der x^b$ compared to other nearby trajectories. Relativistically,
+              the trajectory should be understood as a world-line in 3+1-dimensional spacetime.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'vector-potential-of-solenoid',
+    %q{The magnetic field (top) and vector potential (bottom) of a solenoid. The lower diagram is in the plane cutting through the waist of
+              the solenoid, as indicated by the dashed line in the upper diagram. For an infinite solenoid, the magnetic field is
+              uniform on the inside and zero on the outside, while the vector potential is proportional to $r$ on the inside and to $1/r$ on the outside.}
+  )
+%>
+<% end_marg %>
+
+Consider the example of figure \figref{least-action} from a quantum-mechanical point of view. The charged particle $q$ has wave properties,
+but let's say that it can be well approximated in this example as following a specific trajectory. This is like the ray
+approximation to wave optics. A light ray in classical optics follows Fermat's principle,\index{Fermat's principle} also known as the principle
+of least time, which states that the ray's path from point A to point B is one that extremizes the optical path length (essentially the number of
+oscillations).
+The reason for this is that the ray approximation is only an approximation. The ray actually has some width, which we
+can visualize as a bundle of neighboring trajectories. Only if the trajectory follows Fermat's principle will the
+interference among the neighboring paths be constructive. The classical optical path length is found by integrating
+$\vc{k}\cdot\der\vc{s}$, where $\vc{k}$ is the wavenumber. To make this relativistic, we need to use the frequency
+four-vector to form $f_b\der x^b$, which can also be expressed as
+$f_b v^b \der \tau=\gamma(f-\vc{k}\cdot\vc{v})\der\tau$. If the charge is at rest and there are no magnetic fields, then the quantity in parentheses
+is $f=E/h=(q/h)\Phi$. The correct relativistic generalization is clearly $f_b=(q/h)A_b$.\label{vector-potential-propagator}
+
+Since $A_b$'s spacelike part, $\vc{A}$, results\label{potential-to-fields}
+in the velocity-dependent effects, we conclude that $\vc{A}$ is a kind of potential that relates to the magnetic field, in the same
+way that the potential $\Phi$ relates to the electric field. $\vc{A}$ is known as the vector potential, and the
+relation between the potentials and the fields is
+\begin{align*}
+  \vc{E} &= -\nabla\Phi - \frac{\partial\vc{A}}{\partial t} \\
+  \vc{B} &= \nabla\vc{A}\eqquad.
+\end{align*}
+An excellent discussion of the vector potential from a purely classical point of view
+is given in the classic \emph{Feynman Lectures}.\footnote{\emph{The Feynman Lectures on Physics}, Feynman, Leighton, and Sands, Addison Wesley Longman, 1970}
+Figure \figref{vector-potential-of-solenoid} shows an example.
+
+<% end_sec %>
+<% end_sec %>
+
+<% begin_sec("The tensor transformation laws") %>\label{sec:tensor-transformation-law}\index{transformation laws}\index{tensor transformation laws}
+We may wish to represent a vector in more than one coordinate system, and to convert back
+and forth between the two representations. In general relativity, the transformation of
+the coordinates need not be linear, as in the Lorentz transformations; it can be any smooth,
+one-to-one function.
+For simplicity, however, we start by considering the one-dimensional case, and by assuming the
+coordinates are related in an affine manner, $x'^\mu=ax^\mu+b$.
+The addition of the constant $b$ is merely a change in the choice of origin, so it has
+no effect on the components of the vector, but the dilation by the factor $a$
+gives a change in scale, which results in $v'^\mu = a v^\mu$ for a contravariant vector.
+In the special case where $v$ is an infinitesimal displacement, this is consistent
+with the result found by implicit differentiation of the coordinate transformation.
+For a contravariant vector, $v'_\mu = \frac{1}{a} v_\mu$. Generalizing to more than one
+dimension, and to a possibly nonlinear transformation, we have
+\begin{align}
+  v'^\mu &=  v^\kappa \frac{\partial x'^\mu}{\partial x^\kappa} \\
+  v'_\mu &=  v_\kappa \frac{\partial x^\kappa}{\partial x'^\mu}\eqquad.
+\end{align}
+Note the inversion of the partial derivative in one equation compared to the other.
+Because these equations describe a change from one coordinate system to another,
+they clearly depend on the coordinate system, so we use Greek indices rather than
+the Latin ones that would indicate a coordinate-independent equation. Note that
+the letter $\mu$ in these equations always appears as an index referring to the
+new coordinates, $\kappa$ to the old ones. For this reason, we can get away with
+dropping the primes and writing, e.g., $v^\mu=v^\kappa \partial x'^\mu/\partial x^\kappa$
+rather than $v'$, counting on context to show that $v^\mu$ is the vector expressed in the
+new coordinates, $v^\kappa$ in the old ones. This becomes especially natural if we start
+working in a specific coordinate system where the coordinates have names. For example,
+if we transform from coordinates $(t,x,y,z)$ to $(a,b,c,d)$, then it is clear that
+$v^t$ is expressed in one system and $v^c$ in the other.
+
+Self-check: Recall that the gauge transformations allowed in general relativity are not just any
+coordinate transformations; they must be (1) smooth and (2) one-to-one. Relate both of these
+requirements to the features of the vector transformation laws above.
+
+In equation [2], $\mu$ appears as a subscript on the left side of the
+equation, but as a superscript on the right. This would appear to violate our rules of
+notation, but the interpretation here is that in expressions of the form $\partial/\partial x^i$
+and $\partial/\partial x_i$, the superscripts and subscripts should be understood as being
+turned upside-down. Similarly, [1] appears to have the implied sum over $\kappa$
+written ungrammatically, with both $\kappa$'s appearing as superscripts.
+Normally we only have implied sums in which the index appears once as a superscript and once
+as a subscript. With our new rule for interpreting indices on the bottom of derivatives,
+the implied sum is seen to be written correctly. This rule is similar to the one for
+analyzing the units of derivatives written in Leibniz notation, with, e.g., $\der^2 x/\der t^2$ having
+units of meters per second squared.\label{derivative-flip-indices}
+That is, the flipping of the indices like this is required for  consistency so that
+everything will work out properly when we change our units of measurement, causing all our
+vector components to be rescaled.
+
+A quantity $v$ that transforms according to [1] or [2]
+is referred to as a rank-1 tensor,\index{tensor}\index{tensor!transformation law}
+which is the same thing as a vector.
+
+\begin{eg}{The identity transformation}
+In the case of the identity transformation $x'^\mu=x^\mu$, equation [1] clearly gives $v'=v$,
+since all the mixed partial derivatives $\partial x'^\mu/\partial x^\kappa$ with $\mu \ne \kappa$ are
+zero, and all the derivatives for $\kappa=\mu$ equal 1.
+
+In equation [2], it is tempting to write
+\begin{equation*}
+  \frac{\partial x^\kappa}{\partial x'^\mu} = \frac{1}{\frac{\partial x'^\mu}{\partial x^\kappa}} \qquad \text{(wrong!)}\eqquad,
+\end{equation*}
+but this would give infinite results for the mixed terms! Only in the case of functions of a single
+variable is it possible to flip derivatives in this way; it doesn't work for partial derivatives.
+To evaluate these partial derivatives, we have to invert the transformation (which in this example
+is trivial to accomplish) and then take the partial derivatives.
+\end{eg}
+
+The metric is a rank-2 tensor, and transforms analogously:
+\begin{equation*}
+  g_{\mu\nu} = g_{\kappa\lambda} \frac{\partial x^\kappa}{\partial x'^\mu} \frac{\partial x^\lambda}{\partial x'^\nu}
+\end{equation*}
+(writing $g$ rather than $g'$ on the left, because context makes the distinction clear).
+
+Self-check: Write the similar expressions for $g^{\mu\nu}$, $g^\mu_\nu$, and $g_\mu^\nu$, which are
+entirely determined by the grammatical rules for writing superscripts and subscripts. Interpret the case
+of a rank-0 tensor.
+
+\begin{eg}{An accelerated coordinate system?}\label{eg:bogus-accel-metric}
+Let's see the effect on Lorentzian metric $g$ of the transformation
+\begin{equation*}
+  t' = t   \qquad
+  x' = x+\frac{1}{2}at^2\eqquad.
+\end{equation*}
+The inverse transformation is
+\begin{equation*}
+  t = t'   \qquad
+  x = x'-\frac{1}{2}at'^2\eqquad.
+\end{equation*}
+The tensor transformation law gives
+\begin{align*}
+  g'_{t't'} &= 1-(at')^2 \\
+  g'_{x'x'} &= -1 \\
+  g'_{x't'} &= -at'\eqquad.
+\end{align*}
+Clearly something bad happens at $at'=\pm1$, when the relative velocity surpasses the
+speed of light: the $t't'$ component of the metric vanishes and then reverses its sign.
+This would be physically unreasonable if we viewed this as a transformation from observer A's
+Lorentzian frame into the
+accelerating reference frame of observer B aboard a spaceship who feels a constant
+acceleration. Several things prevent such an interpretation: (1) B cannot exceed the speed
+of light. (2) Even before B gets to the speed of light, the coordinate $t'$ cannot correspond to B's proper time, which is dilated.
+(3) Due to time dilation, A and B do not agree on the rate at which B is accelerating.
+If B measures her own acceleration to be $a'$, A will judge it to be $a<a'$, with
+$a\rightarrow0$ as B approaches the speed of light. There is nothing invalid
+about the coordinate system $(t',x')$, but neither does it have any physically interesting
+interpretation.
+\end{eg}
+
+\begin{eg}{Physically meaningful constant acceleration}\label{eg:const-accel-metric}
+To make a more physically meaningful version of example \ref{eg:bogus-accel-metric},
+we need to use the result of example \ref{eg:hyperbolic-motion} on page \pageref{eg:hyperbolic-motion}.
+The somewhat messy derivation of the coordinate transformation is given by Semay.\footnote{\url{arxiv.org/abs/physics/0601179}}
+The result is
+\begin{align*}
+  t' &= \left(x+\frac{1}{a}\right) \sinh at \\
+  x' &= \left(x+\frac{1}{a}\right) \cosh at 
+\end{align*}
+Applying the tensor transformation law gives (problem \ref{hw:const-accel-metric}, page \pageref{hw:const-accel-metric}):
+\begin{align*}
+  g'_{t't'} &= (1+ax')^2 \\
+  g'_{x'x'} &= -1
+\end{align*}
+Unlike the result of example \ref{eg:bogus-accel-metric}, this one never misbehaves.
+
+The closely related topic of a uniform gravitational field in general relativity is considered in
+problem \ref{hw:uniform-field} on page \pageref{hw:uniform-field}.
+\end{eg}
+
+\begin{eg}{Accurate timing signals}\label{eg:gps-timing}\index{electromagnetic potential four-vector}
+The relation between the potential $\vc{A}$ and the fields $\vc{E}$ and $\vc{B}$ given on page \pageref{potential-to-fields}
+can be written in manifestly covariant form as $F_{ij}=\partial_{[i} A_{j]}$, where $F$, called the electromagnetic tensor,\index{electromagnetic tensor}
+is an antisymmetric rank-two tensor whose six independent components correspond in a certain way with the components of the $\vc{E}$ and $\vc{B}$
+three-vectors. If $F$ vanishes completely at a certain point in spacetime, then the linear form of the tensor transformation laws guarantees
+that it will vanish in all coordinate systems, not just one. The GPS system\index{GPS!timing signals} takes advantage of this fact
+in the transmission of timing signals from the satellites to the users. The electromagnetic wave is modulated so that the bits
+it transmits are represented by phase reversals of the wave. At these phase reversals, $F$ vanishes, and this vanishing holds true
+regardless of the motion of the user's unit or its position in the earth's gravitational field.
+Cf.~problem \ref{hw:galilean-em} on p.~\pageref{hw:galilean-em}.
+\end{eg}
+
+\begin{eg}{Momentum wants a lower index}\label{eg:momentum-is-lower-index}
+In example \ref{eg:force-is-lower-index} on p.~\pageref{eg:force-is-lower-index}, we saw that
+once we arbitrarily chose to write ruler measurements in Euclidean three-space
+as $\Delta x^a$ rather than $\Delta x_a$, it became
+natural to think of the Newtonian force three-vector as ``wanting'' to be notated with
+a lower index.
+We can do something similar with the momentum 3- or 4-vector. The Lagrangian is a relativistic
+scalar, and in Lagrangian mechanics momentum is defined by
+$p_a = \partial L/\partial v^a$.
+The upper index in the denominator on the right becomes a lower index on the left by the same reasoning
+as was employed in the notation of the tensor transformation laws. Newton's second law shows that this is
+consistent with the result of example \ref{eg:force-is-lower-index} on p.~\pageref{eg:force-is-lower-index}.
+\end{eg}
+
+<% end_sec %>
+
+<% begin_sec("Experimental tests",4) %>
+
+<% begin_sec("Universality of tensor behavior") %>\label{tensor-universality}
+The techniques developed in this chapter allow us to make a variety of new predictions that can be
+tested by experiment.
+In general, the mathematical treatment of all observables in relativity as tensors means that
+all observables must obey the same transformation laws.
+This is an extremely strict statement, because it requires that a wide variety of physical systems
+show identical behavior. For example, we already mentioned on page \pageref{types-of-gyroscopes} the
+2007 Gravity Probe B\index{Gravity Probe B} experiment (discussed in detail on pages
+\pageref{sec:geodetic-effect-estimate} and \pageref{sec:geodetic-effect-exact}), in which
+four gyroscopes aboard a satellite were observed to precess due to special- and general-relativistic
+effects. The gyroscopes were complicated electromechanical systems, but the predicted precession
+was entirely independent of these complications. We argued that if two different types of
+gyroscopes displayed different behaviors, then the resulting discrepancy would allow us to
+map out some mysterious vector field. This field would be a built-in characteristic of spacetime
+(not produced by any physical objects nearby), and since all observables in general relativity are
+supposed to be tensors, the field would have to transform as a tensor. Let's say that this tensor
+was of rank 1. Since the tensor transformation law is linear, a nonzero tensor can never be
+transformed into a vanishing tensor in another coordinate system. But by the equivalence principle,
+any special, local property of spacetime can be made to vanish by transforming into a free-falling
+frame of reference, in which the spacetime is has a generic Lorentzian geometry. The mysterious
+new field should therefore vanish in such a frame. This is a contradiction, so we conclude that
+different types of gyroscopes cannot differ in their behavior.
+
+This is an example of a new way of stating the equivalence principle: there is no way to associate
+a preferred tensor field with spacetime.\footnote{This statement of the equivalence principle, along with
+the others we have encountered, is summarized in the back of the book on page
+\pageref{equivalence-principle-summary}.}\label{equivalence-no-preferred-field}\index{equivalence principle!no preferred field}
+<% end_sec %>
+
+<% begin_sec("Speed of light differing from c") %>
+In a Lorentz invariant theory, we interpret $c$ as a property of the underlying spacetime, not
+of the particles that inhabit it. One way in which Lorentz invariance could be violated would
+be if different types of particles had different maximum velocities. In 1997, Coleman and Glashow
+suggested a sensitive test for such an effect.\footnote{arxiv.org/abs/hep-ph/9703240}
+
+Assuming Lorentz invariance, a photon cannot decay into an electron and a positron, $\gamma \rightarrow e^++e^-$
+(example \ref{eg:photon-decay}, page \pageref{eg:photon-decay}). Suppose, however, that material particles have
+a maximum speed $c_m=1$, while photons have a maximum speed $c_p>1$. Then the photon's momentum four-vector,
+$(E,E/c_p)$ is timelike, so a frame does exist in which its three-momentum is zero. The detection of cosmic-ray
+gammas from distant sources with energies on the order of 10 TeV puts an upper limit on the decay rate,
+implying $c_p-1 \lesssim 10^{-15}$.
+
+An even more stringent limit can be put on the possibility of $c_p<1$. When a charged particle moves through a medium
+at a speed higher than the speed of light in the medium, Cerenkov radiation\index{Cerenkov radiation}
+results. If $c_p$ is less than 1, then Cerenkov radiation could be emitted by high-energy charged particles
+in a vacuum, and the particles would rapidly lose energy. The observation of cosmic-ray protons with energies $\sim 10^8$ TeV
+requires $c_p-1 \gtrsim -10^{-23}$.
+
+<% end_sec %> % Speed of light differing from c
+
+<% begin_sec("Degenerate matter") %>\label{sec:degenerate-matter}
+The straightforward properties of the momentum four-vector have surprisingly far-reaching
+implications for matter subject to extreme pressure, as in a star that uses up all its fuel
+for nuclear fusion and collapses. These implications were initially considered too exotic to
+be taken seriously by astronomers. For historical perspective, consider that in 1916, when Einstein
+published the theory of general relativity, the Milky Way was believed to constitute the entire universe; the ``spiral nebulae''
+were believed to be inside it, rather than being similar objects exterior to it. The only types of stars whose
+structure was understood even vaguely were those that were roughly analogous to our own sun. (It was not known that
+nuclear fusion was their source of energy.) The term ``white dwarf'' had not been invented, and neutron stars were
+unknown.
+
+An ordinary, smallish star such as our own sun has enough hydrogen to sustain fusion reactions for billions of
+years, maintaining an equilibrium between its gravity and the pressure of its gases.
+When the hydrogen is used up, it has to begin fusing heavier elements. This leads to a period of
+relatively rapid fluctuations in structure. Nuclear fusion proceeds up until the formation of elements as heavy as
+oxygen ($Z=8$), but the temperatures are not high enough to overcome the strong electrical repulsion of
+these nuclei to create even heavier ones.  Some matter is blown off, but finally nuclear reactions cease
+and the star collapses under the pull of its own gravity.
+
+To understand what happens in such a collapse, we have to understand the behavior 
+of gases under very high pressures.
+In general, a surface area $A$ within a gas is subject to collisions in a time $t$ from the $n$ particles occupying
+the volume $V=Avt$, where $v$ is the typical velocity of the particles. The resulting pressure is given by $P\sim npv/V$,
+where $p$ is the typical momentum.
+
+\begin{itemize}
+\item[] \emph{Nondegenerate gas:} In an ordinary gas such as air, the particles are nonrelativistic, so $v=p/m$, and the thermal energy per particle
+  is $p^2/2m\sim kT$, so the pressure is $P\sim nkT/V$.
+\item[] \emph{Nonrelativistic, degenerate gas:} When a fermionic gas is subject to extreme pressure, the dominant effects creating pressure are
+  quantum-mechanical. Because of the Pauli exclusion
+  principle, the volume available to each particle is $\sim V/n$, so its wavelength is no more than $\sim(V/n)^{1/3}$, leading to
+  $p=h/\lambda \sim h(n/V)^{1/3}$. If the speeds of the particles are still nonrelativistic, then $v=p/m$ still holds, so
+  the pressure becomes $P \sim (h^2/m)(n/V)^{5/3}$.
+\item[] \emph{Relativistic, degenerate gas:} If the compression is strong enough to cause highly relativistic motion for the particles, then
+  $v \approx c$, and the result is $P\sim hc(n/V)^{4/3}$.
+\end{itemize}
+
+As a star with the mass of our sun collapses, it reaches a point at which the electrons begin to behave as a degenerate gas, and
+the collapse stops. The resulting object is called a white dwarf.\index{white dwarf}
+A white dwarf should be an extremely compact body, about the size of the Earth. Because of its small surface area, it should
+emit very little light. In 1910, before the theoretical predictions had been made, Russell, Pickering, and Fleming
+discovered that 40 Eridani B had these characteristics. Russell recalled:
+``I knew enough about it, even in these paleozoic days, to realize at once that there was an extreme inconsistency between what
+we would then have called `possible' values of the surface brightness and density. I must have shown that I was not
+only puzzled but crestfallen, at this exception to what looked like a very pretty rule of stellar characteristics; but
+Pickering smiled upon me, and said: `It is just these exceptions that lead to an advance in our knowledge,' and so the white dwarfs entered the realm of study!''
+
+S. Chandrasekhar showed in that 1930's that there
+was an upper limit to the mass of a white dwarf. We will recapitulate his calculation briefly in condensed order-of-magnitude form.
+The pressure at the core of the star is $P\sim \rho g r\sim GM^2/r^4$, where $M$
+is the total mass of the star. The star contains roughly equal numbers of neutrons, protons, and electrons, so $M=Knm$, where $m$ is
+the mass of the electron, $n$ is the number of electrons, and $K\approx 4000$.  For stars near the limit, the electrons are relativistic.
+Setting the pressure at the core equal to the degeneracy pressure of a relativistic gas, we find that the
+Chandrasekhar limit\index{Chandrasekhar limit}\label{chandrasekhar-limit}
+is $\sim (hc/G)^{3/2}(Km)^{-2}=6M_\odot$. A less sloppy calculation gives something more like $1.4M_\odot$.
+The self-consistency of this solution is investigated in homework problem \ref{hw:white-dwarf} on page \pageref{hw:white-dwarf}.
+<% marg(50) %>
+<%
+  fig(
+    'chandrasekhar',
+    %q{Subrahmanyan Chandrasekhar (1910-1995)}
+  )
+%>
+<% end_marg %>
+
+% h=6.6 10^-34 J.s
+% G=6.7 10^-11 m3.kg-1.s-2
+% c=3 10^8 m/s 
+% K=4000
+% m=9.1 10^-31 kg
+% ms=2.0 10^30 kg
+% (hc/G)^(3/2)(Km)^-2/ms
+%   6.0625148914921
+
+What happens to a star whose mass is above the Chandrasekhar limit? As nuclear fusion reactions flicker out,
+the core of the star becomes a white dwarf, but once fusion ceases completely this cannot be an equilibrium
+state. Now consider the nuclear reactions\index{neutron star}
+\begin{align*}
+  \zu{n} & \rightarrow \zu{p} + e^- + \bar{\nu} \\
+  \zu{p} & + e^-  \rightarrow \zu{n} + \nu\eqquad,
+\end{align*}
+which happen due to the weak nuclear force. The first of these releases 0.8 MeV, and has a half-life of 14 minutes.
+This explains why free neutrons are not observed in significant numbers in our universe, e.g., in cosmic rays.
+The second reaction requires an \emph{input} of 0.8 MeV of energy, so a free hydrogen atom is stable.
+The white dwarf contains fairly heavy nuclei, not individual protons, but similar considerations would seem to apply.
+A nucleus can absorb an electron and convert a proton into a neutron, and in this context the process is
+called electron capture.\index{electron capture}
+Ordinarily this process will only occur if the nucleus is neutron-deficient; once it reaches a neutron-to-proton ratio that
+optimizes its binding energy, neutron capture cannot proceed without a source of energy to make the reaction go.
+In the environment of a white dwarf, however, there is such a source. The annihilation of an electron opens up a
+hole in the ``Fermi sea.'' There is now an state into which another electron is allowed to drop without violating the
+exclusion principle, and the effect cascades upward. In a star with a mass above the Chandrasekhar limit, this process
+runs to completion, with every proton being converted into a neutron. The result is a \emph{neutron star},\index{neutron star}
+which is essentially an atomic nucleus (with $Z=0$) with the mass of a star!
+
+Observational evidence for the existence of neutron stars came in 1967 with the detection by Bell and Hewish at Cambridge
+of a mysterious  radio signal with a period of 1.3373011 seconds. The signal's observability
+was synchronized with the rotation of the earth relative to the stars, rather than with legal clock time
+or the earth's rotation relative to the sun. This led to the conclusion that its origin was in space rather than
+on earth, and Bell and Hewish originally dubbed it LGM-1 for ``little green men.'' The discovery of a second signal,
+from a different direction in the sky, convinced them that it was not actually an artificial signal being generated
+by aliens. Bell published the observation as an appendix to her PhD thesis, and it was soon interpreted as
+a signal from a neutron star. Neutron stars can be highly magnetized, and because of this magnetization they
+may emit a directional beam of electromagnetic radiation that sweeps across the sky once per rotational period ---
+the ``lighthouse effect.'' If the earth lies in the plane of the beam, a periodic signal can be detected, and
+the star is referred to as a pulsar.\index{pulsar} It is fairly easy to see that the short period of rotation
+makes it difficult to explain a pulsar as any kind of less exotic rotating object. In the approximation of
+Newtonian mechanics, a spherical body of density $\rho$, rotating with a period $T=\sqrt{3\pi/G\rho}$, has zero
+apparent gravity at its equator, since gravity is just strong enough to accelerate an object so that it
+follows a circular trajectory above a fixed point on the surface (problem \ref{hw:pulsar}).\label{pulsar-density}
+In reality, astronomical bodies of planetary size and greater are held together by their own gravity, so we have
+$T \gtrsim 1/\sqrt{G\rho}$ for any body that does not fly apart spontaneously due to its own rotation.
+In the case of the Bell-Hewish pulsar, this implies $\rho \gtrsim 10^{10}\ \kgunit/\munit^3$, which is
+far larger than the density of normal matter, and also 10-100 times greater than the typical density of
+a white dwarf near the Chandrasekhar limit.
+
+An upper limit on the mass of a neutron star can be found in a manner entirely analogous to the
+calculation of the Chandrasekhar limit. The only difference is that the mass of a neutron is much
+greater than the mass of an electron, and the neutrons are the only particles present, so there is
+no factor of $K$. Assuming the more precise result of $1.4M_\odot$ for the Chandrasekhar limit rather than our
+sloppy one, and ignoring the interaction of the neutrons via the strong nuclear force,
+we can infer an upper limit on the mass of a neutron star:
+\begin{equation*}
+  1.4M_\odot\left(\frac{Km_e}{m_n}\right)^2 \approx 5M_\odot
+\end{equation*}
+The theoretical uncertainties in such an estimate are fairly large. Tolman, Oppenheimer, and Volkoff\index{Tolman-Oppenheimer-Volkoff limit}
+originally estimated it in 1939 as $0.7M_\odot$, whereas modern estimates are more in the range of 1.5
+to $3M_\odot$. These are significantly lower than our crude estimate of $5M_\odot$,
+mainly because the attractive nature of the strong nuclear force tends to pull the star toward
+collapse. Unambiguous results are presently impossible because of uncertainties in extrapolating the
+behavior of the strong force from the regime of ordinary nuclei, where it has been relatively well parametrized, into
+the exotic environment of a neutron star, where the density is significantly different and no protons
+are present. There are a variety of effects that may be difficult to anticipate or to calculate. For example,
+Brown and Bethe found in 1994\index{Brown-Bethe scenario}\footnote{H.A. Bethe and G.E. Brown, ``Observational constraints on the maximum neutron star mass,''
+Astrophys. J. 445 (1995) L129.  G.E. Brown and H.A. Bethe, ``A Scenario for a Large Number of Low-Mass Black Holes in the Galaxy,''
+Astrophys. J.  423 (1994) 659. Both papers are available at \url{adsabs.harvard.edu}.} that it might be possible for the mass limit to be drastically revised because
+of the process $e^-\rightarrow K^-+\nu_e$, which is impossible in free space due to conservation of energy, but
+might be possible in a neutron star. Observationally, nearly all neutron stars seem to lie in a surprisingly
+small range of mass, between 1.3 and $1.45M_\odot$, but in 2010 a neutron star with a mass of $1.97\pm .04\ M_\odot$ was discovered,
+ruling out most neutron-star models that included exotic matter.\footnote{Demorest
+et al., \url{arxiv.org/abs/1010.5788v1}.}
+
+% K=4000
+% me=9.1 10^-31 kg
+% mn=1.7 10^-27 kg
+% (Kme/mn)^2
+%    4.58463667820071
+
+For stars with masses above the Tolman-Oppenheimer-Volkoff limit, theoretical predictions become even more speculative.
+A variety of bizarre objects has been proposed, including black stars, gravastars, quark stars, boson stars, Q-balls, and electroweak stars.
+It seems likely, however, both on theoretical and observational grounds, that objects with masses of about 3 to 20
+solar masses end up as black holes; see section \ref{sec:black-hole-formation}.\index{black hole!formation}
+
+<% end_sec %>
+
+
+
+<% end_sec %> % exptl tests
+
+\pagebreak[4]
+
+<% begin_sec("Conservation laws") %>\index{conservation laws}\index{energy|seealso{conservation laws}}
+<% begin_sec("No general conservation laws") %>\label{sec:no-conservation-laws}
+Some of the first tensors we discussed were mass and charge, both rank-0 tensors, and the rank-1 momentum tensor, which
+contains both the classical energy and the classical momentum. Physicists originally decided that
+mass, charge, energy, and momentum were interesting because these things were found to be conserved. This makes it natural
+to ask how conservation laws can be formulated in relativity. We're used to stating conservation laws
+casually in terms of the amount of something in the whole universe, e.g., that classically the total amount of
+mass in the universe stays constant. Relativity does allow us to make physical models of the universe
+as a whole, so it seems as though we ought to be able to talk about conservation laws
+in relativity.
+
+We can't.
+
+First, how do we define ``stays constant?'' Simultaneity isn't well-defined, so we can't just
+take two snapshots, call them initial and final, and compare the total amount of, say, electric charge
+in each snapshot. This difficulty isn't insurmountable. As in figure \figref{conservation-spacelike-surfaces}, we can arbitrarily pick out three-dimensional
+spacelike surfaces --- one initial and one final --- and integrate the charge over each one. A law
+of conservation of charge would say that no matter what spacelike surface we picked, the total
+charge on each would be the same.
+
+
+Next there's the issue that the integral might diverge, especially if the universe was spatially
+infinite. For now, let's assume a spatially finite universe. For simplicity, let's assume that
+it has the topology of a three-sphere (see section \ref{sec:cosmological-solutions}
+for reassurance that this isn't physically unreasonable), and we can visualize it as a two-sphere.
+
+In the case of the momentum four-vector, what coordinate system would we express it in? In general,
+we do not even expect to be able to define a smooth, well-behaved coordinate system that covers the
+entire universe, and even if we did, it would not make sense to add a vector expressed in that
+coordinate system at point A to another vector from point B; the best we could do would be
+to parallel-transport the vectors to one point and then add them, but parallel transport is
+path-dependent. (Similar issues occur with angular momentum.)
+For this reason, let's restrict ourselves to the easier case of a scalar, such as
+electric charge.
+<% marg(170) %>
+<%
+  fig(
+    'conservation-spacelike-surfaces',
+    %q{Two spacelike surfaces.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'conservation-sphere-belly-button',
+    %q{We define a boundary around a region whose charge we want to measure.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'conservation-sphere-equator',
+    %q{This boundary cuts the sphere into equal parts.}
+  )
+%>
+<% end_marg %>
+
+But now we're in real trouble. How would we go about actually measuring the total electric charge of
+the universe? The only way to do it is to measure electric fields, and then apply Gauss's law.
+This requires us to single out some surface that we can integrate the flux over, as in \figref{conservation-sphere-belly-button}. This would really
+be a two-dimensional surface on the three-sphere, but we can visualize it as a one-dimensional
+surface --- a closed curve --- on the two-sphere. But now suppose this curve is a great circle, \figref{conservation-sphere-equator}. If we
+measure a nonvanishing total flux across it, how do we know where the charge is? It could be
+on either side.
+
+The conclusion is that conservation laws only make sense in relativity under very special
+circumstances.\footnote{For another argument leading to the same conclusion, see subsection \ref{sec:ctc}, p.~\pageref{sec:ctc}.} We do not have anything like over-arching, global
+principles of conservation.
+As an example of the appropriate special circumstances, section \ref{sec:sch-conserved}, p.~\pageref{sec:sch-conserved} shows how to define conserved quantities, which
+behave like energy and momentum, for the
+motion of a test particle in a particular metric that has a certain symmetry. This is generalized 
+on p.~\pageref{sec:killing-conservation} to a general, global conservation law corresponding to every
+continuous symmetry of a spacetime.
+<% end_sec %> % No general conservation laws
+<% begin_sec("Conservation of angular momentum and frame dragging") %>\label{sec:frame-dragging}
+Another special case where conservation laws work is that if the spacetime we're studying gets very flat at large distances
+from a small system we're studying, then we can define a far-away boundary that surrounds the system,
+measure the flux through that boundary, and find the system's charge.
+For such \emph{asymptotic flatness}\index{asymptotic flatness} spacetimes, we
+can also get around the problems that crop up with conserved vectors, such as
+momentum. (Asymptotic flatness is discussed in more detail in section \ref{subsec:asymptotic-flatness}.)\label{asymptotic-flatness-idea}
+If the spacetime far away is nearly flat, then parallel transport loses its path-dependence,
+so we can unambiguously define a notion of parallel-transporting all the contributions to the
+flux to one arbitrarily chosen point P and then adding them. Asymptotic flatness also allows
+us to define an approximate notion of a global Lorentz frame, so that the choice of P doesn't
+matter.
+<% marg(0) %>
+<%
+  fig(
+    'relativistic-jet',
+    %q{A relativistic jet.}
+  )
+%>
+<% end_marg %>
+% http://en.wikipedia.org/wiki/File:M87_jet.jpg
+
+As an example, figure \figref{relativistic-jet} shows a jet of matter being ejected from the galaxy M87 at
+ultrarelativistic fields. The blue color of the jet in the visible-light image comes from synchrotron radiation,
+which is the electromagnetic radiation emitted by relativistic charged particles accelerated by a magnetic field.
+The jet is believed to be coming from a supermassive black hole at the center of M87. The emission of the jet
+in a particular direction suggests that the black hole is not spherically symmetric. It seems to have a particular
+axis associated with it. How can this be? Our sun's spherical symmetry is broken by the existence of externally
+observable features such as sunspots and the equatorial bulge, but the only information we can get about a black
+hole comes from its external gravitational (and possibly electromagnetic) fields. It appears that something about
+the spacetime metric surrounding this black hole breaks spherical symmetry, but preserves symmetry about some
+preferred axis. What aspect of the initial conditions in the formation of the hole could have determined such an axis?
+The most likely candidate is the angular momentum. We are thus led to suspect that black holes can possess angular
+momentum, that angular momentum preserves information about their formation, and that angular momentum
+is externally detectable via its effect on the spacetime metric.
+
+What would the form of such a metric be? Spherical coordinates in flat spacetime give a metric
+like this:
+\begin{equation*}
+  \der s^2 = \der t^2 - \der r^2 - r^2 \der\theta^2 - r^2 \sin^2\theta \der\phi^2\eqquad.
+\end{equation*}
+We'll see in chapter \ref{ch:vacuum} that for a non-rotating black hole, the metric is of the
+form
+\begin{equation*}
+  \der s^2 = (\ldots)\der t^2 - (\ldots)\der r^2 - r^2 \der\theta^2 - r^2 \sin^2\theta \der\phi^2\eqquad,
+\end{equation*}
+where $(\ldots)$ represents functions of $r$. In fact, there is nothing special about the metric of a black
+hole, at least far away; the same external metric applies to \emph{any}
+spherically symmetric, non-rotating body, such as the moon. Now what about the metric of a rotating body?
+We expect it to have the following properties:
+\begin{enumerate}
+\item It has terms that are odd under time-reversal, corresponding to reversal of the body's angular momentum.
+\item Similarly, it has terms that are odd under reversal of the differential $\der\phi$ of the azimuthal coordinate.
+\item The metric should have axial symmetry, i.e., it should be independent of $\phi$.
+\end{enumerate}
+Restricting our attention to the equatorial plane $\theta=\pi/2$,
+the simplest modification that has these three properties is to add a term of the form
+\begin{equation*}
+  f(\ldots) L\der\phi\der t\eqquad,
+\end{equation*}
+where $(\ldots)$ again gives the $r$-dependence and $L$ is a constant, interpreted as the angular momentum.
+A detailed treatment is beyond the scope of this book,
+but solutions of this form to the relativistic field equations were found by
+New Zealand-born physicist Roy Kerr in 1963 at the University of Texas at Austin.
+
+The astrophysical modeling of observations like figure \figref{relativistic-jet} is complicated, but
+we can see in a simplified thought experiment that if we want to determine the angular momentum of
+a rotating body via its gravitational field, it will be difficult unless we use a measuring process that
+takes advantage of the asymptotic flatness of the space. For example, suppose we send two beams of light past
+the earth, in its equatorial plane, one on each side, and measure their deflections, \figref{frame-dragging-banana}. The
+deflections will be different, because the sign of $\der\phi\der t$ will be opposite for the two beams.
+But the entire notion of a ``deflection'' only makes sense if we have an asymptotically flat background,
+as indicated by the dashed tangent lines. Also, if spacetime were not asymptotically flat in this example,
+then there might be no unambiguous way to determine whether the asymmetry was due to the earth's rotation,
+to some external factor, or to some kind of interaction between the earth and other bodies nearby.
+% frame-dragging-banana.mac
+% Approx kerr Metric suggested by Rindler, p. 337.
+% Some Christoffel symbols have no L-dependence. Others are O(L^2), so numerically small and also don't cause asymmetry.
+% Some involve theta, which is irrelevant since we're in the equatorial plane.
+% The relevant ones are approximately
+%   124    phi t r    +L/r^4   ... leftward deflection for the ray on top in the figure, on both the way in and the way out
+%   142    r t phi    -L/r^2   ... also always leftward
+%   241    t r phi    -3L/r^2  ... I think this just affects speed.
+
+It also turns out that a gyroscope in such a gravitational field precesses. This effect, called frame dragging, was predicted by
+Lense and Thirring\index{Lense-Thirring effect}\index{frame dragging}
+in 1918, and was finally verified experimentally in 2008 by analysis of data from the Gravity Probe B experiment,\index{Gravity Probe B!frame dragging}
+to a precision of about 15\%. The experiment was arranged so that the relatively strong 
+geodetic effect (6.6 arc-seconds per year) and the much weaker Lense-Thirring
+effect (.041 arc-sec/yr) produced precessions in perpendicular directions.
+Again, the presence of an asymptotically flat background was involved, because the probe measured the
+orientations of its gyroscopes relative to the guide star IM Pegasi.
+<% marg(35) %>
+<%
+  fig(
+    'frame-dragging-banana',
+    %q{Two light rays travel in the earth's equatorial plane from A to B. Due to frame-dragging, the ray
+         moving with the earth's rotation is deflected by a greater amount than the one moving contrary
+         to it. As a result, the figure has an asymmetric banana shape. Both the deflection and its
+         asymmetry are greatly exaggerated.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'gravity-probe-b-frame-dragging',
+    %q{Gravity Probe B verified the existence of frame-dragging.
+        The rotational axis of the gyroscope precesses in two perpendicular planes due to the two separate
+        effects: geodetic and frame-dragging.}
+  )
+%>
+<% end_marg %>
+
+<% end_sec %> % Conservation of angular momentum and frame dragging
+<% end_sec %> % Conservation laws
+<% begin_sec("Things that aren't quite tensors") %>
+This section can be skipped on a first reading.
+<% begin_sec("Area, volume, and tensor densities") %>
+We've embarked on a program of redefining every possible physical quantity as a tensor, but so far we haven't tackled
+area and volume. Is there, for example, an area tensor in a locally Euclidean plane? We are encouraged to hope that
+there is such a thing, because on p.~\pageref{affine-area-and-volume} we saw that we could cook up a measure of
+area with no other ingredients than the axioms of affine geometry. What kind of tensor would it be? The notions of vector and scalar from freshman
+mechanics are distinguished from one another by the fact that one has a direction in space and the other does not. Therefore we expect that
+area would be a scalar, i.e., a rank-0 tensor. But this can't be right, for the following reason. Under a rescaling of coordinates by
+a factor $k$, area should change by a factor of $k^2$. But by the tensor transformation laws, a rank-0 tensor is supposed to be
+invariant under a change of coordinates. We therefore conclude that quantities like area and volume are not tensors.
+
+In the language of ordinary vectors and scalars in Euclidean three-space, one way to express area and volume is by using
+dot and cross products. The area of the parallelogram spanned by $\vc{u}$ and $\vc{v}$ is measured by the area vector $\vc{u}\times\vc{v}$,
+and similarly the volume of the parallelepiped formed by  $\vc{u}$, $\vc{v}$, and $\vc{w}$ can be computed as the scalar triple product $\vc{u}\cdot(\vc{v}\times\vc{w})$. 
+Both of these quantities are defined such that interchanging two of the inputs negates the output. In differential
+geometry, we do have a scalar product, which is defined by contracting the indices of two vectors, as in $u^av_a$. If we also had a
+a tensorial cross product, we would be able to define area and volume tensors, so we conclude that there is no tensorial cross product, i.e.,
+an operation that would multiply two rank-1 tensors to produce a rank-1 tensor. Since one of the most important physical applications of
+the cross product is to calculate the angular momentum $\vc{L}=\vc{r}\times\vc{p}$, we find that angular momentum in relativity is
+either not a tensor or not a rank-1 tensor.
+
+When someone tells you that it's impossible to do a seemingly straightforward thing, the typical response is to look for a way
+to get around the supposed limitation. In the case of a locally Euclidean plane, what is to stop us from making a small, standard
+square, and then sliding the square around to any desired location? If we have some figure whose area we wish to measure, we can
+then dissect it into squares of that size and count the number of squares.
+<% marg(0) %>
+<%
+  fig(
+    'mobius-strip',
+    %q{A M\"{o}bius strip is not an orientable surface.}
+  )
+%>
+<% end_marg %>
+
+There are two problems with this plan, neither of which is completely insurmountable. First, the area vector $\vc{u}\times\vc{v}$
+is a vector, with its orientation specified by the direction of the normal to the surface. We need this orientation, for example, when we calculate
+the electric flux as $\int \vc{E}\cdot\der\vc{A}$. Figure \figref{mobius-strip} shows that we cannot always define such an orientation
+in a consistent way. When the $x-y$ coordinate system is slid around the M\"{o}bius strip, it ends up with the opposite orientation.
+In general relativity, there is not any guarantee of orientability in space --- or even in time!\index{orientability} But the vast majority
+of spacetimes of physical interest are in fact orientable in every desired way, and even for those that aren't, orientability still holds
+in any sufficiently small neighborhood.
+
+The other problem is that area has the wrong scaling properties to be a rank-0 tensor.
+We can get around this problem by
+being willing to discuss quantities that don't transform exactly like tensors. Often we only care about transformations, such as
+rotations and translations, that don't involve
+any scaling. We saw in 
+section \ref{sec:lorentz-geometry} on p.~\pageref{sec:lorentz-geometry} that Lorentz boosts also have the special property of
+preserving area in a space-time plane containing the boost.
+We therefore define a \emph{tensor density}\index{tensor density} as a quantity that
+transforms like a tensor under rotations, translations, and boosts,
+but that rescales and possibly flips its sign under other types of
+coordinate transformations. In general, the additional factor comes from
+the determinant $d$ of the matrix consisting of the partial derivatives
+$\partial x'^\mu/\partial x^\nu$ (called the Jacobian matrix).\index{Jacobian matrix}
+This determinant is raised to a power
+$W$, known as the weight of the tensor density.\index{weight of a tensor density} Weight
+zero corresponds to the case of a real tensor. The definition of the sign of $W$ is not standardized in the
+literature. The convention in this book is the one used by Carroll and Weinberg, but the opposite sign is
+used, for example, by Misner, Thorne, and Wheeler, and in the Wikipedia article ``Tensor density.''
+
+\pagebreak[4]
+
+\begin{eg}{Area as a tensor density}
+In a Euclidean plane, making our rulers shorter by a factor of $k$ causes the area measured in the new coordinates
+to increase by a factor of $k^2$. The rescaling is represented by a matrix of partial
+derivatives that is simply $kI$, where $I$ is the identity matrix. The determinant is $k^2$. Therefore
+area is a tensor density of weight $+1$.
+\end{eg}
+
+\begin{eg}{Mass density}
+A piece of aluminum foil as a certain number of milligrams per square centimeter.
+Shrinking rulers by $1/k$ causes this number to decrease by $k^{-2}$, so this mass density has $W=-1$.
+\end{eg}
+
+In Weyl's apt characterization,\footnote{Hermann Weyl, ``Space-Time-Matter,'' 1922, p.~109, available online at \url{archive.org/details/spacetimematter00weyluoft}.} 
+tensors represent intensities, while tensor densities measure quantity.
+<% end_sec %> % Area, volume, and tensor densities
+<% begin_sec("The Levi-Civita symbol") %>\index{angular momentum}
+Although there is no tensorial vector cross product, we can define a similar operation whose output is a tensor density.
+This is most easily expressed in terms of the Levi-Civita symbol\index{Levi-Civita, Tullio}\index{Levi-Civita symbol} $\epsilon$.
+(See p.~\pageref{fig:levi-civita-portrait} for biographical information about Levi-Civita.)
+
+In $n$ dimensions, the Levi-Civita symbol has $n$ indices. It is defined so as to
+be totally asymmetric, in the sense that if any two of the indices are interchanged, its sign flips. This is sufficient
+to define the symbol completely except for an over-all scaling, which is fixed by arbitrarily taking one of the nonvanishing
+elements and setting it to $+1$. To see that this is enough to define $\epsilon$ completely, first note that it must vanish
+when any index is repeated. For example, in three dimensions labeled by $\kappa$, $\lambda$, and $\mu$, $\epsilon_{\kappa\lambda\lambda}$
+is unchanged under an interchange of the second and third indices, but it must also flip its sign under this operation, which means
+that it must be zero. If we arbitrarily fix $\epsilon_{\kappa\lambda\mu}=+1$, then interchange of the second and third indices
+gives $\epsilon_{\kappa\mu\lambda}=-1$, and a further interchange of the first and second yields $\epsilon_{\mu\kappa\lambda}=+1$.
+Any permutation of the three distinct indices can be reached from any other by a series of such pairwise swaps, and the number
+of swaps is uniquely odd or even.\footnote{For a proof, see the Wikipedia article ``Parity of a permutation.''}
+In Cartesian coordinates in three dimensions, it is conventional to choose  $\epsilon_{xyz}=+1$ when
+$x$, $y$, and $z$ form a right-handed spatial coordinate system. In four dimensions, we take
+$\epsilon_{txyz}=+1$ when $t$ is future-timelike and $(x,y,z)$ are right-handed.
+
+In Euclidean three-space, in coordinates such that $g=\operatorname{diag}(1,1,1)$, the vector cross product $\vc{A}=\vc{u}\times\vc{v}$, where we have
+in mind the interpretation of $\vc{A}$ as area, can be expressed
+as $A_\mu=\epsilon_{\mu\kappa\lambda}u^\kappa v^\lambda$.
+
+Self-check: Check that this matches up with the more familiar definition of the vector cross product.
+
+Now suppose that we want to generalize to curved spaces, where $g$ cannot be constant. There are two ways to proceed.
+
+<% begin_sec("Tensorial $\\epsilon$") %>
+One is to let $\epsilon$ have the values $0$ and $\pm1$ at some arbitrarily chosen point, in some arbitrarily chosen coordinate
+system, but to let it transform like a tensor. Then $A_\mu=\epsilon_{\mu\kappa\lambda}u^\kappa v^\lambda$ needs to be modified,
+since the right-hand side is a tensor, and that would make $A$ a tensor, but if $A$ is an area we don't want it to transform like
+a 1-tensor. We therefore need to revise the definition of area to be $A_\mu=g^{-1/2}\epsilon_{\mu\kappa\lambda}u^\kappa v^\lambda$,
+where $g$ is the determinant of the lower-index form of the metric. The following two examples justify this procedure in a locally Euclidean three-space.
+
+\begin{eg}{Scaling coordinates with tensorial $\epsilon$}
+Then scaling of coordinates by $k$ scales all the elements of the metric by $k^{-2}$, $g$ by $k^{-6}$, $g^{-1/2}$ by $k^{3}$, $\epsilon_{\mu\kappa\lambda}$ by
+$k^{-3}$, and $u^\kappa v^\lambda$ by $k^2$. The result is to scale $A_\mu$ by $k^{+3-3+2}=k^{2}$, which makes sense if $A$ is an area.
+\end{eg}
+
+\begin{eg}{Oblique coordinates with tensorial $\epsilon$}
+In oblique coordinates (example \ref{eg:oblique-cartesian}, p.~\pageref{eg:oblique-cartesian}), the two basis vectors have unit
+length but are at an angle $\phi \ne \pi/2$ to one another. The determinant of the metric is $g=\sin^2\phi$, so $\sqrt{g}=\sin\phi$,
+which is exactly the correction factor needed in order to get the right area when $u$ and $v$ are the two basis vectors.
+\end{eg}
+
+This procedure works more generally, the sole modification being that in a space such as a locally Lorentzian one where $g<0$ we need
+to use $\sqrt{-g}$ as the correction factor rather than $\sqrt{g}$.
+<% end_sec %> % Tensorial $\epsilon$
+<% begin_sec("Tensor-density $\\epsilon$") %>
+The other option is to let $\epsilon$ have the same $0$ and $\pm1$ values at all points. Then $\epsilon$ is clearly not a tensor, because
+it doesn't scale by a factor of $k^n$ when the coordinates are scaled by $k$; $\epsilon$ is a tensor density with weight $-1$ for the upper-index version
+and $+1$ for the lower-index one. The relation $A_\mu=\epsilon_{\mu\kappa\lambda}u^\kappa v^\lambda$ gives an area that is a tensor density,
+not a tensor, because $A$ is not written in terms of purely tensorial quantities. Scaling the coordinates by $k$ leaves $\epsilon_{\mu\kappa\lambda}$
+unchanged, scales up $u^\kappa v^\lambda$ by $k^2$, and scales up the area by $k^2$, as expected.
+<% end_sec %> % Tensor-density $\epsilon$
+
+Unfortunately, there is no consistency in the literature as to whether $\epsilon$ should be a tensor or a tensor density.
+Some authors define both a tensor and a nontensor version, with notations
+like $\epsilon$ and $\tilde{\epsilon}$, or\footnote{Misner, Thorne, and Wheeler} $\epsilon_{0123}$ and $[0123]$. 
+Others avoid writing the letter $\epsilon$ completely.\footnote{Hawking and Ellis} The tensor-density version
+is convenient because we always know that its value is $0$ or $\pm 1$. The tensor version has the advantage that it transforms
+as a tensor.
+<% end_sec %> % The Levi-Civita symbol
+<% begin_sec("Spacetime volume") %>\index{volume!spacetime}\label{subsec:spacetime-volume}
+We saw on p.~\pageref{spacetime-area} that area in the $1+1$-dimensional plane of flat spacetime is preserved 
+by a Lorentz boost. This makes sense because when we express the area spanned by a parallelogram with edges
+$\vc{p}$ and $\vc{q}$ as
+$\epsilon^{ab}p_as_b$, all the indices have been contracted, leaving a rank-0 tensor density. In $3+1$ dimensions,
+we have the spacetime volume $V=\epsilon^{abcd}p_a q_b r_c s_d$ spanned by the paralellepiped with edges
+$\vc{p}$, $\vc{q}$, $\vc{r}$, and $\vc{s}$. A typical situation in which this volume is nonzero would be that in which
+one of the vectors is timelike and the other three spacelike.
+Let the timelike one be $\vc{p}$. Assume $|\vc{p}|= 1$, since an example with $|\vc{p}|\ne 1$ can be reduced to this
+by scaling. Then $\vc{p}$ can be interpreted as the velocity vector of some observer, and
+$V$ as the spatial volume that the observer says is spanned by the 
+3-paralellepiped with edges $\vc{q}$, $\vc{r}$, and $\vc{s}$.
+<% end_sec %> % 
+<% begin_sec("Angular momentum") %>\index{angular momentum}
+As discussed above, angular momentum cannot be a rank-1 tensor.
+One approach is to define a rank-2 angular momentum tensor $L^{ab}=r^ap^b-r^bp^a$. 
+
+In a frame whose origin is instantaneously moving along with a certain system's center of mass
+at a certain time, the time-space components of $L$ vanish, and the components $L^{yz}$, $L^{zx}$, and $L^{xy}$ coincide
+in the nonrelativistic limit with the $x$, $y$, and $z$ components of the Newtonian angular momentum vector. 
+We can also define a three-dimensional object
+$L^a=\epsilon_{abc}L^{bc}$ (with three-dimensional tensor-density $\epsilon$ in the spatial dimensions) that
+doesn't transform like a tensor.
+<% end_sec %> % Angular momentum
+<% end_sec %> % Things that aren't quite tensors
+
+<% begin_hw_sec %>
+
+<% begin_hw('photon-four-velocity') %>
+Describe the four-velocity of a photon.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('lhc-proton-speed') %>
+The Large Hadron Collider is designed to accelerate protons to energies of 7 TeV.
+Find $1-v$ for such a proton.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('pe-vacuum') %>
+Prove that an electron in a vacuum cannot absorb a photon. (This is the reason that the ability of
+materials to absorb gamma-rays is strongly dependent on atomic number $Z$. The case of $Z=0$
+corresponds to the vacuum.)
+<% end_hw %>
+
+<% begin_hw('a-dot-v') %>
+(a) For an object moving in a circle at constant speed, the dot product of the classical
+three-vectors $\vc{v}$ and $\vc{a}$ is zero. Give an interpretation in terms of the
+work-kinetic energy theorem.
+(b) In the case of relativistic four-vectors, $v^ia_i=0$ for \emph{any} world-line.
+Give a similar interpretation. Hint: find the rate of change of the four-velocity's squared magnitude.
+<% end_hw %>
+
+<% begin_hw('parity-metric-change') %>
+Starting from coordinates $(t,x)$ having a Lorentzian metric $g$, transform the metric tensor
+into reflected coordinates $(t',x')=(t,-x)$, and verify that $g'$ is the same as $g$.
+<% end_hw %>
+
+<% begin_hw('lorentz-metric-change') %>
+Starting from coordinates $(t,x)$ having a Lorentzian metric $g$, transform the metric tensor
+into Lorentz-boosted coordinates $(t',x')$, and verify that $g'$ is the same as $g$.
+<% end_hw %>
+
+<% begin_hw('const-accel-metric') %>
+Verify the transformation of the metric given in example \ref{eg:const-accel-metric} on page \pageref{eg:const-accel-metric}.
+<% end_hw %>
+
+<% begin_hw('hafele-frame-indept') %>
+A skeptic claims that the Hafele-Keating experiment can only be explained correctly by relativity
+in a frame in which the earth's axis is at rest. Prove mathematically that this is incorrect.
+Does it matter whether the frame is inertial?
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('matrix-noncommutative') %>
+Assume the metric $g=\operatorname{diag}(+1,+1,+1)$. Which of the following correctly expresses the noncommutative
+property of ordinary matrix multiplication?
+\begin{align*}
+  A\indices{_i^j}B\indices{_{jk}} & \ne B\indices{_{jk}}A\indices{_i^j} \\
+  A\indices{_i^j}B\indices{_{jk}} & \ne B\indices{_i^j}A\indices{_{jk}} 
+\end{align*}
+<% end_hw %>
+
+<% begin_hw('dirac-sea-invariant') %>\index{Dirac sea}
+Example \ref{eg:dirac-sea} on page \pageref{eg:dirac-sea} introduced the Dirac sea, whose existence is implied
+by the two roots of the relativistic relation $E=\pm\sqrt{p^2+m^2}$. Prove that a Lorentz boost
+will never transform a positive-energy state into a negative-energy state.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('doppler-three-d') %>
+On page \pageref{sec:doppler}, we found the relativistic Doppler shift in 1+1 dimensions.
+Extend this to 3+1 dimensions, and check your result against the one given by Einstein on
+page \pageref{einstein-doppler}.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('classical-electron-radius') %>
+Estimate the energy contained in the electric field of an electron, if the electron's radius is $r$.
+Classically (i.e., assuming relativity but no quantum mechanics), this energy contributes to the electron's
+rest mass, so it must be less than the rest mass. Estimate the resulting lower limit on $r$, which is known
+as the classical electron radius.
+\hwsoln
+<% end_hw %>
+
+<% begin_hw('compton') %>
+For gamma-rays in the MeV range, the most frequent mode of interaction with matter is Compton scattering,\index{Compton scattering}
+in which the photon is scattered by an electron without being absorbed.
+Only part of the gamma's energy is deposited, and the amount is related to the angle of scattering.
+Use conservation of four-momentum to show that
+in the case of scattering at 180 degrees, the scattered photon has energy $E'=E/(1+2E/m)$, where $m$ is the mass of the
+electron.
+<% end_hw %>
+
+<% begin_hw('pulsar') %>
+Derive the equation $T=\sqrt{3\pi/G\rho}$ given on page \pageref{pulsar-density} for the period
+of a rotating, spherical object that results in zero apparent gravity at its surface.
+<% end_hw %>
+
+<% begin_hw('white-dwarf') %>
+Section \ref{sec:degenerate-matter} presented an estimate of the upper limit on the mass of a white dwarf. Check
+the self-consistency of the solution in the following respects: (1) Why is it valid to ignore the contribution
+of the nuclei to the degeneracy pressure?
+(2) Although the electrons are
+ultrarelativistic, spacetime is approximated as being flat. As suggested in example \ref{eg:newtonian-black-hole}
+on page \pageref{eg:newtonian-black-hole}, a reasonable order-of-magnitude check on this result is that we should
+have $M/r \ll c^2/G$.
+<% end_hw %>
+
+<% begin_hw('no-neutron-stars') %>
+The laws of physics in our universe imply that for bodies with a certain range of masses, a neutron star is the unique
+equilibrium state. Suppose we knew of the existence of neutron stars, but didn't know the mass of the neutron.
+Infer upper and lower bounds on the mass of the neutron.
+<% end_hw %>
+
+<% begin_hw('galilean-em') %>
+Example \ref{eg:gps-timing} on p.~\pageref{eg:gps-timing} briefly introduced the electromagnetic potential four-vector
+$F_{ij}$, and this implicitly defines the transformation properties of 
+the electric and magnetic fields under
+a Lorentz boost $\vc{v}$.\index{electromagnetic potential four-vector}\index{electromagnetic fields!transformation properties of}
+To lowest order in $\vc{v}$, this transformation is given by
+\begin{align*}
+  \vc{E}' &\approx \vc{E}+\vc{v}\times\vc{B} \qquad \text{and}  \\
+  \vc{B}' &\approx \vc{B}-\vc{v}\times\vc{E}\eqquad.  
+\end{align*}
+I'm not a historian of science, but apparently ca.~1905 people like Hertz believed that these were the
+\emph{exact} transformations of the field.\footnote{Montigny and Rousseaux, \url{arxiv.org/abs/physics/0512200}.}
+Show that this can't be the case, because performing two such transformations in a row does not
+in general result in a transformation of the same form.\hwsoln
+<% end_hw %>
+
+<% begin_hw('tachyon-instability') %>
+We know of massive particles, whose velocity vectors always lie inside the future light cone,
+and massless particles, whose velocities lie on it. In principle, we could have a third
+class of particles, called tachyons,\index{tachyon}
+with spacelike velocity vectors. Tachyons would have $m^2<0$, i.e., their masses would have to be
+imaginary. Show that it is possible to pick momentum four-vectors $\vc{p}_1$ and $\vc{p}_2$ for
+a pair of tachyons such that $\vc{p}_1+\vc{p}_2=0$. This implies that the vacuum would be unstable
+with respect to spontaneous creation of tachyon-antitachyon pairs.
+<% end_hw %>
+
+
+<% end_hw_sec %>
+
+<% end_chapter %>

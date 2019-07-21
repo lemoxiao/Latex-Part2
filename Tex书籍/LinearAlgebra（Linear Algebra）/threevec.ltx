@@ -1,0 +1,20 @@
+% in pgfplots draws a vector from O with tiny coord label
+% and with gray visualisation lines.  The first
+% optional argument says where to put the label. AJR Nov 2015
+\def\threevcol{blue}
+\newcommand{\threevec}[4][above]{
+  \addplot3[\threevcol,thick,quiver={u=#2,v=#3,w=#4},-stealth] 
+  coordinates {(0,0,0)};
+  \node[#1] at (axis cs:#2,#3,#4) {\tiny\((#2,#3,#4)\)};
+  \addplot3[gray] coordinates 
+  {(#2,#3,#4)(#2,#3,0)(#2,0,0)(0,0,0)(0,#3,0)(#2,#3,0)};
+  }
+
+% with supplied label as last argument
+\newcommand{\threev}[5][below]{
+  \addplot3[gray] coordinates 
+  {(#2,#3,#4)(#2,#3,0)(#2,0,0)(0,0,0)(0,#3,0)(#2,#3,0)};
+  \addplot3[\threevcol,thick,quiver={u=#2,v=#3,w=#4},-stealth] 
+  coordinates {(0,0,0)};
+  \node[#1] at (axis cs:#2,#3,#4) {$#5$};
+  }

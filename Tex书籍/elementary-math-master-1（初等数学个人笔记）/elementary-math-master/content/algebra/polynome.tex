@@ -1,0 +1,627 @@
+
+\section{多项式}
+\label{sec:polynome}
+
+这一节是参考文献\cite{advanced-algebra}的学习笔记，讨论了多项式的整除理论与及因式分解相关内容。
+
+\subsection{数域}
+\label{sec:number-field}
+
+域本来是抽象代数中的一个概念，但早点接触它还是有好处的。
+
+\begin{definition}
+  如果一个数集包含了0和1，并且对集合中任意两数(可以相同)进行加减乘除运算所得的结果都仍然在这集合中(称为对这四种运算具有封闭性)，则称该数集为一个 \emph{数域}.
+\end{definition}
+
+易知任何数域都包含有理数集作为它的一个子集，常见的有理数集、实数集、复数集都是数域，但数域是一个更宽泛的概念，例如下面这个例子。
+
+\begin{example}
+  设$\pi$是一个无理数，则定义数集 $A_{\pi} = \{x|x=a+b\pi,a,b\in Q\}$，这里$Q$是有理数集，易证这是一个数域，其中除了有理数外，还包含一些无理数，这些无理数都跟一个确定的无理数$\pi$有关，这个数集可以称为是由无理数$\pi$生成的 \emph{最小数域}，这类数域在构造某些特例时是有用的。
+\end{example}
+
+\begin{definition}
+  系数都在某个数域$P$中的多项式$f(x)$称为数域$P$上的多项式。
+\end{definition}
+
+本节所讨论的多项式都是针对某个数域$P$上的多项式而言的，在无特别说明时，这个数域$P$可以是任何数域，当然把它单单理解为实数集和复数集，对结论也没有什么影响。
+
+\subsection{一元多项式}
+\label{sec:polynome-with-one-variable}
+
+
+
+\subsection{整除的概念与带余除法}
+\label{sec:polynome-integer-division-and-devision-with-remainder}
+
+多项式的整除理论与整数的整除理论是两套平行的理论，诸多定理和性质基本上是完全相同的，用抽象代数的语言来说，就是具有相同的代数结构，因而这两套理论可以对照着学习。
+
+\begin{theorem}[带余除法]
+  对数域$P$上的任意两个非零多项式$f(x)$和$g(x)$，存在数域$P$上的另外两个多项式$q(x)$和$r(x)$，其中$r(x)$次数低于$g(x)$或者是零多项式，使得下式成立
+  \[ f(x) = q(x) g(x) + r(x) \]
+  并且$q(x)$及$r(x)$是唯一的。
+\end{theorem}
+
+\begin{proof}[证明]
+  先证明存在性。
+  
+  如果$f(x)$的次数低于$g(x)$，则取$u(x)=0$, $r(x)=f(x)$就可以了，以下证明$f(x)$比$g(x)$次数高的情况，设
+  \[ f(x)=\sum_{i=0}^na_ix^i, \   g(x)=\sum_{i=0}^nb_ix^i \]
+  其中$n>m>0$，则首先用
+  \[ u_0(x)=\frac{a_n}{b_m}x^{n-m} \]
+  与$g(x)$相乘得出一个$n$次多项式，于是这个多项式与$f(x)$的差就是一个次数低于$n$的多项式，即
+  \[ f(x) = u_0(x) g(x) + f_1(x) \]
+  如果$f_1(x)$的次数仍然高于或者等于$g(x)$，则我们再对$f_1(x)$施以同样的手法可得出第二个等式
+  \[ f_1(x) = u_1(x)g(x) + f_2(x) \]
+  依次下去，必定能够在有限步之内(最多$n-m+1$步)使得某个$f_r(x)$的次数低于$g(x)$或者成为零多项式，这时便有
+  \[ f(x) = g(x) \sum_{i=0}^{r-1}u_i(x) + f_r(x) \]
+  于是取
+  \[ q(x)=\sum_{i=0}^{r-1}u_i(x), \  r(x)=f_r(x) \]
+  就可以满足定理要求。
+
+  再证明唯一性，设有两组符合定理中等式的$q(x)$和$r(x)$，即有
+  \[ f(x) = q_1(x)g(x)+r_1(x) = q_2(x)g(x)+r_2(x) \]
+  于是便有
+  \[ (q_1(x)-q_2(x)) g(x) = r_1(x)-r_2(x) \]
+  上式右端的次数低于$g(x)$的次数，因此左边必须有$q_1(x)=q_2(x)$，这时也就必然有$r_1(x)=r_2(x)$，唯一性得证。
+\end{proof}
+
+这个证明过程实际上就是多项式除法的运算过程，定理中的$q(x)$称为$f(x)$除以$g(x)$的\emph{商}，而$r(x)$则为\emph{余式}.
+
+\begin{definition}
+  对于多项式$f(x)$和$g(x)$，如果存在多项式$h(x)$，使得$f(x)=g(x)h(x)$，则称$g(x)$能够\emph{整除}$f(x)$，记为$g(x) \mid f(x)$，此时称$g(x)$是$f(x)$的\emph{因式}，而$f(x)$则称为$g(x)$的\emph{倍式}.
+\end{definition}
+
+多项式整除有以下性质.
+\begin{property}
+  如果多项式$f(x)$和$g(x)$能够互相整除，则它俩只相差一个常数因子，即$f(x)=cg(x)$，$c$为常数。
+\end{property}
+
+\begin{proof}[证明]
+  因为存在多项式$h_1(x)$和$h_2(x)$，使得$f(x)=g(x)h_1(x)$和$g(x)=f(x)h_2(x)$，所以$h_1(x)h_2(x)=1$，于是$h_1(x)$和$h_2(x)$都只能是常数，得证。
+\end{proof}
+
+还有以下两个性质，证明略。
+\begin{property}
+  如果$f(x) \mid g(x)$且$g(x) \mid h(x)$，则$f(x) \mid h(x)$.
+\end{property}
+
+\begin{property}
+  如果$f(x) \mid g(x)(i=1,2,\ldots,n)$，则有
+  \[ f(x) \mid \sum_{i=1}^n u_i(x)g_i(x) \]
+  式中$u_i(x)(i=1,2,\ldots,n)$是任意多项式。
+\end{property}
+
+\begin{theorem}
+  多项式$g(x)$能够整除多项式$f(x)$的充分必要条件是，在带余除法等式
+  \[ f(x)=q(x)g(x)+r(x) \]
+  中的余式$r(x)$是零多项式。
+\end{theorem}
+
+\begin{proof}[证明]
+  充分性显然，只证必要性，由$g(x) \mid f(x)$，知$g(x)$能够整除带余除法等式中三个项的其中两个项，因而也能整除另外一项，即$g(x) \mid r(x)$，但$r(x)$的次数低于$g(x)$，所以只能是零多项式，必要性成立。
+\end{proof}
+
+\subsection{最大公因式与辗转相除法}
+\label{sec:greatest-common-divisor-and-euclidean-division}
+
+\begin{definition}
+  如果$d(x) \mid f(x)$且$d(x) \mid g(x)$，则称$d(x)$是$f(x)$与$g(x)$的一个 \emph{公因式}.
+\end{definition}
+
+显然常数因子是任何两个多项式的公因式，因而公因式是存在的。
+
+\begin{definition}
+  多项式$f(x)$与$g(x)$的诸公因式中，次数最高的那一个称为这两个多项式的\emph{最大公因式}，记为$(f(x),g(x))$.
+\end{definition}
+
+这个定义的问题是，有没有可能同时存在多个次数都最高的公因式(只相差一个常数因子的视为同一个)，也就是最大公因式的唯一性问题。
+
+而流行的定义是:
+
+\begin{definition}
+  设$d(x)$是$f(x)$与$g(x)$的一个公因式，如果$f(x)$与$g(x)$的所有公因式都是$d(x)$的因式，则称$d(x)$是$f(x)$与$g(x)$的\emph{最大公因式}，记为$(f(x),g(x))$.
+\end{definition}
+
+这个定义也有个问题，在这诸公因式中，次数最高的那个，是否能被别的所有公因式都整除呢，所以无论采用哪一种定义，都有些问题要留待对最大公因式有一定程度的讨论后才能解决，这就是最大公因式的性质定理:
+
+\begin{theorem}[最大公因式性质定理]
+  \label{theorem:greatest-factor-polynome-property}
+  设$d(x)$是$f(x)$与$g(x)$的最大公因式，则存在多项式$u(x)$和$v(x)$，使得
+  \[ d(x) = u(x)f(x) + v(x)g(x) \]
+\end{theorem}
+
+为证明这个定理，先提出如下引理
+\begin{lemma}
+  如果有等式
+  \[ f(x)=q(x)g(x)+r(x) \]
+  则$f(x)$与$g(x)$的公因式，也必然是$g(x)$与$r(x)$的公因式.
+\end{lemma}
+由整除性质，引理是显然的。
+
+现在证明\autoref{theorem:greatest-factor-polynome-property}:
+\begin{proof}[证明]
+  根据带余除法，存在多项式$q_1(x)$及$r_1(x)$(次数低于$g(x)$或者是零多项式)，使
+  \[ f(x)=q_1(x)g(x)+r_1(x) \]
+  如果$r_1(x)$不是零多项式，则再继续拿$g(x)$除以$r_1(x)$，得出
+  \[ g(x) = q_2r_1(x)+r_2(x) \]
+  如此反复下去，因为每进行一次，$r_i(x)$的次数至少减少一，因此必然在有限步之后，$r_i(x)$成为零次多项式即为常数，再进行一次之后，$r_i(x)$便成为零多项式，把这过程写成等式序列，并记$r_{-1}(x)=f(x)$,$r_0(x)=g(x)$，便是
+  \begin{eqnarray*}
+    r_{-1}(x) & = & q_1(x)r_0(x)+r_1(x) \\
+    r_0(x) & = & q_2(x)r_1(x)+r_2(x) \\
+    \cdots \\
+    r_{k-1}(x) & = & q_{k+1}(x)r_k(x)+r_{k+1}(x) \\
+    \cdots \\
+    r_{s-2}(x) & = & q_s(x)r_{s-1}(x) + r_s(x) \\
+    r_{s-1}(x) & = & q_{s+1}(x)r_s(x) + 0
+  \end{eqnarray*}
+  按照上述引理，$f(x)$与$g(x)$的公因式，必然也是$g(x)$与$r_1(x)$的公因式，也就必然是$r_1(x)$和$r_2(x)$的公因式，依次推下去，最后必然也是$r_s(x)$与0的公因式，从而就必然是$r_s(x)$的因式，于是$r_s(x)$本身便是最大公因式（无论按照前面的两种定义的那一种）。
+
+  从上面倒数第二个等式可以看出，$r_s(x)$可以用$r_{s-1}(x)$与$r_{s-2}(x)$表示成各自与某个多项式相乘后再相加的形式，而$r_{s-1}(x)$又可以用$r_{s-2}(x)$和$r_{s-3}(x)$用相同的形式表示出来，依次倒着推回去，最后$r_s(x)$便必定可以用$f(x)$与$g(x)$各自与某个多项式相乘后相加的形式表示出来，当然这也可以用数学归纳法的形式进行严格叙述，略去。
+\end{proof}
+
+定理证明过程中的这个反复做带余除法的过程称为 \emph{辗转相除法}，可以用它来求两个多项式的最大公因式。
+
+从定理证明过程中还可以看出，两个多项式的公因式，都是它俩最大公因式的因式，从而最大公因式在不考虑常数因式的意义下是唯一的。
+
+要说明的是，定理中的$u(x)$及$v(x)$不是唯一的，这从下式中可以看出
+\[ d(x) = (u(x)+h(x)g(x))f(x)+(v(x)-h(x)f(x))g(x) \]
+即如果$u(x)$、$v(x)$符合定理，则$u(x)+h(x)g(x)$、$v(x)-h(x)f(x)$也符合定理，其中$h(x)$是任意多项式。
+
+但是要强调的是，只有最大公因式才能表示成这种形式，其它公因式不具有这种表示，这就是下面的定理
+\begin{theorem}
+  设$d(x)$是$f(x)$和$g(x)$的一个公因式，如果存在多项式$u(x)$和$v(x)$使得$d(x)=u(x)f(x)+v(x)g(x)$，则$d(x)$必然是最大公因式。
+\end{theorem}
+
+\begin{proof}[证明]
+  显然根据那等式，$f(x)$与$g(x)$的任一公因式也能够整除$d(x)$，所以$d(x)$是最大公因式。
+\end{proof}
+
+\begin{definition}
+  如果两个多项式的最大公因式为1，即$(f(x),g(x))=1$，则称这两个多项式 \emph{互素}.
+\end{definition}
+
+\begin{theorem}
+  两个多项式$f(x)$与$g(x)$互素的充分必要条件是，存在多项式$u(x)$和$v(x)$使得$u(x)f(x)+v(x)g(x)=1$.
+\end{theorem}
+
+\begin{proof}[证明]
+  如果有这等式，则对于$f(x)$与$g(x)$的最大公因式$d(x)$，必然有$d(x) \mid 1$，所以两个多项式互素，充分性得证，而必要性是显然的。
+\end{proof}
+
+\begin{theorem}
+  \label{theorem:f-prime-g-and-f-mid-gh-so-f-mid-h}
+  如果$(f(x),g(x))=1$，且$f(x) \mid g(x)h(x)$，则$f(x) \mid h(x)$.
+\end{theorem}
+
+\begin{proof}[证明]
+  由互素，存在两个多项式$u(x)$、$v(x)$使得$u(x)f(x)+v(x)g(x)=1$，两边同乘$h(x)$得
+  \[ u(x)f(x)h(x) + v(x)g(x)h(x) = h(x) \]
+  显然$f(x)$能够整除等式左边的两项，因而也能整除右边，得证。
+\end{proof}
+
+\begin{inference}
+  如果$(f(x),g(x)=1)$，且$f(x) \mid h(x)$，$g(x) \mid h(x)$，则$f(x)g(x) \mid h(x)$.
+\end{inference}
+
+\begin{proof}[证明]
+  设$h(x)=f(x)r(x)$，则$g(x) \mid f(x)r(x)$，按前述定理，这时必有$g(x) \mid r(x)$，于是$f(x)g(x) \mid f(x)r(x) = h(x)$.
+\end{proof}
+
+\begin{proof}[证明二]
+  由条件，存在多项式$u(x)$和$v(x)$使$u(x)f(x)+v(x)g(x)=1$，又设$h(x)=f(x)f_1(x)$，在前等式两边同乘$f_1(x)$可得$u(x)f(x)f_1(x)+v(x)g(x)f_1(x)=f_1(x)$，即$u(x)h(x)+v(x)g(x)f_1(x)=f_1(x)$，显然$g(x)$能整除等式的左边，因而也能整除右边，即$g(x) \mid f_1(x)$，从而$f(x)g(x) \mid f(x)f_1(x) = h(x)$.
+\end{proof}
+
+\begin{inference}
+  如果$(f(x),g(x))=1$且$(f(x),h(x))=1$，则$(f(x),g(x)h(x))=1$.
+\end{inference}
+
+\begin{proof}[证明一]
+  设$d(x)=(f(x),g(x)h(x))$，则由$(f(x),g(x))=1$知$(d(x),g(x))=1$，而由$d(x) \mid g(x)h(x)$便得$d(x) \mid h(x)$，于是$d(x)$是$f(x)$与$h(x)$的一个公因式，但是$(f(x),h(x))=1$，所以$d(x)=1$.
+\end{proof}
+
+\begin{proof}[证明二]
+  将等式$u_1(x)f(x)+v_1(x)g(x)=1$与$u_2(x)f(x)+v_2(x)h(x)=1$相乘得
+  \[ [u_1(x)u_2(x)f(x)+u_2(x)v_1(x)g(x)+u_1(x)v_2(x)h(x)]f(x)+v_1(x)v_2(x)g(x)h(x)=1 \]
+ 即得结论.
+\end{proof}
+
+这个结论还可以推广到更一般的情况:
+\begin{theorem}
+  \label{two-group-polynome-product-prime}
+  设$f(x)=f_1(x)f_2(x) \cdots f_n(x)$，$g(x)=g_1(x)g_2(x) \cdots g_m(x)$，并且对于任意的$i(1 \leqslant i \leqslant n)$和$j(1 \leqslant j \leqslant m)$都有$(f_i(x), g_j(x))=1$，则$(f(x), g(x))=1$.
+\end{theorem}
+
+\begin{proof}[证明]
+  因为每一个$f_i(x)$都与所有的$g_j(x)$互素，所以$(f_i(x), g(x))=1(i=1,2,\ldots,n)$，进一步就有$(f(x),g(x))=1$.
+\end{proof}
+
+最大公因式可以推广到多个多项式的情形。
+
+\begin{definition}
+  如果$d(x)$是一组多项式$f_i(x)(i=1,2,\ldots,n)$的公因式，并且这组多项式的任一公因式都是$d(x)$的因式，则称$d(x)$是这组多项式的公因式，也记为$d(x)=(f_1(x),f_2(x),\ldots,f_n(x))$.
+\end{definition}
+
+\begin{theorem}
+  对一组多项式$f_i(x)(i=1,2,\ldots,n)$，定义递推序列
+  \[ d_1(x)=f_1(x), \  d_k(x)=(d_{k-1}(x), f_k(x)) \]
+  则$d_n(x)$便是这组多项式的最大公因式。
+\end{theorem}
+
+依据这定理，最大公因式可以逐次求，先求出$f_1(x)$与$f_2(x)$的最大公因式$d_2(x)$，再求$d_2(x)$与$f_3(x)$的最大公因式，逐次下去，最后求得$d_{n-1}(x)$与$f_n(x)$的最大公因式$d_n(x)$就是这一组多项式的最大公因式。
+
+\begin{proof}[证明]
+  记$r_k(x)=(f_1(x),f_2(x),\ldots,f_k(x))$，易知$d_k(x) \mid f_i(x)(i=1,2,\ldots,k)$，从而$d_k(x) \mid r_k(x)$，另一方面，$r_k(x)$作为$f_1(x),f_2(x),\ldots,f_{k-1}(x)$的一个公因式，也必然是$d_{k-1}(x)$的因式，所以$r_k(x) \mid d_{k-1}(x)$，又$r_k(x) \mid f_k(x)$，所以$r_k(x) \mid d_k(x)$，因此$d_k(x)=r_k(x)(i=1,2,\ldots,n)$（不计常数因子）。
+\end{proof}
+
+同样有性质定理
+\begin{theorem}
+  设一组多项式$f_i(x)(i=1,2,\ldots,n)$的最大公因式是$d(x)$，则存在多项式$u_i(x)(i=1,2,\ldots,n)$使得
+  \[ d(x) = \sum_{i=1}^n u_i(x)f_i(x) \]
+\end{theorem}
+
+\begin{proof}[证明]
+  对多项式的个数使用数学归纳法，$n=2$时显然成立，假若对于$n-1$个多项式也成立，则对于$n$个多项式的情形，由前述定理，$d_n(x)=(d_{n-1}(x), f_n(x))$，因而存在多项式$p(x)$和$u_n(x)$使得
+  \[ d_n(x) = p(x)d_{n-1}(x) + u_n(x)f_n(x) \]
+  而根据归纳假设，存在$p_i(x)(i=1,2,\ldots,n-1)$，使得
+  \[ d_{n-1}(x) = \sum_{i=1}^{n-1}p_i(x)f_i(x) \]
+  代入前式即得结论。
+\end{proof}
+
+同样的，有多个项式互素的定义
+\begin{definition}
+  如果一组多项式的最大公因式是1，则称它们\emph{互素}。
+\end{definition}
+
+一组多项式互素与它们两两互素是不同的，两两互素是更强的约束。
+
+\begin{theorem}
+  一组多项式$f_i(x)(i=1,2,\ldots,n)$互素的充分必要条件是存在一组多项式$u_i(x)(i=1,2,\ldots,n)$，使得
+  \[ \sum_{i=1}^n u_i(x)f_i(x) = 1 \]
+\end{theorem}
+证明略。
+
+\subsection{因式分解定理}
+\label{sec:factoring-theorem}
+
+把一个多项式写成它的因式的乘积叫做 \emph{因式分解}.
+
+\begin{definition}
+  如果数域$P$上一个多项式不能被分解成同一数域上的两个比它次数低的多项式的乘积，则称它是一个 \emph{不可约多项式}，或者说该多项式在数域$P$上\emph{不可约}.
+\end{definition}
+
+按定义，不可约多项式的因式只有1与它本身(不考虑常数因子)。
+
+一个多项式是否是不可约多项式与所讨论的数论有关，比如多项式$x^4-4$在有理数域上可以被分解为$(x^2-2)(x^2+2)$，这两个因子都是有理数域上的不可约多项式，但在实数域上可以进一步分解为
+\[ (x-\sqrt{2})(x+\sqrt{2})(x^2+2) \]
+这些因子都是实数域上的不可约多项式，而在复数域上则还能被继续分解为
+\[ (x-\sqrt{2})(x+\sqrt{2})(x-\sqrt{2}i)(x+\sqrt{2}i) \]
+所以，关于一个多项式还能不能被继续分解，只有在指定了数域后才有意义。
+
+不可约多项式在多项式整除理论中的作用，与整数的整除理论中素数的作用类似。
+
+\begin{theorem}
+  设$f(x)$是数域$P$上的不可约多项式，$g(x)$是该数域上的任一多项式，则要么$f(x) \mid g(x)$，要么$(f(x), g(x))=1$.
+\end{theorem}
+
+\begin{proof}[证明]
+  设$d(x) = (f(x), g(x))$，则由于$f(x)$不可约，$d(x)$作为$f(x)$的因式，要么是1，要么便是$f(x)$自身，如果是前者，则$(f(x),g(x))=1$，如果是后者，则$f(x) \mid g(x)$.
+\end{proof}
+
+\begin{inference}
+  设$f(x)$为不可约多项式，如果$f(x) \mid g(x)h(x)$，则$f(x) \mid g(x)$或者$f(x) \mid h(x)$.
+\end{inference}
+
+\begin{proof}[证明]
+  如果$f(x) \mid g(x)$，自然结论成立，若是$f(x)$不能整除$g(x)$，由$f(x)$不可约，则只能$(f(x), g(x))=1$，于是按照\autoref{theorem:f-prime-g-and-f-mid-gh-so-f-mid-h}就有$f(x) \mid h(x)$，即得证。
+\end{proof}
+
+利用数学归纳法，这结论可以推广到多个数的情形
+\begin{inference}
+  如果$f(x)$是不可约多项式，且$f(x) \mid g_1(x)g_2(x) \cdots g_n(x)$，则$f(x)$必定整除诸$g_i(x)$中至少一个。
+\end{inference}
+
+如果一个多项式不是不可约多项式，则它可以表为两个次数较低的多项式之积，若这两个多项式还有不可约的，则再继续进行分解，由于每一次分解都会降低某一因式的次数，所以这个过程不可能无限的进行下去，直到所有因式都成为不可约多项式为止，于是我们得到以下重要的结果
+
+\begin{theorem}[多项式因式分解定理]
+  数域$P$上的任一非零多项式$f(x)$都可以被分解为同一数域上的一些不可约多项式的乘积
+  \[ f(x) = p_1(x)p_2(x) \cdots p_n(x) \]
+  并且此分解在不考虑常数因式及各因式的顺序的情况下是唯一的。
+\end{theorem}
+
+\begin{proof}[证明]
+  先证分解式的存在性，对多项式$f(x)$的次数作归纳，如果$f(x)$的次数为一，结论是显然的，因为一次多项式在任何数域上都是不可约的，假定任何次数小于$n$的多项式都能被分解为一些次数更低的不可约多项式之积，则对于任一次数为$n$的多项式$f(x)$，如果它本身就是不可约的，则结论显然是成立的，如果它不是不可约的，则它能被分解为两个次数低于$n$的因式之积，按照归纳假设，这两个因式都能被分解，于是把这两个因式的分解式合并起来，就得到$f(x)$的分解式。
+
+  再证分解式的唯一性，设$f(x)$同时还有如下的分解
+  \[ f(x) = q_1(x)q_2(x) \cdots q_m(x) \]
+  其中$q_i(x)$都是数域$P$上的不可约多项式，则有
+  \[ p_1(x)p_2(x) \cdots p_n(x) = q_1(x)q_2(x) \cdots q_m(x) \]
+  由于左边每一个$p_i(x)$都能整除右边，而$p_i(x)$不可约，于是必定能整除某个$q_j(x)$，但是$q_j(x)$也是不可约的，所以只能$p_i(x) = c q_j(x)$，即在允许相差一个常数因子的意义下是相等的，于是左边每一个$p_i(x)$都能与右边的某个$q_j(x)$对应上，同理右边每一个$q_i(x)$也能与左边某一个$p_j(x)$对应上，但这还不能说明左右两边是相同的，还必须证明在等式的两边，每一个不可约多项式(相差常数因子的视为相同)重复出现的次数出是一样的。假定某个不可约多项式$h(x)$在左右两边重复出现的次数分别是$s$和$t$，则$h^s(x)$能整除右边，根据\autoref{two-group-polynome-product-prime}知，$h^s(x)$与右边除去$h^t(x)$之外的部分积是互素的，于是必然有$h^s(x) \mid h^t(x)$，同理也有$h^t(x) \mid h^s(x)$，因而只能$s=t$，所以这两个分解式是一样的。
+\end{proof}
+
+在定理的分解式中，把每一个因式的最高次项系数都提出来，然后把相同的因式写成幂的形式，就得到如下的 \emph{标准分解式}:
+\[ f(x)=c p_1^{\alpha_1}(x)p_2^{\alpha_2}(x) \cdots p_n^{\alpha_n}(x), \  \alpha_i>0 (i=1,2,\ldots,n) \]
+
+对于两个多项式，把它们的分解式中出现的因式都并起来，原来并不出现的因式标之以零次幂，则得到如下的表示
+\[ f(x)=c p_1^{\alpha_1}(x)p_2^{\alpha_2}(x) \cdots p_n^{\alpha_n}(x), \  \alpha_i \geqslant 0 (i=1,2,\ldots,n) \]
+和
+\[ g(x)=d p_1^{\beta_1}(x)p_2^{\beta_2}(x) \cdots p_n^{\beta_n}(x), \  \beta_i \geqslant 0 (i=1,2,\ldots,n) \]
+在此基础上，可导出如下一些重要结论:
+
+\begin{theorem}
+  设两个多项式$f(x)$与$g(x)$有如上分解式，则$f(x) \mid g(x)$的充分必要条件是$\alpha_i \leqslant \beta_i(i=1,2,\ldots,n)$.
+\end{theorem}
+
+\begin{proof}[证明]
+  充分性显然，只证必要性，如果$f(x) \mid g(x)$，则$p_i^{\alpha_i}(x) \mid g(x)$，而根据\autoref{two-group-polynome-product-prime}，有$p_i^{\alpha_i}(x)$与$g(x)$分解式中除$p_i^{\beta_i}(x)$以外剩余的部分是互素的，所以$p_i^{\alpha_i}(x) \mid p_i^{\beta_i}(x)$，所以$\alpha_i \leqslant \beta_i$.
+\end{proof}
+
+因为$f(x)$能被它的因式整除，所以由上述定理便得到
+\begin{theorem}
+  设多项式$f(x)$的标准分解式为
+\[ f(x)=c p_1^{\alpha_1}(x)p_2^{\alpha_2}(x) \cdots p_n^{\alpha_n}(x), \  \alpha_i>0 (i=1,2,\ldots,n) \]
+则它的所有因式都具有形式
+\[ d(x)=d p_1^{\beta_1}(x)p_2^{\beta_2}(x) \cdots p_n^{\beta_n}(x), \  0 \leqslant \beta_i \leqslant \alpha_i (i=1,2,\ldots,n) \]
+\end{theorem}
+
+进一步便可得出
+\begin{theorem}
+  设$f(x)$和$g(x)$具有标准分解式
+\[ f(x)=c p_1^{\alpha_1}(x)p_2^{\alpha_2}(x) \cdots p_n^{\alpha_n}(x), \  \alpha_i \geqslant 0 (i=1,2,\ldots,n) \]
+和
+\[ g(x)=d p_1^{\beta_1}(x)p_2^{\beta_2}(x) \cdots p_n^{\beta_n}(x), \  \beta_i \geqslant 0 (i=1,2,\ldots,n) \]
+则它俩的最大公因式是
+\[ d(x)= p_1^{\gamma_1}(x)p_2^{\gamma_2}(x) \cdots p_n^{\gamma_n}(x), \  \gamma_i=\min\{\alpha_i,\beta_i\} (i=1,2,\ldots,n) \]
+\end{theorem}
+
+
+\subsection{重因式}
+\label{sec:mulitple-factor}
+
+\subsection{多项式函数}
+\label{sec:polynome-function}
+
+在此讨论一下有理系数多项式的有理根的问题，因为有理系数多项式方程总可以化为一个整系数多项式方程，所以只要讨论整系数多项式的根就行了，这时我们有以下定理
+\begin{theorem}
+  整系数$n$次多项式
+  \[ a_nx^n+a_{n-1}x^{n-1}+\cdots+a_1x+a_0 \]
+  如果有一个有理根$r/s$($r$、$s$互素)，则$r \mid a_0$，$s \mid a_n$，在最高次项系数$a_n=1$的特殊情况下，它的有理数都只能是整数根，而且这些根都是常数项$a_0$的因数。
+\end{theorem}
+
+\begin{proof}[证明]
+  由条件得
+  \[ a_n \left( \frac{r}{s} \right)^{n} + a_{n-1}\left( \frac{r}{s} \right)^{n-1} + \cdots + a_1 \frac{r}{s} + a_0 = 0 \]
+  整理得
+  \[ a_nr^n + a_{n-1}r^{n-1}s + \cdots + a_1rs^{n-1} + a_0s^n = 0 \]
+  左边除最后一项外都能被$r$整除，所以$r \mid a_0s^{n-1}$，而$r$与$s$互素，所以$r \mid a_0$，同样，左边除第一项外都能被$s$整除，所以$s \mid a_nr^n$，从而$s \mid a_n$.
+\end{proof}
+
+\begin{example}
+  这个定理可以用来证明某些含有根号的数是无理数，只要构造出它所满足的一个整系数方程，并验证它所有可能的有理候选根都不是它的根，或者能够证明这些有理候选根虽然满足方程但是与原先的数并不相等，那么它的根就必然是无理数了。
+
+  例如对于实数$\sqrt[3]{2}$，它满足整系数方程$x^3-2=0$，根据上面的证明，它如果有有理根，则只能在$\pm 1,\pm 2$中候选，但验证可知这些数都不是它的根，所以$\sqrt[3]{2}$必然是无理数。
+
+  又例如$x=\sqrt{2}+\sqrt{3}$，先构造出它满足的一个整系数方程，将其平方得
+  \[ x^2 = 5+2 \sqrt{6} \]
+  于是有
+  \[ (x^2-5)^2 = 24 \]
+  即
+  \[ x^4 -10 x^2 +1 = 0 \]
+  显然，它的有理候选根也只能是$\pm 1$，但$\pm 1$都不满足这方程，所以$\sqrt{2}+\sqrt{3}$也是无理数。
+
+  还可以构造出更复杂的由开方与四则混合运算构成的式子，例如$\sqrt{2}+\sqrt[3]{3}+(\sqrt[4]{4})^2$，但要构造出它所满足的整系数方程就困难了，这里不再深入讨论这个问题了(因为我还没研究过这个)。
+
+  但这个方法在面对像 $\pi$、$\mathrm{e}$这样的数时就失效了，在代数学中已经证明了，这两个数是\emph{超越数}，也就是不可能有某个有理系数的多项式方程以它为根，而像前面那些能够满足某个有理系数多项式方程的数，就称为\emph{代数数}，所以这个方法只对代数数有效。显然，超越数都是无理数，因为有理数必定是代数数。
+\end{example}
+
+\subsection{对称多项式}
+\label{sec:symmetrical-polynome}
+
+
+
+\subsection{插值多项式}
+\label{sec:interpolation-polynome}
+
+
+\subsection{切比雪夫多项式}
+\label{sec:chebyshev-polynome}
+
+我们知道余弦的二倍角公式和三倍角公式
+\begin{eqnarray*}
+  \cos{2\theta} & = & 2\cos^2{\theta}-1 \\
+  \cos{3\theta} & = & 4\cos^3{\theta}-3\cos{\theta}
+\end{eqnarray*}
+于是$\cos{3\theta}$和$\cos{4\theta}$分别表成了$\cos{\theta}$的二次多项式和三次多项式，那么对于一般形式的$\cos{n\theta}$，情况又如何呢?
+
+由和差化积公式可得
+\[ \cos{(n+1)\theta}+\cos{(n-1)\theta}=2\cos{n\theta}\cos{\theta} \]
+所以
+\[ \cos{(n+1)\theta}=2\cos{n\theta}\cos{\theta}-\cos{(n-1)\theta} \]
+假如$\cos{n\theta}$和$\cos{(n-1)\theta}$分别是$\cos{\theta}$的$n$次多项式和$n-1$次多项式，那么$\cos{(n+1)\theta}$显然也是$\cos{\theta}$的一个次数不超过$n+1$的多项式，而易见最高次系数$a_n$满足递归关系$a_{n+1}=2a_n$，而$a_2=2,a_3=4$，所以$a_n=2^{n-1}$，最高次项系数恒正，从而$\cos{(n+1)\theta}$表成了$\cos{\theta}$的$n+1$次多项式。这结果就是如下的定理:
+
+\begin{theorem}
+  对于任意正整数$n$，$\cos{n\theta}$可表为$\cos{\theta}$的$n$次多项式，这多项式的最高次项系数是$2^{n-1}$，这多项式称为\emph{第一类切比雪夫(Chebyshev)多项式}。
+\end{theorem}
+
+第一类切比雪零头多项式以$T_n(x)$标记，按定义有$\cos{n\theta}=T_n(\cos{\theta})$。
+
+容易得$T_0(x)=1,T_1(x)=x$并有如下递推式
+\begin{equation}
+  \label{eq:first-chebyshev-polynome-recursion}
+  T_{n+1}(x)=2xT_n(x)-T_{n-1}(x)
+\end{equation}
+当然也可以用这个递归式来定义第一类切比雪夫多项式，只是少了三角函数的背景，成了为了定义而定义了。
+
+前几个多项式是如下的表:
+\begin{eqnarray*}
+  T_0(x) & = & 1 \\
+  T_1(x) & = & x \\
+  T_2(x) & = & 2x^2-1 \\
+  T_3(x) & = & 4x^3-3x \\
+  T_4(x) & = & 8x^4-4x^2+1 \\
+  T_5(x) & = & 16x^5-20x^3+5x \\
+  T_6(x) & = & 32x^6-48x^4+18x^2-1
+\end{eqnarray*}
+
+在讨论这些多项式的性质之前，我们再从另外一个角度来引导出第一类切比雪夫多项式。由复数的乘幂公式，复数$z=r(\cos{\theta}+i\sin{\theta})$的乘方是
+\begin{equation*}
+  z^n=[r(\cos{\theta}+i\sin{\theta})]^n = r^n(\cos{n\theta}+i\sin{n\theta})
+\end{equation*}
+在上式中将$\theta$换成$-\theta$得
+\begin{equation*}
+  [r(\cos{\theta}-i\sin{\theta})]^n = r^n(\cos{n\theta}-i\sin{n\theta})
+\end{equation*}
+两式相加，并按二项式定理将左边展开，所有求和指标为奇数的项都被消去，得
+\begin{eqnarray*}
+  \cos{n\theta} & = & \sum_{0 \leqslant i \leqslant n/2}C_n^{2i}(-1)^i\cos^{n-2i}{\theta}\sin^{2i}{\theta} \\
+  & = & \sum_{0 \leqslant i \leqslant n/2}C_n^{2i}(-1)^i\cos^{n-2i}{\theta}(1-\cos^2{\theta})^i \\
+\end{eqnarray*}
+上式中右边每一项都是$\cos{\theta}$的$n$次多项式，所有最高次项的系数和是$C_n^0+C_n^2+C_n^4+\cdots$，这是对上标为偶数的二次项系数求和，由组合数性质，这个和是$2^{n-1}$，于是$\cos{n\theta}$就是$\cos{\theta}$的$n$次多项式，最高次项系数是$2^{n-1}$，这样也引出了第一类的切比雪夫多项式，还得出了它的具体表达式:
+\begin{equation*}
+  T_n(x) = \sum_{0 \leqslant i \leqslant n/2}C_n^{2i}(-1)^ix^{n-2i}(1-x^2)^{i}
+\end{equation*}
+
+以下我们来推证这些多项式的一些性质，我们先由公式$\cos{n\theta}=T_n(\cos{\theta})$得出结论，再尝试利用递推关系来加以证明。
+
+\begin{property}
+  对于任意满足$|x|\leqslant 1$的实数$x$，都有$|T_n(x)| \leqslant 1$.
+\end{property}
+
+第一类切比雪夫多项式刻画的是$\cos{n\theta}$展开为$\cos{\theta}$的多项式，那么正弦的情况又如何呢，还是先观察一下二倍角公式和三倍角公式
+\begin{eqnarray*}
+  \sin{2\theta} & = & 2\sin{\theta}\cos{\theta} \\
+  \sin{3\theta} & = & 3\sin{\theta}-4\sin^3{\theta}
+\end{eqnarray*}
+不难发现，$\sin{n\theta}$无法表示为$\sin{\theta}$的多项式，但是$\sin{n\theta}$似乎可以表达为$\sin{\theta}$与一个关于$\cos{\theta}$的多项式的乘积，也就是说，$\sin{n\theta}/\sin{\theta}$可表为$\cos{\theta}$的多项式。那么对于一般情况，仍然由和差化积
+\begin{equation*}
+  \sin{(n+1)\theta}=2\sin{n\theta}\cos{\theta}-\sin{(n-1)\theta}
+\end{equation*}
+可见，$\sin{(n+1)\theta}$也能表为$\sin{\theta}$与一个关于$\cos{\theta}$的$n$次多项式之积，于是得到
+\begin{theorem}
+  对于任意正整数$n$，$\sin{(n+1)\theta}/\sin{\theta}$可表为一个关于$\cos{\theta}$的$n$次多项式，其最高次项系数是$2^n$，这多项式称为\emph{第二类切比雪夫多项式}。
+\end{theorem}
+
+仍然有递推公式$U_0(x)=1, U_1(x)=2x$和
+\begin{equation*}
+  U_{n+1}(x)=2xU_n(x)-U_{n-1}(x)
+\end{equation*}
+可以发现，两类切比雪夫多项的递推公式是相同的，不同的是两个初始值。
+
+第二类切比雪夫多项式以$U_n(x)$标记，有
+\begin{equation*}
+  \frac{\sin{(n+1)\theta}}{\sin{\theta}} = U_n(\cos{\theta})
+\end{equation*}
+
+同样利用复数的乘方公式，可以得到第二类切比雪夫多项式的具体表达:
+\begin{equation*}
+  U_n(x) = \sum_{0 \leqslant 2i+1 \leqslant n+1}(-1)^iC_{n+1}^{2i+1}x^{n-2i}(1-x^2)^{i}
+\end{equation*}
+其最高次项系数是$C_{n+1}^1+C_{n+1}^3+C_{n+1}^5+\cdots=2^n$。
+
+前几个多项式是
+\begin{eqnarray*}
+  U_0(x) & = & 1 \\
+  U_1(x) & = & 2x \\
+  U_2(x) & = & 4x^2-1 \\
+  U_3(x) & = & 8x^3-4x \\
+  U_4(x) & = & 16x^4-12x^2+1 \\
+  U_5(x) & = & 32x^5-32x^3+6x \\
+  U_6(x) & = & 64x^6-80x^4+24x^2-1
+\end{eqnarray*}
+
+由三角关系，不难推得两类切比雪夫多项式的一些关系式
+\begin{property}
+  两类切比雪夫多项式间满足如下一些关系式:
+  \begin{eqnarray*}
+    T_n^2(x)+(1-x^2)U_{n-1}^2(x) & = & 1 \\
+    T_n(x)+\sqrt{x^2-1}U_{n-1}(x) & = & (x+\sqrt{x^2-1})^n
+  \end{eqnarray*}
+\end{property}
+
+两类多项式还有以下的双重递归:
+\begin{eqnarray*}
+  T_{n+1}(x) & = & xT_n(x)-(1-x^2)U_{n-1}(x) \\
+  U_n(x) & = & xU_{n-1}(x)+T_n(x)
+\end{eqnarray*}
+初始值$T_0(x)=1, U_{-1}(x)=1$，这由余弦和正弦的和角公式便可得出。
+
+在高等数学中，切比雪夫多项是一类正交多项，可以利用它们来逼近函数和曲线，如同泰勒多项式中$1,x,x^2\cdots$的地位一样，不过这不在本书讨论范围。
+
+下面来讨论切比雪夫多项式的根，对于第一类，因为$T_n(\cos{\theta})=\cos{n\theta}$，所以$T_n(x)$的全部根是
+\begin{equation*}
+  x_i=\cos{\frac{2i-1}{2n}\pi}, \  i=1,2,\ldots,n
+\end{equation*}
+同样，$U_n(x)$的全部根是
+\begin{equation*}
+  x_i=\cos{\frac{i}{n+1}\pi}, \  i=1,2,\ldots,n
+\end{equation*}
+显然这些根全部都在区间$[-1,1]$上。
+
+
+
+\subsection{题选}
+\label{sec:exercises-for-polynome}
+
+
+\begin{exercise}
+  (台湾台南吴政哲)已知$a$、$b$、$c$是三次方程$x^3+2x^2+3x+4=0$的三个复根，求表达式$\dfrac{a}{b}+\dfrac{b}{c}+\dfrac{c}{a}$的值.
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4850}]
+
+\exerciseSolvedDate[2017-09-05]
+
+\begin{proof}[解答]
+  一眼看上去容易想到对称多项式和根与系数的关系，但是
+  \[ \frac{a}{b}+\frac{b}{c}+\frac{c}{a} = \frac{ab^2+bc^2+ca^2}{abc} \]
+  分子并不是对称多项式，仅仅是轮换多项式，记$M=ab^2+bc^2+ca^2$，再记其对偶式$N=a^2b+b^2c+c^2a$，可以验证$M+N$、$MN$都是对称多项式
+  \begin{eqnarray*}
+    M+N & = & (ab^2+bc^2+ca^2) + (a^2b+b^2c+c^2a) \\
+    & = & \frac{1}{3}(a+b+c)^3-\frac{1}{3}(a^3+b^3+c^3)-2abc
+  \end{eqnarray*}
+  \begin{eqnarray*}
+    MN & = &(ab^2+bc^2+ca^2)(a^2b+b^2c+c^2a) \\
+    & = & abc(a^3+b^3+c^3)+(a^3b^3+b^3c^3+c^3a^3)+3a^2b^2c^2
+  \end{eqnarray*}
+  因此，$M+N$和$MN$都可以利用根与系数的关系求出，从而$M$可求出，但结果应该是两个值。
+\end{proof}
+
+\begin{exercise}
+  已知整系数四次方程$x^4+ax^3+bx^2+cx+d=0$的一个根是$1+\sqrt{2}+\sqrt{3}$，求常数项$d$的值.
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4866}]
+
+\exerciseSolvedDate[2017-09-18]
+
+\begin{proof}[解答]
+记$\alpha=1+\sqrt{2}+\sqrt{3}$，则
+\[ (\alpha-1)^2=(\sqrt{2}+\sqrt{3})^2=5+2\sqrt{6} \]
+所以$((\alpha-1)^2-5)^2=24$，即
+\[ \alpha^4-4\alpha^3-4\alpha^2+16\alpha-8=0 \]
+这就是$\alpha$所满足的一个四次方程，接下来就是讨论下这个方程与题目中的四次方程有什么样的关系，因为$\alpha$有两个根号，所以猜测这两个方程的系数对应成比例，也就是说是同一个方程，为了说明这一点，先来证明$\alpha$不可能是一个次数低于四并具有有理系数的方程的根，反证法，假如$\alpha$满足下面的有理系数方程
+\[ ax^3+bx^2+cx+d=0 \]
+那么作平移替换$x \to x+\frac{b}{3a}$ 后即可消去其中的二次项，成为
+\[ ax^3+cx+d=0 \]
+注意现在的系数已经不再是之前的系数了，但仍然是有理数，且在这平移下，$\alpha$被变换为$p+q\sqrt{2}+r\sqrt{3}$的形式(其中$p$，$q$，$r$都是有理数)，并不影响接下来的过程。
+
+将$\alpha=p+q\sqrt{2}+r\sqrt{3}$代入上述方程，可知左边三次方展开后会出现$\sqrt{6}$的无理项，且这一项无法在后面得到抵消，所以只能让这一项的系数等于零，从而就有$a=0$，即变为一次方程，但是有理系数的一次方程是不可能有无理根的，所以这就证明了，$\alpha$不可能是一个次数低于四次的有理系数方程的根。
+
+有了这一点就可以证明一开头构造的四次方程与题目中方程必然是系数成比例的了，因为若不然的话，将两个方程的最高次项系数配成相同后相减，则得出一个次数低于四次的有理系数方程，而且$\alpha$必然是这个方程的解，这与前面已经证明的结论相矛盾。
+
+于是最终的结果是，两个方程系数成比例，所以$d=-8$.
+\end{proof}
+
+\begin{exerciseAdditional}
+1. 这个题目的背景就是根式的最小多项式问题，即对于一个给定的根式组合$\alpha=a_1\sqrt[m_1]{r_1}+a_2\sqrt[m_2]{r_2}+\cdots+a_n\sqrt[m_n]{r_n}$，其中$r_i$是互不相同的整数且都没有平方因子，求一个次数最小的有理系数多项式，使它以$\alpha$为其一根，这多项式称为这个根式组合的最小多项式，它的次数也称为这个根式组合的次数，上面这个解答过程其实就是证明了，对于含有两个二次根号的情况$\alpha=a_1\sqrt{r_1}+a_2\sqrt{r_2}$，它的最小多项式是四次的。
+
+2. 解答过程中用了一个结论，即如果表达式$a_1\sqrt{r_1}+a_2\sqrt{r_2}+\cdots+a_n\sqrt{r_n}$(约定同上，但全部限定为二次根式)为有理数，则根式的系数全部为零，换句话说，这表达式的系数若不全为零，则它一定是无理数，这个结论的本质是说，一个最简底数的二次根式是无法用别的最简二次根式的线性组合来表达的。这结论的证明暂没想到，可能需要用到抽象代数的内容。
+\end{exerciseAdditional}
+
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../elementary-math-note"
+%%% End:

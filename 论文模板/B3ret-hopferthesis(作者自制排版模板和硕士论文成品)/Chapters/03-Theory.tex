@@ -1,0 +1,925 @@
+
+
+
+%************************************************
+\chapter{Theory}
+\label{chp:theory}
+%************************************************
+\quotegraffito{If you think it's simple, then you have misunderstood the problem.}
+{Bjarne Stroustrup}% (lecture at Temple U., 11/25/97) 
+%
+%"That's all well and good in practice, but how does it work in theory?"
+%Shmuel Weinberger (MSRI, 9/5/06) 
+
+The review of existing work showed that existing solutions for vector field clustering suffer from at least one of the following problems:
+%
+\begin{enumerate}
+%
+	\item The algorithmic decisions are simple, greedy, and local, which leads to suboptimal results.%Simple clustering schemes like region growing or region splitting make greedy and local decisions. For complex datasets, like underhood flow datasets, this is not expected to lead to satisfactory results.
+%
+	\item The algorithm optimizes globally, but potentially creates disconnected clusters for all meaningful distance functions.
+%
+	\item The algorithm requires high computational effort.
+%
+\end{enumerate}
+
+
+The aim of this thesis is therefore to propose and evaluate a new method which avoids the first two problems, while still requiring only moderate computational effort. The core method investigated in this thesis is \emph{streamline bundling}. In addition applicability of the best candidate of existing methods, namely \cauthor{McKenzie} clustering, is evaluated.
+
+Instead of describing the core method right away, the theory behind the algorithmic components will be presented in the order of processing. After introducing the mathematical notation, an overview of the processing framework is given. It is then followed by the theoretic background for each of the individual processing blocks. This approach provides a natural structure for the remaining chapter and allows to easily match the contents of the theory and the implementation chapters.
+
+
+%===================================================================================
+\section{Mathematical notation}
+
+In the previous chapter, the mathematical notation of related work was retained closely to the original. For the remaining work however, consistent notation will be used.
+
+\graffito{This notation is employed to enable usage of standard labels and letters without creating too much confusion.}
+For \emph{mesh entities} the usual mathematical font will be used: $d_i$ for points, $c_i$ for cells, and $f_{i,j}$ for cell faces. Sets of these entities will be typeset using calligraphic font, \eg, $\mathcal{R}_i$ for sets of cells (regions) and $\mathcal{I}_{i,j}$ for sets of cell faces (interfaces). Bold letters depict vectors.
+
+For \emph{graph entities} typewriter font will be used: $\mathtt{v_i}$ for vertices, $\mathtt{e_{i,j}}$ for edges, and $\mathtt{G(V, E)}$ for a whole graph and its vertex and edge set.
+
+\hspace{0pt}\graffito{$\vec{v}(\mathtt{v_i})$ is the velocity at graph vertex $\mathtt{v_i}$ and $\vec{v}(d_i)$ is the velocity at mesh point $d_i$.}
+%
+All mesh and graph entities can feature attached values, \eg, the velocity at a mesh point, the volume of a mesh region or the volume flow rate along a graph edge. For these attached values, \emph{function notation} will be used, \eg, $\vec{v}(.)$ is the velocity of an element, $\vec{x}(.)$ is its position, and $p(.)$ is its pressure. Notice that many functions apply to both mesh entities and graph entities. The actual meaning of different functions will be explained right before usage.
+
+
+%===================================================================================
+\section{Processing framework overview}
+
+\quotegraffito{Though this be madness, yet there is method in it.}
+{William Shakespeare}
+%
+To derive flow graphs from \ac{CFD} flow fields, several algorithmic steps have to be performed. Some algorithmic steps are interchangeable, other can be omitted. \autoref{fig:theory:intro} shows an overview of all important algorithmic steps for this thesis.
+
+\bigfigure[pos=tbhp,
+           %opt={width=8.25cm},
+           label={fig:theory:intro},
+           shortcaption={Processing framework overview.}]
+{theo-framework-overview}
+{Overview of the important processing modules for this thesis. The global view consists of four stages (blue rectangles and text). These stages contain processing blocks (black rectangles and text) and intermediate data (maroon text). Any path from top to bottom is valid, \ie, some of the processing block groups are interchangeable with others. The possible paths differ in processing time and quality of the results. Two applications of flow graphs are considered, firstly visualization and exploration and secondly the generation of resistance graphs. Some paths are better suited for visualization, while others are better suited for producing resistance graphs.}
+
+The chart is divided into four major stages (blue rectangles and text).
+In the \emph{preprocessing stage}, the deficiencies of the input data are removed and it is prepared for further processing.
+In the \emph{partitioning stage} the input data is partitioned into similar regions by one out of three processing options: Streamline bundling, \cauthor{McKenzie} clustering, or \kMeans clustering.
+The \emph{graph mapping stage} replaces these regions by single vertices within a flow graph. The according edge data and vertex data is created by discrete integration over the regions and their boundaries. One exception of this workflow is the direct computation of approximate flow graphs from the result of streamline bundling.
+Ideally, the resulting flow graph describes the flow well enough to be utilized in an \emph{application stage}.
+
+On a finer level, the figure consists of processing blocks (black rectangles with text) and intermediate data (maroon text).
+%Some of the processing blocks where re-used from existing frameworks (\eg, Streamtracing), some of the processing blocks where re-implemented (\eg, \cauthor{McKenzie} clustering) and some processing blocks where designed from scratch (\eg, Streamline clustering). The ``Reverse simulation'' block was not implemented at all.
+The arrows depict data flow and show that several paths of processing are possible through the graph. The ``Graph collapse'' block is optional (black dashed) and can be omitted. Any path from the input (top) to one of the application blocks (bottom) describes a valid processing chain. The possible chains differ in required computational effort and in the quality of the results.
+
+
+%===================================================================================
+\section{Preprocessing overview}
+\label{sec:theory:preprocessing}
+
+When importing \ac{CFD} data, or any complex data set for that matter, care has to be taken about data inconsistencies and incompatibilities. The occurring problems depend on the import\slash export functionality of the used programs, \ie, the tasks of the preprocessing step depend on the employed software.
+
+The \toyotadataset was generated by a \cauthor{AnsysFluent}~\cite{AnsysFluent} simulation and post-processed using the \cauthor{EnSight}~\cite{EnSight} software package.
+The dataset shows two major problems after loaded into \vtk~\cite{VTK}:
+%
+\begin{description}
+%
+  \item[Inconsistent Normals:] The point order of some of the cells is wrong. Therefore the surface normals are pointing inwards for some cells and outwards for others.
+%
+  \item[Outer Geometry:] The dataset contains a thin layer of extra cells which are outside of the actual car.
+%
+\end{description}
+
+The simple problem of inconsistent surface normals is completely treated in the implementation chapter (\autoref{sec:impl:surface-normals}). The outside geometry problem is more difficult and will be introduced here.
+
+
+%===================================================================================
+\subsection{Undesired outside geometry}
+\label{sec:theory:undesired-geometry}
+
+\quotegraffito{
+  \raggedright
+  \hspace{0pt}\emph{Lisa:}  The basis of this game seems to be simple geometry.  All you have to do is hit the ball \dots~here.\\
+(The ball is hit, gets bounced around, and goes into the hole.)
+
+	\vspace{0.25\baselineskip}
+	\emph{Bart:} I can't believe it.  You've actually found a practical use for geometry!}
+{The Simpsons}
+%
+
+The \toyotadataset was cut out from a complete \ac{CFD} simulation box which simulated the inside and the outside of the car together. This cutting process left some outside geometry attached to the dataset.
+
+\autoref{fig:theory:outside-geometry} demonstrates this situation. The left image shows the \toyotadataset from the back left side with the magnitude of velocity encoded by color. The high velocity areas at the surface of the hood (green) are undesired cells lying outside of the car. Dark blue areas represent the low velocity right next to inside surfaces of the vehicle hull.
+
+\bigdoublefigure[	pos=tbhp,
+                  mainlabel={fig:theory:outside-geometry},
+                  maincaption={Undesired cells lying outside of the car. The left image shows an outside view of the unaltered \toyotadataset colored by velocity magnitude. The greenish cells are outside of the vehicle hull and need to be removed, whereas dark blue cells are inside the car and need to be kept. The right bottom image shows the close-up view of a cut through the car. The outside cells (top) and inside cells (bottom) are separated by a cell-free zone -- the metal of the car hood. The top right image shows the smooth, post-processed dataset for comparison.},
+                  mainshortcaption={Undesired outside geometry.},%
+                  %leftopt={},%width=0.45\textwidth},
+                  leftlabel={fig:theory:outside-geometry-big},
+                  %leftcaption={},
+                  %leftshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  rightlabel={fig:theory:outside-geometry-close},
+                  %rightcaption={},
+                  %rightshortcaption={},
+                  %spacing={\hfill}
+                 ]
+{theo-outside-geometry-big}
+{theo-outside-geometry-combined}
+
+The right bottom image shows a zoomed view of a longitudinal cut through the car. The cell-free space separating inside and outside geometry was filled by the metal of the car hood during \ac{CFD} simulation. Outside and inside cells are therefore only connected at holes in the vehicle hull (\ie, air inlets and outlets). At the top right, the dataset is shown without any outside geometry. All surface areas are smooth and blue, except of real interfaces to the outside.
+
+The three main reasons outside geometry needs to be removed are:
+\begin{enumerate}
+  \item It makes the task of automatically finding air inlets and outlets difficult.\footnote{If outside geometry is removed, inlet and outlet surface tiles can easily be identified by thresholding the angle between flow direction and surface normal. This is also illustrated by \autoref{fig:theory:outside-geometry}, where inlets and outlets correspond to the non-blue regions in the top right image.}
+  
+  \item It potentially wastes clusters for outside geometry or makes border clusters inaccurate if they contain outside geometry.
+  
+  \item It makes volume flow statistics over the dataset imprecise (\eg, total input flow and output flow).
+\end{enumerate}
+
+For separating the outside from the inside cells, a criterion differentiating them is required. Two observations and the resulting algorithmic ideas for removing outside cells will be discussed.
+
+The first observation is that undesired regions are rough at the surface, whereas desired regions are flat at the surface. This leads to a \emph{region growing} approach starting from exposed cells.
+
+The second observation is that undesired regions are thin and contain mainly stacked hexahedra and wedges. This motivates a \emph{depth probing} approach.
+
+Details of these two approaches will be presented in \autoref{sec:impl:undesired-geometry}.
+
+
+%===================================================================================
+\section{Partitioning}
+\label{sec:theory:partitioning}
+
+The partitioning phase takes the cleaned input mesh from the preprocessing phase and outputs a partition of this input mesh.
+
+In \autoref{fig:theory:intro} three alternative approaches to partitioning can be identified.
+The theory for \cauthor{McKenzie} clustering (middle) was already treated in \autoref{sec:related:McKenzie}.
+\kMeans clustering (right) was already treated in \autoref{sec:related:kMeans}. Several distance functions for \kMeans are possible, a good candidate is the distance function described for \ac{CVT} in \autoref{sec:related:CVT} (\autoref{eqn:related:CVT-distance}).
+
+The leftmost partitioning option of \autoref{fig:theory:intro} is the core matter of this thesis and consists of four processing blocks:
+\begin{enumerate}
+  \item During the \emph{seeding} phase seed points are selected from the mesh.
+  
+  \item These seed points are used as starting points for tracing dense streamlines in the \emph{stream tracing} phase.
+  
+  \item \emph{Streamline bundling} finds bundles of similar streamline segments.
+  
+  \item These bundles are then mapped back to the cells of the \threed mesh to obtain the final partition during the \emph{map bundles to regions} phase.
+\end{enumerate}
+
+The following sections will describe these processing blocks in detail.
+
+
+%===================================================================================
+\subsection{Seeding}
+
+A streamline is the simulated path of a massless particle through a flow-field and therefore a curve in \threed. To perform this simulation an initial starting point for this particle needs to be defined. These points are called \emph{seed points} and the process of choosing them is referred to as \emph{seeding}.
+
+In usual visualization applications the goal for seeding is to capture the flow with as few expressive streamlines as possible. Therefore great effort has been put into designing sophisticated seeding algorithms. \cauthor{McLoughlin} provides an excellent overview~\cite{McLoughlin}.
+
+For this application however the requirement is to cover the \threed dataset densely, without leaving regions uncovered by streamlines. On the other hand, generating too many streamlines increases the quality of the result, but at the cost of higher computational effort, especially during streamline bundling.
+Another important point is that for car cooling applications, the regions near the inlets of the dataset are of special importance. This is because the cooling components are placed there and the velocities are usually high and the flow turbulent. Two simple seeding strategies for generating feasible results are \emph{random seeding} and \emph{interface seeding}.
+
+Random seeding simply picks random points from all available grid points.
+
+Interface seeding picks points only at the inlets and outlets of the dataset. This aims to capture the regions near these interfaces for the mentioned reasons. For identifying grid points at inlets and outlets, the angle between velocity vector and surface normal vector is thresholded. At inlets and outlets, the angle is high, whereas at other surface areas the air flows along the vehicle hull, hence the angle is small. Of all identified surface points the required number of points is randomly chosen.
+
+A good strategy is to apply hybrid seeding, which combines the results of both strategies. Interface seeding ensures that regions near the interfaces are covered very well, whereas random seeding ensures adequate coverage of other areas.
+
+\autoref{fig:theory:seeding} shows the result of hybrid seeding as well as the sub-results of random and interface seeding for the \toyotadataset.
+
+\normfigure[	pos=tbhp,
+						label={fig:theory:seeding},
+						shortcaption={Seeding result.}
+						%opt={}
+					]
+{theo-seeding}
+{Result of hybrid seeding for the \toyotadataset. The blue points are derived by random seeding whereas the red points are derived by interface seeding.}
+
+
+%===================================================================================
+\subsection{Stream tracing}
+\label{sec:theory:stream_tracing}
+
+Stream tracing is the process of generating streamlines from seed points. This is achieved by integration of the displacement in the vector field. The displacement is given by~\cite{McLoughlin}
+%
+\begin{equation}
+  d\vec{x} = \vec{v}\, dt.
+\end{equation}
+%
+The position $\vec{x}$ after time $t$ of a particle is given by
+\begin{equation}
+  \vec{x}(t, \vec{x_0}(d)) = \int_0^t\vec{v}(\tau)\, d\tau,
+\end{equation}
+
+if it started at position $\vec{x_0}(d)$ in point $d$ at $t=0$.
+
+For discrete vector fields this integral is computed numerically. In the simplest case, the particle is iteratively moved a small distance (\emph{step size}) according to the velocity at the current point (Euler Scheme). To obtain velocity vectors for arbitrary points an interpolation scheme, \eg, trilinear interpolation, is required. Usually higher order integration methods are employed to increase accuracy (\eg, Runge-Kutta methods).
+
+From an information processing standpoint, dense stream tracing can be seen as a kind of subsampling, as the streamlines preserve the essential features of the vector field around them.
+
+\autoref{fig:theory:streamtracing} shows a typical result of dense stream tracing. The tubes around the streamlines are added for illustrational purposes. Notice the subsampling characteristic: In this example, the dataset consists of \num{2970} streamlines connecting \num{500503} points. The input dataset -- the preprocessed \toyotadataset -- contained \num{7.88} million points.
+By improving the seeding strategy the number of streamlines could be further reduced, as currently many regions are sampled too densely. See \autoref{sec:futur} for improvement ideas.
+
+\bigfigure[	pos=tbhp,
+						%opt={},
+						shortcaption={Stream tracing result.},
+						label={fig:theory:streamtracing},
+				  ]
+{theo-streamtracing-velocitycolor}
+{Result of dense stream tracing of the \toyotadataset at \SI{190}{\kmh}. Each streamline is represented by one tube. The color encodes velocity magnitude.}
+
+
+%===================================================================================
+\subsection{Streamline bundling}
+\label{sec:theory:streamline-bundling}
+
+Looking at \autoref{fig:theory:streamtracing}, identifying clusters with similar flow can be described as a bundling problem. The goal is to \emph{find bundles of streamline segments which are parallel and close to each other}.
+
+A useful analogy for this problem is the placement of cable ties. What is a good method to organize a dense pack of cables using cable ties?
+
+
+%===================================================================================
+\subsubsection{Utility of streamline distance measures}
+
+\quotegraffito{For every problem, there is one solution which is simple, neat, and wrong.}
+{H.~L.~Mencken}% (1880-1956) 
+%
+Streamline clustering from medical applications as described in \autoref{sec:related:medical} is hard to apply to this problem, as bundles of streamline segments are sought after, instead of bundles of whole streamlines.
+
+
+The similarity measures for whole streamlines could be applied to streamline segments too, but there is no simple way of aligning these segments. Imagine two streamlines which start at the same inlet, curve around different sides of the motor and meet again at an outlet. Segments of both streamlines can probably be put into the same streamline segment bundle at the outlet, but how to derive the segments (defined by starting point, end point) that should be compared using the distance measure? The only similarity in this case is spatial closeness. The distances along the curves and even the distances between curve points however, can differ considerably.
+
+Therefore streamline distance measures and clustering methods can only be applied if the segments are already known. This, however, is part of the solution. Notice that the streamline distance measures could be used to evaluate the quality of the resulting bundles. This idea was not adopted for this thesis, as evaluation was performed at a later stage, directly on the mesh partition.
+
+
+%===================================================================================
+\subsubsection{Streamline bundling idea}
+\label{sec:theory:streamline-bundling-idea}
+
+Instead of overcoming the difficulties of adapting existing, distance based solutions to the clustering of streamline segments, this work suggests a geometrically driven method for streamline segment bundling. The main idea is illustrated in \autoref{fig:theory:streamline-bundling-3d}.
+
+\normdoublefigure[pos=tbhp,
+                  mainlabel={fig:theory:streamline-bundling-3d},
+                  maincaption={The basic principle of streamline bundling.
+Starting from a \emph{prototype streamline} with known position and orientation (blue), an orthogonal sweep plane (black) is intersected with all streamlines, the {\em initial slice}~\subref{fig:theory:streamline-bundling-3d-init}. The sweep plane is moved along the prototype performing repeated \emph{incremental slices} at each point of the prototype~\subref{fig:theory:streamline-bundling-3d-incr}. Finally, streamlines that are similar to the prototype in all slices, the \emph{mates}, are grouped together to form a \emph{bundle}.},
+%                 Beginning at a starting point on a \emph{prototype streamline} (blue) nearby streamlines are intersected using a perpendicular sweep plane (black quad). This is called the \emph{initial slice}~ \subref{fig:theory:streamline-bundling-3d-init}. Similar streamlines can be found in \emph{incremental slices} which are performed in both directions along the prototype~\subref{fig:theory:streamline-bundling-3d-incr}. Streamlines which can be found in all of these slices yield a \emph{streamline bundle} (maroon).},
+                  mainshortcaption={Basic principle of streamline bundling.},%
+                  %leftopt={},
+                  leftlabel={fig:theory:streamline-bundling-3d-init},
+                  leftcaption={Initial slice.},
+                  %leftshortcaption={},%
+                  %rightopt={},
+                  rightlabel={fig:theory:streamline-bundling-3d-incr},
+                  rightcaption={Incremental slices.},
+                  %rightshortcaption={},
+                  %spacing={}
+                 ]
+{theo-streamline-bundling-3d-init}
+{theo-streamline-bundling-3d-incr}
+
+Repeated intersections of a sweep plane and nearby streamlines are performed along a \emph{prototype streamline}. The result of one intersection of the sweep plane with nearby streamlines is called a \emph{slice}. Starting with an initial slice, locally similar streamlines (\emph{mates}) will be intersected by several slices in both directions along the prototype. Streamlines which are part of all of these slices are part of the resulting \emph{streamline bundle}.
+
+
+%===================================================================================
+\subsubsection{Streamline bundling problems}
+
+The idea for streamline bundling presented in the previous section is simple, but additional effort is required to solve the following detail issues:
+%
+\begin{description}
+%
+  \item[Prototype selection and processing:] How are prototype streamlines and starting points selected and in which order should they be processed?
+%
+  \item[Streamline similarity:] What are ``nearby streamlines'' and how is the similarity of sliced streamlines defined?
+%
+  \item[Stopping criterion:] Moving the sweep plane farther along the prototype creates longer bundles, but fewer mates will be part of this bundle. When should the sweep plane stop?
+%
+  \item[Bundle collision strategy:] How to proceed if identified bundles collide with each other, \ie, if the current bundle grows into an existing one?
+%
+\end{description}
+
+The following sections will discuss these issues and their proposed solutions.
+
+
+%===================================================================================
+\subsubsection{Prototype selection and processing}
+\label{sec:theory:prototype-selection}
+
+Notice that prototype selection is merely the selection of discrete points along the streamlines. Stream tracing ensures that no point is used for more than one streamline; therefore selecting a point also selects a unique streamline.
+
+An ideal prototype selection scheme would select prototype points that lead to large bundles first, followed by prototypes which lead to smaller and smaller bundles until the whole dataset is covered by bundles. Several schemes to approximate this ideal goal are possible.
+
+A simple but effective scheme is \emph{subsampling}. For every $n$\textsuperscript{th} point on every streamline an initial slice is performed (\eg, $n=20$). The number of intersected, similar streamlines is used as an estimator for the number of mates in the final bundle. Each subsampled point has therefore an assigned \emph{rating}, with all other points having a rating of zero. The scheme is then to start streamline bundling from these points in order of their rating, starting with the highest rated points until all points are processed. This scheme requires only simple bundle collision strategies, as existing bundles are expected to be larger than new ones.
+
+A related scheme is \emph{spherical voting}. The principle is similar to the one above, namely assigning a rating to each point and processing the points in decreasing rating order. The difference lies in the generation of these ratings. Instead of explicitly computing a full slice for some points, every point is visited once and votes for nearby, similar points, thereby increasing their rating. After voting, every point has a rating according to the density of similar points around it. ``Nearby points'' are determined by a sphere of pre-specified radius. Points lying within this sphere can be efficiently computed using $kd$-trees. The similarity of points is specified by the values attached to these points, \eg, the velocities. The advantage of this method is that every point gets a rating, instead of only a few subsampled ones. The approximation of good prototypes by point density however, does not produce satisfactory results. This selection strategy is therefore only included for completeness.
+
+Another possible scheme is \emph{random selection} of prototype points. The major advantage of this approach is its speed. The major disadvantage is that it is far from the ideal prototype selection scheme outlined at the beginning of this section, \ie, selecting large bundles first. To compensate for this problem, a good bundle collision strategy, which allows replacing small, existing bundles by new, larger bundles, is required.
+
+
+%===================================================================================
+\subsubsection{Similarity of sliced streamlines}
+\label{sec:theory:similarity-of-sliced-streamlines}
+
+\quotegraffito{If people do not believe that mathematics is simple, it is only because they do not realize how complicated life is.}
+{John von Neumann}%(1903-1957) 
+%
+Consider a single slicing plane starting at a \emph{slicing point}\footnote{The slicing point for the initial slice is the prototype point. For incremental slices the slicing points lies on the same streamline, but moves farther and farther away from the prototype point.} and being perpendicular to the streamline at this point. The plane intersects many streamlines, close and distant, from the slicing point. The question is: Which of the intersected streamlines are \emph{similar} to the streamline at the slicing point? Similar streamlines can be part of this slice and therefore of the bundle. Expressed in a different way, a streamline bundle consists of all streamline segments that are similar to the prototype in \emph{every single slice} of the bundle.
+
+Each streamline consists of a chain of points with attached position, velocity, and pressure. These values where derived from the initial vector field via stream tracing. In general, the intersection of a streamline with the slicing plane does not coincide with any of the discrete points that span the streamline (\autoref{fig:theory:streamline-similarity}). After the position of the intersection point ($\overline{\vec{x}}$) is computed by intersecting the line with the slicing plane, the other values at the intersection $\overline{\vec{v}}$ and $\overline{p}$ are interpolated from the neighbor points $d_i$ and $d_{i+1}$.
+
+
+\normfigure[pos=tbhp,
+						%opt={},
+						label={fig:theory:streamline-similarity},
+						shortcaption={Similarity of sliced streamlines.}
+					 ]
+{theo-bundling-similarity-detailed}
+{Available values for streamline similarity. Starting from a slicing point on a slicing line (blue) a perpendicular plane (thick maroon line) is used to slice nearby streamlines. A nearby streamline (black) intersects the plane between point $d_i$ and $d_{i+1}$. All streamline points have a position $\vec{x}(d)$, a velocity $\vec{v}(d)$ and a pressure $p(d)$. At the intersection point these values are interpolated ($\overline{\vec{x}}$, $\overline{\vec{v}}$, and $\overline{p}$).}
+
+Using these values, the streamline bundling algorithm has to decide which intersected streamlines are similar to the slicing streamline and should therefore remain in the bundle. The analyzed criteria in this work are only based on values lying on the slicing plane (no lookahead):
+%
+\begin{description}
+%
+  \item[Spatial proximity (radius):] The distance $r$ of the intersection point $\overline{\vec{x}}$ from the center $\vec{x}(d_0)$:
+    \begin{equation}
+    \label{eqn:theory:slicesimil:radius}
+    	r = \| \vec{x}(d_0) - \overline{\vec{x}} \|.
+    \end{equation}
+%
+  \item[Velocity angular similarity:] The angle between the center velocity $\vec{v}(d_0)$ and the intersection velocity $\overline{\vec{v}}$ (approximates the intersection angle $\alpha$):
+  	\begin{equation}
+  	  s_\alpha = \arccos\left( \frac{ \scalprod{\vec{v}(d_0)}
+  	                                         {\overline{\vec{v}}}}
+  	                              { \normprod{\|\vec{v}(d_0)\|}          
+  	                                         {\|\overline{\vec{v}}\|}}
+  	                    \right).
+  	\end{equation}
+%
+  \item[Relative velocity magnitude similarity:] The relative similarity of the magnitudes of $\vec{v}(d_0)$ and $\overline{\vec{v}}$. For easier thresholding, the following measure is useful:
+		\begin{equation} \label{eqn:theory:veloc-ag-similarity}
+			s_{\|\vec{v}\|} = \min\left\{
+			  \frac{\| \vec{v}(d_0) \|}{\| \overline{\vec{v}} \|},
+			  \frac{\| \overline{\vec{v}} \|}{\| \vec{v}(d_0)\|} \right\}.
+		\end{equation}
+%
+  \item[Relative pressure similarity:] Measures how similar the pressures $p(d_0)$ and $\overline{p}$ are in relation to each other. Analogous to \autoref{eqn:theory:veloc-ag-similarity} a good measure is 
+    \begin{equation}
+    	s_p = \min\left\{ \frac{p(d_0)}{\overline{p}},
+    	                 \frac{\overline{p}}{p(d_0)} \right\}.
+    \end{equation}
+%
+\end{description}
+
+Several combinations of these criteria are thinkable. A very robust possibility is using only the spatial proximity measure. Additional criteria can be added depending on the application.% The visualization application for example profits from utilizing the angular similarity $s_\alpha$, which produces cleaner results.
+
+The thresholds for the criteria might also change from slice to slice. For example, increasing the radius between slices allows cone-shaped bundles. A more detailed discussion on the utilized combinations of settings can be found in \autoref{chp:results}.
+
+
+%===================================================================================
+\subsubsection{Slicing stopping criterion}
+\label{sec:theory:slicing-stopping-criterion}
+Starting at the initial slice, the streamline bundle is expanded simultaneously into both directions along the prototype streamline by repeated slicing. The resulting bundle consists only of streamlines which are similar to the prototype in \emph{all} slices, the mates. This implies that the bundle potentially loses, but never gains mates during expansion. Without a stopping criterion the resulting bundle would contain only the prototype streamline. Therefore stopping criteria are required. The following stopping criteria where implemented:
+%
+\begin{description}
+%
+  \item[Lost mate ratio:] Stop a direction if the ratio of mates in the initial slice to mates in the current slice drops below a given threshold.
+%
+  \item[Velocity magnitude change:] Stop if the magnitude of the slice point velocity changed too much since the initial slice.
+%
+  \item[Direction change:] Stop if the direction of the prototype changed too much since the initial slice. This criterion prevents (or allows) bent bundles and the amount of allowable bending.
+%
+  \item[Streamline count minimum:] Stop if the number of streamlines in the bundle (prototype plus mates) drops below a fixed number, \eg, three. This ensures that no bundle is dropped because it becomes too small.
+%
+\end{description}
+
+Different combinations of these stopping criteria allow to tailor the bundling result to specific applications. For the resistance graph application, short and straight bundles with many streamlines are desirable. This can be achieved by strict thresholds on the lost mate ratio and the directional change.
+
+For visualization purposes, long and possibly bent bundles can be desirable. In this case loose thresholds on the lost mate ratio and very loose thresholds on directional changes lead to favorable results.
+
+%\hspace{0pt}
+%Another interesting criterion is based on the bundle volume or an estimator for it. Usually, the bundle volume increases with each incremental slice, because the bundle becomes longer. Only if many streamlines are lost, the bundle volume drops. This criterion is interesting because it needs no parameters, but it requires high computational effort. The idea was therefore not implemented.
+
+
+%===================================================================================
+\subsubsection{Bundle collision strategy}
+\label{sec:theory:bundle-collision}
+
+%\quotegraffito{The really difficult moral issues arise, not from a confrontation of good and evil, but from a collision between two goods.}%Moral one
+%{Irving Kristol}
+%
+The previous sections described all criteria for generating the bundle for a single prototype streamline and starting point. To cover the whole streamline dataset with bundles, this step has to be repeated multiple times. It will therefore occur that the current bundle expands into an existing bundle. The following three strategies for these bundle collisions where investigated, to match the prototype selection schemes described in \autoref{sec:theory:prototype-selection}:
+%
+\begin{description}
+%
+  \item[Keep existing bundles:] This strategy always keeps the existing bundle and is especially useful if the probability of the existing bundle being ``better'' than the current bundle is high. It is therefore well suited if intelligent prototype selection with prototype ratings is used.
+%
+  \item[Remove poor existing bundles:] This simple strategy removes the existing bundle completely, if the current bundle is ``better''. The definition of ``better'' can for example mean ``more mates'' or ``more covered volume''.
+%
+  \item[Overwrite poor existing bundles:] The idea for this strategy is to overwrite overlapping parts of the existing bundle, if the current bundle is better.
+%
+\end{description}
+
+\autoref{fig:theory:bundling-collision} shows examples of these three strategies. %The stopping criteria for streamline bundling (\ie, when to stop searching for more bundles) will be discussed in \autoref{sec:impl:global-bundling-algorithm}. After this phase has finished, the dataset is densely covered by streamline bundles.
+
+\bigtriplefigure[	pos=tbhp,
+									mainlabel={fig:theory:bundling-collision},
+			           	maincaption={Different bundle collision strategies. The maroon bundle already exists, whereas the blue bundle is currently expanding from right to left. In \subref{fig:theory:bnd-coll-keep} the existing bundle is always kept, the expansion therefore stops. In \subref{fig:theory:bnd-coll-remove}, the existing bundle is completely removed if the currently expanding one is better. In \subref{fig:theory:bnd-coll-overwrite} the expanding bundle overwrites any overlapping parts of bundles that are worse.},
+			            mainshortcaption={Bundle collision strategies.},%
+			            leftopt={},%width=0.45\textwidth},
+			            leftlabel={fig:theory:bnd-coll-keep},
+			            leftcaption={Keep existing bundles.},
+			            %leftshortcaption={},%
+			            midopt={},%width=0.45\textwidth},
+			            midlabel={fig:theory:bnd-coll-remove},
+			            midcaption={Remove existing bundles if worse.},
+			            %midshortcaption={},%
+			            rightopt={},%width=0.45\textwidth},
+			            rightlabel={fig:theory:bnd-coll-overwrite},
+			            rightcaption={Overwrite existing bundles if worse.},
+			            %rightshortcaption={}
+			            spacing={},
+			            spacingtwo={}
+			           ]
+{theo-bundling-collision-keep}
+{theo-bundling-collision-remove}
+{theo-bundling-collision-overwrite}
+
+
+\subsection{Mapping bundles to regions}
+\label{sec:theory:map-bundles-to-regions}
+
+In the final step of this partitioning algorithm, the dense streamline bundles are mapped back to the \threed mesh. The simplest method is nearest neighbor mapping, where each cell is mapped to its spatially closest bundle. If the detected bundles do not cover the dataset densely, this approach leads to bad assignments of cells that are too far away from all bundles.
+
+An alternative approach is to map each cell to its closest bundle, but only up to a maximum distance. All cells that are too far away from any bundle are assigned to a separate region. These dead zones usually contain only a few streamlines curling at low speeds. Clustering these zones into disconnected regions has only little influence on the quality of the result. Problems occur if the bundle coverage of the dataset is poor or the chosen maximum distance is too small. Then individual, small dead zones merge together and form one large dead zone, which is undesirable.
+
+
+
+%===================================================================================
+\subsection{Streamline bundling recap}
+After the theory behind streamline bundling is discussed, there are still open questions about the best configurations of the presented options for different tasks. Good configurations of the presented building blocks are not obvious from a theoretic point of view and will therefore be described in \autoref{chp:results}.
+
+
+%===================================================================================
+\section{Mapping regions to a graph}
+\label{sec:theory:map-regions-to-graph}
+
+\quotegraffito{Nature laughs at the difficulties of integration.}
+{Pierre-Simon de Laplace}
+%
+The previous stages resulted in a partition of the \threed mesh. This partition is now mapped to a flow graph $\mathtt{G}(\mathtt{V}=\{\mathtt{v_i}\}, \mathtt{E}=\{\mathtt{e_{i,j}}\})$ in the obvious way: The regions $\mathcal{R}_i$ consisting of cells $\{c_k:c_k\in\mathcal{R}_i\}$ are represented by vertices $\mathtt{v_i}$. Neighboring regions are connected by a set of edges $\mathtt{e_{i,j}}$. The region $\mathcal{R}_i$ that led to a specific vertex $\mathtt{v_i}$ will be called \emph{vertex region}. The common surface between two regions $\mathcal{R}_i$ and $\mathcal{R}_j$ will be called \emph{edge interface} $\mathcal{I}_{i,j}$ and leads to the edge $\mathtt{e_{i,j}}$. The edge interface consists of individual cell faces $\{f_{r,s}:c_r\in\mathcal{R}_i,\, c_s\in\mathcal{R}_j,\,c_r \text{ and } c_s \text{ are neighbors}\}$.
+
+Center positions, pressures, velocities, and volumes of the above \threed mesh entities ($\mathcal{R}_i$, and $c_k$) will be identified as the functions $\vec{x}(.)$, $p(.)$, $\vec{v}(.)$, and $V(.)$ respectively. The areas, velocities, and normal vectors of the above \twod mesh entries ($f_{r,s}$, and $\mathcal{I}_{i,j}$) will be described as the functions $A(.)$, $\vec{v}(.)$. and $\vec{n}(.)$ respectively.\footnote{The normal vectors always point outwards, from the first index to the second index, \ie, from $i$ to $j$ or from $r$ to $s$.}
+
+Accordingly, the values associated with graph entities ($\mathtt{v_i}$, and $\mathtt{e_{i,j}}$) will be identified as: $\mu(.)$ for means, $\sigma(.)$ for standard deviations, $N(.)$ for counts, $V(.)$ for volumes, $A(.)$ for areas, $F(.)$ for scalar volume flows, and $\vec{F}(.)$ for vector volume flows. 
+
+\graffitonextline{Read this paragraph carefully, the orientation of edge values can be confused very easily.} 
+The volume flow over a border face between two cells $i$ and $j$ is given by $A\scalprod{\vec{n}}{\vec{v}}$, where $A\ge0$ is the area of the face, $\vec{v}$ is its velocity, and $\vec{n}$ is its unit normal vector. \emph{The orientation of $\vec{n}$ determines if the flow is computed from $i$ to $j$ or from $j$ to $i$}. Therefore the \emph{projected area} $\vec{A_\text{proj}}=A\vec{n}$ in flow graphs of this thesis is an \emph{oriented measure}, depending on the edge direction. (An alternative approach would be to fix the orientation of the projected area and switch the orientation of the velocity according to the edge direction.)
+
+In the following formulas, each edge exists twice; once for each direction. The values of both directions differ only in the sign for oriented values ($\vec{A_\text{proj}}$, $F$, and $\vec{F}$), and are equal for all other, non-oriented values. The solution to avoid double computation will be treated in \autoref{sec:impl:map-regions-to-graph}.
+
+The unit normal vectors will be represented by $\vec{e}_0=(1,0,0)$,  $\vec{e}_1=(0,1,0)$, and $\vec{e}_2=(0,0,1)$.
+
+\quotegraffito{There is something in statistics that makes it very similar to astrology.}{Gian-Carlo Rota} 
+For computing the weighted means and standard deviations, the following formulas can be utilized to avoid holding all values in memory (running computation):%Maybe quote Wikipedia? Maybe quote Knuth?
+
+\begin{equation}
+	\begin{array}{lll}
+		W_0 = 0      & W_i = W_{i-1} + w_i
+		  & \text{(weights)}\\
+		\mu_0 = 0    & \mu_i = \mu_{i-1} + \frac{w_i}{W_i} (x_i - \mu_{i-1})
+		  & \text{(means)}\\
+		Q_0 = 0      & Q_i = Q_{i-1} + w_i (x_i - \mu_{i-1}) (x_i - \mu_i)
+		  & \text{(helper sums)}\\
+		\sigma_0 = 0 & \sigma_i = \sqrt{\frac{Q_i}{W_i}}
+		  & \text{(standard deviations)}\\
+	\end{array}
+\end{equation}
+
+
+Many applications are imaginable for flow graphs. It is therefore hard to determine which data to store in vertices and regions. For this reason, all natural vertex and edge values were evaluated and associated to the graph. At the moment this includes the following values:
+%The guideline for this thesis was the following:
+%\emph{Compute and store everything into the flow graph that can naturally be stored in the graph.}
+%
+%Therefore every obvious natural measure which can be associated with either a vertex or an edge and does not require the storage of region information is computed and stored. 
+%The currently evaluated measures are:
+%
+
+
+
+\begin{description}
+%
+	\item[Vertex spatial means (vector):] The weighed component-wise average spatial position of the vertex region. The weights are given by the cell volumes:
+%
+\begin{equation}
+	\boldsymbol\mu_\vec{x}(\mathtt{v_i}) =
+	\normprod{
+		\frac{1}{V(\mathcal{R}_i)}
+	}{
+		\sum\limits_{c_k\in\mathcal{R}_i} {
+			\normprod{ V(c_k) }{ \vec{x}(c_k) }
+		}
+	}.
+\end{equation}
+%
+%  
+  \item[Vertex spatial standard dev. (vector):] The standard deviations from the above means, weighted by cell volumes, and computed separately for each component:
+%
+\begin{equation}
+	\boldsymbol\sigma_\vec{x}(\mathtt{v_i}) = \sqrt{
+		\normprod{
+			\frac{1}{V(\mathcal{R}_i)}
+		}{
+			\sum\limits_{c_k\in\mathcal{R}_i}{
+			 	\normprod{
+			 		V(c_k)
+			 	}{
+			 		\left( \vec{x}(c_k) - \boldsymbol\mu_\vec{x}(\mathtt{v_i}) \right)^2 
+			 	}
+			} 
+		}
+	}.
+\end{equation}
+%
+	\item[Vertex pressure mean (scalar):] The pressure mean, weighted by cell volume, within the vertex region:
+%
+\begin{equation}
+	\mu_p(\mathtt{v_i}) =
+		\normprod{ 		
+			\frac{1}{V(\mathcal{R}_i)}
+		}{
+			\sum\limits_{c_k\in\mathcal{R}_i} { \normprod{V(c_k)}{p(c_k)} }
+		}.
+\end{equation}
+%
+%
+	\item[Vertex pressure standard dev. (scalar):] The standard deviation from the above mean, also weighted by cell volume:
+%
+\begin{equation}
+	\sigma_p(\mathtt{v_i}) = \sqrt{ 
+		\normprod{
+			\frac{1}{V(\mathcal{R}_i)}
+		}{
+			\sum\limits_{c_k\in\mathcal{R}_i} {
+				\normprod{
+					V(c_k)
+				}{
+					\left( p(c_k) - \mu_p(\mathtt{v_i}) \right)^2
+				} 
+			}
+		} 
+	}.
+\end{equation}
+%
+%
+	\item[Vertex velocity means (vector):] The weighed component-wi\-se average velocity of the vertex region. The weights are given by the cell volumes:
+%
+\begin{equation}
+	\boldsymbol\mu_\vec{v}(\mathtt{v_i}) =
+	\normprod{
+		\frac{1}{V(\mathcal{R}_i)}
+	}{
+		\sum\limits_{c_k\in\mathcal{R}_i} {
+			\normprod{ V(c_k) }{ \vec{v}(c_k) }
+		}
+	}.
+\end{equation}
+%
+%
+  \item[Vertex velocity standard dev. (vector):] The standard deviations from the above means, weighted by cell volumes, and computed separately for each component:
+%
+\begin{equation}
+	\boldsymbol\sigma_\vec{v}(\mathtt{v_i}) = \sqrt{
+		\normprod{
+			\frac{1}{V(\mathcal{R}_i)}
+		}{
+			\sum\limits_{c_k\in\mathcal{R}_i}{
+			 	\normprod{
+			 		V(c_k)
+			 	}{
+			 		\left( \vec{v}(c_k) - \boldsymbol\mu_\vec{v}(\mathtt{v_i}) \right)^2 
+			 	}
+			} 
+		}
+	}.
+\end{equation}
+%
+%
+  \item[Vertex cell count (scalar):] The number of cells within the region $\mathcal R_i$ that is represented by $\mathtt{v_i}$:
+%
+\begin{equation}
+	N_c(\mathtt{v_i}) = \left| \mathcal{R}_i \right|.
+\end{equation}
+%
+%
+\item[Vertex volume (scalar):] The volume of the region represented by this vertex:
+%
+\begin{equation}
+	V(\mathtt{v_i}) = V(\mathcal{R}_i) = \sum\limits_{c_k\in\mathcal{R}_i}{V(c_k)}.
+\end{equation}
+%
+%
+  \item[Vertex face count (scalar):] The number of cell faces at the surface of the vertex region:
+%
+\begin{equation}
+	N_f(\mathtt{v_i}) =\left| \{f_{r,s}:r = \mathtt{i}\} \right| = \sum\limits_\mathtt{j}{N_f(\mathtt{e_{i,j}})}.
+\end{equation}
+%
+%
+  \item[Edge projected areas (vector):] The projected areas of the interfaces between the regions $\mathcal R_i$ and $\mathcal R_j$ to the $xy$-, $xz$-, and $yz$-planes:
+%
+\begin{equation}
+	\vec{A}_\text{proj}(\mathtt{e_{i,j}}) = 
+	-\vec{A}_\text{proj}(\mathtt{e_{j,i}}) =
+		\sum\limits_{f_{r,s}\in\mathcal{I}_{i,j}}{ 
+			\normprod{
+				A(f_{r,s})
+			}{
+				\vec{n}(f_{r,s}) 
+			}
+		}.
+\end{equation}
+%
+%
+  \item[Edge velocity means (vector):] The weighted component-wise average velocity of the edge interface. The weights are given by the cell face areas:
+%
+\begin{equation}
+	\boldsymbol\mu_\vec{v}(\mathtt{e_{i,j}}) =
+	\boldsymbol\mu_\vec{v}(\mathtt{e_{j,i}}) =
+	\normprod{ 
+		\frac{1}{A(\mathcal{I}_{i,j})}
+	}{
+		\sum\limits_{f_{r,s}\in\mathcal{I}_{i,j}}{
+			\normprod{
+				A(f_{r,s})
+			}{
+				\vec{v}(f_{r,s}) 
+			}
+		}
+	}.
+\end{equation}
+%
+%
+  \item[Edge volume flows, exact (vector):] The sum of volume flows over each individual face of the edge interface, \ie, the volume flows are computed first for each projected face and accumulated afterwards. Gives volume flows separated in $x$-, $y$- and $z$-direction:
+%
+\begin{equation}
+	\vec{F}_\text{exact}(\mathtt{e_{i,j}}) = 
+	-\vec{F}_\text{exact}(\mathtt{e_{j,i}}) = 
+		\sum\limits_{f_{r,s}\in\mathcal{I}_{i,j}}{
+			\normprod{
+				A(f_{r,s})
+			}{
+				\scalprod{ \vec{n}(f_{r,s}) }{ \vec{v}(f_{r,s}) }
+			}
+		}.
+\end{equation}
+%
+%
+  \item[Edge volume flows, exact sum (scalar):] The sum of the entries of the above vector:
+%
+\begin{equation}
+	F_\text{exact}(\mathtt{e_{i,j}}) = 
+	-F_\text{exact}(\mathtt{e_{j,i}}) = 
+		\sum\limits_{t=1}^3{
+			\scalprod{
+				\vec{e}_t
+			}{
+				\vec{F}_\text{exact}(\mathtt{e_{i,j}})
+			}
+	 	}.
+\end{equation}
+%
+%
+  \item[Edge volume flows, approx. (vector):] The element\--\-wise multiplication of ``edge projected areas'' and ``edge velocity mean'' gives an approximate volume flow:
+%
+\begin{equation}
+	\vec{F}_\text{approx}(\mathtt{e_{i,j}}) = 
+	-\vec{F}_\text{approx}(\mathtt{e_{j,i}}) = 
+		\sum\limits_{t=1}^3{
+			\normprod{
+				\vec{e}_t
+			}{
+				\normprod{
+					\left( 
+						\scalprod{
+							\vec{e}_t
+						}{
+					 		\vec{A}_\text{proj}(\mathtt{e_{i,j}})
+						}
+					\right)
+				}{
+					\left(
+						\scalprod{
+							\vec{e}_t
+						}{
+							\boldsymbol\mu_\vec{v}(\mathtt{e_{i,j}})
+						} 
+					\right)
+				}
+			}
+		}.
+\end{equation}
+%
+%
+  \item[Edge volume flows, approx. sum (scalar):] The sum of the entries of the above vector gives the approximate scalar volume flow rate:
+%
+\begin{equation}
+	F_\text{approx}(\mathtt{e_{i,j}}) = 
+	-F_\text{approx}(\mathtt{e_{j,i}}) = 
+		\sum\limits_{t=1}^3{
+			\scalprod{
+				\vec{e}_t
+			}{
+				\vec{F}_\text{approx}(\mathtt{e_{i,j}})
+			}
+	 	}.
+\end{equation}
+%
+%
+	\item[Edge face count (scalar):] The number of faces in the edge interface:
+%
+\begin{equation}
+	N_f(\mathtt{e_{i,j}}) = 
+	N_f(\mathtt{e_{j,i}}) =
+	\left| \mathcal{I}_{i,j} \right|.
+\end{equation}
+%
+%
+  \item[Vertex in flow (scalar):] The total volume flow into this vertex; determined by integration over the surface. This is the sum of the negative ``edge volume flow exact sum''-values (\ie, the incoming edges) multiplied by $-1$.
+%
+\begin{equation}
+	F_\text{in}(\mathtt{v_i}) = 
+		-\sum\limits_\mathtt{j}{
+			\min\left(
+				0; 
+				F_\text{exact}(\mathtt{e_{j,i}})
+			\right)
+		}.
+\end{equation}
+%
+%
+  \item[Vertex out flow (scalar):] The total volume flow out of this vertex; determined by integration over the surface. This is equal to the sum of positive ``edge volume flow exact sum''-values (\ie, outgoing edges).
+%
+\begin{equation}
+	F_\text{out}(\mathtt{v_i}) = 
+		\sum\limits_\mathtt{j}{
+			\max\left(
+				0; 
+				F_\text{exact}(\mathtt{e_{i,j}})
+			\right)
+		}
+\end{equation}
+%
+\end{description}
+
+
+%===================================================================================
+\section{Mapping bundles to a graph}
+An alternative to calculating the exact flow graph from the partitioned \threed mesh is to calculate an approximate flow graph directly from the bundles. This approach is faster and uses less memory than mapping the bundles to the \threed mesh. As in the previous scheme, each bundle results in one vertex. However, in contrast to the previous scheme, an edge is created between two vertices, if the respective bundles are directly connected by a streamline.
+
+The calculation of vertex and edge data in this case is a rough estimation based on streamline counts and velocities. Therefore this approach is applicable only to visualization tasks.
+
+Even for visualization tasks of dense bundles however, the exact, mesh-based calculation is advantageous, because the computational overhead is not very large.
+
+The only use case for this algorithmic step is therefore pure visualization of \emph{sparse bundles}. If only a few large bundles and their interconnections are sought-after, a complete mapping to the \threed mesh is not advantageous. In this case the flow graph has to be derived directly from the sparse bundles.
+
+Mapping from bundles to a graph has been implemented, but was neither optimized nor utilized. It will therefore be excluded from further discussion.
+
+
+%===================================================================================
+\section{Graph collapse}
+\label{sec:theory:graph-collapse}
+
+There is no way to directly influence the final number of vertices in the flow graph during streamline bundling, because the number of bundles cannot be enforced.
+
+To reduce the number of vertices a series of edge collapses can be performed. The graph operation \emph{edge collapse} is the removal of an edge from a graph by combining the two vertices that the edge connects. Therefore, each edge collapse reduces the vertex count by one. \autoref{fig:theory:graph-collapse} illustrates this operation for flow graphs.
+
+\bigdoublefigure[	pos=tbhp,
+                  mainlabel={fig:theory:graph-collapse},
+                  maincaption={The edge collapse operation for a flow graph. The maroon network depicts the graph, whereas the black outlines show the underlying regions. The left figure shows the graph before collapsing the blue edge $\mathtt{e_{i,j}}$. The right figure shows the graph after collapsing it.},%
+                  mainshortcaption={Edge collapse graph operation.},
+                  %leftopt={},%width=0.45\textwidth},
+                  leftlabel={fig:theory:graph-collapse-before},
+                  leftcaption={Before edge collapse.},
+                  %leftshortcaption={},%
+                  %rightopt={},%width=0.45\textwidth},
+                  rightlabel={fig:theory:graph-collapse-after},
+                  rightcaption={After edge collapse.},
+                  %rightshortcaption={},
+                  %spacing={\hspace{1cm}}
+                 ]
+{theo-graph-collapse}
+{theo-graph-collapse-after}
+
+Three steps have to be performed during edge collapse:
+%
+%
+\begin{enumerate}
+	\item Merge the edges of shared neighbors. In \autoref{fig:theory:graph-collapse-before} there are two shared neighbors: $\mathtt{v_k}$ and $\mathtt{v_l}$. The according edges need to be merged: $\mathtt{e_{l,i}}$ with $\mathtt{e_{j,l}}$, and $\mathtt{e_{i,k}}$ with $\mathtt{e_{j,k}}$. During merging, the edge directions have to be taken into account for oriented values like volumetric flow rates.% The exact update algorithm is described in Section~XY.% The merged edges are connected to the kept vertex (\eg, $\mathtt{v_i}$ and $\mathtt{v_i}$ ).
+%
+	\item Merge vertices $\mathtt{v_i}$ and $\mathtt{v_j}$ into $\mathtt{v_n}$. This involves combining the vertex values described in \autoref{sec:theory:map-regions-to-graph} and associating the combined values to $\mathtt{v_n}$. Most of the combinations are straight forward, with the exception of the standard deviations. The following formula was used to combine standard deviations (for vectors it was applied component-wise):
+%
+\begin{equation}
+\begin{split}
+\sigma(\mathtt{v_n}) = \sigma(\mathtt{v_i}\cup\mathtt{v_j}) =\\
+\sqrt{
+	\normprod{
+		\frac{
+			V(\mathtt{v_i})
+		}{
+ 			V(\mathtt{v_n})
+ 		}
+ 	}{
+		\sigma^2(\mathtt{v_i})
+	}
+ 	+
+ 	\normprod{
+		\frac{
+ 	  	V(\mathtt{v_j})		
+ 	  }{
+ 			V(\mathtt{v_n})
+ 		}
+ 	}{
+ 	  \sigma^2(\mathtt{v_j})
+ 	}
+ 	+
+ 	\normprod{
+	 	\frac{
+			\normprod{
+				V(\mathtt{v_i})
+			}{
+				V(\mathtt{v_j})
+			}
+	 	}{
+	 		V(\mathtt{v_n})
+	 	}
+	}{
+		\left(
+			\mu(\mathtt{v_i}) - \mu(\mathtt{v_j})
+		\right)^2
+	}
+},\\
+\quad\text{where}\quad V(\mathtt{v_n}) = V(\mathtt{v_i}) + V(\mathtt{v_j}).
+\end{split}
+\end{equation}
+%
+	\item Remove the edge $\mathtt{e_{i,j}}$ and its associated data.
+\end{enumerate}
+
+%===================================================================================
+\section{Flow graph error measures}
+\label{sec:theory:graph-error-measures}
+
+For selecting good candidate edges to collapse, a global measure $E(\mathtt{G})$ is required. Then, by repeatedly collapsing the best current candidate edge $\mathtt{e_{i,j}}$ according to that error measure, the targeted number of vertices is reached. The best candidate edge has the lowest increase $\Delta E(\mathtt{e_{i,j}})$ of the global error measure. All vertex and edge values described in \autoref{sec:theory:map-regions-to-graph} can be utilized to construct this error measure.
+%
+The error measure used within this thesis is the total \ac{SSE} for velocities, $E_\vec{v}(\mathtt{G})$. It is derived as follows.
+
+
+The velocity \ac{SSE} vector for one region (vertex) is defined es
+%
+\begin{equation}
+  \vec{E_{\vec{v}}}(\mathtt{v_i}) =
+	  \sum\limits_{c_k\in\mathcal{R}_i}{
+	    \normprod{
+        V(c_k)
+			}{
+			  \left( \vec{v}(c_k) - \boldsymbol\mu_\vec{v}(\mathtt{v_i}) \right)^2 
+			}
+		}.
+\end{equation}%
+%
+The direct computation requires the individual cell values $V(c_k)$ and $\vec{v}(c_k)$ and therefore does not allow deriving this measure for a graph vertex. However, it can easily be computed from the velocity standard deviations and region volumes that are stored with each vertex (see \autoref{sec:theory:map-regions-to-graph}) as
+%
+\begin{equation}
+  \vec{E}_{\vec{v}}(\mathtt{v_i}) =
+  \normprod{
+    \boldsymbol\sigma^2_\vec{v}(\mathtt{v_i})
+   }{
+     V(\mathtt{v_i})
+   },
+\end{equation}
+%
+which makes the scalar, total error of the whole graph\graffito{The calculation of the norm was postponed as long as possible to minimize directional errors.}
+%
+\begin{equation}
+  E_{\vec{v}}(\mathtt{G}) = \sum\limits_{\mathtt{v_i}\in\mathtt{V}}{
+    \|\vec{E}_{\vec{v}}(\mathtt{v_i})\|
+  }.
+\end{equation}
+%
+Finally, the cost of collapsing edge $\mathtt{e_{i,j}}$ according to this error measure is 
+\begin{equation}
+   \Delta E_\vec{v}(\mathtt{e_{i,j}}) = \|\vec{E}_\vec{v}(\mathtt{v_n}) - \vec{E}_\vec{v}(\mathtt{v_i}) - \vec{E}_\vec{v}(\mathtt{v_j})\|,
+\end{equation}
+%
+where $\mathtt{v_n}$ is the merged vertex.
+%{
+%[A much longer version using exact and approximate measures. Now the exact measures are used always.]
+%}
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+%*****************************************
+
+
+
+

@@ -1,0 +1,465 @@
+V této kapitole si uvedeme nìkteré základní metody numerického øe¹ení
+diferenciálních rovnic. Zatímco není mo¾né numericky obdr¾et obecné
+øe¹ení, øe¹ení poèáteèní úlohy lze numericky aproximovat pomìrnì
+snadno: hlavní my¹lenkou je, ¾e zaèneme v bodì zadaném vazební
+podmínkou a v okolí tohoto bodu nahradíme integrální køivku její
+teènou. Tím se dostaneme do dal¹ího bodu, odkud opìt integrální
+køivku aproximujeme teènou. Smìrnici teèny zjistíme z diferenciální
+rovnice, buï pøímo z derivace (Eulerova metoda), nebo ponìkud
+rafinovanìji, kdy bereme v úvahu i konvexnosti èi konkávnost a fakt,
+¾e se derivace mìní s mìnícím se $x$. Staèí tedy mít zvolen
+\textit{krok} numerické metody (interval, na kterém aproximaci teènou
+pou¾ijeme) a výstupem metody bude aproximace integrální køivky pomocí
+lomené èáry (po èástech lineární funkcí).
+
+\section{ODR prvního \v{r}ádu}
+
+
+
+
+Øe¹íme poèáteèní úlohu pro diferenciální rovnici prvního øádu
+rozøe¹enou vzhledem k derivaci:\footnote{Jak bylo zmínìno, poèáteèní
+  podmínka je pro numerickou aproximaci dùle¾itá, udává toti¾ bod, ze
+  kterého zaèínáme. Numericky proto najdeme pouze partikulární øe¹ení,
+  najít obecné øe¹ení numericky se nám nepodaøí} \fbox{$\left\{
+  \begin{aligned}
+    y'&=f(x,y)\\ y(x_0)&=y_0
+  \end{aligned}\right.
+$}
+
+Øe¹ení aproximujeme po èástech lomenou èarou (viz obrázky \ref{numint}
+a \ref{numint2}), vodorovná vzdálenost mezi jednotlivými uzly se
+nazývá \textit{krok}, oznaèujeme jej $h$, má-li dal¹í èást lomené èáry
+smìrnici $k$, dostaneme dal¹í bod pomocí vztahù \fbox{$
+  \left\{\begin{aligned}
+      x_{i+1}&=x_i+h\\
+      y_{i+1}&=y_i+kh
+\end{aligned}\right.
+$}
+
+Uvedeme si na ukázku metody \textit{s pevným krokem}, kdy nemìníme
+krok, ale pouze smìr lineární funkce, která aproximuje integrální
+køivku. Podle toho, jak v jednotlivých krocích volíme smìrnici
+aproximaèní funkce, rozli¹ujeme nìkolik metod.
+
+\begin{description}
+\item[Eulerova metoda] Jako smìrnici teèny pou¾ijeme hodnotu smìrového
+  pole v bodì, ze kterého vycházíme: $k=k_1:=f(x_i,y_i)$
+\item[RK] (metoda Runge-Kutta druhého øádu) Jako smìrnici teèny
+  pou¾ijeme hodnotu smìrového pole v bodì, do kterého bychom se
+  dostali po provedení pùlky kroku Eulerovou metodou. Podíváme se
+  tedy, kam bychom se dostali Eulerovou metodou, podíváme se jak po
+  cestì vypadá smìrové pole a podle toho zvolíme výchozí smìr:
+  $k=k_2:=f\left(x_i+\frac h2, y_i+k_1\frac h2\right)$
+\item[RK4] (metoda Runge-Kutta ètvrtého øádu) Zde se jedná o ponìkud
+  rafinovanìj¹í variantu pøedchozího, uveïme jen vzorec, bez bli¾¹ího
+  vysvìtlení: $k=\frac
+  16(k_1+2k_2+2k_3+k_4)$,\\
+  kde $k_3:=f\left(x_i+\frac h2,y_i+k_2\frac h2\right)$ a
+  $k_4:=f(x_i+h, y_i+k_3 h )$
+\end{description}
+
+%\newpage
+
+\newif\ifbarevnesipky
+\barevnesipkyfalse
+
+
+\def\trajektorie#1#2{
+\mfsrc{x1:=#1;y1:=#2;%t:=0;
+for i=1 upto pocet: 
+x2:=x1+krok*funkcef(x1,y1);
+y2:=y1+krok*funkceg(x1,y1);}
+\zpracuj{z1}{z2}
+%t:=t+krok;
+\mfsrc{
+if y2>0: x1:=x2;
+y1:=y2 fi;
+%show x1,y1;
+endfor
+}}
+
+\def\trajektorieRK#1#2{
+\mfsrc{x1:=#1;y1:=#2;%t:=0;
+for i=1 upto pocet:
+k1:=funkceg(x1,y1);
+x3:=x1+(krok/2);
+y3:=y1+k1*(krok/2);
+k2:=funkceg(x3,y3); 
+x2:=x1+krok*funkcef(x1,y1);
+y2:=y1+krok*k2;}
+\zpracuj{z1}{z2}
+%t:=t+krok;
+\mfsrc{
+if y2>0: x1:=x2;
+y1:=y2 fi;
+%show x1,y1;
+endfor
+}}
+
+\def\trajektorieRKF#1#2{
+\mfsrc{x1:=#1;y1:=#2;%t:=0;
+for i=1 upto pocet:
+k1:=funkceg(x1,y1);
+x3:=x1+(krok/2);
+y3:=y1+k1*(krok/2);
+k2:=funkceg(x3,y3);
+y4:=y1+k2*(krok/2);
+k3:=funkceg(x3,y4);
+y5:=y1+k3*(krok/2);
+k4:=funkceg(x3,y5);
+kk:=(k1+2*k2+2*k3+k4)/6; 
+x2:=x1+krok*funkcef(x1,y1);
+y2:=y1+krok*kk;}
+\zpracuj{z1}{z2}
+%t:=t+krok;
+\mfsrc{
+if y2>0: x1:=x2;
+y1:=y2 fi;
+%show x1,y1;
+endfor
+}}
+
+\def\zpracuj#1#2{\lines{#1,#2}}
+
+\def\vodsipka#1{
+\mfsrc{x1:=#1; 
+  if funkceg(0,x1)>0:x3:=x1+delka else: x3:=x1-delka fi;
+  if funkceg(0,x1)*funkceg(0,x3)<0: x1:=-100;x3:=-100 fi;
+  if x3>x1:rust:=blue else: rust:=red fi;
+}
+\ifbarevnesipky \drawcolor{rust}
+\headcolor{rust} \fi
+\pen{1.5pt}
+\draw\arrow\lines{(x1,0),(x3,0)}
+}
+
+
+\def\svsipka#1{
+\mfsrc{x1:=#1; 
+  if funkceg(0,#1)>0:x3:=x1+delka else: x3:=x1-delka fi;
+  if funkceg(0,x1)*funkceg(0,x3)<0: x1:=-100;x3:=-100 fi;
+  if x3>x1:rust:=blue else: rust:=red fi;
+}
+\ifbarevnesipky \drawcolor{rust}
+\headcolor{rust} \fi
+\pen{1.5pt}
+\draw\arrow\lines{(0,x1),(0,x3)}
+}
+
+
+
+\def\sipka#1#2{
+\mfsrc{x1:=#1; y1:=#2; 
+    x3:=x1+(delka*funkcef(#1,#2))/((funkcef(#1,#2)*xscale/100)++(funkceg(#1,#2)*yscale/100));
+    y3:=y1+(delka*funkceg(#1,#2))/((funkcef(#1,#2)*xscale/100)++(funkceg(#1,#2)*yscale/100));
+    if y3>y1:rust:=blue else: rust:=red fi;
+    }
+\ifbarevnesipky \drawcolor{rust}
+\headcolor{rust} \fi
+\draw\arrow\lines{z1,z3}}
+
+\def\sipkad#1#2{
+\mfsrc{x1:=#1; y1:=#2; 
+    x3:=x1+(delka*funkcef(#1,#2))/((funkcef(#1,#2)*xscale/100)++(funkceg(#1,#2)*yscale/100));
+    y3:=y1+(delka*funkceg(#1,#2))/((funkcef(#1,#2)*xscale/100)++(funkceg(#1,#2)*yscale/100));
+    if y3>y1:rust:=blue else: rust:=red fi;
+    }
+\ifbarevnesipky \drawcolor{rust}
+\headcolor{rust} \fi
+\dashed\arrow\lines{z1,z3}}
+
+\def\smpole#1{\proberbody#1;,;}
+\def\traj#1{\proberPP#1;,;}
+\def\poslednibod{}
+\def\ignoruj#1{\relax}
+
+\def\proberbody#1,#2;{\def\temp{#1}\ifx\temp\poslednibod\let\next\relax
+\else\sipka{#1}{#2}\relax\let\next\proberbody\fi\next}
+
+\def\proberPP#1,#2;{\def\temp{#1}\ifx\temp\poslednibod\let\next\relax
+\else
+%\message{#1,#2;}
+\trajektorie{#1}{#2}\relax\let\next\proberPP\fi\next}
+
+\mfsrc{path p,q;color rust;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newcommand\bb[1]{{\fboxsep 2pt\colorbox{white}{#1}}}
+
+
+
+
+
+\barevnesipkytrue
+
+
+\mfsrc{pr:=0.2;}
+\mfsrc{delka:=0.2; krok:=0.2; pocet:=2;}
+\fdef{funkcef}{x,y}{1}
+\fdef{funkceg}{x,y}{x+y**2}
+
+
+\begin{figure}
+  \centering
+\leavevmode
+\begin{mfpic}[600][200]{0}{0.5}{0.9}{1.8}
+  \pen{1pt}
+  \tlabelsep{1pt}
+\tlabel[tl](0,1.8){\colorbox{yellow}{$
+%\left\{
+\begin{aligned}y'&=x+y^2\\y(0)&=1
+\end{aligned}
+%\right.
+\quad\vrule width 0.4 pt\quad
+%\left\{
+\begin{aligned}x_{n+1}&=x_n+h\\
+    y_{n+1}&=y_n+kh\\h&=0.2
+  \end{aligned}
+%\right.
+$}
+}
+
+%  \drawcolor{green}
+  \mfsrc{krok:=0.02; pocet:=20;}
+  \trajektorieRKF{0}{1}
+  \mfsrc{krok:=0.2; pocet:=2;}
+  \tlabel[tr](0.39,1.8){\bb{Pøesné øe¹ení}}
+
+  \drawcolor{black}
+  \trajektorie{0}{1}
+  \tlabel[bl](0.4,1.5){\bb{Euler}}
+  \tlabel[tl](0,1){\bb{$k_1$}}
+  \tlabel[tl](0.2,1.2){\bb{$k_1$ pro druhý krok}}
+
+%  \drawcolor{rgb(0.5,0.5,0.5)}
+  \trajektorieRK{0}{1}
+  \tlabel[bl](0.4,1.71){\bb{RK}}
+  \tlabel[tl](0.1,1.1){\bb{$k_2$}}
+
+%  \drawcolor{rgb(1,1,0)}
+  \trajektorieRKF{0}{1}
+  \tlabel[tl](0.4,1.71){\bb{RK4}}
+
+  \tlabelsep{3pt}
+
+  \penwd{1pt}
+  \drawcolor{blue}\headcolor{blue}
+  \mfsrc{for j=0.9 step 0.1 until 1.8:
+    for i:=0 step 0.05 until 0.5:}
+  \sipka{i}{j}
+  \mfsrc{endfor;endfor;}
+  \drawcolor{black}
+  \doaxes{lbrt}
+  \bmarks{0,0.2,0.4}
+  \tmarks{0,0.2,0.4}
+  \lmarks{1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8}
+  \pointcolor{red}
+  \pointfilltrue
+  \point[4pt]{(0,1)}
+
+  \barevnesipkyfalse
+  \drawcolor{red}\headcolor{red}
+  \smpole{0,1;0.1,1.1}
+  \sipkad{0.2}{1.2}
+
+  \axislabels{b}[tc]{{$0$}0,{$0.2$}0.2,{$0.4$}0.4}
+  \axislabels{l}[cr]{{$1$}1,{$1.2$}1.2,{$1.4$}1.4,{$1.6$}1.6}
+\end{mfpic}
+  \caption{Numerické øe¹ení poèáteèní úlohy $y'=x+y^2$, $y(0)=1$}
+  \label{numint}
+\end{figure}
+
+
+
+\newpage
+
+\barevnesipkytrue
+
+
+\mfsrc{pr:=0.2;}
+\mfsrc{delka:=0.2; krok:=0.2; pocet:=2;}
+\fdef{funkcef}{x,y}{1}
+\fdef{funkceg}{x,y}{x+y**3}
+
+
+\begin{figure}
+  \centering
+
+\leavevmode
+\begin{mfpic}[600][113]{0}{0.5}{0.9}{2.5}
+  \pen{1pt}
+  
+  \tlabelsep{1pt}
+
+\tlabel[tl](0,2.5){\colorbox{yellow}{$
+%\left\{
+\begin{aligned}y'&=x+y^3\\y(0)&=1
+\end{aligned}
+%\right.
+\quad\vrule width 0.4 pt\quad
+%\left\{
+\begin{aligned}x_{n+1}&=x_n+h\\
+    y_{n+1}&=y_n+kh\\h&=0.2
+  \end{aligned}
+%\right.
+$}}
+%  \drawcolor{green}
+  \mfsrc{krok:=0.01; pocet:=39;}
+  \tlabel[tr](0.39,2.5){\bb{Pøesné øe¹ení}}
+  \trajektorieRKF{0}{1}
+  \mfsrc{krok:=0.2; pocet:=2;}
+
+
+%  \drawcolor{black}
+  \trajektorie{0}{1}
+  \tlabel[cl](0.4,1.6){\bb{Euler}}
+  \tlabel[tl](0,1){\bb{$k_1$}}
+  \tlabel[tl](0.2,1.2){\bb{$k_1$ pro druhý krok}}
+
+%  \drawcolor{rgb(0.5,0.5,0.5)}
+  \trajektorieRK{0}{1}
+  \tlabel[cl](0.4,2.05){\bb{RK}}
+  \tlabel[tl](0.1,1.1){\bb{$k_2$}}
+
+%  \drawcolor{rgb(1,1,0)}
+  \trajektorieRKF{0}{1}
+  \tlabel[cl](0.4,2.15){\bb{RK4}}
+
+
+  % \Rozsah[4.1-]{\traj{0,0.92}}
+  % \Rozsah[5-]{
+  %   \mfsrc{pocet:=500;}
+  %   \drawcolor{gray(0.5)}
+  %   \traj{0.5,0}}
+
+  \penwd{1pt}
+  \drawcolor{blue}\headcolor{blue}
+  \mfsrc{for j=0.9 step 0.1 until 2.4:
+    for i:=0 step 0.05 until 0.5:}
+  \sipka{i}{j}
+  \mfsrc{endfor;endfor;}
+  \drawcolor{black}
+  \doaxes{lbrt}
+  \bmarks{0,0.2,0.4}
+  \tmarks{0,0.2,0.4}
+  \lmarks{1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2,2.1,2.2,2.3,2.4}
+  \pointcolor{red}
+  \pointfilltrue
+  \point[4pt]{(0,1)}
+
+  \barevnesipkyfalse
+  \drawcolor{red}\headcolor{red}
+  \smpole{0,1;0.1,1.1}
+  \sipkad{0.2}{1.2}
+
+  \axislabels{b}[tc]{{$0$}0,{$0.2$}0.2,{$0.4$}0.4}
+  \axislabels{l}[cr]{{$1$}1,{$1.2$}1.2,{$1.4$}1.4,{$1.6$}1.6,{$1.8$}1.8,{$2$}2,{$2.2$}2.2,{$2.4$}2.4}
+\end{mfpic}
+\caption{Numerické øe¹ení poèáteèní úlohy $y'=x+y^3$, $y(0)=1$}
+\label{numint2}
+\end{figure}
+
+\section{Dal¹í rovnice}
+
+\begin{itemize}
+\item Stejnì se postupuje i pro systém libovolného poètu lineárních
+  rovnic prvního øádu. Napøíklad pro autonomní systém $
+  \left\{\begin{aligned} x'&=f(x,y)\\y'&=g(x,y)
+    \end{aligned}\right. $, poèáteèní podmínku $\left\{
+    \begin{aligned}
+      x(0)&=x_0,\\ 
+      y(0)&=y_0
+    \end{aligned}\right. $ 
+  a Eulerovu metodu s krokem $h$ dostáváme $ {\left\{
+    \begin{aligned}
+      t_{i+1}&=t_i+h\\
+      x_{i+1}&=x_i+h f(x_i, y_i)\\
+      y_{y+1}&=y_i+h g(x_i,y_i)
+    \end{aligned}\right.} .  $
+
+\item   Diferenciální rovnici druhého øádu $y''+p(x)y'+q(x)y=f(x)$ mù¾eme
+  substitucí $y_1=y$, $y_2=y'$ pøepsat na systém $ \left\{
+    \begin{aligned}
+      y_1'&=y_2\\
+      y_2'&=f(x)-p(x)y_2-q(x)y_1
+    \end{aligned}
+  \right. $
+\end{itemize}
+\endinput
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TeX
+\mfsrc{aaaaa;}
+\headcolor{black}
+\headlen{4pt}
+\mfsrc{aaaaa;}
+
+MP
+aaaaa;
+setvariable (color) (headcolor) (black);
+aaaaa;
+
+
+
+
+TeX
+\mfsrc{aaaaa;}
+\arrow\lines{a,b}
+\mfsrc{aaaaa;}
+
+
+MP:
+aaaaa;
+store (curpath)
+headpath (3.0pt, 0, 0)
+drawn
+polyline (false)
+(a,b);
+aaaaa;
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,191 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\usetikzlibrary{%
+  calc,%
+  decorations.markings,%
+  decorations.pathreplacing,%
+  decorations.shapes,%
+  fit,%
+  intersections,%
+  matrix,%
+  positioning,%
+  shapes,%
+}
+
+\newcommand{\figureFont}{\sffamily}
+\newcommand{\figureFontSize}{\small}
+
+\colorlet{shade0}{black!0!white}
+\colorlet{shade1}{black!20!white}
+\colorlet{shade2}{black!40!white}
+\colorlet{shade3}{black!60!white}
+\colorlet{shade4}{black!80!white}
+\newlength{\normalLineWidth}
+\setlength{\normalLineWidth}{.6pt}
+\newlength{\nodeDist}
+\setlength{\nodeDist}{16pt}
+\newlength{\nodeSize}
+\setlength{\nodeSize}{14pt}
+\newlength{\dataFlowLineWidth}
+\setlength{\dataFlowLineWidth}{.6pt}
+\newlength{\controlFlowLineWidth}
+\setlength{\controlFlowLineWidth}{1.2pt}
+\newlength{\controlFlowLabelXSep}
+\setlength{\controlFlowLabelXSep}{4pt}
+\newlength{\edgeNrXSep}
+\setlength{\edgeNrXSep}{3pt}
+\newlength{\edgeNrYSep}
+\setlength{\edgeNrYSep}{2pt}
+\newlength{\matchLabelDist}
+\setlength{\matchLabelDist}{10pt}
+\tikzset{%
+  every picture/.style={%
+    >=stealth,
+  },
+  nothing/.style={%
+    draw=none,
+    fill=none,
+    minimum size=0,
+    inner sep=0,
+    outer sep=0,
+    node distance=0,
+  },
+  node/.style={%
+    draw,
+    fill=shade0,
+    circle,
+    minimum size=\nodeSize,
+    inner sep=0,
+    outer sep=0,
+    node distance=\nodeDist,
+    font=\relsize{-.5},
+  },
+  computation node/.style={%
+    node,
+    circle,
+    line width=\dataFlowLineWidth,
+  },
+  control node/.style={%
+    node,
+    diamond,
+    minimum size=1.5\nodeSize,
+    line width=\controlFlowLineWidth,
+  },
+  value node/.style={%
+    rectangle,
+    draw,
+    fill=shade0,
+    minimum size=0.7\nodeSize,
+    inner sep=0,
+    outer sep=0,
+    node distance=\nodeDist,
+    line width=\dataFlowLineWidth,
+    font=\relsize{-.5},
+  },
+  state node/.style={%
+    value node,
+    fill=shade2,
+  },
+  block node/.style={%
+    rectangle,
+    draw,
+    fill=shade0,
+    minimum size=0.8\nodeSize,
+    inner xsep=4pt,
+    inner ysep=0,
+    outer sep=0,
+    node distance=\nodeDist,
+    line width=\controlFlowLineWidth,
+    font=\relsize{-.5}\strut,
+  },
+  data flow/.style={%
+    ->,
+    line width=\dataFlowLineWidth,
+  },
+  state flow/.style={%
+    data flow,
+    dashed,
+  },
+  control flow/.style={%
+    ->,
+    line width=\controlFlowLineWidth,
+    shorten <=-\controlFlowLineWidth,
+  },
+  control-flow label/.style={
+    nothing,
+    inner xsep=\controlFlowLabelXSep,
+    font=\sffamily\relsize{-.5},
+    auto,
+  },
+  definition edge/.style={%
+    line width=\dataFlowLineWidth,
+    dotted,
+  },
+  edge number/.style={
+    nothing,
+    inner xsep=\edgeNrXSep,
+    inner ysep=\edgeNrYSep,
+    font=\relsize{-2},
+    auto,
+  },
+  block label/.style={
+    control-flow label,
+    inner xsep=0,
+    inner ysep=2pt,
+    font=\relsize{-.5}\irFont\bfseries,
+  },
+  match line/.style={%
+    dash pattern=on 2.5pt off 3pt,
+    line width=\dataFlowLineWidth,
+  },
+  selected match line/.style={%
+    match line,
+    solid,
+  },
+  match node/.style={%
+    match line,
+    draw,
+    circle,
+    inner sep=1pt,
+    outer sep=0,
+  },
+  match label/.style={%
+    nothing,
+    outer sep=1pt,
+    node distance=\matchLabelDist,
+    font=\footnotesize,
+  },
+  match attachment line/.style={%
+    line width=1.25\dataFlowLineWidth,
+  },
+  dead/.style={
+    draw=black!60!white,
+    text=black!60!white,
+  },
+  invclip/.style={%
+    clip,
+    insert path={
+      { [reset cm]
+        (-16383.99999pt,-16383.99999pt) rectangle (16383.99999pt,16383.99999pt)
+      }
+    },
+  },
+  ->-/.style={
+    decoration={
+      markings,
+      mark=at position #1 with {\arrow{>}},
+    },
+    postaction={decorate},
+  },
+}
+\makeatletter
+\tikzset{
+  position/.style args={#1 degrees from #2}{%
+    at=(#2.#1), anchor=#1+180, shift=(#1:\tikz@node@distance),
+  },
+}
+\makeatother

@@ -1,0 +1,2274 @@
+% \iffalse meta-comment
+% !TEX program  = pdfLaTeX
+%<*internal>
+\iffalse
+%</internal>
+%<*readmemd>
+## ftc-notebook — Formating for FIRST Tech Challenge (FTC)  Notebooks
+
+Team FTC 9773, Robocracy, Released 2019/02, Version 1.0
+
+### Abstract
+  
+The ftc-notebook package will greatly simplify filling entries for your FIRST Tech Challenge (FTC) engineering or outreach notebook. We build on top of LaTeX, a robust system that can easily accommodates documents of 100+ pages of entries, figures, and tables while providing support for cross-references.  We developed this package to support most frequently used constructs encountered in an FTC notebook: meetings, tasks, decisions with pros and cons, tables, figures with explanations, team stories and bios, and more. We developed this package during the 2018- season and are using it for our engineering notebook. Team Robocracy is sharing this style in the spirit of coopertition.
+
+### Overview
+
+The LaTeX package ftc-notebook provides help to format a FIRST Tech Challenge (FTC) engineering or outreach notebook. Using this style, you will be able to seamlessly produce a high quality notebook. Its main features are as follows.
+
+- Esthetically pleasing cover pages for the notebook and monthly updates.
+- Easy to use format to enter a team story and a bio for each of the team members.
+- Quick references using list of tasks, figures, and tables.
+- Meeting entries separated into lists of tasks.
+- Each task is visually labeled as one of several kind of activities, such as Strategy, Design, Build, Software,... Activity kind can be customized to reflect a team’s particular focus.
+- Support for supporting your decisions in clear tables that list the pros and cons of each of your decisions.
+- Support for illustrating your robot using pictures with callouts. A callout is text in a box with an arrow pointing toward an interesting feature on your picture.  
+- Support for pictures with textual explanation, and groups of picture within a single figure.
+
+We developed this style during the 2018-2019 FTC season and we used it successfully during our competitive season. Compared to other online documents, it is much more robust for large documents. By designing a common style for all frequent patterns, the document also has a much cleaner look. LaTeX is also outstanding at supporting references. Try combining it with an online service like Overleaf, and your team will be generating quality notebooks in no time by actively collaborating online.
+
+We developed this package to require little knowledge of LaTeX. We have tried to hide of the implementation details as much as possible. We explain LaTeX concepts as we encountered them in the document, so we recommend that LaTeX novices read the document once from front to back. Experienced users may jump directly to figures and sections explaining specific environment and commands.
+
+The overall structure of an FTC notebook should be as shown in Figure 1 below.
+
+```
+  \documentclass[11pt]{article}
+  \usepackage[Num=FTC~9773, Name=Robocracy]{ftc-notebook}
+  \begin{document}
+  % 1: cover page and lists
+  \CoverPage{2018-19}{robocracy18.jpg}
+  \ListOfTasks
+  \ListOfFigures
+  \ListOfTables
+  
+  % 2: start of the actual notebook with optional team story and bios
+  \StartNotebook
+  \input{src/story.tex}
+  \input{src/bio.tex}
+  
+  % 3: meeting entries with optional month delimiters
+  \Month{August}{aug18.jpg}
+  \input{src/aug19.tex}
+  \input{src/aug21.tex}
+  % repeat for successive months until the end of your successful season
+  \end{document}
+  
+  Figure 1: Template for notebook.
+```
+  
+A document consists of three distinct parts. First, we generate a cover page, followed by lists of tasks, figures, and tables. Pages use alphabetical numbering, as customary for initial front matter. As shown in Figure 1, a LaTeX document starts with a \documentclass command, followed by a list of packages used, and then a \begin{document} command. In LaTeX, comments use the percent character.
+
+Second, we indicate the beginning of the actual notebook using the \StartNotebook command. Pages are then numbered with numerical page numbers starting at 1. A team story and team bio can be entered here, and have specific LaTeX commands detailed in the documentation.  For users unfamiliar with LaTeX, \input commands are used to include separate files whose file names are passed as arguments. The included files are processed as if they were directly listed in the original file. We will use this feature extensively to manage large documents such as an engineering notebook.
+
+Third, we have the actual content of the notebook. We structure entries by meeting and suggest that each meeting uses a distinct input file for its text and a corresponding subdirectory for its supporting material, such as pictures. A meeting entry typically consists of a list of tasks.  Optionally, a new month can be started with a cover page that includes a picture that highlights the accomplishment of the team for that month.
+
+Because you may generate a lot of text, figures, and pictures over the course of your season, we recommend the file structure shown in Figure 2.
+
+```
+Directory structure:
+  
+  notebook.tex:     Your main latex file.
+  ftc-notebook.sty: This style files that includes all the formatting, 
+                    unless the style file was installed in your
+                    LaTeX directory
+  newmeeting.sh:    A bash script that allows you to create a new
+                    meeting file that is pre-filled. The script can be
+                    customized for your team.
+  src:              Directory where all the meeting info will go.
+  |        
+  --> images:       A subdirectory where all the global pictures will go.
+  |                 We recommend to put the team logo, team picture,
+  |                 and monthly pictures (if you chose to use them)
+  |                 Pictures are searched there by default.
+  --> aug19.tex     A file that includes all the text for your
+  |                 (hypothetical) August 19th meeting 
+  --> aug19:        A subdirectory where you put all the images 
+                    needed in your aug19.tex file
+
+Figure 2. Directory structure.
+```
+
+We recommend to use a pair of "date.tex" LaTeX file and "date" subdirectory for each meeting.  This structure minimizes the risk of name conflicts for pictures and other attachments during the FTC season. Generally, directories logically organized by dates also facilitate searching for specific information.
+
+%</readmemd>
+%<*readmetxt>
+ftc-notebook — Formating for FIRST Tech Challenge (FTC)  Notebooks
+Team FTC 9773, Robocracy, Released 2019/02, Version 1.0
+
+Abstract
+  
+The ftc-notebook package will greatly simplify filling entries for
+your FIRST Tech Challenge (FTC) engineering or outreach notebook. We
+build on top of LaTeX, a robust system that can easily accommodates
+documents of 100+ pages of entries, figures, and tables while
+providing support for cross-references.  We developed this package to
+support most frequently used constructs encountered in an FTC
+notebook: meetings, tasks, decisions with pros and cons, tables,
+figures with explanations, team stories and bios, and more. We
+developed this package during the 2018- season and are using it for
+our engineering notebook. Team Robocracy is sharing this style in the
+spirit of coopertition.
+
+Overview
+
+The LaTeX package ftc-notebook provides help to format a FIRST Tech
+Challenge (FTC) engineering or outreach notebook. Using this style,
+you will be able to seamlessly produce a high quality notebook. Its
+main features are as follows.
+
+- Esthetically pleasing cover pages for the notebook and monthly
+  updates.
+- Easy to use format to enter a team story and a bio for each of
+  the team members.
+- Quick references using list of tasks, figures, and tables.
+- Meeting entries separated into lists of tasks.
+- Each task is visually labeled as one of several kind of activities,
+  such as Strategy, Design, Build, Software,... Activity kind can be
+  customized to reflect a team’s particular focus.
+- Support for supporting your decisions in clear tables that list the
+  pros and cons of each of your decisions.
+- Support for illustrating your robot using pictures with callouts.
+  A callout is text in a box with an arrow pointing toward an
+  interesting feature on your picture.  
+- Support for pictures with textual explanation, and groups of picture
+  within a single figure.
+
+We developed this style during the 2018-2019 FTC season and we used it
+successfully during our competitive season. Compared to other online
+documents, it is much more robust for large documents. By designing a
+common style for all frequent patterns, the document also has a much
+cleaner look. LaTeX is also outstanding at supporting references. Try
+combining it with an online service like Overleaf, and your team will
+be generating quality notebooks in no time by actively collaborating
+online.
+
+We developed this package to require little knowledge of LaTeX. We
+have tried to hide of the implementation details as much as
+possible. We explain LaTeX concepts as we encountered them in the
+document, so we recommend that LaTeX novices read the document once
+from front to back. Experienced users may jump directly to figures and
+sections explaining specific environment and commands.
+
+The overall structure of an FTC notebook should be as shown in Figure 1
+below.
+
+
+  \documentclass[11pt]{article}
+  \usepackage[Num=FTC~9773, Name=Robocracy]{ftc-notebook}
+  \begin{document}
+  % 1: cover page and lists
+  \CoverPage{2018-19}{robocracy18.jpg}
+  \ListOfTasks
+  \ListOfFigures
+  \ListOfTables
+  
+  % 2: start of the actual notebook with optional team story and bios
+  \StartNotebook
+  \input{src/story.tex}
+  \input{src/bio.tex}
+  
+  % 3: meeting entries with optional month delimiters
+  \Month{August}{aug18.jpg}
+  \input{src/aug19.tex}
+  \input{src/aug21.tex}
+  % repeat for successive months until the end of your successful season
+  \end{document}
+  
+  Figure 1: Template for notebook.
+
+  
+A document consists of three distinct parts. First, we generate a
+cover page, followed by lists of tasks, figures, and tables. Pages use
+alphabetical numbering, as customary for initial front matter. As
+shown in Figure 1, a LaTeX document starts with a \documentclass
+command, followed by a list of packages used, and then
+a \begin{document} command. In LaTeX, comments use the percent
+character.
+
+Second, we indicate the beginning of the actual notebook using the
+\StartNotebook command. Pages are then numbered with numerical page
+numbers starting at 1. A team story and team bio can be entered here,
+and have specific LaTeX commands detailed in the documentation.  For
+users unfamiliar with LaTeX, \input commands are used to include
+separate files whose file names are passed as arguments. The included
+files are processed as if they were directly listed in the original
+file. We will use this feature extensively to manage large documents
+such as an engineering notebook.
+
+Third, we have the actual content of the notebook. We structure
+entries by meeting and suggest that each meeting uses a distinct input
+file for its text and a corresponding subdirectory for its supporting
+material, such as pictures. A meeting entry typically consists of a
+list of tasks.  Optionally, a new month can be started with a cover
+page that includes a picture that highlights the accomplishment of the
+team for that month.
+
+Because you may generate a lot of text, figures, and pictures over the
+course of your season, we recommend the file structure shown in Figure 2.
+
+
+Directory structure:
+  
+  notebook.tex:     Your main latex file.
+  ftc-notebook.sty: This style files that includes all the formatting, 
+                    unless the style file was installed in your
+                    LaTeX directory
+  newmeeting.sh:    A bash script that allows you to create a new
+                    meeting file that is pre-filled. The script can be
+                    customized for your team.
+  src:              Directory where all the meeting info will go.
+  |        
+  --> images:       A subdirectory where all the global pictures will go.
+  |                 We recommend to put the team logo, team picture,
+  |                 and monthly pictures (if you chose to use them)
+  |                 Pictures are searched there by default.
+  --> aug19.tex     A file that includes all the text for your
+  |                 (hypothetical) August 19th meeting 
+  --> aug19:        A subdirectory where you put all the images 
+                    needed in your aug19.tex file
+
+Figure 2. Directory structure.
+
+
+We recommend to use a pair of "date.tex" LaTeX file and "date"
+subdirectory for each meeting.  This structure minimizes the risk of
+name conflicts for pictures and other attachments during the FTC
+season. Generally, directories logically organized by dates also
+facilitate searching for specific information.
+
+%</readmetxt>
+%<*newmeeting>
+#!/bin/bash
+# file name, entry num
+if [ $# -ne 2 ]; 
+    then echo "
+  USAGE: newmeeting.sh name num
+    create a new directory and tex file for your meeting, where
+      name: file directory and file name for the new entry (e.g. sept06)
+      num:  populate src/name/name.tex with num tasks"
+  exit
+fi
+
+# customize your list of team members
+MEMBERS="Alonso, Aman, Arjun, Cadence, David, Deeya, Divek, Elina, Kaitlyn, Nicky, Zachary"
+
+
+DIR=src/$1
+FILE=src/$1.tex
+
+if [ -d "$DIR" ]; then
+    # Control will enter here if $DIRECTORY doesn't exist.
+    echo "directory $DIR exists already, pick a new name"
+    exit
+fi
+
+mkdir $DIR
+
+# print new day entry
+echo "
+% New entry for the day/weekend/week
+\begin{Meeting}% [type]% optional type (Preseason, Competition)
+  {}% title
+  {}% date
+  {hours}% duration
+  {$MEMBERS}% members
+  {% list of tasks" > $FILE
+
+# print task within new day entry
+for i in `seq 1 $2`;
+do
+  echo "     %
+     \TaskInfo{}{task:$1:}% title & label
+       {}% reflection" >> $FILE
+done
+echo "}
+
+%pict path: src/$1/.jpg
+" >> $FILE
+
+# print tasks
+for i in `seq 1 $2`;
+do
+  echo "
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NEW TASK: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Task% optional continuation of task, e.g. [\TaskRef{task:}]
+  {}% {num}[num]: num in 1-6: 1 Strategy; 2 Design; 3 Build; 4 Math/Physic; 5 Software; 6 Team
+
+\MeetingSummary
+     
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{Purpose and Overview} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{Design Process and Decisions} 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{Conclusions} 
+
+
+" >> $FILE
+done
+
+# print end of new day entry
+echo "
+ \end{Meeting}
+" >> $FILE
+
+echo "add following in main tex file:
+    \input{src/$1.tex}
+"
+%</newmeeting>
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+\preamble
+----------------------------------------------------------------
+ftc-notebook --- format for an FIRST Tech Challenge (FTC) engineering
+                 notebook with daily entries, team story, bio,
+                 and list of fig/table/tasks
+Version:         Released 2019/02, Version 1.0
+Authors:         FTC 9773, Team Robocracy
+E-mail:          ftcrobocracy@gmail.com
+----------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+Copyright (c) 2019 FTC 9773, Team Robocracy
+All rights reserved.
+
+Developed by FTC 9773 Robocracy team members
+Westchester County, NY
+2019
+
+This work may be distributed and/or modified under the
+conditions of the LaTeX Project Public License, either version 1.3
+of this license or (at your option) any later version.
+The latest version of this license is in
+  http://www.latex-project.org/lppl.txt
+and version 1.3 or later is part of all distributions of LaTeX
+version 2005/12/01 or later.
+
+This work has the LPPL maintenance status `maintained'.
+
+The Current Maintainer of this work is FTC 9773 Team Robocracy.
+
+This work consists of the files ftc-notebook.dtx, ftc-notebook.ins,
+ftc-notebook.pdf, ftc-notebook.sty, and newmeeting.sh and the derived files
+                                
+This package includes the callout.sty package, which was lightly
+adapted for our needs.  The original copyright of that package is
+listed before the callout code. Original version of the callout.sty
+is found on ctan.org
+                                
+\endpostamble
+\usedir{tex/latex/demopkg}
+\generate{
+  \file{\jobname.sty}{\from{\jobname.dtx}{package}}
+}
+%</install>
+%<install>\endbatchfile
+%<*internal>
+\usedir{source/latex/demopkg}
+\generate{
+  \file{\jobname.ins}{\from{\jobname.dtx}{install}}
+}
+\nopreamble\nopostamble
+\usedir{doc/latex/demopkg}
+\generate{
+  \file{README.md}{\from{\jobname.dtx}{readmemd}}
+  \file{README.txt}{\from{\jobname.dtx}{readmetxt}}
+}
+\generate{
+  \file{newmeeting.sh}{\from{\jobname.dtx}{newmeeting}}
+}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%</internal>
+%<*package>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ftc9773}[2019/02/03 FIRST Tech Challenge (FTC) %
+  package for engineering notebook by Robocracy]
+%</package>
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{\jobname}
+\usepackage[numbered]{hypdoc}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabu}
+\usepackage{tocloft}
+\renewcommand\cftloftitlefont{\Large}
+\renewcommand\cftlottitlefont{\Large}
+\lstnewenvironment{dtxverblisting}{%
+  \lstset{
+    gobble=2,
+    basicstyle=\ttfamily,
+    columns=fullflexible,
+    keepspaces=true,
+  }%
+}{}
+\addtolength\textwidth{-120pt}
+\addtolength\oddsidemargin{80pt}
+\addtolength\evensidemargin{80pt}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\OnlyDescription
+\begin{document}
+  \DocInput{\jobname.dtx}
+\end{document}
+%</driver>
+% \fi
+% 
+%\GetFileInfo{\jobname.sty}
+%
+%\title{^^A
+%  \textsf{ftc-notebook} --- Formating for FIRST Tech Challenge (FTC) Notebooks\thanks{^^A
+%    This file describes version 1.0, last revised \filedate.^^A
+%  }^^A
+%}
+%\author{^^A
+%  FTC 9773, Robocracy\thanks{E-mail: ftcrobocracy@gmail.com}^^A
+%}
+%\date{Released \filedate}
+%
+%\maketitle
+%
+%\begin{abstract}
+%
+%The \texttt{ftc-notebook} package will greatly simplify filling entries
+%for your FTC engineering or outreach notebook. We build on top of
+%LaTeX, a robust system that can easily accommodates 100+ pages of
+%documents, figures, and tables while providing support for 
+%cross-references.  We developed this package to support most
+%frequently used constructs encountered in an FTC notebook: meetings,
+%tasks, decisions with pros and cons, tables, figures with
+%explanations, team stories and bios, and more. We developed this
+%package during the 2018-2019 season and are using it for our
+%engineering notebook. Team Robocracy is sharing this style in the
+%spirit of coopertition.
+%
+%\end{abstract}
+%\sloppy
+%\changes{v1.0}{2019/02/03}{First public release}
+%\vspace{1cm}~\\
+%\tableofcontents
+%\newpage
+%\listoffigures
+%\listoftables
+%\newpage
+%
+%\section{Overview}
+%
+%The LaTeX package \texttt{ftc-notebook} provides help to format a
+%FIRST Tech Challenge (FTC) engineering or outreach notebook. Using
+%this style, you will be able to seamlessly produce a high quality
+%notebook. Its main features are as follows.
+%
+%\begin{itemize}
+%  \item Esthetically pleasing cover pages for the notebook and monthly updates.
+%  \item Easy to use format to enter a team story and a bio for
+%    each of the team members.
+%  \item Quick references using list of tasks, figures, and tables.
+%  \item Meeting entries separated into lists of tasks.
+%  \item Each task is visually labeled as one of several kind of activities,
+%    such as Strategy, Design, Build, Software,... Activity kind can be
+%    customized to reflect a team's particular focus.
+%  \item Support for supporting your decisions in clear tables that
+%    list the pros and cons of each of your decisions.
+%  \item Support for illustrating your robot using pictures with
+%    callouts. A callout is text in a box with an arrow pointing
+%    toward an interesting feature on your picture.
+%  \item Support for pictures with textual explanation, and groups of
+%    picture within a single figure.
+%\end{itemize}
+%
+%
+%We developed this style during the 2018-2019 FTC season and we used
+%it successfully during our competitive season. Compared to other
+%online documents, it is much more robust for large documents. By
+%designing a common style for all frequent patterns, the document also
+%has a much cleaner look.  LaTeX is also outstanding at supporting
+%references. Try combining it with an online service like Overleaf,
+%and your team will be generating quality notebooks in no time by
+%actively collaborating online.
+%
+%We developed this package to require little knowledge of LaTeX. We
+%have tried to hide of the implementation details as much as
+%possible. We explain LaTeX concepts as we encountered them in the
+%document, so we recommend that LaTeX novices read the document once
+%from front to back. Experienced users may jump directly to figures and
+%sections explaining specific environment and commands.
+%
+%The overall structure of an FTC notebook should be as shown in
+%Figure~\ref{fig:template} below.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \documentclass[11pt]{article}
+%    \usepackage[Num=FTC~9773, Name=Robocracy]{ftc-notebook}
+%    \begin{document}
+%      % 1: cover page and lists
+%      \CoverPage{2018-19}{robocracy18.jpg}    
+%      \ListOfTasks
+%      \ListOfFigures
+%      \ListOfTables
+%
+%      % 2: start of the actual notebook with optional team story and bios
+%      \StartNotebook
+%      \input{src/story.tex}
+%      \input{src/bio.tex}
+%
+%      % 3: meeting entries with optional month delimiters
+%      \Month{August}{aug18.jpg}
+%      \input{src/aug19.tex}
+%      \input{src/aug21.tex}    
+%      % repeat for successive months until the end of your successful season
+%    \end{document}
+%  \end{dtxverblisting}
+%  \caption{Template for notebook.}
+%  \label{fig:template}
+%\end{figure}
+%
+%A document consists of three distinct parts. First, we generate a
+%cover page, followed by lists of tasks, figures, and tables. Pages
+%use alphabetical numbering, as customary for initial front matter. As
+%shown in Figure~\ref{fig:template}, a Latex document starts with a
+%\cs{documentclass} command, followed by a list of packages used, and
+%then a \cs{begin\{document\}} command. In LaTeX, comments use "\%."
+%
+%Second, we indicate the beginning of the actual notebook using the
+%\cs{StartNotebook} command.  Pages are then numbered with numerical
+%page numbers starting at 1. A team story and team bio can be entered
+%here, and have specific LaTeX commands detailed in
+%Sections~\ref{sec:story} and~\ref{sec:bio}. For users unfamiliar with
+%LaTeX, \cs{input} commands are used to include separate files whose
+%file names are passed as arguments. The included files are processed
+%as if they were directly listed in the original file. We will use this
+%feature extensively to manage large documents such as an engineering
+%notebook.
+%
+%Third, we have the actual content of the notebook. We structure
+%entries by meeting and suggest that each meeting uses a distinct input
+%file for its text and a corresponding subdirectory for its
+%supporting material, such as pictures. A meeting entry typically
+%consists of a list of tasks. Optionally, a new month can be started
+%with a cover page that includes a picture that highlights the
+%accomplishment of the team for that month.
+%
+%We strongly recommend that you use the following file structure
+%for your notebook.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    Directory structure:
+%      notebook.tex:     Your main latex file.
+%      ftc-notebook.sty: This package files, unless the package was 
+%                        installed in your LaTeX install directory.
+%      newmeeting.sh:    A bash script that allows you to create a new
+%                        meeting file that is pre-filled. The script can 
+%                        be customized for your team.
+%      src:              A directory where all the meeting info will go.
+%      |
+%      --> image:        A subdirectory where all the global pictures will 
+%      |                 go. We recommend to place there the team logo, 
+%      |                 team picture, and monthly pictures.
+%      |                 Pictures are searched there by default.
+%      --> aug19.tex     A file that includes all the text for your
+%      |                 (hypothetical) August 19th meeting.
+%      --> aug19:        A subdirectory where with all the images
+%                        needed for your aug19.tex LaTeX file.
+%  \end{dtxverblisting}
+%  \caption{Directory structure.}
+%\end{figure}
+%
+%We recommend to use a pair of "date.tex" LaTeX file and "date"
+%subdirectory for each meeting.  This structure minimizes the risk of
+%name conflicts for pictures and other attachments during the FTC
+%season. Generally, directories logically organized by dates also
+%facilitate searching for specific information.
+%
+%\section{Package Description and Customization\label{sec:package}}
+%
+%The package parameters are used to customize the notebook with the
+%team name, team number, and the filename for a jpeg logo file. These
+%are required parameters, as this style will not work without them. In
+%particular, the logo file is expected to be either in the root
+%directory or in the src/image subdirectory. The second line of
+%Figure~\ref{fig:template} illustrates the mandatory parameters that
+%we used for our team. Use a "\textasciitilde" character instead of a
+%space when defining your parameters.
+%
+%In addition, each task in an FTC season is categorized by 6 distinct
+%activity kinds. The default activity kinds are "Strategy," "Design,"
+%"Build," "Physics and Math," "Software," and "Team". The default
+%values can be changed easily using the Kind parameters
+%listed in Table~\ref{tab:arguments}.
+%
+%\begin{table}[H]
+%  \begin{center}
+%  \begin{tabular}{|p{2cm}|p{5cm}|p{5cm}|}
+%    \hline
+%    \textbf{option name} & \textbf{description} & \textbf{default} \\ \hline 
+%    \texttt{Num} & team number & FTC\textasciitilde 000 \\ 
+%    \texttt{Name} & team name & Outstanding\textasciitilde Team \\ 
+%    \texttt{Notebook} & notebook type & Engineering\textasciitilde Notebook \\ \hline
+%    \texttt{Grid} & enables grid overlay over pictures & \\ \hline
+%    \texttt{KindOne} & first task kind & Strategy \\ 
+%    \texttt{KindTwo} & second task kind & Design  \\ 
+%    \texttt{KindThree} & third task kind & Build \\ 
+%    \texttt{KindFour} & fourth task kind & Physics and Math \\ 
+%    \texttt{KindFive} & fifth task kind & Software \\ 
+%    \texttt{KindSix} & sixth task kind & Team \\\hline
+%  \end{tabular}
+%  \end{center}
+%  \caption{Parameters for package, using "\textasciitilde" wherever a space is needed.}
+%  \label{tab:arguments}
+%\end{table}
+%
+%Additionally, default colors can be changed using the
+%\cs{definecolor} commands as shown below. For each of the five colors
+%used by the package, we can provide a specific RGB triplet of values 
+%to change the default coloring scheme.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \definecolor{TitleColor}{rgb}{0.65, 0.73, 0.29}
+%    \definecolor{MainTableHeaderColor}{rgb}{0.84, 0.96, 0.29}
+%    \definecolor{MainTableCellColor}{rgb}{0.70, 0.82, 0.32}
+%    \definecolor{NormalTableHeaderColor}{rgb}{0.84, 0.96, 0.29}
+%    \definecolor{NormalTableCellColor}{rgb}{0.94, 0.99, 0.78}
+%    \definecolor{NormalTableCellWhite}{rgb}{1.0, 1.0, 1.0}
+%  \end{dtxverblisting}
+%  \caption{Example of how to change the default colors of the titles.}
+%\end{figure}
+%
+%These commands must be placed after the \cs{usepackage} command and
+%before the \cs{begin\{document\}} command.
+%
+%\section{Entering Text for a Meeting\label{sec:meeting}}
+%
+%In this section, we describe the environments and commands
+%used to generate a report summarizing the activities of a
+%meeting. A meeting can report a day's worth of work, or a weekend, or
+%even a week. Our preference is to use one meeting report per weekend.
+%
+%The structure of a meeting is as follows. It starts with a high level
+%description of the meeting, including date, title, and a list of
+%members that participated to the meeting.  The high level description
+%also includes a list of task accomplished. The goal of this high
+%level description is to allow a team to quickly locate prior tasks
+%that were accomplished in a meeting. No-one will have to read the
+%whole file to determine if a new drivetrain was attempted on that
+%weekend, or not. It should be right at the beginning of the meeting
+%file.
+%
+%After the high level info, we will have the text, figures, and
+%tables associated with each of the tasks.
+%
+%\subsection{Meeting Description}
+%
+%\begin{macro}{Meeting}
+%
+%Let us now look at the format of a meeting entry, for example for an
+%hypothetical August~19 meeting written in a "src/aug18.tex" LaTeX
+%file.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{Meeting}[<kind>]%
+%      {<title>} {<date>} {<duration>} {<members>}% 
+%      {% list of tasks
+%        \TaskInfo{<task title>}{<task label>}{<task reflection>}%
+%      }
+%      % meeting info
+%    \end{meeting}
+%  \end{dtxverblisting}
+%  \caption{Meeting entry (first and last command in a given meeting file).}
+%  \label{fig:meeting}
+%\end{figure}
+%
+%The overall structure is a \texttt{Meeting} environment. In LaTeX,
+%environments are delineated with a \cs{begin\{env\}} command and a
+%matching \cs{end\{env\}} command at the end of the environment.  The
+%\cs{begin\{Meeting\}} command initialize the \texttt{Meeting}
+%environment with one optional argument and five mandatory arguments.
+%This command should be the first LaTeX command in the "src/aug18.tex"
+%file.
+%
+%In LaTeX, mandatory arguments are given in curly braces, and optional
+%arguments are passed in square brackets. For commands with long
+%parameters, it is tempting to separate the arguments in many
+%lines. When doing so, especially with optional arguments, we
+%recommend to start a comment at the end of each of the parameter lines
+%(i.e. add a "\%" character). This will let LaTeX know that the next lines 
+%may contain an additional argument.
+%
+%The first argument \oarg{kind} is optional and describes the meeting
+%kind. A typical meeting kind may be "Meeting," "Preseason,"
+%"Competition," "Outreach," or something of this sort. "Meeting" is
+%used by default if the optional argument is omitted. The second
+%argument \marg{title} is mandatory and indicates the meeting's
+%title. The third argument \marg{date} is mandatory and provides the
+%meeting's date or date range.  The fourth argument \marg{duration} is
+%mandatory and describes the duration of the meeting. The fifth
+%argument \marg{members} is mandatory and lists the name of the team
+%members present at the meeting. The sixth and last argument is
+%mandatory and provides a list of tasks performed at the meeting. This
+%list provides one \cs{TaskInfo} command per task. This command is
+%detailed in Section~\ref{sec:taskinfo}.
+%
+%After the \cs{begin\{Meeting\}} command, we have the actual
+%content of the meeting. We provide many commands to properly format
+%most typical entries, such as sections, subsections, figures,
+%tables, list of decisions... These commands will be detailed in
+%subsequent sections.
+%
+%The file is terminated by the \cs{end\{Meeting\}} command to
+%indicate that all of the info about this meeting has be given. It
+%will print a box where team members can sign the entry as requested
+%by FTC best practices.
+%
+%\end{macro}
+%
+%\subsection{Task Description\label{sec:taskinfo}}
+%
+%\begin{macro}{\TaskInfo}
+%
+%A meeting is structured in several tasks. Each task is first
+%described within the \cs{begin\{Meeting\}} command's sixth argument
+%using the \cs{TaskInfo} command. This command has three mandatory
+%arguments, as shown in Figure~\ref{fig:meeting}.
+%
+%The first argument \marg{task title} indicates the title of the
+%task. The second argument \marg{task label} provides a unique label
+%for this task.  The third argument \marg{task reflection} is used to
+%provide a short reflection on the status of this task. This can
+%typically be something like "we discovered new problems," "we
+%realized that this approach works much better than previous
+%solutions," or any other high-level observation that you want
+%to share with the readers.
+%
+%If you accomplished three tasks during a given meeting, then three
+%\cs{TaskInfo} entries must be provided within the list of tasks.
+%
+%\end{macro}
+%
+%Now is a good time to mention how labels and references are used in
+%LaTeX. Wherever a reference is needed, we must give a unique string
+%that will describe the location in the document associated with the
+%label, typically a page, task, figure, or table number. We recommend
+%to structure the label with the kind (\texttt{task}, \texttt{fig},
+%\texttt{tab}), followed by the file name, followed by a string that
+%make sense to the particular label. Later in the text, you can
+%explicitly reference the given label, for example with
+%"Task\textasciitilde \cs{ref\{task:aug19:challenge\}},"
+%"Figure\textasciitilde \cs{ref\{fig:aug19:lift\}}," or
+%"Table\textasciitilde \cs{ref\{tab:aug19:decision\}}." For users not
+%familiar with LaTeX, a "\textasciitilde" character is used to
+%represent a space where the text before and after the tilde cannot be
+%separated by an end-of-line.
+%
+%\begin{macro}{\TaskRef}
+%\begin{macro}{\TableRef}
+%\begin{macro}{\FigureRef}
+%
+%We also provide custom commands to generate the task/table/figure
+%number as well as the page number of where to find the
+%task/table/figure: \cs{TaskRef\{<label>\}}, \cs{TableRef\{<label>\}},
+%or \cs{FigureRef\{<label>\}}. These commands are convenient to refer
+%to task/table/figures far in the past.
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\Task}
+%
+%Between the \cs{begin\{Meeting\}} and \cs{end\{Meeting\}} constructs,
+%we must provide detailed info for each task. Below is the command
+%used to do to start the actual description of a given task.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \Task [<prior task>] {<first kind>} [<second kind>]
+%  \end{dtxverblisting}
+%  \caption{Start of a task description.}
+%  \label{fig:task}
+%\end{figure}
+%
+%This command will start a new task section. One such command is
+%needed for each of the \cs{TaskInfo} listed in the
+%\cs{begin\{Meeting\}} command. This command will reuse the title
+%listed by the \cs{TaskInfo} command in the same order. We decided on
+%this structure so that if a team member were to change the title of
+%the task in the \cs{TaskInfo} arguments, this change would
+%automatically be reflected at the start of the task's description
+%here.
+%
+%The first optional argument \oarg{prior task} let us indicates if
+%this task is a continuation of one or more prior tasks. We strongly
+%recommend to fill in this argument when appropriate. For example, if
+%a given task is the continuation of a task with label
+%\texttt{task:aug06:challenge}, the argument should be set to
+%\cs{TaskRef\{task:aug06:challenge\}}.
+%
+%The second mandatory argument \marg{first kind} indicates which kind
+%of tasks this is. Recall that we are able to change the default kinds
+%in Section~\ref{sec:package} in Table~\ref{tab:arguments}.  If the
+%type corresponds to the first kind (e.g. "Strategy" by default), then
+%we expect the number "1" here. Acceptable values are numbers between
+%1 and 6, inclusively. Sometimes, it may be hard to classify a task
+%with only one type: the optional third argument \oarg{second kind}
+%let us input a second kind. The order between the first and second
+%numbers is not important.
+%
+%\end{macro}
+%
+%\subsection{Sections and Lists}
+%
+%\begin{macro}{\Section}
+%\begin{macro}{\Section*}
+%\begin{macro}{\Subsection}
+%\begin{macro}{\Subsection*}
+%
+%Now that we have a task section, we can can start filling the
+%description for that task. Most likely, we will want to have sections
+%and subsections to group related material
+%together. \cs{Section\{<title>\}} and \cs{Subsection\{<title>\}}
+%respectively starts a numbered section and subsection with the given
+%title.  The starred versions are variants that omit the section
+%numbering.
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\MeetingSummary}
+%
+%The \cs{MeetingSummary} simply emits a unnumbered section title with a
+%"Meeting Summary" title.
+%
+%\end{macro}
+%
+%\begin{macro}{EnumerateWithTitle}
+%\begin{macro}{ItermizeWithTitle}
+%
+%A frequent pattern is to have a section title followed by a list of
+%items. In LaTeX, numbered lists are referred as \texttt{enumerate}
+%environment and unnumbered or bulleted lists are referred as
+%\texttt{itemize} environment. Regardless of the type of list,
+%elements of the list always start with an \cs{item} command.
+%
+%While traditional LaTeX list environments can be used, we define here
+%two custom list environments that provide for an unnumbered section
+%title followed by a list of numbered or unnumbered list element. The
+%figure below illustrates a possible use of such constructs.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{EnumerateWithTitle}{A numbered list title} 
+%      \item one enumeration
+%      \item another enumeration, add more as needed
+%    \end{EnumerateWithTitle}
+%    
+%    \begin{ItemizeWithTitle}{A bulleted list title} 
+%      \item one bullet, add more as needed
+%    \end{ItemizeWithTitle}
+%  \end{dtxverblisting}
+%  \caption{Titled sections with numbered and unnumbered lists.}
+%\end{figure}
+%
+%In general, you can always use the LaTeX default list environments
+%(to be used with \cs{begin\{<environment>\}} and
+%\cs{end\{<environment>\}}, namely \texttt{enumerate},
+%\texttt{itemize}, or \texttt{compactitem} for, respectively, a number
+%list of items, a list of bulleted items, or a compact list of
+%bulleted items.
+%
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Tables}
+%
+%When entering data for a task, one pattern that we often use is a
+%table of pros and cons arguments. We need a table
+%with three columns: one describing the option considered, a second
+%column describing the pros of this option, and a third column
+%describing the drawbacks of this option. Below is an example of such
+%a decision tables.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{DecisionTable}
+%      {Decisions about lift}
+%      {tab:aug06:lift:decision}
+%       %
+%        \TableEntryTextItemItem{
+%          drawer slides
+%        } {% pros items
+%          \item works well
+%        } {% minus item
+%          \item heavy
+%        }
+%        \\ \hline
+%       %
+%        \TableEntryTextItemItem{
+%          rev slides
+%        } {% pros items
+%          \item light
+%        } {% minus item
+%          \item difficult under heavily load
+%        }
+%        % omit "\\ \hline" for last row
+%    \end{DecisionTable}
+%  \end{dtxverblisting}
+%  \caption{Example of decision table with pros and cons.}
+%  \label{fig:decision example}
+%\end{figure}
+%
+%Before going in the details of the environments and commands,
+%Figure~\ref{fig:decision example} illustrates a comparison for a
+%lift, comparing drawer slides to REV slides. Each row is given by a
+%\cs{TableEntry} type of commands, two in this case, separated by
+%\cs{\textbackslash~\textbackslash hline} commands. This
+%first type of commands provides the data for a given row, and that
+%latter type of commands forces LaTeX to create a new line and
+%separate the entries by a horizontal line inside of the table.
+%
+%\begin{macro}{DecisionTable}
+%
+%A decision tables always consists of a table environment with three
+%columns. Its arguments are as follows.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{DecisionTable} [<first col name>]%
+%      [<second col name>] [<third col name>]%
+%      {<caption>} {<label>}
+%  
+%    \end{DecisionTable}
+%  \end{dtxverblisting}
+%  \caption{Decision table.}
+%  \label{fig:decision}
+%\end{figure}
+%
+%The first three optional arguments, \oarg{first col name},
+%\oarg{second col name}, and \oarg{third col name}, are used to change
+%the default column names, respectively "Option," "Pro," and "Cons."
+%The fourth mandatory argument \marg{caption} is the title of the
+%table. This caption will also be listed in the list of tables
+%generated by the \cs{ListOfTables} command. The fifth mandatory
+%argument \marg{label} is a label to be used when referencing the
+%table.  We strongly encourage each table to be referenced at least
+%once in the text.
+%
+%\end{macro}
+%
+%\begin{macro}{DescriptionTable}
+%\begin{macro}{DescriptionTable*}
+%
+%We often need tables with two columns. For this purpose, we
+%propose the following \texttt{DescriptionTable} environments.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{DescriptionTable} {<first col name>}%
+%      {<second col name>} {<caption>} {<label>}
+%  
+%    \end{DescriptionTable}
+%  \end{dtxverblisting}
+%  \caption{Decision table.}
+%  \label{fig:description}
+%\end{figure}
+%
+%The first two mandatory arguments \marg{first col name} and
+%\marg{second col name} indicate the titles of each column. The
+%next tow mandatory arguments \marg{caption} and \marg{label}
+%provides, respectively, the caption and a label to refer to the
+%table.
+%
+%The two environments are very similar. The non-starred environment
+%has a narrow column followed by a wider column, ideal for title
+%followed by a longer text in the second column. The starred
+%environment has two columns of equal sizes.
+%
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\TableEntryTextTextText}
+%\begin{macro}{\TableEntryTextItemItem}
+%
+%The rows of tables with three columns are entered by the
+%\cs{TableEntryTextTextText} and \cs{TableEntryTextItemItem}
+%commands. Each take three mandatory arguments to input the data for each
+%of the three columns in a given row. The first command takes three text
+%entries, and the second command takes one text entry followed by two
+%bulleted lists. As shown in Figure~\ref{fig:decision example}, the
+%bulleted lists are entered as lines each starting by the \cs{item}
+%command. In tables, LaTeX does not like empty lines. So do not
+%include empty lines, and if you need a line break, you can always
+%enter the \cs{\textbackslash} new line command explicitly.
+%
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{\TableEntryTextText}
+%\begin{macro}{\TableEntryTextItem}
+%\begin{macro}{\TableEntryItemItem}
+%
+%The rows of tables with two columns are similarly entered with the
+%\cs{TableEntryTextText}, \cs{TableEntryTextItem}, and
+%\cs{TableEntryItemItem} commands. Each takes two mandatory arguments,
+%one for each column. Text or items are expected in the arguments
+%depending on the name of the command used.
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\subsection{Figures}
+%
+%Figures are important in notebooks, and the package
+%proposes several commands to help us with them. First, you need to
+%know that LaTeX primarily likes JPEG format, so pictures will 
+%need to be converted to JPEGs.  By convention, the pictures are
+%expected in the "src/aug19" subdirectory when processing the
+%"src/aug19.tex" meeting entry. It's a convention, not mandatory, but
+%useful to follow as long term there are lots of pictures, so grouping
+%them by meeting is convenient.
+%
+%\begin{macro}{\PictFigure}[H]
+%
+%The first, simplest command will generate a figure with a caption for
+%a single JPEG file. It expects the following arguments.
+%
+%\begin{figure}
+%  \begin{dtxverblisting}
+%    \PictFigure [<location>] {<jpeg file>} [<horizontal fraction>]%
+%      {<caption>} {<label>} [<callout>]
+%  \end{dtxverblisting}
+%  \caption{Figure with one picture.}
+%\end{figure}
+%
+%The second mandatory argument \marg{jpeg file} provides the path to
+%the JPEG file as well as the file name, including the ".jpg"
+%extension. It is best to use the full path from the root directory,
+%for example "src/aug19/game.jpg". The third optional argument \oarg{horizontal
+%fraction} provides an optional fraction (between 0 and 1) that
+%indicates the fraction of the horizontal page that should be utilized
+%for the picture. Default is 0.9 or 90\% of the horizontal space. The
+%fourth argument \marg{caption} is the caption text, and the fifth
+%argument \marg{label} is a label string used to create a unique
+%reference to this figure. The caption of each figure will also be
+%listed in the list of figures generated by the \cs{ListOfFigure}
+%command.
+%
+%Figures are floating object, they move where LaTeX estimate they fit
+%best. You can have some influence over the placement of the figures
+%using the first optional argument \oarg{location}. Possible values
+%are combinations of the entries shown in the table below. 
+%
+%\begin{table}[H]
+%  \begin{center}
+%  \begin{tabular}{|p{2cm}|p{9cm}|}
+%    \hline
+%    \textbf{Key} & \textbf{Description}
+%    \\ \hline
+%    h for here & try to put the figure close to where it is in the text \\
+%    t for top & try to put it at the top of a page\\
+%    b for bottom &  try to put the figure at the bottom of a page \\
+%    p for page & try to put it on a separate page (not with other text) \\
+%    H for HERE & try harder to put it here \\
+%    ! & try to force your choice. \\
+%    htb  & You can put several choices at once, e.g. a frequent one is [htb] %
+%           for here, or top, or bottom. \\
+%    \hline
+%  \end{tabular}
+%  \end{center}
+%  \caption{Values for floating object location in LaTex.}
+%  \label{tab:location}
+%\end{table}
+%
+%The last optional argument \oarg{callout} is used to add one or more
+%callouts. Callouts are used to overlay a text box on a figure, along
+%with an arrow pointing to the location of the interesting feature
+%is. So for example, the \cs{Callout\{-6,5\}\{Look Here\}\{-1,1\}}
+%command place a text box with text "Look Here" at the coordinate (X,
+%Y) = (-6, 5) with an arrow starting at the box and pointing to the
+%coordinate (X, Y) = (-1, 1). You may have arbitrary many callouts
+%inside the \oarg{callout} optional argument. Recall that if you write
+%the callout argument on a new line, we recommend to start a comment
+%at the end of the prior argument lines (i.e. add a "\%"
+%character). This will let LaTeX know that the next line contains
+%the optional argument.
+%
+%Because callouts require us to know the precise coordinates at which
+%to locate the text box and the arrow, we have added a parameter to
+%the \texttt{ftc-notebook} package, namely \texttt{grid}, as defined in
+%Table~\ref{tab:arguments}. When setting this package parameter, every
+%figure will include a grid that will help us determine the proper
+%coordinates for the callouts. Simply remove the parameter when done.
+%
+%\end{macro}
+%
+%\begin{macro}{\ExplainedPictFigure}
+%
+%Another frequent pattern is to have a picture one side of the page,
+%with a textual explanation next to it. For this pattern, we introduce the
+%\cs{ExplainedPictFigure} command which add one parameter to the
+%previous \cs{PictFigure} command to provide for a textual explanation.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \ExplainedPictFigure [<location>] {<jpeg files>}%
+%      [<horizontal fraction>] {<caption>} {<label>}
+%      {<explanation>} [<callout>]
+%  \end{dtxverblisting}
+%  \caption{An explained picture.}
+%  \label{fig:explained picture}
+%\end{figure}
+%
+%Because the picture and the textual explanation share the width of
+%the page, we suggest to use a smaller fraction of the horizontal
+%space for the picture.  In Figure~\ref{fig:explained picture} we may
+%use a \marg{horizontal value} of 0.5 for 50\% of the space for the
+%picture, thus leaving the remaining 50\% for the text. In the
+%mandatory argument \marg{explanation} we can enter a text such as the
+%one below.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    {% explanation (no empty line allowed); 
+%      Interesting features:
+%      \begin{compactitem}
+%        \item compact 
+%      \end{compactitem} 
+%    }
+%  \end{dtxverblisting}
+%  \caption{Example of an explanation text.}
+%  \label{fig:explanation text}
+%\end{figure}
+%
+%In this example, we have a phrase followed by a compact list of bullets.
+%
+%\end{macro}
+%
+%\begin{macro}{GroupedFigures}
+%\begin{macro}{PictSubfigure}
+%\begin{macro}{ExplainedPictSubfigure}
+%
+%Another frequent pattern is to add a group of pictures. To handle this
+%case, we introduce here a \texttt{GroupedFigures} environment
+%to encapsulate several subfigures. The commands are as below.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{GroupedFigures} [<locations>] {<caption>} {<label>}
+%
+%      \PictSubfigure {<jpeg file>} [<horizontal fraction>]%
+%        {<caption>} {<label>} [<callout>]
+%
+%      \ExplainedPictFigure {<jpeg files>}%
+%        [<horizontal fraction>] {<caption>} {<label>}
+%        {<explanation>} [<callout>]
+%
+%    \end{GroupedFigures}
+%  \end{dtxverblisting}
+%  \caption{Example of grouped figures.}
+%  \label{fig:groups fig}
+%\end{figure}
+%
+%The \cs{begin\{GroupedFigures\}} has the usual optional argument
+%\oarg{location} and mandatory arguments \marg{caption} and
+%\marg{label}.
+%
+%In turn, all of the subfigures have arguments similar to the figures
+%command previously seen, expect that they omit the optional location
+%argument as they are already grouped in a single floating figure.
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+%\begin{macro}{RawPict}
+%
+%There is one additional command that is convenient for pictures.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \RawPict {<jpeg file>} {<horizontal fraction>} {<callout>}
+%  \end{dtxverblisting}
+%  \caption{Raw picture.}
+%  \label{fig:raw picture}
+%\end{figure}
+%
+%This \cs{RawPict} command is used to insert a figure directly in a
+%table without labels, captions, and other arguments. It just take the
+%JPEG file name, its horizontal size, and callout which can be left
+%empty by using "\texttt{\{\}"}.
+%
+%\end{macro}
+%
+%This give you the essentials of the \texttt{ftc-notebook} package, many
+%more basic LaTeX command are useful, here is a list:
+%\texttt{enumerate}, \texttt{itemize}, \texttt{textbf}, handling
+%native \texttt{tabular} (tables in LaTeX) or \texttt{longtable}
+%(tables that can be split among consecutive pages).
+%
+%\section{Team Story\label{sec:story}}
+%
+%\begin{macro}{TeamStory}
+%We can add a "Team Story" page by using the following environment.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{TeamStory}{<moto>}
+%
+%      % team story
+%
+%    \end{TeamStory}
+%  \end{dtxverblisting}
+%  \caption{Team story.}
+%  \label{fig:story}
+%\end{figure}
+%
+%This environment let us enter a team story page with a mandatory
+%\marg{moto} argument, for example the team goal of the team for the
+%season.
+%
+%\end{macro}
+%
+%\section{Team Biography\label{sec:bio}}
+%
+%\begin{macro}{Bio}
+%\begin{macro}{BioEntry}
+%
+%We can also add a list of biographies for each team member as follows.
+%
+%\begin{figure}[H]
+%  \begin{dtxverblisting}
+%    \begin{Bio}
+%
+%      \BioEntry {<name>} {<title>}%
+%        [<role title>] {<role description>}%
+%        [<outreach role title>] {<outreach role description>}%
+%        {<jpeg file>} [<horizontal fraction>]%
+%        {<full bio>}
+%
+%    \end{Bio}
+%  \end{dtxverblisting}
+%  \caption{Team biography table.}
+%  \label{fig:bio}
+%\end{figure}
+%
+%The \texttt{Bio} environment creates a table in which the bio of each
+%team member can be given. The format for each team member comprises
+%of a picture given by the \marg{jpeg file} argument with the team
+%member's name from the \marg{name} argument and title from the
+%\marg{title} argument.
+%
+
+%Below the picture, we will also generate two role entries, each with
+%an optional role title and a mandatory role description. This is can
+%be used to highlight the team role and outreach role of each team
+%member. The full bio given by \marg{full bio} is listed in a second
+%column, next to the picture.
+
+%
+%\end{macro}
+%\end{macro}
+%
+%\section{Miscellaneous Commands}
+%
+%\begin{macro}{\CoverPage}
+%
+%The \cs{CoverPage} command is used to generate a cover page for your
+%notebook. It takes two mandatory arguments: \marg{date} and
+%\marg{jpeg file}. The date is used to describe the season,
+%e.g. "2018-2019". The second argument gives the picture to be
+%used on the cover page. By default, the picture is expected in the
+%"src/image" directory, but you can provide a different file path to
+%the file, e.g. "src/story/teampict.jpg".
+%
+%\end{macro}
+%
+%\begin{macro}{\ListOfTasks}
+%\begin{macro}{\ListOfFigures}
+%\begin{macro}{\ListOfTables}
+%
+%These commands create the corresponding list of tasks, figures, and
+%tables. We recommend that they are used before the \cs{StartNotebook}
+%command as the page numbering prior to the start command uses
+%alphabetical page numbering. This will allow the notebook to grow,
+%with the corresponding lists of tasks, figures, and tables to also
+%grow without changing the page numbering of your older notebook entry
+%pages.
+%
+%\end{macro}
+%\end{macro}
+%\end{macro}
+
+%\begin{macro}{\StartNotebook}
+%
+%Use this command to separate the front matter (cover pages and list
+%of content) from your actual notebook entry.
+%
+%\end{macro}
+
+%\begin{macro}{\Month}
+%
+%The \cs{month} command is used to create a cover page for a new
+%month. It takes two mandatory arguments: \marg{month} and \marg{jpeg
+%file}. The first argument indicates the month, and the second
+%arguments gives a path to the picture you want to use for the month
+%cover page. 
+%
+%\end{macro}
+
+%\StopEventually{^^A
+%  \PrintChanges
+%  \PrintIndex
+%}
+%
+%<*package>
+%\begin{macrocode}
+% \iffalse
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Package Options
+
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{
+  family=FTC,
+  prefix=FTC@
+}
+\DeclareStringOption [FTC 000]             {Num}      [FTC 000]
+\DeclareStringOption [Outstanding Team]    {Name}     [Outstanding Team]
+\DeclareStringOption [logo.jpg]            {Logo}     [logo.jpg]
+\DeclareStringOption [Engineering Notebook]{Notebook} [Engineering Notebook]
+\DeclareStringOption [Strategy]            {KindOne}  [Strategy]
+\DeclareStringOption [Design]              {KindTwo}  [Design]
+\DeclareStringOption [Build]               {KindThree}[Build]
+\DeclareStringOption [Math/Physics]        {KindFour} [Math/Physics]
+\DeclareStringOption [Software]            {KindFive} [Software]
+\DeclareStringOption [Team]                {KindSix}  [Team]
+\DeclareBoolOption                         {Grid}
+
+\ProcessKeyvalOptions*
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% includes
+
+%% general support
+\RequirePackage{longtable}
+\RequirePackage{datetime}
+\newdateformat{monthyeardate}{ \monthname[\THEMONTH] \THEYEAR }
+\RequirePackage[labelfont=bf, textfont=bf]{caption}
+\RequirePackage{subcaption}
+\RequirePackage{xparse}
+\RequirePackage{float}
+\RequirePackage{needspace}
+\RequirePackage{mathptmx}
+\RequirePackage{anyfontsize}
+\RequirePackage{t1enc}
+\RequirePackage{suffix}
+\RequirePackage[absolute, overlay]{textpos}
+
+%% support for tables
+\RequirePackage{array}
+\RequirePackage{multirow}
+\RequirePackage{tabu}
+\RequirePackage{paralist}
+
+%% capitalization \capitalisewords{Will Get First Letters in Cap}
+\RequirePackage{mfirstuc}
+\MFUnocap{are}
+\MFUnocap{or}
+\MFUnocap{and}
+\MFUnocap{for}
+\MFUnocap{by}
+\MFUnocap{a}
+\MFUnocap{an}
+\MFUnocap{in}
+\MFUnocap{am}
+\MFUnocap{pm}
+\MFUnocap{to}
+\MFUnocap{of}
+
+%% page
+\RequirePackage[letterpaper, portrait, margin=2cm]{geometry}
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\RequirePackage{titlesec}
+
+%% image
+\RequirePackage{graphicx}
+\graphicspath{{src/images/}}
+
+%% support for color
+\RequirePackage[table,dvipsnames]{xcolor}
+\RequirePackage{colortbl}
+
+%% support for callout (inlined below)
+\RequirePackage{calc}
+\setlength\arrayrulewidth{2pt}
+    
+%% for arrays of variables
+\RequirePackage{arrayjobx}
+    
+%% conditional
+\RequirePackage{ifthen}    
+   
+%% to use apostroph as \textquotesingle 
+\RequirePackage{textcomp}
+\RequirePackage[utf8]{inputenx}
+\RequirePackage{newunicodechar}
+
+%% for code listing ( \begin{lstlisting} \end{lstlisting}
+\RequirePackage{listings}
+
+ %% custom list
+\RequirePackage{tocloft}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% start of inlined callout (because package is not aways present)
+%% modified only to "un-package it." It was hardwired for the desired
+%% color scheme, and the arrow was made wider. The original can be found
+%% at CTAN.org
+
+% callouts.sty 
+% ==================================================================
+% (c) 2017 Markus Stuetz, markus.stuetz@gmail.com
+% This program can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt; either
+% version 1 of the License, or any later version.
+% ==================================================================
+
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\RequirePackage{xifthen}
+
+\newcommand*{\focol}{white}
+\newcommand*{\bgcol}{black}
+\newcommand*{\arcol}{red}
+
+%% ==================================================================
+
+\newenvironment{annotate}[2]
+{ \begin{tikzpicture}[scale=#2]
+  % Annotate
+  \node (pic) at (0,0) {#1};%
+  \newdimen\xtic
+  \newdimen\ytic
+  \pgfextractx\xtic{\pgfpointanchor{pic}{east}}
+  \pgfmathparse{int(\xtic/1cm)}
+  \pgfmathsetmacro\xtic{\pgfmathresult}
+  \pgfextracty\ytic{\pgfpointanchor{pic}{north}}
+  \pgfmathparse{int(\ytic/1cm)}
+  \pgfmathsetmacro\ytic{\pgfmathresult}
+}%
+{ \end{tikzpicture} }
+
+%% ==================================================================
+
+\newcommand{\helpgrid}[1][\bgcol]{
+  \draw[help lines, color=#1] (pic.south west) grid (pic.north east);%
+    \fill[#1] (0,0) circle (3pt);%
+  \foreach \i in {-\xtic,...,\xtic} {%
+    \node at (\i+0.2,0.2) {\color{#1} \tiny \i};}
+  \foreach \i in {-\ytic,...,\ytic} {%
+    \node at (0.2,\i+0.2) {\color{#1} \tiny \i};}
+}
+
+\newcommand{\callout}[3]{%
+  \node [fill=\bgcol] (text) at (#1) {\scriptsize\color{\focol} #2};
+  \draw [line width=0.9mm,\arcol,->] (text) -- (#3);
+}
+
+\newcommand{\note}[2]{%
+  \node [fill=\bgcol] at (#1) {\scriptsize\color{\focol} #2};
+}
+
+\newcommand{\arrow}[2]{%
+  \draw [\arcol,thick,->] (#1) -- (#2);
+}
+
+%% === EOF ================================================
+%% end of inlined callout 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% customizations arrays
+
+\newarray\@TaskDate
+\@TaskDate(1)={} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% counters (private)
+\newcounter{TaskCounter} \setcounter{TaskCounter}{0}
+\newcounter{TaskSection} \setcounter{TaskSection}{0}
+\newcounter{TaskSubSection}[TaskSection] \setcounter{TaskSubSection}{0}
+\newcounter{TaskSubSubSection}[TaskSubSection] \setcounter{TaskSubSubSection}{0}
+
+\renewcommand{\theTaskSection}{\arabic{TaskSection}}
+\renewcommand{\theTaskSubSection}{\arabic{TaskSection}.{\arabic{TaskSubSection}}}
+    
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% new month
+\NewDocumentCommand{\Month}{m m}
+%% 1: month
+%% 2: picture
+{
+  \cleardoublepage
+  \newpage
+  \@TaskDate(1)={#1,}
+  \begin{flushleft}
+  \tabulinesep=1.2mm
+  \begin{tabu}{p{2cm}>{\raggedright\arraybackslash}p{14.7cm}}
+      \multirow{2}{*}{\includegraphics[width=2cm]{\FTC@Logo}} 
+       & \textbf{\Large \color{TitleColor} \capitalisewords{#1}} \\
+       & \\ \cline{2-2} \\
+  \end{tabu}
+  \vspace{10mm}  \\	
+  \end{flushleft}
+  {\centering \includegraphics[width=0.85\textwidth]{#2} \\}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%macro new days
+\NewDocumentEnvironment{Meeting}{O{Meeting} m m m m m}
+%% 1: Type Meeting/Pre-Season
+%% 5 2: Title of Meeting
+%% 2 3: Date
+%% 3 4: Time
+%% 4 5: Who participated
+%% 6: Items
+{
+  %% arrays init
+  \newarray\TaskTitle
+  \newarray\TaskLabel
+  %% print first table with logo, meeting type, date, Title
+  \clearpage
+  \newpage
+  \@TaskDate(1)={#3, Task \theTaskSection, } 
+   \begin{flushleft}
+   \tabulinesep=1.2mm
+   \begin{tabu}{p{2cm}>{\raggedright\arraybackslash}p{14.7cm}}
+       \multirow{3}{*}{\includegraphics[width=2cm]{\FTC@Logo}} 
+           & \textbf{\Large \color{TitleColor} \capitalisewords{#1 -  #3.}} \\
+           & {\Large \capitalisewords{#2.}} \\ 
+           & \\ \cline{2-2} \\
+   \end{tabu}
+   \vspace{5mm}  \\
+   %% print time and participant
+   {\color{TitleColor} \textbf{Time:}} {\capitalisewords{#4.}} \\
+   {\color{TitleColor} \textbf{Meeting Participants:}} {#5.} \\
+   \vspace{5mm}  
+   %% print task box 
+   \rowcolors{1}{MainTableCellColor}{MainTableCellColor}
+   \begin{tabu}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{6cm}|>%
+        {\raggedright\arraybackslash}p{10cm}|}
+      \arrayrulecolor{TitleColor} \hline
+      \cellcolor{MainTableHeaderColor} & 
+      \cellcolor{MainTableHeaderColor} \textbf{Task:} & 
+      \cellcolor{MainTableHeaderColor} \textbf{Goals and Reflections:} \\  \hline
+      #6
+  \end{tabu}
+  \end{flushleft}
+}
+{
+  \needspace{3cm}
+  \begin{flushleft}
+  \rowcolors{1}{MainTableCellColor}{MainTableCellColor}
+  \tabulinesep=1.2mm
+  \begin{tabu}{|>{\raggedright\arraybackslash}p{13.5cm}>{\raggedright\arraybackslash}p{4cm}|}
+      \arrayrulecolor{TitleColor} \hline
+      \cellcolor{MainTableHeaderColor} \textbf{Signed by:} &%
+        \cellcolor{MainTableHeaderColor} \textbf{Date:} \\  \hline
+      &  \\
+      & #3   \\ \hline
+  \end{tabu}
+  \end{flushleft}
+  %% delete array
+  \delarray\TaskTitle
+  \delarray\TaskLabel
+  \ifnum\value{TaskCounter}=\value{TaskSection} \else
+    \PackageError{Robocracy text}{More Task defined than described}{add text}
+  \fi
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Task Info
+\newcommand{\TaskInfo}[3] %
+%% 1: title
+%% 2: reference 
+%% 2: reflection
+{
+  \stepcounter{TaskCounter}
+  \TaskTitle(\theTaskCounter)={#1}
+  \TaskLabel(\theTaskCounter)={#2}
+  \cellcolor{MainTableHeaderColor} \textbf{\arabic{TaskCounter}.} & \textbf{#1} & #3. \\ \hline 
+}
+ 
+%% private
+\newcommand{\@TypeColor}[4]
+{%
+ \ifthenelse%
+   {\equal{#1}{#2}}%
+   {\cellcolor{black}\textcolor{NormalTableCellColor}{#4}}%
+   {\ifthenelse%
+     {\equal{#1}{#3}}%
+     {\cellcolor{black}\textcolor{NormalTableCellColor}{#4}}%
+     {#4}%
+   }%
+}%
+
+%% private
+\ExplSyntaxOn
+\DeclareExpandableDocumentCommand{\IfNoValueOrEmptyTF}{mmm}
+{
+ \IfNoValueTF{#1}
+  {#2} %% true
+  {\tl_if_empty:nTF {#1} {#2} {#3}} %% false
+}
+\ExplSyntaxOff
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% task section
+\NewDocumentCommand{\Task}{o m O{-1}}
+%% 1: optional label (dependent on tha task)
+%% 2: kind number: 1 to 6
+%% 3: optional second kind number
+{
+  \par
+  \Needspace{5cm}
+  \bigskip
+  \begin{flushleft}
+  \refstepcounter{TaskSection}
+  \checkTaskLabel(\theTaskSection) %% was not able to use \TaskLabel(\theTaskSection)
+                                   %% in label directly, works with \check & \cache
+  \label{\cachedata}
+  \rowcolors{1}{NormalTableCellColor}{NormalTableCellColor}
+  \tabulinesep=3mm
+  \begin{tabu}{|>{\centering\arraybackslash}p{2.6cm}|>{\centering\arraybackslash}p{2.6cm}|>%
+      {\centering\arraybackslash}p{2.6cm}|>{\centering\arraybackslash}p{2.6cm}|>%
+      {\centering\arraybackslash}p{2.6cm}|>{\centering\arraybackslash}p{2.6cm}|}
+    \arrayrulecolor{TitleColor} \hline
+    \multicolumn{6}{|l|}{\cellcolor{NormalTableHeaderColor} %
+       \textbf{\large Task \theTaskSection: \TaskTitle(\theTaskSection).}} \\
+    \IfNoValueOrEmptyTF{#1}{}{\multicolumn{6}{|l|}{\cellcolor{NormalTableHeaderColor} %
+       \small Continuing from:#1} \\} \hline
+    \@TypeColor{1}{#2}{#3}{\FTC@KindOne} & 
+    \@TypeColor{2}{#2}{#3}{\FTC@KindTwo} & 
+    \@TypeColor{3}{#2}{#3}{\FTC@KindThree} & 
+    \@TypeColor{4}{#2}{#3}{\FTC@KindFour} & 
+    \@TypeColor{5}{#2}{#3}{\FTC@KindFive} & 
+    \@TypeColor{6}{#2}{#3}{\FTC@KindSix} \\ \hline
+  \end{tabu}
+  \end{flushleft}
+  \checkTaskTitle(\theTaskSection) %% was not able to use \TaskLabel(\theTaskSection)
+  \mycustomtask{\cachedata} %% for gen task entry
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Task Section
+\NewDocumentCommand{\@Section}{m}
+ {
+    \Needspace{4cm}
+    \begin{flushleft}
+       {\color{TitleColor} \large \textbf{#1}} \\
+    \end{flushleft}
+ }
+
+\NewDocumentCommand{\Section}{sm}{%
+  \IfBooleanTF#1
+    {%% with star
+      \@Section{#2}
+    } {%% without star
+      \refstepcounter{TaskSubSection}
+      \@Section{\theTaskSubSection: #2}
+    }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Meeting Summary
+\NewDocumentCommand{\MeetingSummary}{}
+  { \Section*{Meeting Summary} }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Task Subsection
+\NewDocumentCommand{\@Subsection}{m} 
+{ 
+  \needspace{3cm} %
+  \begin{flushleft} %
+    { \color{TitleColor} \large  \textbf{#1}}  
+    \vspace{-2mm}\\
+  \end{flushleft} %
+}
+
+\NewDocumentCommand{\Subsection}{sm}{%
+  \IfBooleanTF#1
+    {%% with star
+      \@Subsection{#2}
+    } {%% without star
+      \refstepcounter{TaskSubSubSection}
+      \@Subsection{\arabic{TaskSection}.%
+        \arabic{TaskSubSection}.\arabic{TaskSubSubSection}: #2}
+    }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Enumerate with Title
+\NewDocumentEnvironment{EnumerateWithTitle}{m} %
+{
+  \Subsection*{#1}
+  \begin{enumerate}
+}
+{
+  \end{enumerate}
+}
+
+\NewDocumentEnvironment{ItemizeWithTitle}{m} %
+{
+  \Subsection*{#1}
+  \begin{itemize}
+}
+{
+  \end{itemize}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% pictures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% private
+\newcommand{\Callout}[3]{\callout{#1}{\large #2}{#3}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Picture (annotated)
+\newcommand{\RawPict}[3]%
+%% 1: image
+%% 2: size in fraction of page width
+%% 3: annotations
+{  %
+  \begin{minipage}{\linewidth}
+    \centering %
+    \begin{annotate}{\includegraphics[width=#2\textwidth]{#1}}{#2} %
+      \ifFTC@Grid
+        \helpgrid
+      \fi
+      %%  \callout{x , y of text}{Text}{x, y of arrow}
+      #3
+    \end{annotate}
+  \end{minipage}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure with one Pict
+\NewDocumentCommand{\PictFigure}{O{htb} m O{0.9} m  m o}%
+%% 1 location (optional, everywhere)
+%% 2 file
+%% 3 size (optional, 90%)
+%% 3 caption
+%% 5 label 
+%% 6 annotation (optional)
+{ %
+  \begin{figure}[#1]
+  \centering
+  \RawPict{#2}{#3}{#6}
+  \caption{#4.}
+  \label{#5}
+  \end{figure}
+}
+
+\newlength{\@ExplainedPictFigureTextLength}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure with one picture and explanations
+%% private internal command
+\NewDocumentCommand{\RawExplainedPict}{m O{0.6} m o}%
+%% 1 file
+%% 2 size pict (optional, default 0.6, must be < 0.95)
+%% 3 explanation
+%% 4 annotation (annotation)
+{
+  \setlength{\@ExplainedPictFigureTextLength}{0.95\textwidth -  #2\textwidth}
+  \centering
+  \begin{minipage}{#2\textwidth}
+  \RawPict{#1}{.9}{#4}
+  \end{minipage}%
+  \begin{minipage}{\@ExplainedPictFigureTextLength}
+    #3
+  \end{minipage}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure with one picture and explanations
+\NewDocumentCommand{\ExplainedPictFigure}{O{htb} m O{0.6} m m m o}%
+%% 1 location (optional, everywhere)
+%% 2 file
+%% 3 size pict (optional, default 0.6, must be < 0.95)
+%% 4 caption
+%% 5 label 
+%% 6 explanation
+%% 7 annotation (optional)
+{
+  \begin{figure}[#1]
+    \RawExplainedPict{#2}[#3]{#6}[#7]
+    \caption{#4.}
+    \label{#5}
+  \end{figure}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure with one picture and explanations
+\NewDocumentCommand{\PictSubfigure}{m O{0.4} m m o}%
+%% 1 file
+%% 2 size pict (optional, default 0.4, must be smaller than 0.95)
+%% 3 caption
+%% 4 label 
+%% 5 annotation (optional)
+{
+  \begin{subfigure}{#2\textwidth}
+    \RawPict{#1}{.9}{#5}
+    \caption{#3.}
+    \label{#4}
+  \end{subfigure}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure with one picture and explanations
+\NewDocumentCommand{\ExplainedPictSubfigure}{m O{0.6} m m m o}%
+%% 1 file
+%% 2 size pict (optional, default 0.6, must be < 0.95)
+%% 3 caption
+%% 4 label
+%% 5 explanation
+%% 6 annotation (optional)
+{
+  \begin{subfigure}{0.9\textwidth}
+    \RawExplainedPict{#1}[#2]{#5}[#6]
+    \caption{#3.}
+    \label{#4}
+  \end{subfigure}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Figure with Multiple Figures
+\NewDocumentEnvironment{GroupedFigures}{O{htb} m m}%
+%% 1 location (optional, everywhere)
+%% 2 caption
+%% 3 label
+{
+  \begin{figure}[#1]
+    \centering
+}
+{
+    \caption{#2.}
+    \label{#3}
+  \end{figure}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%new tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\arraystretch}{1.5}
+
+%% internal command
+\NewDocumentEnvironment{MyTable}{m m m m m} %
+%% 1: color
+%% 2: table column definition
+%% 3: legend 
+%% 4: caption
+%% 5: label
+{
+  \begin{center}
+    \rowcolors{2}{#1}{#1}
+    \begin{longtable}{#2}
+      %
+      \arrayrulecolor{TitleColor}
+      \caption{#4.} \label{#5} \\
+      \hline
+      \rowcolor{NormalTableHeaderColor} #3 \\ \hline
+      \endfirsthead
+      %
+      \arrayrulecolor{TitleColor}
+      \hline
+      \rowcolor{NormalTableHeaderColor} #3 \\ \hline
+      \endhead
+}
+{
+    \\ \hline
+    \end{longtable}
+  \end{center}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% decision
+\NewDocumentEnvironment{DecisionTable}{O{Option} O{Pro} O{Cons} m m} %
+%% 1,2,3: column names (optional: all or none please)
+%% 4: caption
+%% 5: label
+{
+  \begin{MyTable}{NormalTableCellColor}{|p{4cm}|p{6.5cm}|p{6.5cm}|}
+      {\textbf{#1:} & \textbf{#2:} & \textbf{#3:}}
+      {#4}{#5}
+}
+{ \end{MyTable} }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% description Table
+%%    no star: small + large sized columns
+%%    with star: 2 medium sized columns
+\NewDocumentEnvironment{DescriptionTable}{m m m m} %
+%% 1: first col title
+%% 2: second col title  
+%% 3: caption
+%% 4: label
+{
+  \begin{MyTable}{White}{|p{5cm}|p{12cm}|}
+    {\textbf{#1} & \textbf{#2}}
+    {#3}{#4}
+}
+{ \end{MyTable} }
+
+\NewDocumentEnvironment{DescriptionTable*}{m m m m} %
+%% 1: first col title
+%% 2: second col title  
+%% 3: caption
+%% 4: label
+{
+  \begin{MyTable}{White}{|p{8.5cm}|p{8.5cm}|}
+    {\textbf{#1} & \textbf{#2}}
+    {#3}{#4}
+}
+{ \end{MyTable} }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% table entries
+\NewDocumentCommand{\TableEntryTextTextText}{m m m}
+%% 1,2,3: text, text, text entries (use in decision table)
+{
+  \begin{minipage}[t]{\linewidth}
+    \vspace{1mm}
+    \raggedright
+    #1
+    \vspace{2mm}
+    \end{minipage}
+    &
+    \begin{minipage}[t]{\linewidth}
+    \vspace{1mm}
+    \raggedright
+    #2
+    \vspace{2mm}
+  \end{minipage}
+  &
+  \begin{minipage}[t]{\linewidth}
+    \vspace{1mm}
+    \raggedright
+    #3
+    \vspace{2mm}
+  \end{minipage}
+}
+
+\NewDocumentCommand{\TableEntryTextItemItem}{m m m}
+%% 1,2,3: text, items, items entries (use in decision table)
+{
+  \TableEntryTextTextText%
+    {#1}
+    {\begin{compactitem} #2 \end{compactitem}}
+    {\begin{compactitem} #3 \end{compactitem}}     
+}
+
+\NewDocumentCommand{\TableEntryTextText}{m m}
+%% 1, 2: text, text entries (use in description table)
+{
+  \begin{minipage}[t]{\linewidth}
+    \vspace{1mm}
+    \raggedright
+    #1
+    \vspace{2mm}
+  \end{minipage}
+  &
+  \begin{minipage}[t]{\linewidth}
+    \vspace{1mm}
+    \raggedright
+    #2
+    \vspace{2mm}
+  \end{minipage}
+}
+
+\NewDocumentCommand{\TableEntryTextItem}{m m}
+%% 1,2: items, items entries (use in description table)
+{
+  \TableEntryTextText%
+    {#1}
+    {\begin{compactitem} #2 \end{compactitem}}     
+}
+
+\NewDocumentCommand{\TableEntryItemItem}{m m}
+%% 1,2: items, items entries (use in description table)
+{
+  \TableEntryTextText%
+    {\begin{compactitem} #1 \end{compactitem}}
+    {\begin{compactitem} #2 \end{compactitem}}     
+}
+
+\NewDocumentCommand{\MyTableKey}{m} {\cellcolor{NormalTableHeaderColor} #1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% bio
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ \NewDocumentEnvironment{Bio}{} %
+{
+  \cleardoublepage
+  \newpage
+  
+  \addcontentsline{mcf}{mycustomtask}{Meet the Team}
+  \begin{center}
+    \rowcolors{1}{White}{White}
+    \begin{longtable}{|>{\raggedright\arraybackslash}p{8.5cm}|%
+        >{\raggedright\arraybackslash}p{8.5cm}|}
+      %
+      \arrayrulecolor{TitleColor}
+      \hline
+      \multicolumn{2}{|c|}{\cellcolor{NormalTableHeaderColor} %
+        \textbf{\Large Meet the team}}
+      \\ \hline
+      \endhead
+}
+{
+    \\ \hline
+    \end{longtable}
+  \end{center}
+}
+
+\NewDocumentCommand{\BioEntry}{m m O{Role} m O{Outreach} m m O{0.5} m}
+%% 1, 2  Name, blurb below name
+%% 3, 4  Role (optional), role description
+%% 5, 6  Outreach role (optional), outreach description
+%% 7, 8  pic, (optional) fractional size
+%% 9     full bio
+{
+  \TableEntryTextText{%
+    \begin{center}
+      \RawPict{#7}{#8}{} \\
+      \textbf{#1} \\ 
+      #2 \vspace{3mm}\\
+    \end{center}
+    \textbf{#3:} #4\vspace{3mm} \\
+    \textbf{#5:} #6 
+  } {
+      #9
+  }
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% team story
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\NewDocumentEnvironment{TeamStory}{O{Our Team Story} m}
+%% 1: Title (default Our Team Story)
+%% 2: Team one-liner description
+{
+  \cleardoublepage
+  \newpage
+
+  \addcontentsline{mcf}{mycustomtask}{#1}
+  \begin{flushleft}
+  \tabulinesep=1.2mm
+  \begin{tabu}{p{3cm}>{\raggedright\arraybackslash}p{13.7cm}}
+      \multirow{2}{*}{\includegraphics[width=3cm]{\FTC@Logo}} 
+       & \textbf{ \color{TitleColor} \textit{\fontsize{40}{50}\selectfont #1}} \\
+       & \textbf{\LARGE ``#2''} \\ \cline{2-2} \\
+  \end{tabu}
+  \vspace{10mm}  \\	
+  \end{flushleft}
+  \begin{Large}
+}{
+  \end{Large}
+}
+
+\NewDocumentCommand{\CoverPage}{m m O{14}}
+%% 1: year
+%% 2: picture
+%% 3: vertical size of picture in cm
+{
+\newpage
+%% text block that overlay info
+\begin{textblock}{10}(2.5, 3.5)%
+  \renewcommand{\arraystretch}{2}%
+  \begin{tabu}{l}
+    \multicolumn{1}{c}{{\Huge \FTC@Num ~}} \\
+    {\fontsize{60}{70}\selectfont \textbf{\textsc{\FTC@Name}}} \\
+    \includegraphics[height=#3cm]{#2} \\
+    \multicolumn{1}{c}{\cellcolor{MainTableCellColor} %
+      \fontsize{30}{40}\selectfont \textbf{\textsc{\FTC@Notebook}}} \\
+  \end{tabu}
+\end{textblock}
+%%background table
+\begin{tabular}[t]{p{9cm}>{\columncolor{MainTableHeaderColor}}p{8cm}}
+  \multirow{3}{*}{\includegraphics[height=4cm]{\FTC@Logo}} & \\
+   & \multicolumn{1}{r}{\cellcolor{MainTableHeaderColor} \textbf{ \Huge #1~}} \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+   & \\
+\end{tabular}
+\newpage
+
+~ 
+\begin{textblock}{12}(2, 14)%
+  \noindent
+  Document typeset in LaTeX with the \texttt{ftc-notebook} package created %
+  by FTC 9773, Team Robocracy.
+\end{textblock}
+
+\newpage
+
+}
+                   
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Misc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% refs
+\NewDocumentCommand{\TaskRef}{m}    {Task~\ref{#1} on page~\pageref{#1}}
+\NewDocumentCommand{\FigureRef}{m}  {Figure~\ref{#1} on page~\pageref{#1}}
+\NewDocumentCommand{\TableRef}{m}   {Table~\ref{#1} on page~\pageref{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% list of tasks
+\newcommand{\listexamplename}{Table of Contents}
+\newlistof{mycustomtask}{mcf}{\listexamplename}
+\newcommand{\mycustomtask}[1]
+{%
+   \refstepcounter{mycustomtask}
+   \addcontentsline{mcf}{mycustomtask}
+   {\protect\numberline{\themycustomtask}#1}\par
+}
+
+\NewDocumentCommand{\listoftasks}{}
+{
+  \pagenumbering{roman}
+  \cfoot{\thepage}
+  \listofmycustomtask
+}
+
+\renewcommand\cftmycustomtaskfont{\large}
+\renewcommand\cftfigfont{\large}
+\renewcommand\cfttabfont{\large}
+\renewcommand\cftloftitlefont{\Huge\bfseries}
+\renewcommand\cftlottitlefont{\Huge\bfseries}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% start of doc
+\NewDocumentCommand{\StartNotebook}{}
+{
+  \cfoot{}
+  \lfoot{\FTC@Num, \FTC@Name, \FTC@Notebook.}
+  \rfoot{\@TaskDate(1) Page \thepage.}
+  \pagenumbering{arabic}
+}                     
+
+\NewDocumentCommand{\ListOfTasks}{}
+{
+  \listoftasks
+  \newpage
+}
+
+\NewDocumentCommand{\ListOfFigures}{}
+{
+  \listoffigures
+  \newpage
+}
+
+\NewDocumentCommand{\ListOfTables}{}
+{
+  \listoftables
+  \newpage
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% defaults
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% title and array rules
+\definecolor{TitleColor}{rgb}{0.65, 0.73, 0.29}
+%% main table backgrounds
+\definecolor{MainTableHeaderColor}{rgb}{0.84, 0.96, 0.29}
+\definecolor{MainTableCellColor}{rgb}{0.70, 0.82, 0.32}
+%% normal table backgrounds
+\definecolor{NormalTableHeaderColor}{rgb}{0.84, 0.96, 0.29}
+\definecolor{NormalTableCellColor}{rgb}{0.94, 0.99, 0.78}
+\definecolor{NormalTableCellWhite}{rgb}{1.0, 1.0, 1.0}
+
+% \fi
+%\end{macrocode}
+%</package>
+%\Finale

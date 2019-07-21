@@ -1,0 +1,1611 @@
+%!TEX root = ../larxxia.tex
+
+\section{The dot product determines angles and lengths}
+\label{sec:dpdal}
+\secttoc
+
+The previous \autoref{sec:asv} discussed how to add, subtract and stretch vectors.
+Question: can we multiply two vectors?
+The answer is that `vector multiplication' has major differences to the multiplication of scalars.
+This section introduces the so-called dot product of two vectors that, among other attributes, gives us a way of determining the angle between the two vectors.
+
+\begin{example} \label{eg:ezyang}
+Consider the two vectors \(\uv=(7,-1)\) and \(\vv=(2,5)\) as plotted in the margin.
+\def\vecopsHook{\node[above] at (axis cs:0,0) {$\qquad\theta$};}
+\marginpar{\vecops07{-1}25}
+What is the angle~\(\theta\) between the two vectors?
+\begin{solution} 
+Form a triangle with the vector \(\uv-\vv=(5,-6)\) going from the tip of~\vv\ to the tip of~\uv, as shown in the margin.
+\marginpar{\vecops37{-1}25}%
+The sides of the triangles are of length \(|\uv|=\sqrt{7^2+(-1)^2}=\sqrt{50}=5\sqrt2\), \(|\vv|=\sqrt{2^2+5^2}=\sqrt{29}\), and \(|\uv-\vv|=\sqrt{5^2+(-6)^2}=\sqrt{61}\).
+By the \idx{cosine rule} for triangles
+\begin{equation*}
+|\uv-\vv|^2=|\uv|^2+|\vv|^2-2|\uv||\vv|\cos\theta \,.
+\end{equation*}
+Here this rule rearranges to
+\begin{eqnarray*}
+|\uv||\vv|\cos\theta
+&=&\tfrac12(|\uv|^2+|\vv|^2-|\uv-\vv|^2)
+\\&=&\tfrac12(50+29-61)
+\\&=&9\,.
+\end{eqnarray*}
+Dividing by the product of the lengths then gives \(\cos\theta=9/(5\sqrt{58})=0.2364\) so the angle \(\theta =\arccos(0.2364) =1.3322 =76.33^\circ\) as is reasonable from the plots.
+\end{solution}
+\end{example}
+
+The interest in this \autoref{eg:ezyang} is the number nine on the right-hand side of \(|\uv||\vv|\cos\theta=9\)\,.  
+The reason is that~\(9\) just happens to be~\(14-5\), which in turn just happens to be \(7\cdot2+(-1)\cdot5\), and it is no coincidence that this expression is the same as \(u_1v_1+u_2v_2\) in terms of vector components \(\uv=(u_1,u_2)=(7,-1)\) and \(\vv=(v_1,v_2)=(2,5)\).
+Repeat this example for many pairs of vectors~\uv\ and~\vv\ to find that always \(|\uv||\vv|\cos\theta=u_1v_1+u_2v_2\) (\autoref{ex:ezyang}).
+This equality suggests that the sum of products of corresponding components of~\uv\ and~\vv\ is closely connected to the angle between the vectors.
+
+
+\begin{definition} \label{def:dotprod}
+For every two vectors in~\(\RR^n\), $\uv=(\hlist un)$ and $\vv=(\hlist vn)$,
+define the \bfidx{dot product} (or \bfidx{inner product}), denoted by a dot between the two vectors, as the \idx{scalar}
+\begin{equation*}
+\uv\cdot \vv:= \lincomb uvn\,.
+\end{equation*}
+\end{definition}
+
+The dot product of two vectors gives a scalar result, not a vector result.
+
+When writing the vector dot product, the dot between the two vectors is essential.
+We sometimes also denote the scalar product by such a dot (to clarify a product) and sometimes omit the dot between the scalars, for example \(a\cdot b=ab\) for scalars. 
+But for the vector dot product the dot must not be omitted: `\(\uv\vv\)' is meaningless.
+
+
+\begin{example} \label{eg:}
+Compute the dot product between the following pairs of vectors.
+\begin{enumerate}
+\item \(\uv=(-2,5,-2)\), \(\vv=(3,3,-2)\)
+\begin{solution} 
+\(\uv\cdot\vv=(-2)3+5\cdot3+(-2)(-2)=13\). 
+Alternatively, \(\vv\cdot\uv=3(-2)+3\cdot5+(-2)(-2)=13\)\,.
+That these give the same result is a consequence of the general commutative law, \autoref{thm:dotopsa}, and so in the following we compute the dot product only one way around.
+\end{solution}
+
+\item \(\uv=(1,-3,0)\), \(\vv=(1,2)\)
+\begin{solution} 
+There is no answer: a dot product cannot be computed here as the two vectors are of different sizes. 
+\end{solution}
+
+\item \(\av=(-7,3,0,2,2)\), \(\bv=(-3,4,-4,2,0)\)
+\begin{solution} 
+\(\av\cdot\bv=(-7)(-3)+3\cdot4+0(-4)+2\cdot2+2\cdot0=37\). 
+\end{solution}
+
+\item \(\pv=(-0.1,-2.5,-3.3,0.2)\), \(\qv=(-1.6,1.1,-3.4,2.2)\)
+\begin{solution} 
+\(\pv\cdot\qv=(-0.1)(-1.6)+(-2.5)1.1+(-3.3)(-3.4)+0.2\cdot2.2=9.07\).
+\end{solution}
+\end{enumerate}
+\end{example}
+
+
+
+\begin{activity}
+What is the dot product of the two vectors \(\uv=2\iv-\jv\) and \(\vv=3\iv+4\jv\)\,?
+\actposs[4]{\(2\)}{\(5\)}{\(8\)}{\(10\)}
+%\partswidth=5em
+%\begin{parts}
+%\item\actans \(2\)
+%\item \(5\)
+%\item \(8\)
+%\item \(10\)
+%\end{parts}
+\end{activity}
+
+
+
+
+
+\begin{theorem} \label{thm:anglev}
+For every two non-zero vectors~\uv\ and~\vv\ in~\(\RR^n\),  
+\begin{aside}
+The symbol~\idx{$\theta$} is the Greek letter theta, and usually denotes angles.
+\end{aside}%
+the \bfidx{angle}~\(\theta\) between the vectors is determined by 
+\begin{equation*}
+\cos\theta=\frac{\uv\cdot\vv}{|\uv||\vv|}\,,
+\quad 0\leq\theta\leq\pi
+\quad (0\leq\theta\leq180^\circ).
+\end{equation*}
+\end{theorem}
+
+\begin{wrapfigure}{r}{0pt} 
+\begin{tikzpicture} 
+\begin{axis}[axis equal image,hide axis,domain=-135:180]
+    \addplot[quiver={u=x,v=2*y,scale arrows=0.5},
+        red,-stealth,samples=8] ({cos(x)},{sin(x)/2});
+    \addplot[quiver={u=1,v=0,scale arrows=0.6},
+        blue,-stealth,samples=8] ({cos(x)},{sin(x)/2});
+    \node at (axis cs:0.95,0.45) {$\frac\pi4$};
+    \node at (axis cs:0.95,-0.45) {$\frac\pi4$};
+    \node at (axis cs:0.1,0.6) {$\frac\pi2$};
+    \node at (axis cs:0.1,-0.6) {$\frac\pi2$};
+    \node at (axis cs:-0.6,0.45) {$\frac{3\pi}4$};
+    \node at (axis cs:-0.6,-0.45) {$\frac{3\pi}4$};
+    \node[above] at (axis cs:-1,0) {$\pi$};
+    \node[above] at (axis cs:1,0) {$0$};
+\end{axis}
+\end{tikzpicture}
+\end{wrapfigure}
+This picture illustrates the range of angles between two vectors: when they point in the same direction the angle is zero; when they are at \idx{right-angles} to each other the angle is~\(\pi/2\), or equivalently~\(90^\circ\); when they point in opposite directions the angle is~\(\pi\), or equivalently~\(180^\circ\).
+
+
+
+\begin{example} \label{eg:}
+Determine the \idx{angle} between the following pairs of vectors.
+\begin{enumerate}
+\item \((4,3)\) and \((5,12)\)
+\begin{solution} 
+These vectors (shown in the margin) 
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \node[above] at (axis cs:0,0) {$\quad31^\circ$};
+  \addplot[blue,thick,quiver={u=4,v=3},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:4,3) {$(4,3)$};
+  \addplot[blue,thick,quiver={u=5,v=12},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:5,12) {$(5,12)$};
+\end{axis}
+\end{tikzpicture}}%
+have length \(\sqrt{4^2+3^2}=\sqrt{25}=5\) and \(\sqrt{5^2+12^2}=\sqrt{169}=13\), respectively.
+Their dot product  \((4,3)\cdot(5,12)=20+36=56\).
+Hence \(\cos\theta =56/(5\cdot13) =0.8615\) and so angle \(\theta =\arccos(0.8615) =0.5325 =30.51^\circ\).
+\end{solution}
+
+
+\item \((3,1)\) and \((-2,1)\)
+\begin{solution} 
+These vectors (shown in the margin) 
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \node[above] at (axis cs:0,0) {$135^\circ$};
+  \addplot[blue,thick,quiver={u=3,v=1},-stealth,mark=empty] coordinates {(0,0)};
+  \node[left] at (axis cs:3,1) {$(3,1)$};
+  \addplot[blue,thick,quiver={u=-2,v=1},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:-2,1) {$(-2,1)$};
+\end{axis}
+\end{tikzpicture}}%
+have length \(\sqrt{3^2+1^2}=\sqrt{10}\) and \(\sqrt{(-2)^2+1^2}=\sqrt{5}\), respectively.
+Their dot product  \((3,1)\cdot(-2,1)=-6+1=-5\).
+Hence \(\cos\theta =-5/(\sqrt{10}\cdot\sqrt5) =-1/\sqrt2 =-0.7071\) and so angle \(\theta =\arccos(-1/\sqrt2) =2.3562 =\frac34\pi =135^\circ\) (\autoref{tbl:cosines}).
+\end{solution}
+
+
+
+\item \((4,-2)\) and \((-1,-2)\)
+\begin{solution} 
+These vectors (shown in the margin) 
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \node[below] at (axis cs:0,0) {$\quad90^\circ$};
+  \addplot[blue,thick,quiver={u=4,v=-2},-stealth,mark=empty] coordinates {(0,0)};
+  \node[left] at (axis cs:4,-2) {$(4,-2)$};
+  \addplot[blue,thick,quiver={u=-1,v=-2},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:-1,-2) {$(-1,-2)$};
+\end{axis}
+\end{tikzpicture}}%
+have length \(\sqrt{4^2+(-2)^2}=\sqrt{20}=2\sqrt5\) and \(\sqrt{(-1)^2+(-2)^2}=\sqrt{5}\), respectively.
+Their dot product  \((4,-2)\cdot(-1,-2)=-4+4=0\).
+Hence \(\cos\theta =0/(2\sqrt{5}\cdot\sqrt5) =0\) and so angle \(\theta=\frac12\pi=90^\circ\) (\autoref{tbl:cosines}).
+\end{solution}
+
+\end{enumerate}
+\end{example}
+
+
+
+\begin{activity}
+What is the angle between the two vectors \((1,\sqrt3)\) and \((\sqrt3,1)\)?
+\actposs[4]{\(30^\circ\)}{\(60^\circ\)}{\(64.34^\circ\)}{\(77.50^\circ\)}
+%\partswidth=5em
+%\begin{parts}
+%\item\actans \(30^\circ\)
+%\item \(60^\circ\)
+%\item \(64.34^\circ\)
+%\item \(77.50^\circ\)
+%\end{parts}
+\end{activity}
+
+
+
+
+\begin{table}
+\caption{when a \idx{cosine} is one of these tabulated special values, then we know the corresponding \idx{angle} exactly.  
+In other cases we usually use a calculator (\(\arccos\) or \(\texttt{cos}^{-1}\)) or computer (\texttt{acos()}) to compute the angle numerically.}
+\label{tbl:cosines}
+\index{acos()@\texttt{acos()}}%
+\begin{equation*}\def\arraystretch{1.1}
+\begin{array}{crcr@.l}
+\hline
+\theta&\theta&\cos\theta&\multicolumn2c{\cos\theta}
+\\\hline
+0&0^\circ&1&1
+\\\pi/6&30^\circ&{\sqrt3}/2&0&8660
+\\\pi/4&45^\circ&1/{\sqrt2}&0&7071
+\\\pi/3&60^\circ&1/2&0&5
+\\\pi/2&90^\circ&0&0
+\\{2\pi}/3&120^\circ&-1/2&-0&5
+\\{3\pi}/4&135^\circ&-1/{\sqrt2}&-0&7071
+\\{5\pi}/6&150^\circ&-{\sqrt3}/2&-0&8660
+\\\pi&180^\circ&-1&-1
+\\\hline
+\end{array}
+\end{equation*}
+\end{table}
+
+
+
+
+\begin{example} \label{eg:}
+\index{bond angles}
+In \idx{chemistry} one computes the angles between bonds in molecules and crystals.  
+In engineering one needs the angles between beams and struts in complex structures.
+The \idx{dot product} determines such \idx{angle}s.
+\begin{enumerate}
+\item Consider the cube drawn in stereo below, and compute the angle between the diagonals on two adjacent faces.
+\begin{center}
+\qview{50}{55} {\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize,view={\q}{30}
+  ,axis equal, axis lines=box, height=5cm
+  ] 
+  \node[below] at (axis cs:0,0,0) {$O$};
+  \addplot3[blue,mark=empty] coordinates {
+  (0,0,0)(1,0,0)(1,1,0)(0,1,0)(0,0,0)(0,0,1)(1,0,1)(1,0,0)
+  (1,0,1)(1,1,1)(1,1,0)(1,1,1)(0,1,1)(0,1,0)(0,1,1)(0,0,1)};
+  \addplot3[red,thick,quiver={u=1,v=1,w=0},-stealth] coordinates {(0,0,0)};
+  \addplot3[red,thick,quiver={u=0,v=1,w=1},-stealth] coordinates {(0,0,0)};
+  \node[above] at (axis cs:0,0,0) {$\qquad\theta$};
+\end{axis}
+\end{tikzpicture}}
+\end{center}
+\begin{solution} 
+Draw two vectors along adjacent diagonals: the above pair of vectors are \((1,1,0)\) and \((0,1,1)\).
+They both have the same length as \(|(1,1,0)|=\sqrt{1^2+1^2+0^2}=\sqrt2\) and \(|(0,1,1)|=\sqrt{0^2+1^2+1^2}=\sqrt2\)\,.
+The dot product is \((1,1,0)\cdot(0,1,1)=0+1+0=1\)\,.
+Hence the cosine \(\cos\theta=1/(\sqrt2\cdot\sqrt2)=1/2\)\,.
+\autoref{tbl:cosines} gives the angle \(\theta=\frac\pi3=60^\circ\).
+\end{solution}
+
+
+\item Consider the cube drawn in stereo below: what is the angle between a diagonal on a face and a diagonal of the cube?
+\begin{center}
+\qview{50}{55} {
+\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize,view={\q}{30}
+  ,axis equal, axis lines=box, height=5cm
+  ] 
+  \node[below] at (axis cs:0,0,0) {$O$};
+  \addplot3[blue,mark=empty] coordinates {
+  (0,0,0)(1,0,0)(1,1,0)(0,1,0)(0,0,0)(0,0,1)(1,0,1)(1,0,0)
+  (1,0,1)(1,1,1)(1,1,0)(1,1,1)(0,1,1)(0,1,0)(0,1,1)(0,0,1)};
+  \addplot3[red,thick,quiver={u=1,v=1,w=0},-stealth] coordinates {(0,0,0)};
+  \addplot3[red,thick,quiver={u=1,v=1,w=1},-stealth] coordinates {(0,0,0)};
+  \node[above] at (axis cs:0.3,0.3,0) {$\theta$};
+\end{axis}
+\end{tikzpicture}}
+\end{center}
+\begin{solution} 
+Draw two vectors along the diagonals: the above pair of vectors are \((1,1,0)\) and \((1,1,1)\).
+The face-diagonal has length \(|(1,1,0)|=\sqrt{1^2+1^2+0^2}=\sqrt2\) whereas the cube diagonal has length \(|(1,1,1)|=\sqrt{1^2+1^2+1^2}=\sqrt3\)\,.
+The dot product is \((1,1,0)\cdot(1,1,1)=1+1+0=2\)\,.
+Hence  \(\cos\theta=2/(\sqrt2\cdot\sqrt3)=\sqrt{2/3}=0.8165\)\,.
+Then a calculator (or \script, see \autoref{sec:umovc}) gives the angle to be \(\theta =\arccos(0.8165) =0.6155 =35.26^\circ\).
+\end{solution}
+
+
+\item A \idx{body-centered cubic} lattice (such as that formed by caesium chloride crystals) has one lattice point in the center of the unit cell as well as the eight corner points.
+Consider the body-centered cube of atoms drawn in stereo below with the center of the cube at the origin: what is the angle between the center atom and two adjacent corner atoms?
+\begin{center}
+\qview{62}{67} {
+\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize,view={\q}{30}
+  ,axis equal, axis lines=box, height=5cm
+  ] 
+  \addplot3[blue,mark=*] coordinates {(0,0,0)};
+  \addplot3[blue,mark=*] coordinates {
+  (-1,-1,-1)(1,-1,-1)(1,1,-1)(-1,1,-1)(-1,-1,-1)(-1,-1,1)(1,-1,1)(1,-1,-1)
+  (1,-1,1)(1,1,1)(1,1,-1)(1,1,1)(-1,1,1)(-1,1,-1)(-1,1,1)(-1,-1,1)};
+  \addplot3[red,thick,quiver={u=1,v=1,w=-1},-stealth] coordinates {(0,0,0)};
+  \addplot3[red,thick,quiver={u=1,v=1,w=1},-stealth] coordinates {(0,0,0)};
+  \node[right] at (axis cs:0,0,0) {$\ \theta$};
+\end{axis}
+\end{tikzpicture}}
+\end{center}
+\begin{solution} 
+Draw two corresponding vectors from the center atom: the above pair of vectors are \((1,1,1)\) and \((1,1,-1)\).
+These have the same length \(|(1,1,1)|=\sqrt{1^2+1^2+1^2}=\sqrt3\) and \(|(1,1,-1)|=\sqrt{1^2+1^2+(-1)^2}=\sqrt3\)\,.
+The dot product is \((1,1,1)\cdot(1,1,-1)=1+1-1=1\)\,.
+Hence \(\cos\theta=1/(\sqrt3\cdot\sqrt3)=1/3=0.3333\)\,.
+Then a calculator (or \script, see \autoref{sec:umovc}) gives the angle \(\theta =\arccos(1/3) =1.2310 =70.53^\circ\).
+\end{solution}
+\end{enumerate}
+\end{example}
+
+
+ 
+
+
+
+
+\begin{example}[semantic similarity] \label{eg:lsidot}
+Recall that \autoref{eg:deflsv} introduced the encoding of sentences and documents as word count vectors.
+In the example, a word vector has five components, \((N_{\text{cat}},N_{\text{dog}},N_{\text{mat}},N_{\text{sat}},N_{\text{scratched}})\) where the various~\(N\) are the counts of each word in any sentence or document. For example,
+\begin{enumerate}
+\item ``The dog sat on the mat'' has word vector \(\av=(0,1,1,1,0)\).
+\item ``The cat scratched the dog'' has word vector \(\bv=(1,1,0,0,1)\).
+\item ``The cat and dog sat on the mat'' has word vector \(\cv=(1,1,1,1,0)\).
+\end{enumerate}
+Use the \idx{angle} between these three \idx{word vector}s to characterise the similarity of sentences: a small angle means the sentences are somehow close; a large angle means the sentences are disparate.
+\begin{solution} 
+First, these word vectors have lengths \(|\av|=|\bv|=\sqrt3\) and \(|\cv|=2\).
+Second, the `angles' between these sentences are the following.
+\begin{itemize}
+\item The angle~\(\theta_{ab}\) between ``The dog sat on the mat'' and ``The cat scratched the dog'' satisfies
+\begin{equation*}
+\cos\theta_{ab}=\frac{\av\cdot\bv}{|\av||\bv|}
+=\frac{0+1+0+0+0}{\sqrt3\cdot\sqrt3}=\frac13\,.
+\end{equation*}
+A calculator  (or \script, see \autoref{sec:umovc}) then gives the angle \(\theta_{ab} =\arccos(1/3) =1.2310=70.53^\circ\) so the sentences are quite dissimilar.
+
+\item The angle~\(\theta_{ac}\) between ``The dog sat on the mat'' and ``The cat and dog sat on the mat'' satisfies
+\begin{equation*}
+\cos\theta_{ac}=\frac{\av\cdot\cv}{|\av||\cv|}
+=\frac{0+1+1+1+0}{\sqrt3\cdot2}=\frac3{2\sqrt3}=\frac{\sqrt3}2\,.
+\end{equation*}
+\autoref{tbl:cosines} gives the angle \(\theta_{ac}=\tfrac\pi6=30^\circ\) so the sentences are roughly similar.
+
+\item The angle~\(\theta_{bc}\) between ``The cat scratched the dog'' and ``The cat and dog sat on the mat'' satisfies
+\begin{equation*}
+\cos\theta_{bc}=\frac{\bv\cdot\cv}{|\bv||\cv|}
+=\frac{1+1+0+0+0}{\sqrt3\cdot2}=\frac2{2\sqrt3}=\frac1{\sqrt3}\,.
+\end{equation*}
+A calculator  (or \script, see \autoref{sec:umovc}) then gives the angle \(\theta_{bc} =\arccos(1/\sqrt3) =0.9553 =54.74^\circ\) so the sentences are moderately dissimilar.
+
+\end{itemize}
+The following stereo plot schematically draws these three vectors at the correct angles from each other, and with correct lengths, in some abstract coordinate system (\autoref{sec:sbd} gives the techniques to do such plots systematically).
+\begin{center}
+%a=[0 1 1 1 0
+%1 1 0 0 1
+%1 1 1 1 0]'
+%[u,s,v]=svd(a)
+%b=s(1:3,:)*v'
+%dd=b'*b
+\qview{55}{60} {
+\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize,view={\q}{20}
+  ,axis equal, axis lines=box ] 
+  \node[below] at (axis cs:0,0,0) {$O$};
+  \threev{1.54}{0.70}{0.38}{\av}
+  \threev{1.19}{-1.25}{0.15}{\bv}
+  \threev{1.95}{0.21}{-0.39}{\cv}
+\end{axis}
+\end{tikzpicture}}
+\end{center}
+\end{solution}
+\end{example}
+
+
+
+\begin{proof} 
+To prove the angle \autoref{thm:anglev}, form a triangle from vectors \uv, \vv\ and \(\uv-\vv\) as illustrated in the margin.
+\marginpar{%
+\def\vecopsHook{\node[above] at (axis cs:0,0) {$\qquad\theta$};}
+\vecops37{-1}35}%
+Recall and apply the \idx{cosine rule} for triangles
+\begin{equation*}
+|\uv-\vv|^2=|\uv|^2+|\vv|^2-2|\uv||\vv|\cos\theta\,.
+\end{equation*}
+In \(\RR^n\) this rule rearranges to
+\begin{eqnarray*}
+2|\uv||\vv|\cos\theta
+&=&|\uv|^2+|\vv|^2-|\uv-\vv|^2
+\\&=&u_1^2+u_2^2+\cdots+u_n^2
++v_1^2+v_2^2+\cdots+v_n^2
+\\&&{}
+-(u_1-v_1)^2-(u_2-v_2)^2-\cdots-(u_n-v_n)^2
+\\&=&u_1^2+u_2^2+\cdots+u_n^2
++v_1^2+v_2^2+\cdots+v_n^2
+\\&&{}
+-u_1^2+2u_1v_1-v_1^2-u_2^2+2u_2v_2-v_2^2
+\\&&{}
+-\cdots-u_n^2+2u_nv_n-v_n^2
+\\&=&2u_1v_1+2u_2v_2+\cdots+2u_nv_n
+\\&=&2(\lincomb uvn)
+\\&=&2\uv\cdot\vv\,.
+\end{eqnarray*}
+Dividing both sides by \(2|\uv||\vv|\) gives \(\cos\theta=\frac{\uv\cdot\vv}{|\uv||\vv|}\) as required.
+\end{proof}
+
+
+
+
+
+\subsection{Work done involves the dot product}
+\label{sec:wdidp}
+
+In physics and engineering, ``work'' has a precise meaning related to energy: when a forces of magnitude~\(F\) acts on a body and that body moves a distance~\(d\), then the \idx{work} done by the force is \(W=Fd\)\,.
+This formula applies only for one dimensional force and displacement, the case when the force and the displacement are all in the same direction.
+For example, if a 5\,kg barbell drops downwards~2\,m under the force of gravity (9.8~newtons/kg), then the work done by gravity on the barbell during the drop is
+\begin{equation*}
+W=F\times d=(5\times9.8)\times 2=98\text{ joules}.
+\end{equation*}
+This work done goes to the kinetic energy of the falling barbell.
+The kinetic energy dissipates when the barbell hits the floor.
+
+\begingroup
+\newcommand{\mytemp}[1]{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \node[below] at (axis cs:0,0) {$O$};
+  \addplot[blue,quiver={u=4,v=1},-stealth,mark=empty] coordinates {(0,0)};
+  \node[below] at (axis cs:4,1) {$\dv$};
+  \addplot[red,thick,quiver={u=2,v=2},-stealth,mark=empty] coordinates {(0,0)};
+  \node[above] at (axis cs:1,1) {$\Fv$};
+  \ifnum0<#1
+  \addplot[brown,thick] coordinates {(0,0)(40/17,10/17)(2,2)};
+  \node[above] at (axis cs:0,0) {$\qquad\theta$};
+  \node[below] at (axis cs:1.6,0.4) {$F_0$};
+  \fi
+\end{axis}
+\end{tikzpicture}}
+In general, the applied force and the displacement are not in the same direction (as illustrated in the margin).
+Consider the general case when a vector force~\Fv\ acts on a body which moves a displacement vector~\dv.
+\marginpar{\mytemp0}%
+Then the work done by the force on the body is the length of the displacement times the component of the force in the direction of the displacement---the component of the force at \idx{right-angles} to the displacement does no work.
+
+As illustrated in the margin, draw a right-angled triangle to decompose the force~\Fv\ into the component~\(F_0\) in the direction of the displacement, and an unnamed component at right-angles.
+\marginpar{\mytemp1}%
+Then by the scalar formula, the work done is \(W=F_0|\dv|\).
+As drawn, the force~\Fv\ makes an angle~\(\theta\) to the displacement~\dv: the dot product determines this angle via \(\cos\theta=(\Fv\cdot\dv)/(|\Fv||\dv|)\)  (\autoref{thm:anglev}).
+By basic trigonometry, the adjacent side of the force triangle has length \(F_0=|\Fv|\cos\theta=|\Fv|\frac{\Fv\cdot\dv}{|\Fv||\dv|}=\frac{\Fv\cdot\dv}{|\dv|}\).
+Finally, the work done \(W=F_0|\dv|=\frac{\Fv\cdot\dv}{|\dv|}|\dv|=\Fv\cdot\dv\), the dot product of the vector force and vector displacement.
+\endgroup
+
+\begin{example} \label{eg:}
+A sailing boat travels a distance of~\(40\)\,m East and~\(10\)\,m North, as drawn in the margin.
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal
+  , axis lines=middle, xlabel={East}, ylabel={North}
+  ,xtick={0},ytick={0},ymax=29,xmax=45,ymin=-12
+  ] 
+  \addplot[blue,thick,quiver={u=40,v=10},-stealth,mark=empty] coordinates {(0,0)};
+  \node[above] at (axis cs:40,10) {$\dv$};
+  \addplot[red,thick,quiver={u=20,v=-10},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:20,-10) {$\Fv$};
+  \addplot[brown,quiver={u=5,v=-20},-stealth,mark=empty] coordinates {(-5,20)};
+  \node[right] at (axis cs:-5,20) {wind};
+\end{axis}
+\end{tikzpicture}}%
+The wind from abeam of strength and direction \((1,-4)\)\,m/s generates a force \(\Fv=(20,-10)\) (newtons) on the sail, as drawn.
+What is the work done by the wind?
+\begin{solution} 
+The direction of the wind is immaterial except for the force it generates.
+The displacement vector \(\dv=(40,10)\)\,m.
+Then the work done is \(W=\Fv\cdot\dv =(40,10)\cdot(20,-10) =800-100 =700\)~joules.
+\end{solution}
+\end{example}
+
+
+
+\begin{activity}
+Recall the force of gravity on an object is the mass of the object time the acceleration of gravity,~\(9.8\)\,m/s\({}^2\).
+A 3\,kg~ball is thrown horizontally from a height of~2\,m and lands~10\,m away on the ground: what is the total work done by gravity on the ball?
+\actposs{\(58.8\) joules}{\(19.6\) joules}{\(29.4\) joules}{\(98\) joules}
+%\begin{parts}
+%\item \(19.6\) joules
+%\item \(29.4\) joules
+%\item\actans \(58.8\) joules
+%\item \(98\) joules
+%\end{parts}
+\end{activity}
+
+
+Finding components of vectors in various directions is called projection. 
+Such projection is surprisingly common in applications and is developed much further by \autoref{sec:proj}.
+
+
+
+
+
+
+\subsection{Algebraic properties of the dot product}
+\label{sec:apdp}
+
+
+To manipulate the dot product in algebraic expressions, we need to know its basic algebraic rules.
+The following rules of \autoref{thm:dotops} are analogous to well known rules for scalar multiplication.
+
+
+\begin{example} \label{eg:}
+Given vectors \(\uv=(-2,5,-2)\), \(\vv=(3,3,-2)\) and \(\wv=(2,0,-5)\), and  scalar \(a=2\), verify that (properties~\ref{thm:dotopse} and~\ref{thm:dotopsf})
+\begin{itemize}
+\item \(a(\uv\cdot\vv)=(a\uv)\cdot\vv=\uv\cdot(a\vv)\) (a form of associativity);
+\item \((\uv+\vv)\cdot\wv=\uv\cdot\wv+\vv\cdot\wv\) (distributivity).
+\end{itemize}
+\begin{solution} 
+\begin{itemize}
+\item For the first:
+\begin{eqnarray*}
+a(\uv\cdot\vv)&=&2\big((-2,5,-2)\cdot(3,3,-2)\big)
+\\&=&2\big((-2)3+5\cdot3+(-2)(-2)\big)
+\\&=&2\cdot13=26\,;
+\\(a\uv)\cdot\vv&=&(-4,10,-4)\cdot(3,3,-2)
+\\&=&(-4)3+10\cdot3+(-4)(-2)
+\\&=&26\,;
+\\\uv\cdot(a\vv)&=&(-2,5,-2)\cdot(6,6,-4)
+\\&=&(-2)6+5\cdot6+(-2)(-4)
+\\&=&26\,.
+\end{eqnarray*}
+These three are equal.
+
+\item For the second:
+\begin{eqnarray*}
+(\uv+\vv)\cdot\wv&=&(1,8,-4)\cdot(2,0,-5)
+\\&=&1\cdot2+8\cdot0+(-4)(-5)
+\\&=&22\,;
+\\\uv\cdot\wv+\vv\cdot\wv&=&
+(-2,5,-2)\cdot(2,0,-5)
+\\&&{}
++(3,3,-2)\cdot(2,0,-5)
+\\&=&\big[(-2)2+5\cdot0+(-2)(-5)\big]
+\\&&{}
++\big[3\cdot2+3\cdot0+(-2)(-5)\big]
+\\&=&6+16=22\,.
+\end{eqnarray*}
+These are both equal.
+\end{itemize}
+\end{solution}
+\end{example}
+
+
+
+
+\begin{theorem}[dot properties] \label{thm:dotops}
+For all vectors~\uv, \vv\ and~\wv\ in~\(\RR^n\), and for all scalars~\(a\), the following properties hold:
+\begin{enumerate}
+\item\label{thm:dotopsa} \(\uv\cdot\vv=\vv\cdot\uv\) \quad(\idx{commutative law});
+\item\label{thm:dotopsc} \(\uv\cdot\ov=\ov\cdot\uv=0\);
+\item\label{thm:dotopse} \(a(\uv\cdot\vv)=(a\uv)\cdot\vv=\uv\cdot(a\vv)\);
+\item\label{thm:dotopsf} \((\uv+\vv)\cdot\wv=\uv\cdot\wv+\vv\cdot\wv\)\quad(\idx{distributive law});
+\item\label{thm:dotopsg} \(\uv\cdot\uv\geq0\)\,, and moreover, \(\uv\cdot\uv=0\) if and only if \(\uv=\ov\)\,.
+\end{enumerate}
+\end{theorem}
+
+
+\begin{proof} 
+Here prove only the commutative law~\ref{thm:dotopsa} and the inequality~\ref{thm:dotopsg}.
+\autoref{ex:dotops} asks you to analogously prove the other properties.
+At the core of each proof is the definition of the dot product which empowers us to deduce a property via the corresponding property for scalars.
+\begin{itemize}
+\item To prove the commutative law~\ref{thm:dotopsa} consider
+\begin{eqnarray*}
+\uv\cdot\vv&=&\lincomb uvn \quad(\text{by Defn.~\ref{def:dotprod}})
+\\&&\quad(\text{using each scalar mult.\ is commutative})
+\\&=&\lincomb vun
+\\&=&\vv\cdot\uv \quad(\text{by Defn.~\ref{def:dotprod}}).
+\end{eqnarray*}
+
+\item To prove the inequality~\ref{thm:dotopsg} consider
+\begin{eqnarray*}
+\uv\cdot\uv&=&\lincomb uun\quad(\text{by Defn.~\ref{def:dotprod}})
+\\&=&u_1^2+u_2^2+\cdots+u_n^2
+\\&\geq&0+0+\cdots+0 \quad(\text{as each scalar term is}\geq0)
+\\&&{}=0\,.
+\end{eqnarray*}
+To prove the ``moreover'' part, first consider the zero vector.
+From \autoref{def:dotprod}, in~\(\RR^n\),
+\begin{equation*}
+\ov\cdot\ov={0^2+0^2+\cdots+0^2}=0\,.
+\end{equation*}
+Second, let vector \(\uv=(\hlist un)\) in~\(\RR^n\) satisfy \(\uv\cdot\uv=0\)\,.
+Then we know that
+\begin{equation*}
+\underbrace{u_1^2}_{\geq0}+\underbrace{u_2^2}_{\geq0}
++\cdots+\underbrace{u_n^2}_{\geq0}=0\,.
+\end{equation*}
+Being squares, all terms on the left are non-negative, so the only way they can all add to zero is if they are all zero.
+That is, \(u_1=u_2=\cdots=u_n=0\)\,.
+Hence, the vector~\uv\ must be the zero vector~\ov.
+\end{itemize}
+\end{proof}
+
+
+
+\begin{activity}
+For vectors \(\uv,\vv,\wv\in\RR^n\), which of the following statements is not generally true?
+\actposs[1]{\((2\uv)\cdot(2\vv)=2(\uv\cdot\vv)\)}
+{\(\uv\cdot(\vv+\wv)=\uv\cdot\vv+\uv\cdot\wv\)}
+{\(\uv\cdot\vv-\vv\cdot\uv=0\)}
+{\((\uv-\vv)\cdot(\uv+\vv)=\uv\cdot\uv-\vv\cdot\vv\)}
+\end{activity}
+
+
+
+The above proof of \autoref{thm:dotopsg}, that \(\uv\cdot\uv=0\) if and only if \(\uv=\ov\)\,, may look uncannily familiar.
+The reason is that this last part is essentially the same as the proof of \autoref{thm:veclen0} that the zero vector is the only vector of length zero.
+The upcoming \autoref{thm:triscal} establishes that this connection between dot products and lengths is no coincidence.
+
+
+
+
+\begin{example} \label{eg:triscal}
+For the two vectors \(\uv=(3,4)\) and \(\vv=(2,1)\) verify the following three properties: 
+\begin{enumerate}
+\item \(\sqrt{\uv\cdot\uv}=|\uv|\), the \idx{length} of~\uv;
+\item \(|\uv\cdot\vv|\leq|\uv||\vv|\) (\idx{Cauchy--Schwarz inequality});
+\item \(|\uv+\vv|\leq|\uv|+|\vv|\) (\idx{triangle inequality}).
+\end{enumerate}
+
+\begin{solution} 
+\begin{enumerate}
+\item Here \(\sqrt{\uv\cdot\uv}=\sqrt{3\cdot3+4\cdot4}=\sqrt{25}=5\)\,, whereas the length \(|\uv|=\sqrt{3^2+4^2}=\sqrt{25}=5\) (\autoref{def:veclen}). These expressions are equal.
+
+\item Here \(|\uv\cdot\vv|=|3\cdot2+4\cdot1|=10\)\,, whereas  \(|\uv||\vv|=5\sqrt{2^2+1^2}=5\sqrt5=11.180\)\,.  
+Hence \(|\uv\cdot\vv|=10\leq11.180=|\uv||\vv|\).
+
+\item Here \(|\uv+\vv|=|(5,5)|=\sqrt{5^2+5^2}=\sqrt{50}=7.071\)\,, whereas \(|\uv|+|\vv|=5+\sqrt5=7.236\)\,.
+Hence \(|\uv+\vv|=7.071\leq7.236=|\uv|+|\vv|\)\,.
+\marginpar{\vecops13421}%
+This is called the triangle inequality because the vectors~\uv, \vv\ and~\(\uv+\vv\) may be viewed as forming a triangle, as illustrated in the margin, and this inequality follows because the length of a side  of a triangle must be less than the sum of the other two sides.
+\end{enumerate}
+\end{solution}
+\end{example}
+
+
+The \idx{Cauchy--Schwarz inequality} inequality is one point of distinction between this `vector multiplication' and scalar multiplication: for scalars \(|ab|=|a||b|\), but the dot product of vectors is typically less, \(|\uv\cdot\vv|\leq|\uv||\vv|\).
+
+\begin{example} \label{eg:}
+The general proof of the \idx{Cauchy--Schwarz inequality} involves a trick, so let's introduce the trick using the vectors of \autoref{eg:triscal}.
+Let vectors \(\uv=(3,4)\) and \(\vv=(2,1)\) and consider the line given parametrically \index{parametric equation}(\autoref{def:parlin}) as the position vectors \(\xv=\uv+t\vv=(3+2t,4+t)\) for scalar parameter~\(t\)---illustrated in the margin.
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=middle, domain=-2.9:1.9
+  ,xlabel={$x$},ylabel={$y$}
+  ] 
+%\node[left] at (axis cs:0,0) {$O$};
+\addplot[brown,no marks] ({3+2*x},{4+x});
+\addplot[blue,thick,quiver={u=3,v=4},-stealth] coordinates {(0,0)};
+\node[right] at (axis cs:2,3) {$\uv$};
+\addplot[red,thick,quiver={u=2,v=1},-stealth] coordinates {(3,4)};
+\node[below] at (axis cs:5,5) {$\vv$};
+\end{axis}
+\end{tikzpicture}}%
+The position vector~\xv\ of any point on the line has length~\(\ell\) (\autoref{def:veclen}) where
+\begin{eqnarray*}
+\ell^2&=&(3+2t)^2+(4+t)^2
+\\&=&9+12t+4t^2+16+8t+t^2
+\\&=&\underbrace{25}_{c}+\underbrace{20}_{b}t+\underbrace{5}_{a}t^2,
+\end{eqnarray*}
+a quadratic polynomial in~\(t\).
+We know that the length~\(\ell>0\)  (the line does not pass through the origin so no~\xv\ is zero).
+Hence the quadratic in~\(t\) cannot have any zeros.
+By the known properties of quadratic equations it follows that the \idx{discriminant} \(b^2-4ac<0\)\,.
+Indeed it is: here \(b^2-4ac=20^2-4\cdot5\cdot25=400-500=-100<0\)\,.
+Usefully, here \(a=5=|\vv|^2\), \(c=25=|\uv|^2\) and \(b=20=2\cdot10=2(\uv\cdot\vv)\).
+So \(b^2-4ac<0\), written as \(\tfrac14b^2<ac\)\,, becomes the statement that \(\tfrac14[2(\uv\cdot\vv)]^2=(\uv\cdot\vv)^2<|\vv|^2|\uv|^2\).
+Taking the square-root of both sides verifies the Cauchy--Schwarz inequality.  
+The proof of the next theorem establishes it in general.
+\end{example}
+
+
+
+
+
+
+\begin{theorem} \label{thm:triscal}
+For all vectors \uv\ and \vv\ in~\(\RR^n\) the following properties hold:
+\begin{enumerate}
+  \item\label{thm:triscala} \(\sqrt{\uv\cdot\uv}=|\uv|\), the \idx{length} of~\uv;
+\item\label{thm:triscalb} \(|\uv\cdot\vv|\leq|\uv||\vv|\) (\bfidx{Cauchy--Schwarz inequality});
+\item\label{thm:triscalc} \(|\uv\pm\vv|\leq|\uv|+|\vv|\) (\bfidx{triangle inequality}).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof} 
+Each property depends upon the previous.
+\begin{itemize}
+\item[\ref{thm:triscala}]
+\begin{eqnarray*}
+\sqrt{\uv\cdot\uv}&=&\sqrt{\lincomb uun}\quad(\text{by Defn.~\ref{def:dotprod}})
+\\&=&\sqrt{u_1^2+u_2^2+\cdots+u_n^2}
+\\&=&|\uv|\quad(\text{by Defn.~\ref{def:veclen}}).
+\end{eqnarray*}
+
+\item[\ref{thm:triscalb}]  
+To prove the Cauchy--Schwarz inequality between vectors~\uv\ and~\vv\ first consider the trivial case when \(\vv=\ov\): then the left-hand side \(|\uv\cdot\vv|=|\uv\cdot\ov|=|\ov|=0\); whereas the right-hand side \(|\uv||\vv|=|\uv||\ov|=|\uv|0=0\); and so the inequality \(|\uv\cdot\vv|\leq|\uv||\vv|\) is satisfied in this case.
+
+Second, for the case when \(\vv\neq\ov\), consider the line given parametrically by \(\xv=\uv+t\vv\) for (real) scalar parameter~\(t\), as illustrated in the margin.
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none, domain=-1.4:2.4 ] 
+\node[left] at (axis cs:0,0) {$O$};
+\addplot[brown,no marks] ({3-2*x},{1+x});
+\addplot[blue,thick,quiver={u=3,v=1},-stealth] coordinates {(0,0)};
+\node[below] at (axis cs:2,0.67) {$\uv$};
+\addplot[red,thick,quiver={u=-2,v=1},-stealth] coordinates {(3,1)};
+\node[above] at (axis cs:2,1.5) {$\vv$};
+\end{axis}
+\end{tikzpicture}}%
+The distance~\(\ell\) of a point on the line from the origin is the length of its position vector, and by property~\ref{thm:triscala}
+\begin{eqnarray*}
+\ell^2&=&\xv\cdot\xv
+\\&=&(\uv+t\vv)\cdot(\uv+t\vv)
+\\&&\quad(\text{then using distibutivity~\ref{thm:dotopsf}})
+\\&=&\uv\cdot(\uv+t\vv)+(t\vv)\cdot(\uv+t\vv)
+\\&&\quad(\text{again using distibutivity~\ref{thm:dotopsf}})
+\\&=&\uv\cdot\uv+\uv\cdot(t\vv)+(t\vv)\cdot\uv+(t\vv)\cdot(t\vv)
+\\&&\quad(\text{using scalar mult.\ property~\ref{thm:dotopse}})
+\\&=&\uv\cdot\uv+t(\uv\cdot\vv)+t(\vv\cdot\uv)+t^2(\vv\cdot\vv)
+\\&&\quad(\text{using~\ref{thm:triscala} and commutativity~\ref{thm:dotopsa}})
+\\&=&|\uv|^2+2(\uv\cdot\vv)t+|\vv|^2t^2
+\\&=&at^2+bt+c,
+\end{eqnarray*}
+a quadratic in~\(t\), with coefficients \(a=|\vv|^2>0\), \(b=2(\uv\cdot\vv)\), and \(c=|\uv|^2\).
+Since \(\ell^2\geq0\) (it may be zero if the line goes through the origin), then this quadratic in~\(t\) has either no zeros or just one zero.
+By the properties of quadratic equations, the \idx{discriminant} \(b^2-4ac\leq0\)\,, that is, \(\tfrac14b^2\leq ac\)\,.
+Substituting the particular coefficients here gives 
+\(\tfrac14\big[2(\uv\cdot\vv)\big]^2=(\uv\cdot\vv)^2\leq|\vv|^2|\uv|^2\).
+Taking the square-root of both sides then establishes the Cauchy--Schwarz inequality  \(|\uv\cdot\vv|\leq|\uv||\vv|\).
+
+\item[\ref{thm:triscalc}]
+To prove the triangle inequality between vectors~\uv\ and~\vv\ first observe the Cauchy--Schwarz inequality implies \((\uv\cdot\vv)\leq|\uv||\vv|\) (since the left-hand side has magnitude\({}\leq{}\)the right-hand side).
+Then consider (analogous to the \(t=1\) case of the above)
+\marginpar{\vecops131{-2}2}%
+\begin{eqnarray*}
+|\uv+\vv|^2
+&=&(\uv+\vv)\cdot(\uv+\vv)
+\\&&\quad(\text{then using distibutivity~\ref{thm:dotopsf}})
+\\&=&\uv\cdot(\uv+\vv)+\vv\cdot(\uv+\vv)
+\\&&\quad(\text{again using distibutivity~\ref{thm:dotopsf}})
+\\&=&\uv\cdot\uv+\uv\cdot\vv+\vv\cdot\uv+\vv\cdot\vv
+\\&&\quad(\text{using~\ref{thm:triscala} and commutativity~\ref{thm:dotopsa}})
+\\&=&|\uv|^2+2(\uv\cdot\vv)+|\vv|^2
+\\&&\quad(\text{using Cauchy--Schwarz inequality})
+\\&\leq&|\uv|^2+2|\uv||\vv|+|\vv|^2
+\\&&{}=(|\uv|+|\vv|)^2.
+\end{eqnarray*}
+Take the square-root of both sides to establish the triangle inequality \(|\uv+\vv|\leq|\uv|+|\vv|\).
+
+The minus case follows because \(|\uv-\vv|=|\uv+(-\vv)|\leq|\uv|+|-\vv|=|\uv|+|\vv|\).
+\marginpar{\vecops331{-2}2}%
+
+\end{itemize}
+\end{proof}
+
+
+\begin{example} \label{eg:}
+Verify the \idx{Cauchy--Schwarz inequality} (\(+\)~case) and the \idx{triangle inequality} for the vectors \(\av=(-1,-2,1,3,-2)\) and \(\bv=(-3,-2,10,2,2)\).
+\begin{solution} 
+We need the length of the vectors:
+\begin{eqnarray*}
+|\av|&=&\sqrt{(-1)^2+(-2)^2+1^2+3^2+(-2)^2}
+\\&=&\sqrt{19}=4.3589,
+\\|\bv|&=&\sqrt{(-3)^2+(-2)^2+10^2+2^2+2^2}
+\\&=&\sqrt{121}=11\,.
+\end{eqnarray*}
+also, the dot product
+\begin{eqnarray*}
+\av\cdot\bv
+&=&(-1)(-3)+(-2)(-2)+1\cdot10+3\cdot2+(-2)2
+\\&=&19\,.
+\end{eqnarray*}
+Hence \(|\av\cdot\bv|=19<47.948=|\av||\bv|\), which verifies the Cauchy--Schwarz inequality.
+
+Now, the length of the sum
+\begin{eqnarray*}
+|\av+\bv|&=&|(-4,-4,11,5,0)|
+\\&=&\sqrt{(-4)^2+(-4)^2+11^2+5^2+0^2}
+\\&=&\sqrt{178}=13.342\,.
+\end{eqnarray*}
+Here \(|\av+\bv|=13.342\) whereas \(|\av|+|\bv|=11+\sqrt{19}=15.359\)\,.
+Hence, here \(|\av+\bv|\leq|\av|+|\bv|\) which verifies the triangle inequality.
+\end{solution}
+\end{example}
+
+
+
+
+
+
+
+
+\subsection{Orthogonal vectors are at right-angles}
+\label{sec:ovra}
+
+\index{orthogonal vectors|(}
+
+Of all the angles that vectors can make with each other, the two most important angles are, firstly, when the vectors are aligned with each other, and secondly, when the vectors are at right-angles to each other.
+Recall \autoref{thm:anglev} gives the angle~\(\theta\) between two vectors via \(\cos\theta=\frac{\uv\cdot\vv}{|\uv||\vv|}\).
+For vectors at \idx{right-angles} \(\theta=90^\circ\) and so \(\cos\theta=0\) and hence non-zero vectors are at right-angles only when the dot product \(\uv\cdot\vv=0\)\,.
+We give a special name to vectors at right-angles.
+
+
+\begin{definition} \label{def:orthovec}
+Two vectors~\uv\ and~\vv\ in~\(\RR^n\) are termed
+\bfidx{orthogonal} (or \bfidx{perpendicular})
+if and only if their dot product \(\uv\cdot\vv=0\)\,.
+\marginpar{The term `orthogonal' derives from the Greek for `right-angled'.}
+\end{definition}
+
+By convention the zero vector~\ov\ is orthogonal to all other vectors.
+However, in practice, we almost always use the notion of orthogonality only in connection with \emph{non-zero} vectors.
+Often the requirement that the orthogonal vectors are non-zero is explicitly made, but beware that sometimes the requirement may be implicit in the problem.
+
+
+\begin{example} \label{eg:}
+The \idx{standard unit vector}s (\autoref{def:stuniv}) are orthogonal to each other.
+For example, consider the standard unit vectors~\iv, \jv\ and~\kv\ in~\(\RR^3\):
+\begin{itemize}
+\item \(\iv\cdot\jv=(1,0,0)\cdot(0,1,0)=0+0+0=0\);
+\item \(\jv\cdot\kv=(0,1,0)\cdot(0,0,1)=0+0+0=0\);
+\item \(\kv\cdot\iv=(0,0,1)\cdot(1,0,0)=0+0+0=0\).
+\end{itemize}
+By \autoref{def:orthovec} these are orthogonal to each other.
+\end{example}
+
+
+\begin{example} \label{eg:}
+Which pairs of the following vectors, if any, are \idx{perpendicular} to each other?
+\(\uv=(-1,1,-3,0)\), \(\vv=(2,4,2,-6)\) and \(\wv=(-1,6,-2,3)\).
+\begin{solution} 
+Use the dot product.
+\begin{itemize}
+\item \(\uv\cdot\vv =(-1,1,-3,0)\cdot(2,4,2,-6) =-2+4-6+0 =-4 \neq0\) so this pair are not perpendicular. 
+\item \(\uv\cdot\wv =(-1,1,-3,0)\cdot(-1,6,-2,3) =1+6+6+0 =13 \neq0\) so this pair are not perpendicular. 
+\item \(\vv\cdot\wv =(2,4,2,-6)\cdot(-1,6,-2,3) =-2+24-4-18 =0\) so this pair are the only two vectors perpendicular to each other. 
+\end{itemize}
+\end{solution}
+\end{example}
+
+
+
+\begin{activity}
+Which pair of the following vectors are orthogonal to each other?
+\(\xv=\iv-2\kv\)\,, \(\yv=-3\iv-4\jv\)\,, \(\zv=-\iv-2\jv+2\kv\)
+\actposs[4]{no pair}{\(\yv,\zv\)}{\(\xv,\zv\)}{\(\xv,\yv\)}
+%\partswidth=5em
+%\begin{parts}
+%\item \(\yv,\zv\)
+%\item \(\xv,\zv\)
+%\item \(\xv,\yv\)
+%\item\actans no pair
+%\end{parts}
+\end{activity}
+
+
+
+\begin{example} \label{eg:}
+Find the number~\(b\) such that vectors \(\av=\iv+4\jv+2\kv\) and \(\bv=\iv+b\jv-3\kv\) are at \idx{right-angles}.
+\begin{solution} 
+For vectors to be at right-angles, their dot product must be zero.
+Hence find~\(b\) such that
+\begin{equation*}
+0=\av\cdot\bv=(\iv+4\jv+2\kv)\cdot(\iv+b\jv-3\kv)
+=1+4b-6=4b-5\,.
+\end{equation*}
+Solving \(0=4b-5\) gives \(b=5/4\).
+That is, \(\iv+\tfrac54\jv-3\kv\) is at right-angles to \(\iv+4\jv+2\kv\).
+\end{solution}
+\end{example}
+
+
+
+\paragraph{Key properties}
+The next couple of innocuous looking theorems are vital keys to important results in subsequent chapters.
+
+To introduce the first theorem, consider the 2D plane and try to draw a non-zero vector at \idx{right-angles} to both the two standard unit vectors~\iv\ and~\jv.
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ,ymin=-1.1,xmin=-1.1,xmax=1.1,ymax=1.1
+  ] 
+  \node[below] at (axis cs:0,0) {$O$};
+  \addplot[blue,thick,quiver={u=1,v=0},-stealth] coordinates {(0,0)};
+  \node[above] at (axis cs:1,0) {$\iv$};
+  \addplot[blue,thick,quiver={u=0,v=1},-stealth,forget plot] coordinates {(0,0)};
+  \node[right] at (axis cs:0,1) {$\jv$};
+  \addplot+[quiver={u=rand,v=rand},-stealth] coordinates {(0,0)(0,0)(0,0)};
+\end{axis}
+\end{tikzpicture}}%
+The red vectors in the margin illustrate three failed attempts to draw a vector at right-angles to both~\iv\ and~\jv.
+It cannot be done. 
+No vector in the plane can be at right angles to both the standard unit vectors in the plane.
+
+
+\begin{theorem} \label{thm:nononz}
+There is no non-zero vector \idx{orthogonal} to all \(n\)~\idx{standard unit vector}s in~\(\RR^n\).
+\end{theorem}
+
+\begin{proof} 
+Let \(\uv=(\hlist un)\) be a vector in~\(\RR^n\) that is orthogonal to all \(n\)~standard unit vectors.  
+Then by \autoref{def:orthovec} of orthogonality:
+\begin{itemize}
+\item \(0=\uv\cdot\ev_1=(\hlist un)\cdot(1,0,\ldots,0)=u_1+0+\cdots+0=u_1\), and so the first component must be zero;
+\item \(0=\uv\cdot\ev_2=(\hlist un)\cdot(1,0,\ldots,0)=0+u_2+0+\cdots+0=u_2\), and so the second component must be zero; and so on to
+\item \(0=\uv\cdot\ev_n=(\hlist un)\cdot(0,0,\ldots,1)=0+0+\cdots+u_n=u_n\), and so the last component must be zero.
+\end{itemize}
+Since \(u_1=u_2=\cdots=u_n=0\) the only vector that is orthogonal to all the standard unit vectors is \(\uv=\ov\), the zero vector.
+\end{proof}
+
+
+To introduce the second theorem, 
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=none
+  ] 
+  \node[right] at (axis cs:0,0) {$O$};
+  \addplot[blue,thick,quiver={u=0.6,v=0.8},-stealth] coordinates {(0,0)};
+  \addplot[blue,thick,quiver={u=-0.8,v=0.6},-stealth] coordinates {(0,0)};
+  \addplot[blue,thick,quiver={u=0.145,v=-0.989},-stealth] coordinates {(0,0)};
+\end{axis}
+\end{tikzpicture}}%
+imagine trying to draw three unit vectors in any orientation in the 2D plane such that all three are at \idx{right-angles} to each other.
+The margin illustrates one attempt.
+It cannot be done.
+There are at most two vectors in 2D that are all at right-angles to each other.
+
+
+\begin{theorem}[orthogonal completeness] \label{thm:orthcomp}
+In a set of \idx{orthogonal} \idx{unit vector}s in~\(\RR^n\), there can be no more than \(n\)~vectors in the set.
+\footnote{For the pure at heart, this property is part of the definition of what we mean by~\(\RR^n\).  
+The representation of a vector in~\(\RR^n\) by \(n\)~components (here \autoref{def:vecs}) then follows as a consequence, instead of vice-versa as here.}
+\end{theorem}
+
+
+\begin{proof} 
+Use contradiction%
+\ifcsname r@sec:pc\endcsname\ (\autoref{sec:pc})\fi.
+Suppose there are more than \(n\)~orthogonal unit vectors in the set.
+\marginpar{\rotatebox{53.10}{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal image, axis lines=middle,xtick={-1,0,1},ytick={-1,0,1}
+  ,ymin=-1.4,ymax=1.4,xmin=-1.4,xmax=1.4 ] 
+  \node[below] at (axis cs:0,0) {$\quad O$};
+  \addplot[blue,thick,quiver={u=1,v=0},-stealth] coordinates {(0,0)};
+  \node[above] at (axis cs:1,0) {$\ev_1$};
+  \addplot[blue,thick,quiver={u=0,v=1},-stealth] coordinates {(0,0)};
+  \node[right] at (axis cs:0,1) {$\ev_2$};
+  \addplot[blue,thick,quiver={u=-0.704,v=-0.710},-stealth] coordinates {(0,0)};
+\end{axis}
+\end{tikzpicture}}}%
+Define a coordinate system for~\(\RR^n\) using the first~\(n\) of the given unit vectors as the \(n\)~standard unit vectors 
+(as illustrated for~\(\RR^2\) in the margin).
+\autoref{thm:nononz} then says there cannot be any more non-zero vectors orthogonal than these \(n\)~standard unit vectors.
+This contradicts there being more than~\(n\) orthogonal unit vectors.
+To avoid this contradiction the supposition must be wrong; that is, there cannot be more than~\(n\) orthogonal unit vectors in~\(\RR^n\).
+\end{proof}
+
+
+\index{orthogonal vectors|)}
+
+
+
+
+
+
+\subsection{Normal vectors and equations of a plane}
+\label{sec:nvep}
+
+\index{normal vector|(}
+
+This section uses the dot product to find equations of a plane in 3D.
+The key is to write points in the plane as those at right-angles to the direction perpendicular to the plane, called a normal.
+Let's start with an example of the idea in 2D.
+
+\begin{example} \label{eg:}
+First find the equation of the line that is \idx{perpendicular} to the vector~\((2,3)\) and that passes through the origin.
+Second, find the equation of the line that passes through the point~\((4,1)\) (instead of the origin).
+\begin{solution} 
+Recall that vectors at right-angles have a zero dot product (\autoref{sec:ovra}).
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis equal, axis lines=middle, xlabel={$x$}, ylabel={$y$}
+  ] 
+  \addplot[brown,thick,mark=empty] {-2/3*x};
+  \addplot[blue,thick,quiver={u=2,v=3},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:2,3) {$(2,3)$};
+  \addplot[red,thick,quiver={u=-3,v=2},-stealth,mark=empty] coordinates {(0,-0.1)};
+  \node[above] at (axis cs:-3,2) {$\xv$};  
+\end{axis}
+\end{tikzpicture}}
+Thus the position vector~\xv\ of every point in the line satisfies the dot product \(\xv\cdot(2,3)=0\)\,.
+For \(\xv=(x,y)\), as illustrated in the margin, \(\xv\cdot(2,3)=2x+3y\) so the equation of the line is \(2x+3y=0\)\,.
+
+When the line goes through \((4,1)\) (instead of the origin), then it is the displacement \(\xv-(4,1)\) that must be orthogonal to~\((2,3)\), as illustrated.
+\marginpar{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize, domain=-1:9
+  ,axis equal, axis lines=middle, xlabel={$x$}, ylabel={$y$}
+  ] 
+  \addplot[brown,thick,mark=empty] {-2/3*(x-4)+1};
+  \addplot[blue,thick,quiver={u=2,v=3},-stealth,mark=empty] coordinates {(4,1)};
+  \node[right] at (axis cs:6,4) {$(2,3)$};
+  \addplot[red,quiver={u=4,v=1},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:4,1) {$(4,1)$};
+  \addplot[red,quiver={u=1,v=3},-stealth,mark=empty] coordinates {(0,0)};
+  \node[right] at (axis cs:0.5,1.5) {$\vec x$};
+  \addplot[red,thick,quiver={u=-3,v=2},-stealth,mark=empty] coordinates {(4,0.95)};
+  \node[right] at (axis cs:1.3,2.8) {$\vec x-(4,1)$};
+\end{axis}
+\end{tikzpicture}}
+That is, the equation of the line is \((x-4,y-1)\cdot(2,3)=0\).
+Evaluating the dot product gives \(2(x-4)+3(y-1)=0\); that is, \(2x+3y=2\cdot4+3\cdot1=11\) is an equation of the line.
+
+\end{solution}
+\end{example}
+
+
+
+
+
+\begin{activity}
+What is an equation of the line through the point~\((4,2)\) and that is a right-angles to the vector~\((1,3)\)?
+\actposs{\(x+3y=10\)}{\(4x+2y=10\)}{\(4x+y=11\)}{\(2x+3y=11\)}
+%\begin{parts}
+%\item \(4x+2y=10\)
+%\item \(x+3y=10\)\actans
+%\item \(4x+y=11\)
+%\item \(2x+3y=11\)
+%\end{parts}
+\end{activity}
+
+
+
+
+
+\begingroup\newcommand{\mytmp}[1]{%
+\qview{20}{25}{\begin{tikzpicture} 
+\begin{axis}[footnotesize,font=\footnotesize, height=5cm, view={\q}{20}
+  , domain=-1.5:3.5, axis equal, axis lines=box
+  ] 
+  \ifnum0<#1
+  \addplot3[red,quiver={u=1,v=1,w=2},-stealth,mark=empty] coordinates {(0,0,0)};
+  \node[left] at (axis cs:0.7,0.7,1.4) {$\pv$};
+  \addplot3[red,quiver={u=3,v=1.5,w=1.5},-stealth,mark=empty] coordinates {(0,0,0)};
+  \node[right] at (axis cs:1,0.5,0.5) {$\xv$};
+  \node[left] at (axis cs:0,0,0) {$O$};
+  \fi
+  \addplot3[surf,shader=interp,opacity=0.5,samples=2] {2-(x-1)/3+(y-1)/3};
+  \addplot3[blue,thick,quiver={u=1,v=-1,w=3},-stealth,mark=empty] coordinates {(1,1,2)};
+  \node[left] at (axis cs:2,0,5) {$\nv$};
+  \addplot3[mark=*] coordinates {(1,1,2)} node[left] {$P$};
+  \addplot3[red,thick,quiver={u=2,v=0.5,w=-0.5},-stealth,mark=empty] coordinates {(1,1,2)};
+  \addplot3[mark=*] coordinates {(3,1.5,1.5)} node[right] {$X$};
+  \ifnum0<#1
+  \node[above] at (axis cs:2.6,1.3,1.7) {$\xv-\pv$};
+  \fi
+\end{axis}
+\end{tikzpicture}}}
+Now use the same approach to finding an equation of a plane in 3D.
+The problem is to find the equation of the plane that goes through a given point~\(P\) and is perpendicular to a given vector~\nv, called a \bfidx{normal vector}.
+As illustrated in stereo below, that means to find all points~\(X\) such that~\(\ovect{PX}\) is orthogonal to~\nv.
+\begin{center}\mytmp0\end{center}
+Denote the position vector of~\(P\) by~\(\pv=(x_0,y_0,z_0)\),  the position vector of~\(X\) by \(\xv=(x,y,z)\), and let the \idx{normal vector} be \(\nv=(a,b,c)\).
+Then, as drawn below, the displacement vector \(\ovect{PX}=\xv-\pv=(x-x_0,y-y_0,z-z_0)\) and so for \(\ovect{PX}\) to be orthogonal to~\nv\ requires \(\nv\cdot(\xv-\pv)=0\); that is, an \bfidx{equation of the plane} is
+\begin{equation*}
+a(x-x_0)+b(y-y_0)+c(z-z_0)=0\,,
+\end{equation*}
+equivalently, and equation of the plane is
+\begin{equation*}
+ax+by+cz=d
+\quad\text{for constant }d=ax_0+by_0+cz_0\,.
+\end{equation*}
+\begin{center}\mytmp1\end{center}
+\endgroup
+
+
+
+\begin{example} \label{eg:}
+Find an \idx{equation of the plane} through point \(P=(1,1,2)\) that has \idx{normal vector} \(\nv=(1,-1,3)\).
+(This is the case in the above illustrations.)
+Hence write down three distinct points on the plane.
+\begin{solution} 
+Letting \(\xv=(x,y,z)\) be the coordinates of a point in the plane, the above argument asserts an equation of the plane is \(\nv\cdot(\xv-\ovect{OP})=0\) which becomes
+\(1(x-1)-1(y-1)+3(z-2)=0\); that is, \(x-1-y+1+3z-6=0\)\,, which rearranged is \(x-y+3z=6\)\,. 
+
+To find some points in the plane, rearrange this equation to \(z=2-x/3+y/3\) and then substitute any values for~\(x\) and~\(y\):  
+\(x=y=0\) gives \(z=2\) so \((0,0,2)\) is on the plane; 
+\(x=3\) and \(y=0\) gives \(z=1\) so \((3,0,1)\) is on the plane;
+\(x=2\) and \(y=-2\) gives \(z=2/3\) so \((2,-2,\frac23)\) is on the plane; and so on.
+\end{solution}
+\end{example}
+
+
+
+
+
+\begin{example} \label{eg:}
+Write down a \idx{normal vector} to each of the following planes:
+\begin{parts}
+\item \(3x-6y+z=4\)\,;
+\item \(z=0.2x-3.3y-1.9\)\,.
+\end{parts}
+\begin{solution} \ 
+\begin{enumerate}
+\item In this standard form \(3x-6y+2z=4\) a normal vector is the coefficients of the variables, \(\nv=(3,-6,2)\) (or any scalar multiple).
+\item Rearrange \(z=0.2x-3.3y-1.9\) to standard form \(-0.2x+3.3y+z=-1.9\) then a normal is \(\nv=(-0.2,3.3,1)\) (or any multiple).
+\end{enumerate} 
+\end{solution}
+\end{example}
+
+
+
+
+\begin{activity}
+Which of the following is a normal vector to the plane \(x_2+2x_3+4=x_1\)\,?
+\actposs{\((-1,1,2)\)}{\((1,2,1)\)}{\((1,2,4)\)}{none of these}
+%\begin{parts}
+%\item \((-1,1,2)\)\actans
+%\item \((1,2,1)\)
+%\item \((1,2,4)\)
+%\item none of these.
+%\end{parts}
+\end{activity}
+
+
+
+
+\index{normal vector|)}
+
+
+
+
+\index{parametric equation|(}
+\paragraph{Parametric equation of a plane}
+An alternative way of describing a plane is via a parametric equation analogous to the parametric equation of a line (\autoref{sec:pel}).
+Such a parametric representation generalises to every dimension (\autoref{sec:lcss}).
+
+The basic idea, as illustrated in the margin, is that given any plane (through the origin for the moment), then choosing almost any two vectors in the plane allows us to write all points in the plane as a sum of multiples of the two vectors.
+With the given vectors~\uv\ and~\vv\ shown in the margin, illustrated are the points \(\uv+2\vv\), \(\tfrac12\uv-2\vv\) and \(-2\uv+3\vv\).
+\marginpar{\begin{tikzpicture}
+\newcommand{\ppoint}[2]{
+    \pgfmathparse{#1*3+#2*1}\let\h\pgfmathresult
+    \pgfmathparse{#1*1+#2*2}\let\v\pgfmathresult
+    \addplot[red,mark=*,only marks] coordinates {(\h,\v)};
+    \edef\temp{\noexpand
+    \node[below] at (axis cs:\h,\v) {$#1\noexpand\uv{#2}\noexpand\vv$};
+    }\temp
+    }
+\begin{axis}[footnotesize,font=\footnotesize
+  ,axis lines=none%,xlabel={$x$},ylabel={$y$}
+  , axis equal
+  , view={0}{90}
+  ,xmax=7.5,ymax=5.5,xmin=-7.5,ymin=-5.5
+  ]
+\addplot3[mesh,brown,samples=17,domain=-4:4,dotted] (3*x+y,x+2*y,0);
+\addplot3[mesh,brown,samples=9,domain=-4:4] (3*x+y,x+2*y,0);
+\addplot[blue,quiver={u=3,v=1},-stealth,thick] coordinates {(0,0)};
+\node[right] at (axis cs:3,1) {$\uv$};
+\addplot[blue,quiver={u=1,v=2},-stealth,thick] coordinates {(0,0)};
+\node[above] at (axis cs:1,2) {$\vv$};
+\node[left] at (axis cs:0,0) {$O$};
+\ppoint{1}{+2}
+\ppoint{0.5}{-2}
+\ppoint{-2}{+3}
+\end{axis}
+\end{tikzpicture}}%
+Similarly, all points in the plane have a position vector in the form \(s\uv+t\vv\) for some scalar parameters~\(s\) and~\(t\).
+The grid shown in the margin illustrates the sum of integral and half-integral multiples.
+The formula \(\xv=s\uv+t\vv\) for parameters~\(s\) and~\(t\) is called a parametric equation of the plane.
+
+
+
+
+\begin{example} \label{eg:}
+Find a parametric equation of the plane that passes through the three points \(P=(-1,2,3)\), \(Q=(2,3,2)\) and \(R=(0,4,5)\), drawn below in stereo.
+\newcommand{\mytemp}[1]{%
+\qview{50}{55} {\begin{tikzpicture}
+\begin{axis}[footnotesize,font=\footnotesize,height=5cm
+  ,axis lines=box, axis equal, view={\q}{25} ]
+\addplot3[black,mark=*,only marks,nodes near coords
+,nodes near coords align={above}
+,point meta=explicit symbolic] coordinates {
+(-1,2,3)[$P$] (2,3,2)[$Q$] (0,4,5)[$R$] };
+\addplot3[surf,shader=interp,opacity=0.5,samples=2,domain=-0.9:1.9] (3*x+y-1,x+2*y+2,-x+2*y+3);
+\ifnum0<#1
+\addplot3[blue,quiver={u=-1,v=2,w=3},-stealth,thick] coordinates {(0,0,0)};
+\node[left] at (axis cs:-0.5,1,1.5) {$\pv$};
+\node[left] at (axis cs:0,0,0) {$O$};
+\addplot3[blue,quiver={u=3,v=1,w=-1},-stealth,thick] coordinates {(-1,2,3)};
+\node[below] at (axis cs:0.5,2.5,2.5) {$\uv$};
+\addplot3[blue,quiver={u=1,v=2,w=2},-stealth,thick] coordinates {(-1,2,3)};
+\node[below] at (axis cs:-0.33,3.33,4.33) {$\vv$};
+\fi
+\end{axis}
+\end{tikzpicture}}}
+\begin{center}\mytemp0\end{center}
+
+\begin{solution} 
+This plane does not pass through the origin, so we first choose a point and make the description relative to that point: say choose point~\(P\) with position vector \(\pv=\ovect{OP}=-\iv+2\jv+3\kv\).
+Then, as illustrated below, two vectors parallel to the required plane are 
+\begin{eqnarray*}
+\uv&=&\ovect{PQ} =\ovect{OQ}-\ovect{OP} 
+\\&=&(2\iv+3\jv+2\kv)-(-\iv+2\jv+3\kv) 
+\\&=&3\iv+\jv-\kv,
+\\\vv&=&\ovect{PR} =\ovect{OR}-\ovect{OP} 
+\\&=&(4\jv+5\kv)-(-\iv+2\jv+3\kv) 
+\\&=&\iv+2\jv+2\kv.
+\end{eqnarray*}
+\begin{center}\mytemp1\end{center} 
+Lastly, every point in the plane is the sum of the displacement vector~\pv\ and arbitrary multiples of the parallel vectors~\uv\ and~\vv.
+That is, a parametric equation of the plane is \(\xv=\pv+s\uv+t\vv\) which here is
+\begin{eqnarray*}
+\xv&=&(-\iv+2\jv+3\kv)+s(3\iv+\jv-\kv)+t(\iv+2\jv+2\kv)
+\\&=&(-1+3s+t)\iv+(2+s+2t)\jv+(3-s+2t)\kv.
+\end{eqnarray*}
+\end{solution}
+\end{example}
+
+
+
+
+\begin{definition} \label{def:parpla}
+A \bfidx{parametric equation} of a plane is \(\xv=\pv+s\uv+t\vv\) where \pv~is the \idx{position vector} of some point in the plane,   the two vectors~\uv\ and~\vv\ are parallel to the plane (\(\uv,\vv\neq\ov\) and are at a non-zero \idx{angle} to each other), and the \idx{scalar} \bfidx{parameter}s~\(s\) and~\(t\) vary over all real values to give \idx{position vector}s of all points in the plane.
+\end{definition}
+
+The beauty of this definition is that it applies for planes in any number of dimensions by using vectors with the corresponding number of components.
+
+
+
+\begin{example} \label{eg:}
+Find a parametric equation of the plane that passes through the three points \(P=(6,-4,3)\), \(Q=(-4,-18,7)\) and \(R=(11,3,1)\), drawn below in stereo.
+\begin{center}
+\qview{50}{55} {\begin{tikzpicture}
+\begin{axis}[footnotesize,font=\footnotesize,height=5cm
+  ,axis lines=box, axis equal, view={\q}{25} ]
+\addplot3[black,mark=*,only marks,nodes near coords
+,nodes near coords align={above}
+,point meta=explicit symbolic] coordinates {
+(6,-4,3)[$P$] (-4,-18,7)[$Q$] (11,3,1)[$R$] };
+\end{axis}
+\end{tikzpicture}}
+\end{center}
+
+\begin{solution} 
+First choose a point and make the description relative to that point: say choose point~\(P\) with position vector \(\pv=\ovect{OP}=6\iv-4\jv+3\kv\).
+Then, as illustrated below, two vectors parallel to the required plane are 
+\begin{eqnarray*}
+\uv&=&\ovect{PQ} =\ovect{OQ}-\ovect{OP} 
+\\&=&(-4\iv-18\jv+7\kv)-(6\iv-4\jv+3\kv) 
+\\&=&-10\iv-14\jv+4\kv,
+\\\vv&=&\ovect{PR} =\ovect{OR}-\ovect{OP} 
+\\&=&(11\iv+3\jv+\kv)-(6\iv-4\jv+3\kv) 
+\\&=&5\iv+7\jv-2\kv.
+\end{eqnarray*}
+Oops: notice that \(\uv=-2\vv\) so the vectors~\uv\ and~\vv\ are not at a nontrivial angle; instead they are aligned along a line because the three points~\(P\), \(Q\) and~\(R\) are collinear.
+There are an infinite number of planes passing through such collinear  points.
+Hence we cannot answer the question which requires ``the plane''.
+\end{solution}
+\end{example}
+
+
+
+\begin{example} \label{eg:}
+Find a parametric equation of the plane that passes through the three points \(A=(-1.2,2.4,0.8)\), \(B=(1.6,1.4,2.4)\) and \(C=(0.2,-0.4,-2.5)\), drawn below in stereo.
+%Hence determine if the point \(D=(6.7,1.5,2.3)\) is in the plane, or not.
+\newcommand{\mytemp}[1]{%
+\qview{10}{15} {\begin{tikzpicture}
+\begin{axis}[footnotesize,font=\footnotesize,height=5cm
+  ,axis lines=box, axis equal, view={\q}{20} ]
+\addplot3[black,mark=*,only marks,nodes near coords
+,nodes near coords align={above}
+,point meta=explicit symbolic] coordinates {
+(-1.2,2.4,0.8)[$A$] (1.6,1.4,2.4)[$B$] (0.2,-0.4,-2.5)[$C$] };
+\addplot3[surf,shader=interp,opacity=0.5,samples=2,domain=-0.1:1.1] (-1.2+2.8*x+1.4*y,2.4-x-2.8*y,0.8+1.6*x-3.3*y);
+\ifnum0<#1
+\addplot3[blue,quiver={u=-1.2,v=2.4,w=0.8},-stealth,thick] coordinates {(0,0,0)};
+\node[right] at (axis cs:-0.6,1.2,0.4) {$a$};
+\node[right] at (axis cs:0,0,0) {$O$};
+\addplot3[blue,quiver={u=2.8,v=-1,w=1.6},-stealth,thick] coordinates {(-1.2,2.4,0.8)};
+\node[below] at (axis cs:0.2,1.9,1.6) {$u$};
+\addplot3[blue,quiver={u=1.4,v=-2.8,w=-3.3},-stealth,thick] coordinates {(-1.2,2.4,0.8)};
+\node[left] at (axis cs:-0.5,1,-0.85) {$v$};
+\fi
+\end{axis}
+\end{tikzpicture}}}
+\begin{center}\mytemp0\end{center}
+\begin{solution} 
+First choose a point and make the description relative to that point: say choose point~\(A\) with position vector \(\av=\ovect{OA}=-1.2\iv+2.4\jv+0.8\kv\).
+Then, as illustrated below, two vectors parallel to the required plane are 
+\begin{eqnarray*}
+\uv&=&\ovect{AB} =\ovect{OB}-\ovect{OA} 
+\\&=&(1.6\iv+1.4\jv+2.4\kv)-(-1.2\iv+2.4\jv+0.8\kv) 
+\\&=&2.8\iv-\jv+1.6\kv\,,
+\\\vv&=&\ovect{AC} =\ovect{OC}-\ovect{OA} 
+\\&=&(0.2\iv-0.4\jv-2.5\kv)-(-1.2\iv+2.4\jv+0.8\kv) 
+\\&=&1.4\iv-2.8\jv-3.3\kv\,.
+\end{eqnarray*}
+\begin{center}\mytemp1\end{center}
+Lastly, every point in the plane is the sum of the displacement vector~\av, and arbitrary multiples of the parallel vectors~\uv\ and~\vv.
+That is, a parametric equation of the plane is \(\xv=\av+s\uv+t\vv\) which here is
+\begin{eqnarray*}
+\xv&=&\begin{bmatrix} -1.2\\2.4\\0.8 \end{bmatrix}
++s\begin{bmatrix} 2.8\\-1\\1.6 \end{bmatrix}
++t\begin{bmatrix} 1.4\\-2.8\\-3.3 \end{bmatrix}
+\\&=&\begin{bmatrix} -1.2+2.8s+1.4t\\2.4-s-2.8t\\0.8+1.6s-3.3t \end{bmatrix}.
+\end{eqnarray*}
+\end{solution}
+\end{example}
+
+
+
+
+\begin{activity}
+Which of the following is \emph{not} a parametric equation of a plane?
+\actposs[1]{\((4,1,4)+(3,6,3)s+(2,4,2)t\)}{\(\iv+s\jv+t\kv\)}{\((-1,1,-1)s+(4,2,-1)t\)}{\((3s+2t,4+2s+t,4+3t)\)}
+%\begin{enumerate}
+%\item \(\iv+s\jv+t\kv\)
+%\item \((-1,1,-1)s+(4,2,-1)t\)
+%\item \((3s+2t,4+2s+t,4+3t)\)
+%\item \((4,1,4)+(3,6,3)s+(2,4,2)t\) \actans
+%\end{enumerate}
+\end{activity}
+
+
+
+
+\index{parametric equation|)}
+
+
+
+
+
+
+
+\subsection{Exercises}
+
+
+
+\begin{exercise} \label{ex:ezyang} 
+Following \autoref{eg:ezyang}, use the \idx{cosine rule} for triangles to find the angle between the following pairs of vectors.  
+Confirm that \(|\uv||\vv|\cos\theta=\uv\cdot\vv\) in each case.
+\begin{parts}
+\item \((6,5)\) and \((-3,1)\)
+\item \((6,2,2)\) and \((-1,-2,5)\)
+\item \((2,2.9)\) and \((-1.4,0.8)\)
+\item \((-3.6,0,-0.7)\) and \((1.2,-0.9,-0.6)\)
+\end{parts}
+\end{exercise}
+
+
+
+
+\begin{exercise} \label{ex:} 
+Which of the following pairs of vectors appear orthogonal?  
+\newcommand{\TwoVec}[4]{\begin{tikzpicture} 
+\begin{axis}[axis equal, axis lines=middle,footnotesize]
+    \addplot[quiver={u=#1,v=#2},blue,-stealth,thick] coordinates {(0,0)};
+    \addplot[quiver={u=#3,v=#4},blue,-stealth,thick] coordinates {(0,0)};
+\end{axis}
+\end{tikzpicture}}
+%[q,d]=qr(randn(2));if rand<0.5,b=diag(randn(1,2))*q', else c=randn(2)+0.5*eye(2), end
+\begin{parts}
+\item \TwoVec{1.30}{0.63}{-0.34}{0.10}
+\answer{Not orthogonal.}
+
+\item \TwoVec{-0.68}{-0.20}{-0.84}{0.29}
+\answer{Not orthogonal.}
+
+\item \TwoVec{2.21}{-0.07}{0.08}{2.51}
+\answer{Orthogonal.}
+
+\item \TwoVec{0.65}{-0.17}{0.28}{1.06}
+\answer{Orthogonal.}
+
+\item \TwoVec{0.59}{-0.21}{0.02}{0.22}
+\answer{Not orthogonal.}
+
+\item \TwoVec{0.44}{-1.45}{1.25}{0.01}
+\answer{Not orthogonal.}
+
+\item \TwoVec{-1.87}{-0.45}{-0.29}{1.21}
+\answer{Orthogonal.}
+
+\item \TwoVec{2.03}{0.37}{-1.18}{0.52}
+\answer{Not orthogonal.}
+
+\end{parts}
+\end{exercise}
+
+
+
+
+
+
+
+\begin{exercise} \label{ex:} 
+Recall that \autoref{eg:deflsv} represented the following sentences by \idx{word vector}s \(\wv=(N_{\text{cat}}\), \(N_{\text{dog}}\), \(N_{\text{mat}}\), \(N_{\text{sat}}\), \(N_{\text{scratched}})\).
+\begin{itemize}
+\item ``The cat and dog sat on the mat'' is summarised by the vector \(\av=(1,1,1,1,0)\).
+\item ``The dog scratched'' is summarised by the vector \(\bv=(0,1,0,0,1)\).
+\item  ``The dog sat on the mat; the cat scratched the dog.'' is summarised by the vector \(\cv=(1,2,1,1,1)\).
+\end{itemize}
+Find the similarity between pairs of these sentences by calculating the angle between each pair of word vectors.  
+What is the most similar pair of sentences?
+
+\answer{\(\theta_{ab}=69.30^\circ\), \(\theta_{ac}=27.89^\circ\), \(\theta_{bc}=41.41^\circ\).  The first and third sentences have smallest angle and so are most similar.}
+%a=[1 1 1 1 0
+% 0 1 0 0 1
+% 1 2 1 1 1]
+%aa=a*a'
+%d=diag(1./sqrt(diag(aa)))
+%acos(d*aa*d)*180/pi
+\end{exercise}
+
+
+
+\begin{exercise} \label{ex:} 
+Recall \autoref{ex:8siambks} found word vectors in~\(\RR^7\) for the titles of eight books that The Society of Industrial and Applied Mathematics (\textsc{siam}) reviewed recently.
+The following four titles have more than one word counted in the word vectors.
+\begin{enumerate}
+\item Introduction to Finite and Spectral Element Methods using \textsc{matlab}
+\item Iterative Methods for Linear Systems: Theory and Applications 
+\item Singular Perturbations: Introduction to System Order Reduction Methods with Applications 
+\item Stochastic Chemical Kinetics: Theory and Mostly Systems Biology Applications
+\end{enumerate}
+Find the similarity between pairs of these titles by calculating the angle between each pair of corresponding word vectors in~\(\RR^7\).  What is the most similar pair of titles?  What is the most dissimilar titles?
+
+%a=[0,1,0,0,1,0,0
+%1,0,1,1,1,1,1
+%1,1,0,0,1,1,0
+%1,0,0,0,0,1,1]
+%aa=a*a'
+%d=diag(1./sqrt(diag(aa)))
+%acos(d*aa*d)*180/pi
+\answer{Angles are 
+\(\theta_{ab}=73.22^\circ\),
+\(\theta_{ac}=45^\circ\),
+\(\theta_{ad}=90^\circ\),
+\(\theta_{bc}=52.24^\circ\),
+\(\theta_{bd}=45^\circ\),
+\(\theta_{cd}=54.74^\circ\).
+So the pair \av~and~\cv, and the pair \bv~and~\dv\ are both closest pairs.  The most dissimilar titles are \av~and~\dv.}
+\end{exercise}
+
+
+
+\begin{exercise} \label{ex:} 
+Suppose two non-zero word vectors are orthogonal.  
+Explain what such orthogonality means in terms of the words of the original sentences.
+\end{exercise}
+
+
+
+
+
+
+\begin{exercise} \label{ex:dotops} 
+For the properties of the dot product, \autoref{thm:dotops}, prove some properties chosen from \ref{thm:dotopsc}--\ref{thm:dotopsf}.
+\end{exercise}
+
+
+
+\begin{exercise} \label{ex:} 
+Verify the \idx{Cauchy--Schwarz inequality} (\(+\)~case) and also the \idx{triangle inequality} for the following pairs of vectors.
+\begin{parts}
+\item \((2,-4,4)\) and \((6,7,6)\)
+\item \((1,-2,2)\) and \((-3,6,-6)\)
+\item \((-2,-3,6)\) and \((3,1,2)\)
+\item \((3,-5,-1,-1)\) and \((1,-1,-1,-1)\)
+\item \(\begin{bmatrix} -0.2\\0.8\\-3.8\\-0.3 \end{bmatrix}\) and 
+\(\begin{bmatrix} 2.4\\-5.2\\5.0\\1.9 \end{bmatrix}\)
+\item \(\begin{bmatrix} 0.8\\0.8\\6.6\\-1.5 \end{bmatrix}\) and 
+\(\begin{bmatrix} 4.4\\-0.6\\2.1\\2.2 \end{bmatrix}\)
+\end{parts}
+\end{exercise}
+
+
+\begin{exercise} \label{ex:} 
+Find an equation of the plane with the given \idx{normal vector}~\nv\ and through the given point~\(P\).
+\begin{parts}
+\item \(P=(1,2,-3)\), \(\nv=(2,-5,-2)\).
+\item \(P=(5,-4,-13)\), \(\nv=(-1,0,-1)\).
+\item \(P=(10,-4,-1)\), \(\nv=(-2,4,5)\).
+\item \(P=(2,-5,-1)\), \(\nv=(4,9,-4)\).
+\item \(P=(1.7,-4.2,2.2)\), \(\nv=( 1,0,4)\).
+\item \(P=(3,5,-2)\), \(\nv=(-2.5,-0.5,0.4)\).
+\item \(P=(-7.3,-1.6,5.8)\), \(\nv=(-2.8,-0.8,4.4)\).
+\item \(P=(0,-1.2,2.2)\), \(\nv=(-1.4,-8.1,-1.5)\).
+\end{parts}
+\end{exercise}
+
+
+
+
+\begin{exercise} \label{ex:} 
+Write down a \idx{normal vector} to the plane described by each of the following equations.
+\begin{parts}
+\item \(2x+3y+2z=6\)
+\item \(-7x-2y+4=-5z\)
+\item \(-12x_1+2x_2+2x_3-8=0\)
+\item \(2x_3=8x_1+5x_2+1\)
+\item \(0.1x=1.5y+1.1z+0.7\)
+\item \(-5.5x_1+1.6x_2=6.7x_3-1.3\)
+\end{parts}
+\end{exercise}
+
+
+\begin{exercise} \label{ex:thrpp} 
+For each case, find a parametric equation of the plane through the three given points.
+\begin{parts}
+\item 
+\((0,5,-4)\),
+\((-3,-2,2)\),
+\((5,1,-3)\).
+\answer{\((-3,-2,2)+(3,7,-6)s+(8,3,-5)t\)}
+
+\item
+\((0,-1,-1)\),
+\((-4,1,-5)\),
+\((0,-3,-2)\).
+\answer{\((-4,1,-5)+(4,-2,4)s+(4,-4,3)t\)}
+
+\item 
+\((2,2,3)\),
+\((2,3,3)\),
+\((3,1,0)\).
+\answer{\((2,3,3)+(0,-1,0)s+(1,-2,-3)t\)}
+
+\item
+\((-1,2,2)\),
+\((0,1,-1)\),
+\((1,0,-4)\).
+\answer{There is no ``the plane'' as the three points are collinear.}
+
+\item
+\((0.4,-2.2,8.7)\),
+\((-2.2,1.3,-4.9)\),
+\((-1.4,3.2,-0.4)\).
+\answer{\((-2.2,1.3,-4.9)+(2.6,-3.5,13.6)s+(0.8,1.9,4.5)t\)}
+
+\item
+\((2.2,-6.7,2)\),
+\((-2.6,-1.6,-0.5)\),
+\((2.9,5.4,-0.6)\).
+\answer{\((-2.6,-1.6,-0.5)+(4.8,-5.1,2.5)s+(5.5,7,-0.1)t\)}
+
+\item
+\((-5.6,-2.2,-6.8)\),
+\((-1.8,4.3,-3.9)\),
+\((2.5,-3.5,-1.7)\),
+\answer{\((-1.8,4.3,-3.9)+(-3.8,-6.5,-2.9)s+(4.3,-7.8,2.2)t\)}
+
+\item
+\((1.8,-0.2,-0.7)\),
+\((-1.6,2,-3.7)\),
+\((1.4,-0.5,0.5)\),
+\answer{\((-1.6,2,-3.7)+(3.4,-2.2,3)s+(3,-2.5,4.2)t\)}
+
+\end{parts}
+\end{exercise}
+
+
+\begin{exercise} \label{ex:} 
+For each case of \autoref{ex:thrpp} that you have done, find two other parametric equations of the plane.
+\end{exercise}
+
+
+
+
+
+\begin{comment}%{ED498555.pdf}
+why, what caused X?
+how did X occur?
+what-if? what-if-not?
+how does X compare with Y?
+what is the evidence for X?
+why is X important?
+\end{comment}
+
+
+
+

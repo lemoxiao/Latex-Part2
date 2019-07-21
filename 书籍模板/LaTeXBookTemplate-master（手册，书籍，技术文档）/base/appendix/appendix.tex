@@ -1,0 +1,48 @@
+\ifthenelse{\equal{\CONFIGEnableTableOfAppendixSeparately}{true}}
+{
+    \RedeclareSectionCommand[tocnumwidth=6em]{section}
+    \RedeclareSectionCommand[tocnumwidth=6.5em]{subsection}
+
+    \RedeclareSectionCommand[tocindent=0em]{section}
+    \RedeclareSectionCommand[tocindent=2em]{subsection}
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+}{}
+
+% update mark for use of \leftmark and \rightmark
+\markboth{\DICTAppendix}{\DICTAppendix}
+
+\chapter*{\DICTAppendix}
+
+\nomtcrule
+\mtcsettitle{minitoc}{\DICTTableOfAppendix}
+\setcounter{section}{0}
+
+\addstarredchapter{\DICTAppendix}
+
+\ifthenelse{\equal{\CONFIGEnableTableOfAppendixSeparately}{true}}
+{
+    \ifthenelse{\equal{\CONFIGEnableTableOfAppendix}{true}}
+    {
+        \vspace{-10mm}
+        \minitoc % show minitoc
+        \newpage
+    }{}
+}{}
+
+\ifthenelse{\equal{\CONFIGEnableTableOfAppendixSeparately}{true}}
+{
+    \renewcommand{\thesection}{\DICTAppendix~\Alph{section}}
+}{
+    \renewcommand{\thesection}{\Alph{section}}
+}
+
+% include appendix content
+%--------------------------------------
+\IfFileExists{contents/\CONFIGLanguage/contents}{
+    \input{base/appendix/\CONFIGLanguage}
+}{
+    Content: UNSUPPORTED LANGUAGE ,,\CONFIGLanguage ``
+}
+%--------------------------------------
+
+\addtocontents{toc}{\protect\setcounter{tocdepth}{3}}

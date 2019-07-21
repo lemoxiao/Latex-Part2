@@ -1,0 +1,118 @@
+% vim: ts=4 sts=4 sw=4 et tw=75
+% preamble here.
+
+\documentclass[nofonts, oneside]{ctexbook}
+
+\usepackage{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\usepackage{amssymb}
+\usepackage{hyperref}
+% for number of footnote
+\usepackage{pifont}
+% 一页结束时, 脚注编号清零
+\usepackage[perpage]{footmisc}
+% verbatim and endverbatim
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{multicol}
+\usepackage{tocloft}
+
+% for fixing "Unable to load picture or PDF file 'bc-book.mps'"
+\DeclareGraphicsRule{.mps}{eps}{*}{}
+
+% 脚注编号带圈
+\renewcommand\thefootnote{\ding{\numexpr171+\value{footnote}}}
+
+% from package geometry
+% 为边注加边框
+\let\oldmarginpar=\marginpar
+\renewcommand\marginpar[1]{%
+    \oldmarginpar{\framebox{#1}}%
+}
+\geometry{%
+    margin=1cm,
+    marginparsep = 0.5cm,
+    marginparwidth=1cm,
+    top = 2.5cm,
+    bottom = 2cm,
+    outer = 1.8cm,
+    inner = 1.8cm
+}
+
+% from package hyperref
+\hypersetup{
+    bookmarksnumbered = true,
+    pdftitle = {Hacking Vim 7.2},
+    pdfcreator = {wuzhouhui250@gmail.com},
+    pdfauthor = {Kim Schulz},
+    pdfsubject = {Vim},
+    colorlinks = false,
+    pdfborder = 0 0 0,
+    pdfkeywords = {vim, text editing}
+}
+
+
+\setCJKfamilyfont{heiti}{FandolHei}
+% 章节格式
+\CTEXsetup[format={\CJKfamily{heiti}\large\upshape}]{subsection}
+\CTEXsetup[numberformat={\CJKfamily{heiti}\large\upshape\bfseries}]{subsection}
+\CTEXsetup[format={\CJKfamily{heiti}}]{subsubsection}
+% 目录格式
+\renewcommand\cftchapfont{\CJKfamily{heiti}}
+\settowidth\cftchapnumwidth{第几十几章} % 最宽的可能编号
+\renewcommand\cftchapaftersnumb{\hspace{2.2em}} % 额外间距
+
+% from package fontspec and xeCJK
+\setCJKmainfont{AR PL UMing CN}
+\setCJKsansfont{AR PL UMing CN}
+\setCJKmonofont[Scale=0.9]{AR PL UMing CN}
+\setmainfont{FreeSerif}
+\setsansfont{FreeSans}
+% "Mapping={}" make quote symbol straight
+\setmonofont[Mapping={}]{FreeMono}
+
+\newcommand\vi{\texttt{vi}}
+\newcommand\vim{\texttt{vim}}
+
+% TODO: warning 与 tips 环境有一对中括号, 而且高度随内容而改变.
+\newenvironment{warning}%
+{
+    \begin{quotation}
+        \parbox[c]{4em}{\includegraphics[scale=1.8]{./images/bc-book.mps}}
+    \begin{minipage}{33em}
+}
+{
+    \end{minipage}
+    \end{quotation}
+}
+
+\newenvironment{tips}%
+{
+    \begin{quotation}
+        \parbox[c]{4em}{\includegraphics[scale=1.8]{./images/bc-lampe.mps}}
+    \begin{minipage}{33em}
+}
+{
+    \end{minipage}
+    \end{quotation}
+}
+
+\newcommand\file[1]{\texttt{#1}}
+\newcommand\newterm[1]{#1}
+\newcommand\email[1]{\href{mailto:#1}{#1}}
+\newcommand\key[1]{\textit{#1}}
+
+\newenvironment{vimcmdform}
+    {\list{}{\leftmargin=2em\rightmargin=0em}\item[]}
+    {\endlist}
+
+\lstnewenvironment{vimcode}
+    {\lstset{basicstyle=\ttfamily,
+        xleftmargin=2em,
+        breaklines=true,
+        tabsize=4}}
+    {}
+
+\title{深入 Vim 7.2}
+\author{Kim Schulz \and \url{https://github.com/wuzhouhui/hacking_vim} }

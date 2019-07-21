@@ -1,0 +1,935 @@
+
+\section{数列}
+\label{sec:number-sequence-general}
+
+\subsection{数列概念}
+
+数列就是一个数的序列，可以是有限序列也可以是无限序列，按下标记法可以写成$a_1,a_2,\ldots$，有时为了方便也可以让下标从零开始$a_0,a_1,a_2,\ldots$，甚至作为无穷序列时，还可以把下标扩展到负整数:$\cdots,a_{-2},a_{-1},a_0,a_1,a_2,\cdots$，成为一个双向无穷数列，如果有一个公式可以把数列的每一项表成它的下标的函数，就称此公式为该数列的\emph{通项公式}。数列本质上是定义在整数集或者正整数集上的函数。
+
+\begin{example}
+  任一实数在十进制下可以表为
+  \[ a_na_{n-1}\cdots a_1a_0.a_{-1}a_{-2}\cdots \]
+  其中$a_i$取值范围是$0,1,\ldots,9$，这便可以视为一个数列，而且是单侧无穷数列，而这个实数的值是
+  \[ a_n\cdot 10^n + a_{n-1} \cdot 10^{n-1} + \cdots + a_1 \cdot 10 + a_0 \cdot 10^0 + a_{-1} \cdot 10^{-1} + a_{-2} \cdot 10^{-2} +\cdots \]
+\end{example}
+
+除了通项公式之外，\emph{递推公式}也是研究数列的一个重要手段，所谓递推公式是指一个联系着数列中相邻若干项的一个公式，例如可以这样定义一个数列，约定$a_1=1$，$a_2=1$，以后的每一项都由它前面的两项之和来定义，即$a_{n+2}=a_{n+1}+a_n(n \geqslant 1)$，显然这公式唯一的确定了数列的每一项，也就确定了数列本身，它就是有名的 \emph{斐波那契(Fibonacci)数列}，后文还会讨论它。
+
+\subsection{等差数列与等比数列}
+
+等差数列和等比数列是最常见的两种数列。
+
+\begin{definition}
+ 如果一个数列$\ldots,a_{-2},a_{-1},a_0,a_1,a_2,\ldots$中，任一项减去它前一项所得差值都相同，即存在常数$d$，对任意整数$n$都有$a_n-a_{n-1}=d$，则称此数列为 \emph{等差数列}，而常数$d$称为此等差数列的\emph{公差}.
+\end{definition}
+
+显然，正整数数列$\ldots,-2,-1,0,1,2,\ldots$是公差为1的等差数列，任何项都取相同值的\emph{常数数列}则是公差为零的等差数列。
+
+等差数列的递推公式也可以用$a_{n+1}+a_{n-1}=2a_n$来刻画，而且其中不出现公差，仅仅通过项的关系来就定义出等差数列，这也表明，数列的递推公式可以不唯一。
+
+\begin{theorem}
+对于等差数列中的任意两项（无论顺序）有
+\[ a_n-a_m=(n-m)d \]
+\end{theorem}
+
+\begin{proof}[证明]
+证明是容易的，只要证明$n\geqslant m$的情况即可（否则可以反过来相减），首先可以验证$n$与$m$相等时该等式成立，而后有
+\[ a_n-a_m=\sum_{k=m}^{n-1}(a_{k+1}-a_k)=(n-m)d \]
+当然，对差值$n-m$施行归纳法也是可行的。
+\end{proof}
+
+假定我们知道$a_0$和公差$d$，在上式中取$m=0$，我们就得到等差数列的通项公式
+\begin{theorem}
+  等差数列的每一项可以由$a_0$及公差$d$表为
+\[ a_n=a_0+nd \]
+这便是等差数列的通项公式.
+\end{theorem}
+
+当然通项并不一定非得使用$a_0$来表示，$a_n=a_1+(n-1)d$，$a_n=a_{100}+(n-100)d$也都是通项。
+
+易见这通项是关于$n$的一次函数，实际上容易证明，如果数列的通项可表成关于下标的一次函数，则它必然是等差数列。
+
+现在考虑对等差数列进行某种求和，如果从$a_0$开始，向正下标或者负下标进行累加，$n$是任意一个整数（无论正负），记$S_n=\sum_{i=0}^{n}a_n$，则
+\[ S_n=\sum_{i=0}^na_i=\sum_{i=0}^n(a_0+nd)=(n+1)a_0+d\sum_{i=0}^ni\]
+于是这个求和就归结为对自然数序列$0,1,2,\ldots,n$进行求和，高斯曾经口算出$1+2+3+\cdots+100=5050$，他的计算方法是，将1与100相加得101，2与99相加得101，如此这般，最后50与51相加得101，于是$1+2+\cdots+100=50 \times 101=5050$，把这个方法略加改造便得出如下的计算$1+2+\cdots+n$的方法，为了避免$n$的奇偶性带来分组分不完从而还需要分奇偶讨论的问题，再拿一个式子$n+(n-1)+\cdots+2+1$与$1+2+\cdots+(n-1)+n$进行相加，则这两个式子对应位置上的两数之和都是$n+1$，所以最终得公式
+\[ 1+2+\cdots+n = \frac{1}{2}n(n+1) \]
+不必怀疑右端会有出现小数的可能，因为作为连续的两个自然数$n$和$n+1$中必定一奇一偶，所以右端永不会为小数。
+
+把这公式应用到上面的式子便得
+\begin{theorem}
+  在公差为$d$的等差数列$a_n$中，有
+  \[ S_n=\sum_{i=0}^na_i=(n+1)a_0+\frac{1}{2}n(n+1)d \]
+  其中$n$可以是任意整数(包括负整数)。
+\end{theorem}
+
+上面求$1+2+\cdots+n$的方法称为\emph{倒序相加法}，当然也可以直接把这方法应用到$S_n=a_0+a_1+\cdots+a_n$上，同样可得出上面的结果.
+
+\begin{example}[一类与组合数有关的和式]
+  在本例中，我们来考虑求和 $C(n,m)=\sum\limits_{i=0}^n i^mC_n^i$，其中$m$是一个确定的非负整数。
+
+  在 $m=0$ 的情形，由二项式定理即知这个和是$C(n,0)=2^n$.而在$m=1$的情况下，和式即$\sum\limits_{i=0}^niC_n^i$，此时有两种方法可以求出这个和式，其一是利用倒序相加，我们有
+  \begin{eqnarray*}
+    \sum_{i=0}^n iC_n^i & = & \frac{1}{2} \left( \sum_{i=0}^n iC_n^i + \sum_{i=0}^n iC_n^{n-i} \right) \\
+                        & = & \frac{1}{2} \left( \sum_{i=0}^n iC_n^i + \sum_{i=0}^n (n-i)C_n^i \right) \\
+    & = & \frac{n}{2} \sum_{i=0}^nC_n^i = n 2^{n-1}
+  \end{eqnarray*}
+  即 $C(n,1)=n 2^{n-1}$.
+
+  另一个方法是利用了组合恒等式 $iC_n^i = nC_{n-1}^{i-1}(i>0)$，这很容易验证，利用它我们有
+  \begin{eqnarray*}
+    C(n,1) & = & \sum_{i=0}^n iC_n^i \\
+           & = & n\sum_{i=1}^n C_{n-1}^{i-1} \\
+    & = & n 2^{n-1}
+  \end{eqnarray*}
+  受此启发，对于$m=2$我们也有类似方法，在$n>1$时有
+  \begin{eqnarray*}
+    i^2C_n^i & = & n i C_{n-1}^{i-1} \\
+             & = & n (1+(i-1)) C_{n-1}^{i-1} \\
+             & = & n C_{n-1}^{i-1} + n(i-1)C_{n-1}^{i-1} \\
+    & = & nC_{n-1}^{i-1} + n(n-1)C_{n-2}^{i-2}
+  \end{eqnarray*}
+  因此，
+  \begin{eqnarray*}
+    C(n,2) & = & \sum_{i=0}^n i^2C_n^i \\
+           & = & C_n^1 + n\sum_{i=2}^nC_{n-1}^{i-1} + n(n-1)\sum_{i=2}^nC_{n-2}^{i-2} \\
+           & = & n + n(2^{n-1}-1)+n(n-1)2^{n-2} \\
+    & = & n 2^{n-1} + n(n-1)2^{n-2}
+  \end{eqnarray*}
+
+  在一般情形下，对于$C(n,m)=\sum\limits_{i=0}^ni^mC_n^i$，可以利用$C_{n+1}^i=C_n^i+C_n^{i-1}(1 \leqslant i \leqslant n)$，有
+  \begin{eqnarray*}
+    i^mC_{n+1}^i & = & i^mC_n^i + i^mC_n^{i-1} \\
+                 & = & i^mC_n^i + (1+(i-1))^m C_n^{i-1} \\
+    & = & i^mC_n^i + \sum_{k=0}^m C_m^k(i-1)^kC_n^{i-1}
+  \end{eqnarray*}
+  显然对于上式最后一行的前一项求和(从1到$n$)就是$C(n,m)$，而对后一项从1到$n$求和则是
+  \[ \sum_{i=1}^n \sum_{k=0}^mC_m^k(i-1)^kC_n^{i-1} = \sum_{k=0}^m C_m^k \sum_{i=1}^n (i-1)^kC_n^{i-1}=\sum_{k=0}^m C_m^k (C(n,k)-n^k) \]
+  所以最终
+  \[ C(n+1,m)=(n+1)^m + C(n,m) + \sum_{k=0}^m C_m^k (C(n,k)-n^k) \]
+\end{example}
+
+\begin{definition}
+  如果一数列$\ldots,a_{-2},a_{-1},a_0,a_1,a_2,\ldots$中，任意一项与前一项的比值都是同一非零常数，即存在非零常数$q$，使得对于任意整数$n$都有$a_n / a_{n-1} = q$成立，则称此数列是 \emph{等比数列}，而比值常数$q$称为它的 \emph{公比}.
+\end{definition}
+
+对于等比数列，如果它的各项都是正的，取对数即可变身为一个等差数列。对于所有的等比数列，同样可以得出类似于等差数列的结论来，即是
+
+\begin{theorem}
+对于公比为$q$的等比数列$\cdots,a_{-2},a_{-1},a_0,a_1,a_2,\cdots$，对任意整数$n$和任意整数$m$都成立
+\[ \frac{a_n}{a_m}=q^{n-m} \]
+\end{theorem}
+
+并由此得出通项
+\begin{theorem}
+  公比为$q$的等比数列$\ldots,a_{-2},a_{-1},a_0,a_1,a_2,\ldots$的通项可表为
+ \[ a_n=a_0q^n \]
+\end{theorem}
+
+关于等比数列的求和
+\[ S_n = a_0+a_1+\cdots+a_n = a_0(1+q+\cdots+q^{n}) \]
+这就归结为对$1+q+q^2+\cdots+q^{n}$求值，
+
+由数学归纳法可得出下面的乘法公式，它也是平方差公式和立方差公式的自然推广(见\autoref{example:a-power-n-b-power-n-factoring})
+\begin{equation}
+  \label{eq:a-power-n-substract-b-power-n}
+ a^n-b^n = (a-b)(a^{n-1}+a^{n-2}b+\cdots+ab^{n-2}+b^{n-1}) 
+\end{equation}
+式中$n$是任意正整数，
+
+在式中把$n$换成$n+1$并取$a=1,b=q$便可得出，对于任意正整数$n$，成立
+\[ 1+q+\cdots+q^{n} = \frac{1-q^{n+1}}{1-q} \]
+若$n$为负整数，则上式中以$1/q$代$q$，便知上式仍然成立，于是对于等比数列就有
+\begin{theorem}
+  在以$q(q \neq 1)$为公比的等比数列$\ldots,a_{-2},a_{-1},a_0,a_1,a_2,\ldots$中，对于任意整数$n$都有
+  \[ S_n = \sum_{i=0}^na_i = \frac{a_0(1-q^{n+1})}{1-q} \]
+  而在$q=1$时，$S_n=(n+1)a_0$.
+\end{theorem}
+
+还可以以另外一种方式得出这公式，因为
+\[ S_n = a_0+a_1+\cdots+a_n \]
+两端同乘以公比$q$，便可得出
+\[ qS_n = q(a_0+a_1+\cdots+a_n) = a_1+a_2+\cdots+a_n+a_{n+1} \]
+于是
+\[ (1-q)S_n = a_0-a_{n+1} = a_0(1-q^{n+1}) \]
+所以得出
+\[ S_n = \frac{a_0-a_{n+1}}{1-q} = \frac{a_0(1-q^{n+1})}{1-q} \]
+当然这过程中要求$q \neq 1$，而对于$q=1$的情况，$S_n=(n+1)a_0$.
+
+这个方法称为 \emph{错位相减法}，下面这个例子提示了这个方法的一些用途。
+
+\begin{example}[错位相减法的一个用途]
+  考虑对数列$a_n = n q^n(n=1,2,3,\ldots)$进行求和，这里要求$q \neq 1$，否则就变成早已解决过的问题了。同样有
+  \[ S_n = a_1+a_2+\cdots+a_n = q+2q^2+3q^3 + \cdots + (n-1)q^{n-1} + nq^n \]
+  两端同乘以$q$得
+  \[ qS_n = q^2+2q^3+3q^4 + \cdots + (n-1)q^n + nq^{n+1} \]
+  把以上两式相减，得
+  \[ (1-q)S_n = (q + q^2 + \cdots + q^n) - n q^{n+1} \]
+  显然上式右端括号中的部分是等比数列的求和，于是$S_n$便可以求出。
+
+  接下来再考虑数列$a_n=n^mq^n(n=1,2,3,\ldots)$，其中$m$是个固定的正整数,记
+  \[ S_m(n) = \sum_{i=1}^na_i = \sum_{i=1}^n n^m q^n = q + 2^mq^2 + \cdots + (n-1)^mq^{n-1} + n^m q^m \]
+  进行同样的过程有
+  \[ qS_m(n) = q^2 + 2^mq^3 + \cdots + (n-1)^m q^n + n^m q^{n+1} \]
+  两式相减
+  \[ (1-q)S_m(n) = q +(2^m-1)q^2 + (3^m-2^m)q^3 + \cdots + (n^m-(n-1)^m)q^m - n^mq^{n+1}  \]
+  而利用下面的公式(它可以由二项式定理得出)
+  \[ (1+k)^n-k^n = 1+nk+C_n^2k^2 + \cdots + C_n^{n-1}k^{n-1} \]
+  上式可化为
+  \begin{eqnarray*}
+    (1-q)S_m(n) & = & \sum_{i=1}^n(i^m-(i-1)^m)q^i - n^mq^{n+1} \\
+                & = & \sum_{i=0}^{n-1}((1+i)^m-i^m)q^{i+1} - n^mq^{n+1} \\
+                & = & \sum_{i=0}^{n-1}\sum_{j=0}^{m-1}C_m^ji^jq^{i+1} - n^mq^{n+1} \\
+                & = & \sum_{j=0}^{m-1}C_m^j\sum_{i=0}^{n-1}i^jq^{i+1} - n^mq^{n+1} \\
+    & = & q\sum_{j=0}^{m-1}C_m^jS_j(n-1) - n^mq^{n+1}
+  \end{eqnarray*}
+  这意味着$S_m(n)$可以用$S_0(n-1),S_1(n-1),\ldots,S_{m-1}(n-1)$来表示，即具有递推性，而$S_0(n-1)$显然就是等比数列求和，于是$S_m(n)$便可以求出来。
+
+  进一步，便可以求形如$a_n=p(n)q^n$这样的数列的和，其中$p(n)$是关于$n$的多项式，只是这过程将越来越繁琐，如此机械化的计算方法，由计算机程序来进行是再合适不过了。
+\end{example}
+
+\begin{example}[自然数的幂和]
+  \label{example:sum-of-power-of-integer}
+  在上面得出了公式
+  \[ 1+2+\cdots+n = \frac{1}{2}n(n+1) \]
+  现在就来讨论下一般的$S_m(n)=\sum_{i=1}^ni^m$的求和公式，仍然由
+  \[ (1+k)^m-k^m = 1 + mk + C_m^2k^2 + \cdots + C_m^{m-1}k^{m-1} \]
+  对$k=1,2,\ldots,n$进行累加，便得
+  \[ (1+n)^m-1 = S_0(n)+C_m^1S_1(n)+C_m^2S_2(n) + \cdots C_m^{m-1}S_{m-1}(n) \]
+  显然这便是联系着诸$S_m(n)$的递推关系，把它写成更美观的形式
+  \[ \sum_{i=0}^mC_m^iS_i(n) = (1+n)^{m+1}-1 \]
+  且有初始公式
+  \[ S_0(n) = n \]
+  由此出发便能求出任何$S_m(n)$的表达式来，比如说取$m=2$便得
+  \[ S_0(n)+2S_1(n)+S_2(n) = (1+n)^3-1 \]
+  于是得出
+  \[ S_2(n) = 1^2+2^2+\cdots+n^2 = \frac{1}{6}n(n+1)(2n+1) \]
+  同样不必怀疑右端的整数性，因为$n$与$n+1$作为相邻两个正整数，必然有一个偶数，故$2 \mid n(n+1)$，还需证明$3 \mid n(n+1)(2n+1)$，若是$n$与$n+1$中有3的倍数，则自然不消说，若是$n$与$n+1$都不是3的倍数，则它俩被3除所得余数必然一个是1，另一个是2，于是$2n+1=n+(n+1)$便必然是3的倍数，于是2和3都能整除$n(n+1)(2n+1)$且2与3互素，所以6也能整除它。
+
+  同样再取$m=3$，便可得出
+  \[ S_3(n)= 1^3+2^3+\cdots+n^3 = \frac{1}{4}n^2(n+1)^2 \]
+  一般的可以知道，$S_m(n)$是关于$n$的$m+1$次多项式。
+\end{example}
+
+\subsection{差分与高阶等差数列}
+\label{sec:difference-and-high-level-common-difference-sequence}
+
+\begin{definition}
+  对于无穷数列$\ldots,a_{-2},a_{-1},a_0,a_1,a_2,\ldots$，定义它的 \emph{一阶差分数列} 为
+  \[ \Delta a_n = a_n-a_{n-1} \]
+  进一步递归的定义它的$m$阶差分数列是
+  \[ \Delta^ma_n = \Delta^{m-1}a_n - \Delta^{m-1}a_{n-1} \]
+  即$m$阶差分是$m-1$阶差分的差分，这称为 \emph{高阶差分}，为了方便，可以把数列本身看作它自己的 \emph{零阶差分数列}.
+\end{definition}
+
+差分将一个数列变换为另一个数列，这与平方运算把一个数变成另一个数，求导运算把一个函数变成另一个函数没什么差别，所以差分是在数列这种数学对象上的一种运算。
+
+为了讨论的方便，用$a_n^{(m)}$代表数列$a_n$的$m$阶差分数列，并规定$a_n^{(0)}=a_n$，上标加了括号，以与幂相区别，在这定义就有
+\[ a_n^{(m)} = a_n^{(m-1)} - a_{n-1}^{(m-1)} \]
+
+接下来有高阶等差数列的定义
+\begin{definition}
+  如果一个数列$a_n$的$m$阶差分数列是等差数列，则该数列称为 \emph{$m$阶等差数列}.
+\end{definition}
+
+显然等差数列本身即是零阶等差数列，同时，如果一个数列是$m$阶等差数列，则它也必然是$m+1$阶等差数列，$m+2$阶等差数列，等等。
+
+易见
+\begin{theorem}
+  数列$a_n$是$m$阶等差数列的充分必要条件是$\Delta a_n$是$m-1$阶等差数列.
+\end{theorem}
+
+假定$a_n$是一个$m$阶等差数列，那么存在常数$d$，使得对任意整数$n$成立下式
+\[ a_n^{(m)} - a_{n-1}^{(m)} = d \]
+把式中的$m$阶差分数列用$m-1$阶差分的差分来替代，就得到
+\[ a_n^{(m-1)}-2a_{n-1}^{(m-1)}+a_{n-2}^{(m-1)} = d \]
+同样的手段再施行两次，得
+\begin{eqnarray*}
+ a_n^{(m-2)}-3a_{n-1}^{(m-2)}+3a_{n-2}^{(m-2)}-a_{n-3}^{(m-2)} & = & d  \\
+ a_n^{(m-3)}-4a_{n-1}^{(m-3)}+6a_{n-2}^{(m-3)}-4a_{n-3}^{(m-3)}+a_{n-4}^{(m-3)} & = & d 
+\end{eqnarray*}
+易见各项式的系数正好便是二项式系数并交错的带上正负号，并且$m-k$阶差分数列的公式中便含有相邻$k+2$项，照此规律，当差分的阶数降为零时，公式成为
+\[ C_{m+1}^0a_n-C_{m+1}^1a_{n-1}+\cdots+(-1)^{m+1}C_{m+1}^{m+1}a_{n-m-1} = d \]
+这便是$m$阶等差数列的一个递推公式，但是公式中带有未知常数$d$，现在想办法去掉它，因为对于$m$阶等差数列而言，它的$m$阶差分数列成为等差数列，那么它的$m+1$阶差分数列就成为一个常数数列，也就是公差为零的等差数列，因此按照上面的公式，原来数列的递推公式可以表为
+\[ C_{m+2}^0a_n-C_{m+2}^1a_{n-1}+\cdots+(-1)^{m+2}C_{m+2}^{m+2}a_{n-m-2} = 0 \]
+于是得到以下重要结果
+\begin{theorem}
+  \label{theorem:recursive-for-high-level-common-difference-sequence}
+  $m-2$阶等差数列的递推公式是
+\[ C_m^0a_n-C_m^1a_{n-1}+\cdots+(-1)^mC_m^ma_{n-m} = 0 \]
+\end{theorem}
+这只要把上面的推导，改用数学归纳法写出来就可以证明它。
+
+这结果对于等差数列即零阶等差数列而言就成为$a_n-2a_{n-1}+a_{n-2}=0$.
+
+现在讨论一下高阶等差数列的通项问题，先考虑一阶等差数列$a_n$，按定义，它的一阶差分数列是等差数列，于是有
+\[ a_n - a_{n-1} = rn+s \]
+于是对于整数$n$(包括负整数)，就有
+\begin{eqnarray*}
+  a_n & = & a_0 + \sum_{i=1}^n(a_i-a_{i-1}) \\
+      & = &  a_0 + \sum_{i=1}^n(ri+s) \\
+      & = &  a_0 + ns + r\sum_{i=1}^n i \\
+  & = & a_0 + ns + \frac{1}{2}rn(n+1)
+\end{eqnarray*}
+这表明它的通项是关于$n$的二次多项式，再重复同样的过程并利用自然数的幂和公式(\autoref{example:sum-of-power-of-integer})便可得出二阶等差数列的通项是关于$n$的三次多项式，如此等等，于是得出如下重要结果
+\begin{theorem}
+  \label{theorem:common-formular-for-high-level-common-difference-sequence}
+  无穷数列$\ldots,a_{-2},a_{-1},a_0,a_1$是$m$阶等差数列的充分必要条件是，它的通项能表成关于下标的$m+1$次多项式.
+\end{theorem}
+
+这结果表明，高阶等差数列本质上就是多项式数列。
+
+\begin{proof}[证明]
+  对$m$施行数学归纳法，$m=0$的情况是显然的，假设必要性对于小于$m$的正整数都成立，那么对于一个$m$阶等差数列$a_n$，它的一阶差分数列是$m-1$阶等差数列，因而通项为关于下标的$m$次多项式，于是
+  \[ a_n-a_{n-1} = \sum_{j=0}^m b_jn^j \]
+  累加得
+  \begin{eqnarray*}
+    a_n & = & a_0 + \sum_{i=0}^n(a_i-a_{i-1}) \\
+        & = & a_0 + \sum_{i=0}^n\sum_{j=0}^mb_ji^j \\
+    & = & a_0 + \sum_{j=0}^mb_j\sum_{i=0}^ni^j \\
+  \end{eqnarray*}
+  在\autoref{example:sum-of-power-of-integer}中，我们就已经知道$\sum_{i=1}^ni^j$是$j+1$次多项式，于是$a_n$便是关于$n$的$m+1$次多项式，所以必要性成立.
+
+  再证充分性，同样施行归纳法，如果数列的通项是关于下标的一次多项式，显然它必然是(零阶)等差数列，即$m=0$时充分性成立，假若充分性对于小于$m$的正整数都成立，现在设数列$a_n$的通项是关于$n$的$m+1$次多项式，即
+  \[ a_n = \sum_{i=0}^{m+1}b_in^i \]
+  则它的差分数列
+  \[ a_{n+1}-a_n = \sum_{i=0}^{m+1}b_i((1+n)^i-n^i) \]
+  显然，$n^{m+1}$被抵销，这成为一个次数低于$m+1$的多项式，按归纳假设，这差分数列必然是某一阶的等差数列，且阶数小于$m$，于是原来的数列$a_n$也是某一阶的等差数列，且阶数小于等于$m$，自然也是$m$阶等差数列.
+\end{proof}
+
+\subsection{线性递推数列}
+\label{subsec:linear-recurrence-sequence}
+
+本节讨论常系数线性递推数列的通项求法问题\footnote{线性递推数列的通项求法这部分内容，主要参考了文献\cite{olympic-math}.}，这个都是有固定结论的内容，本文只是粗略转叙一番而已。
+
+所谓常系数线性递推数列，是指它的递推公式形如$\sum_{k=1}^n \lambda _k a_k = c$的数列，例如斐波那契数列$a_{n+2}=a_{n+1}+a_n$。
+
+先看最简单的一种，递推式为$a_{n+1}=pa_n+q$的数列，当$p=1$时它成为等差数列，当$q=0$则成为等比数列，所以此处限定$p \neq 1, q \neq 0$。
+
+要求它的通项，只要在它两端同时除以$p^{n+1}$，就有
+\[ \frac{a_{n+1}}{p^{n+1}} = \frac{a_n}{p^n} + \frac{q}{p^{n+1}} \]
+因此有
+\begin{eqnarray*}
+\frac{a_n}{p^n} & = & \frac{a_1}{p} + \sum_{k=2}^{n}\left( \frac{a_k}{p^k} - \frac{a_{k-1}}{p^{k-1}} \right) \\
+& = & \frac{a_1}{p} + \sum_{k=2}^{n}\frac{q}{p^k}
+\end{eqnarray*}
+剩下的就是对一个等比数列进行求和了。
+
+另外一种方法比较巧妙，假定存在一个实数$\lambda$，使得$a_{n+1}+\lambda=p(a_n+\lambda)$，展开与原递推式比较即得$\lambda=\frac{q}{p-1}$，于是数列$a_n-\lambda$就成为一个等比数列了。
+
+现在看二阶的情形，每一项需要它前面两项才能确定：$a_{n+2}=pa_{n+1}+qa_n$，假想有两个实数$r$和$s$能够使得
+\begin{equation}
+  \label{eq:two-level-linear-recurrence-sequence-1}
+a_{n+2}-ra_{n+1}=s(a_{n+1}-ra_n)
+\end{equation}
+展开后与原递推式比较可得
+\begin{align*}
+  r+s  =  p \\
+  rs  =  -q
+\end{align*}
+因此$r$和$s$是方程$x^2=px+q$的两个根，在复数范围内，它必有两个解(可以相等，重根按重数计算)，于是数列$a_{n+1}-ra_{n}$成为等比数列，求出它的通项$a_{n+1}-ra_n=f(n)$后，只要两端同时除以$r^{n+1}$即可求出$a_n$的通项，其结果如下
+
+如果方程有两个等根$x=r$，那么
+\[ a_n = \left( \frac{a_2-ra_1}{r^2} - \frac{a_2-2ra_1}{r^2} \right)r^n \]
+如果方程有两个不相等的根$x_1=r,x_2=s$，那么
+\[ a_n = \frac{a_2-sa_1}{r(r-s)} r^n - \frac{a_2-ra_1}{s(r-s)} s^n \]
+
+如果这两个根不相等，则还有另一种求法，因为$r$和$s$都是方程$x^2=px+q$的根，因此既然有\ref{eq:two-level-linear-recurrence-sequence-1}成立，也就必然有
+\begin{equation}
+  \label{eq:two-level-linear-recurrence-sequence-2}
+a_{n+2}-sa_{n+1}=r(a_{n+1}-sa_n)
+\end{equation}
+成立，递推下去，便有
+\begin{align*}
+  a_{n}-ra_{n-1}  =  s^{n-2}(a_2-ra_1) \\
+  a_{n}-sa_{n-1}  =  r^{n-2}(a_2-sa_1) 
+\end{align*}
+从中解出$a_n$来:
+\[ a_n=\frac{(a_2-sa_1)r^{n-1}-(a_2-ra_1)s^{n-1}}{r-s} \]
+易见这公式具有如下形式
+\[ a_n=c_1r^n+c_2s^n \]
+其中$c_1$和$c_2$是常数，这常数跟$a_1$、$a_2$以及$r$和$s$有关，跟$r$和$s$有关实际上就是跟$p$与$q$有关，可以直接将$a_1$和$a_2$的值代入上式中定出$c_1$和$c_2$，这只需求解一个二元一次方程组就可以了。
+
+而对于有两个等根的情形，通项具有形式
+\[ a_n = (c_1+c_2n)r^n \]
+的情形，同样可以利用待定系数法求出$c_1,c_2$.
+
+更一般的情形是
+\begin{theorem}
+对于线性递推数列$\sum_{k=1}^n\lambda_k a_{p+k}=c$，称方程$\sum_{k=1}^n\lambda _k x^k = c$为它的特征方程，在复数范围内这个特征方程必有$n$个根（重根按重数计算），假定这些根是 $x_i(i=1,2,\cdots,m, m \leq n)$，相应根的重数是$r_i(i=1,2,\cdots,m, \sum_{i=1}^mr_i=n)$，则它的通项是：
+\[ a_n=\sum_{i=1}^mP_{r_i-1}(n)x_i^n \]
+上式中$P_{r_i-1}(n)$表示一个关于$n$的次数是$r_i-1$的多项式，如果哪个根是单重根，则它的系数是常数。
+\end{theorem}
+
+此定理便是说，线性递推数列，其实就是多项式作系数的指数的组合，以后在微分方程中还会看到，常系数线性微分方程的解也是指数函数的组合，这两个结果表明，差分与微分存在某种类似，差分可以视为微分的离散化。
+
+\begin{example}
+作为一个例子，现在来求斐波那契数列的通项，递推公式为$a_{n+2}=a_{n+1}+a_n$，特征方程是$x^2=x+1$，其两个根是$x_{1,2}=\frac{1}{2}(1 \pm \sqrt{5})$，于是通项应为：
+\[ a_n=\alpha _1 x_1^n+ \alpha _2 x_2^n \]
+将$a_1=1$和$a_2=1$带入求出两个系数，最后得：
+\[ a_n= \frac{1}{\sqrt{5}}\left[ \left( \frac{1+\sqrt{5}}{2} \right)^n - \left( \frac{1-\sqrt{5}}{2} \right)^n \right] \]
+令人惊讶的是一个所有项都是正整数的数列，其通项居然出现了无理数，事实上，利用二项定理可以证明，这个表达式将永远是正整数。
+\end{example}
+
+\begin{example}
+  讨论数列$a_1=1,a_2=1$，而以后的项由$a_{n+2}=a_{n+1}-a_n$决定，其特征方程是$x^2=x-1$，方程在复数范围内有两个根
+  \[ \alpha = \frac{1+\sqrt{3}i}{2}, \  \beta = \frac{-1+\sqrt{3}i}{2} \]
+  通项则有形式$a_n=c_1 \alpha^n + c_2 \beta^n$的形式，将$a_1$和$a_2$的值代入通项定出$c_1$和$c_2$后得
+  \[ a_n = \frac{1}{\sqrt{3}i} \left( \frac{1+\sqrt{3}i}{2} \right)^{n} - \frac{1}{\sqrt{3}i} \left( \frac{-1+\sqrt{3}i}{2} \right)^n \]
+ 这时的通项，就不得不借助复数来表达了，实际上这还是一个周期数列。
+\end{example}
+
+\begin{example}
+  我们已经知道，一个$m-2$阶等差数列的递推公式是
+\[ C_m^0a_n-C_m^1a_{n-1}+\cdots+(-1)^mC_m^ma_{n-m} = 0 \]
+这显然是一个线性递推数列，其特征方程是
+\[ \sum_{i=0}^m(-1)^iC_m^ix^i = 0 \]
+也就是$(1-x)^m = 0$，这方程只有一个$m$重根$x=1$，因而通项可表为$a_n=p(n) \cdot 1^n$，其中$p(n)$是一个$m-1$次多项式，这样就再次证明了\autoref{theorem:common-formular-for-high-level-common-difference-sequence}.
+\end{example}
+
+
+
+\subsection{分式型递推数列}
+\label{sec:general-formular-of-frac-recursive-series}
+
+\subsection{递推方法的应用}
+\label{sec:application-of-recursive-method}
+
+有些问题本身并不是数列问题，但因为问题与自然数有关，递推方法往往能发挥作用，这一节举几个例子。
+
+\begin{example}[伯努利信封问题]
+  \label{example:bernoulli-envelope-solved-by-recursive-method}
+  伯努利信封问题早在介绍容斥原理时就解决过(见\autoref{example:bernoulli-envelope-solved-by-inc-exclu-principle})，此处介绍运用数列递推方法的解决方式，有两个方法，其一是大数学家欧拉所提供的，思维精巧，其二是我自己的解法。
+
+  简单复述一下此问题，有相同数目的一一配对的信件和信封，把这些信件装进这些信封中，问没有任何一封信件装进正确的信封的装法总数是多少。
+
+  
+  欧拉对此问题有一个借助数列递推的解法，记信封数目为$n$时的结果为$a_n$，那么$a_1=0$，来看下这个数列的递推情况，在有$n+1$个信封时，考虑编号为1的那封信件，除1号信封外它有$n$个信封可以装入，假定它装入的信封编号是$r$，那再考虑编号为$r$的信件，它此时有两个选择，一是它可以装入1号信封，这时其它的$n-1$个信件的装法是$a_{n-1}$，它的另一个选择是不装入1号信封，这时由于1号信封等同于$r$号信封，所以除1号信件以外的$n$封信件有$a_n$种装法，于是得到该数列的递推公式为:
+  \begin{equation*}
+    a_{n+1}=n(a_n+a_{n-1})
+  \end{equation*}
+  两边同除以$(n+1)!$并记$b_n=\frac{a_n}{n!}$可得
+  \begin{equation*}
+    b_{n+1}=\frac{n}{n+1}b_n+\frac{1}{n+1}b_{n-1}
+  \end{equation*}
+  即
+  \begin{equation*}
+    b_{n+1}-b_n=-\frac{1}{n+1}(b_n-b_{n-1})
+  \end{equation*}
+  所以
+  \begin{equation*}
+    b_n-b_{n-1}= \sum_{i=2}^{n}(b_i-b_{i-1})= \sum_{i=2}^n (-1)^{i}\frac{1}{i!}
+  \end{equation*}
+  于是
+  \begin{equation*}
+    a_n= n!b_n = n!(b_1 + \sum_{i=2}^n(b_i-b_{i-1})) = n! \sum_{i=2}^n(-1)^{i}\frac{1}{i!}
+  \end{equation*}
+  同样在$0!=1$的约定下即有
+  \begin{equation*}
+    a_n = n!\sum_{i=0}^n(-1)^{i}\frac{1}{i!}
+  \end{equation*}
+
+  以下介绍另一个解法，这个解法是我在高中时期搞出来的，那时我还没听说过伯努利信封问题，当时考虑的问题是：有编号为$1,2,\ldots,n$的$n$个人和同样编号的$n$个座位，如果每个人都不允许坐与自身编号相同的座位，有多少种坐法？我当时称之为错位排列问题，原稿早已遗失（也太啰嗦，长达三页，当时花费了好多天，写出来后自己不会word，花了十元钱请打印店打出来，成天自我欣赏，这大概代表了我高中时期在数学上的最高成就），此处是根据思路重新写的。
+
+考虑编号为1的人，假如他坐在编号为$r_1$的座位上，又看编号为$r_1$的人，他可以坐在1号座位上，也可以坐在$r_2$号座位上，如果是坐在1号座位上，那么1号和$r_1$号这两个人由于交叉坐，与其他人无涉，如果是坐在$r_2$号座位上，则再继续看$r_2$号人，依此顺着链条$1\rightarrow r_1 \rightarrow r_2 \rightarrow \cdots$，这样下去的结果是，从1号人开始，能够找到一个环，使得该环内的人和座位与环外的人和座位无涉，可以独立开来，如果找不到这样的环，那无非是所有人一起构成了一个整体环，即是无法分割。这样的环可能不止一个，但我们仅考虑包含1号人的那个环。
+
+假定$n$个人的错位排列数为$a_n$，设包含1号人的环共含有$m(2\leqslant m \leqslant n-2)$个人，那么只要从除1号之外的人中选出$m-1$个人排在这个座位链上，因此座法是$(m-1)!C_{n-1}^{m-1}=\dfrac{(n-1)!}{(n-m)!}$，而剩下的$n-m$个人又组成了一个较小的错位排列，因此其坐法数是$a_{n-m}$，此外，当$m=n$时，所有人构成一个环，只要把他们按照座位链排成一排即可，所以此时的坐法是$(n-1)!$，于是总共的坐法是：
+\begin{equation*}
+  a_n=\sum_{m=2}^{n-2}\frac{(n-1)!}{(n-m)!}a_{n-m}+(n-1)!=(n-1)!(\sum_{m=2}^{n-2}\frac{a_{n-m}}{(n-m)!}+1)
+\end{equation*}
+将式中的求和顺序倒过来，就有
+\begin{equation}
+  \label{eq:requsive-equation-derangement}
+  a_n=(n-1)!(\sum_{m=2}^{n-2}\frac{a_{m}}{m!}+1)
+\end{equation}
+此即其作为数列的递推公式，自然的，$a_1=0,a_2=1$。
+
+下面来求它的通项公式，上式可以变形为：
+\begin{equation}
+  \label{recursive-equation-derangement-2}
+  \frac{a_n}{n!}=\frac{1}{n}(1+\sum_{m=2}^{n-2}\frac{a_m}{m!})
+\end{equation}
+只要记$b_n=\dfrac{a_n}{n!}$，则有$b_1=0$和
+\begin{equation}
+  \label{eq:recursive-equation-derangement-simple}
+  b_n=\frac{1}{n}(1+\sum_{m=2}^{n-2}b_m)
+\end{equation}
+于是有
+\begin{equation}
+  \label{eq:recursive-equation-derangement-simple-diff}
+  nb_n-(n-1)b_{n-1}=b_{n-2}
+\end{equation}
+也就是
+\begin{equation}
+  \label{eq:recursive-equation-derangement-simple-diff2}
+  b_n-b_{n-1}=-\frac{1}{n}(b_{n-1}-b_{n-2})
+\end{equation}
+而$b_2-b_1=\dfrac{1}{2}$，所以
+\begin{equation}
+  \label{eq:recursive-equation-derangement-bn}
+  b_n-b_{n-1}=(-1)^{n-2}\frac{1}{n!}=(-1)^n\frac{1}{n!}
+\end{equation}
+于是
+\begin{equation}
+  \label{eq:derangement-bn}
+  b_n=b_1+\sum_{m=2}^{n}(b_m-b_{m-1})=\sum_{m=2}^n(-1)^m\frac{1}{m!}
+\end{equation}
+所以最终
+\begin{equation}
+  \label{eq:derangement-an}
+  a_n=n!b_n=n!\sum_{m=2}^n(-1)^m\frac{1}{m!}
+\end{equation}
+在$0!=1$的约定下，也可以把求和指标从零开始
+\begin{equation}
+  \label{eq:derangement-an2}
+  a_n=n!\sum_{m=0}^n(-1)^m\frac{1}{m!}
+\end{equation}
+这就是最终的结果。
+
+\end{example}
+
+\subsection{题选}
+\label{sec:exercise-for-number-series}
+
+
+
+\begin{exercise}
+  已知各项都是正实数的数列$x_n$对一切正整数$n$都成立$x_n+\frac{1}{x_{n+1}}<2$，求证该数列所有项都满足$x_n<1$.
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4129}]
+
+\exerciseSolvedDate[2016-06-20]
+
+\begin{proof}[解答]
+  如果用上极限理论，则可以很容易的得出它单调增加并以1为极限，结论不证自明，所以这里主要讨论的是初等证明。
+
+因为
+$$
+x_n+\frac{1}{x_{n+1}}<2 \leqslant 
+x_{n+1}+\frac{1}{x_{n+1}}
+$$
+所以$x_n<x_{n+1}$，即该数列单调增加。
+
+又显然$x_n<2$，所以
+$$
+2>x_n+\frac{1}{x_{n+1}}>x_n+\frac{1}{2}
+$$
+于是$x_n<2-\frac{1}{2}$，我们得到一个更加好的上限，重复这个过程，我们由$x_n<y_m$就可以得到
+$$
+x_n<2-\frac{1}{y_m}
+$$
+所以我们作数列$y_m$，它由$y_1=2$和
+$$
+y_{m+1}=2-\frac{1}{y_m}
+$$
+来确定。
+
+数列$y_m$的每一项都大过数列$x_n$的全部项，所以它的下标特意用$m$而不是$n$来表示，以示不相关。
+
+现在来求$y_m$的通项公式，由于
+$$
+\frac{1}{y_{m+1}-1}=1+\frac{1}{y_{m}-1}
+$$
+因此数列$\frac{1}{y_m-1}$是等差数列，它的通项为$y_m=1+\frac{1}{m}$\footnote{这是分式型递推数列求通项的不动点解法。}，于是$x_n<y_m$对一切正整数$n$和$m$都成立，所以必定有$x_n\leqslant 1$（用反证法），而$x_n$的单调性则保证了等号是不能取的。
+\end{proof}
+
+\begin{exerciseAdditional}
+下面关于$y_m$再给个不求通项的玩法\footnote{其实这是高数的玩法，就差提到确界二字了。}，$y_m>1$这一点根据数学归纳法是明显成立的。下面证明它可以任意接近1，也就是要证明，对于无论多么小的正实数$\delta$，总存在$y_m$中的某一项$y_M$，使得$y_M<1+\delta$。
+采用反证法，假定存在某个正实数$\delta$，使得$y_m$中的所有项都满足$y_m\geqslant 1+\delta$，则
+$$
+y_{m+1}-1=\frac{1}{y_m}(y_m-1)\leqslant 
+\frac{1}{1+\delta}(y_m-1)
+$$
+于是
+$$
+y_m-1\leqslant \frac{1}{(1+\delta)^m}
+$$
+显然与假设矛盾，故得证。
+\end{exerciseAdditional}
+
+\begin{exercise}
+  数列$a_n$满足：$a_1=\frac{1}{2}$，$a_{n+1}=\frac{na_n+a_n^2}{n+1}$，
+  \begin{enumerate}
+  \item 求证该数列是递减的。
+  \item 求证 $a_n < \frac{7}{4n}$
+  \end{enumerate}
+\end{exercise}
+\begin{proof}[解答]
+  根据数列归纳法易知 $0<a_n<1$，所以
+  \begin{equation*}
+    a_{n+1}=\frac{na_n+a_n^2}{n+1} < \frac{na_n+a_n}{n+1} = a_n
+  \end{equation*}
+  所以数列递减，第二问，只要证明$n>3$时有如下更强的不等式即可（使用数学归纳法，过程略去）
+  \begin{equation*}
+    a_n \leqslant \frac{7}{4n}-\frac{4}{n^2}
+  \end{equation*}
+\end{proof}
+
+\begin{exercise}
+  记 $I_n=1-\frac{1}{2}+\frac{1}{3}-\frac{1}{4}+\cdots+\frac{1}{2n-1}-\frac{1}{2n}$，求证，在正整数$n\geqslant 100$时，有$0.68<I_{n}<0.7$.
+\end{exercise}
+\begin{proof}[证明]
+  记$J_n=\sum_{k=1}^n(\frac{1}{2k}-\frac{1}{2k+1})$，由于$z_n=\frac{1}{n-1}-\frac{1}{n}=\frac{1}{n(n-1)}$是递减的，并且相邻两项也相差越来越小，所以有不等式$z_{2k}<\frac{1}{2}(z_{2k-1}+z_{2k+1})$,也就是如下的:
+\begin{equation*}
+  \frac{1}{2k-1} - \frac{1}{2k} < \frac{1}{2} \left[ \left( \frac{1}{2k-2} - \frac{1}{2k-1} \right) + \left( \frac{1}{2k} - \frac{1}{2k+1} \right) \right]
+\end{equation*}
+对上式左边进行累加，但从$k=3$到$k=n$使用右边放缩，得
+\begin{equation*}
+  I_n<\frac{1}{2}+\frac{1}{12}+\frac{1}{2} \left[ \left( J_n-\frac{1}{6}-\frac{1}{2n(2n+1} \right) + \left( J_n-\frac{1}{6}-\frac{1}{20} \right) \right]
+\end{equation*}
+化简
+\begin{equation*}
+ I_n<J_n+\frac{47}{120} - \frac{1}{4n(2n+1)}
+\end{equation*}
+利用$I_n+J_n=1-\frac{1}{2n+1}$从上式中换掉$J_n$得
+\begin{equation}
+  \label{eq:sign-sum-reciprocal-positive-integer-max}
+  I_n<\frac{167}{240}-\frac{1}{2(2n+1)}-\frac{1}{8n(2n+1)}<\frac{167}{240}<\frac{168}{240}=0.7
+\end{equation}
+于是不等式的右边得证，接下来考虑左边不等式，同样因为$z_n$是递减的，有不等式$z_{2k}>\frac{1}{2}(z_{2k}+z_{2k+1})$，也就是
+\begin{equation*}
+  \frac{1}{2k-1} - \frac{1}{2k} > \frac{1}{2} \left[ \left( \frac{1}{2k-1} - \frac{1}{2k} \right) + \left( \frac{1}{2k} - \frac{1}{2k+1} \right) \right]
+\end{equation*}
+对左边进行累加，在$k \geqslant 3$ 时使用右边放缩，得到
+\begin{equation*}
+  I_n > \frac{1}{2} + \frac{1}{12} + \frac{1}{2} \left( \frac{1}{5} - \frac{1}{2n+1} \right)
+\end{equation*}
+也就是
+\begin{equation}
+  \label{eq:sign-sum-reciprocal-positive-integer-min}
+ I_n > \frac{41}{60} -\frac{1}{2(2n+1)} 
+\end{equation}
+在$n \geqslant 100$时，有
+\begin{equation*}
+  I_{n} \geqslant I_{100} > \frac{41}{60} - \frac{1}{402} = 0.680845771... > 0.68
+\end{equation*}
+所以不等式左边得证.
+
+其实证明左边所用的放缩是比较松的，实际上因为$\lim_{n\to\infty}I_n=\ln{2}=0.693147...$，所以左边不等式的放缩余地较大，所以这样的放缩也能达到要求，现在来尝试使用更强的放缩，看看能得到一个什么样的结果。
+
+对于$z_{n}$，不等式$z_n>2z_{n+1}-z_{n+2}$将是一个更强的放缩，所以我们有$z_{2k}>2z_{2k+1}-z_{2k+2}$，也就是下面的不等式
+\begin{equation*}
+  \frac{1}{2k-1}-\frac{1}{2k} > 2 \left( \frac{1}{2k}-\frac{1}{2k+1} \right) - \left( \frac{1}{2k+1}-\frac{1}{2k+2} \right)
+\end{equation*}
+对上式左边进行累加，但只在$k\geqslant 3$时使用右边放缩，即得
+\begin{equation*}
+  I_n > \frac{1}{2}+\frac{1}{12} + 2 \left( J_n-\frac{1}{6}-\frac{1}{20} \right) - \left( I_n-\frac{1}{2}-\frac{1}{12}-\frac{1}{30}+\frac{1}{(2n+1)(2n+2)} \right)
+\end{equation*}
+将其中的$J_{n}$用$1-I_n-\frac{1}{2n+1}$替换掉，即得
+\begin{equation*}
+  I_n>\frac{83}{120}-\frac{1}{2(2n+1)}-\frac{1}{4(2n+1)(2n+2)}
+\end{equation*}
+因此在$n \geqslant 100$时，便有
+\begin{equation*}
+  I_n \geqslant I_{100} > \frac{83}{120}-\frac{1}{2(2\times 100+1)}-\frac{1}{4(2\times 100+1)(2 \times 100 + 2)} = 0.6891729471.....
+\end{equation*}
+这个值已经非常接近$0.69$了。
+\end{proof}
+
+\begin{exercise}
+  数列$a_n$满足$a_1=2$，$(n+1)a_{n+1}^2=na_n^2+a_n$，求证
+  \[ \sum_{i=2}^n \frac{a_i^2}{i^2}<\frac{9}{5} \]
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4542}]
+
+\exerciseSolvedDate[2017-04-09]
+
+\begin{proof}[证明一]
+  由数列归纳法易证$a_n>1$，所以
+\[ a_{n+1}^2=\frac{na_n^2+a_n}{n+1} < \frac{na_n^2+a_n^2}{n+1} = a_n^2 \]
+于是数列递减，所以当$n>1$时，$a_n < a_1=2$
+\[ (n+1)a_{n+1}^2 = na_n^2+a_n < na_n^2+2\]
+于是累加下去，就有
+\[ na_n^2 < a_1^2+2(n-1)=2(n+1) \]
+所以
+\[ a_n^2 < 2 \left( 1+\frac{1}{n} \right) \]
+于是
+\[ \sum_{i=2}^n \frac{a_i^2}{i^2} <2 \left( \sum_{i=2}^n \frac{1}{i^2}+\sum_{i=2}^n \frac{1}{i^3} \right) \]
+借用放缩
+\[ \frac{1}{i^2}<\frac{1}{(i-1)i}=\frac{1}{i-1}+\frac{1}{i} \]
+和
+\[ \frac{1}{i^3}<\frac{1}{(i-1)i(i+1)} = \frac{1}{2} \left( \frac{1}{(i-1)i}-\frac{1}{i(i+1)} \right) \]
+从$i \geqslant 4$开始放缩，累加即得
+\begin{align*}
+\sum_{i=2}^n \frac{a_i^2}{i^2} & < 2 \left( \frac{1}{4}+\frac{1}{9}+(\frac{1}{3}-\frac{1}{n})+\frac{1}{8}+\frac{1}{27}+\frac{1}{2}(\frac{1}{12}-\frac{n}{n+1}) \right) \\
+& < 2 \left( \frac{1}{4}+\frac{1}{9}+\frac{1}{3}+\frac{1}{8}+\frac{1}{27}+\frac{1}{24} \right) \\
+& = 2 \left( \frac{3}{4}+\frac{4}{27} \right)<\frac{9}{5}
+\end{align*}
+\end{proof}
+
+\begin{proof}[证明二]
+ 不以要证的不等式为目标，研究下这个数列的性态，因为
+\[ a_{n+1}^2=a_n \frac{na_n+1}{n+1} \]
+显然$\frac{na_n+1}{n+1}$是$a_n$和1的加权平均，因为$a_n>1$有$\frac{na_n+1}{n+1}<a_n$，所以有
+\begin{align*}
+a_{n+1} &=\sqrt{a_n\cdot \frac{na_n+1}{n+1}} \\
+& <\frac{1}{2} \left( a_n+\frac{na_n+1}{n+1} \right)  \\
+& = \frac{2n+1}{2n+2}a_n+\frac{1}{2n+2}
+\end{align*}
+另一方面，由$\frac{na_n+1}{n+1}<a_n$，所以
+\[ a_{n+1}^2=a_n \cdot  \frac{na_n+1}{n+1} > \left( \frac{na_n+1}{n+1} \right)^2 \]
+所以
+\[ a_{n+1}>\frac{n}{n+1}a_n+\frac{1}{n+1} \]
+综合这两个估计，得到
+\[ \frac{n}{n+1}a_n+\frac{1}{n+1} < a_{n+1} < \frac{2n+1}{2n+2}a_n+\frac{1}{2n+2} \]
+左右都是$a_n$和1的加权平均，只是权重不同，上式改写为
+\[ \frac{n}{n+1}(a_n-1) < a_{n+1}-1 < \frac{2n+1}{2n+2} (a_n-1) \]
+所以最后就有估计式
+\[ 1+\frac{1}{n} < a_n < 1 + \frac{1}{2} \cdot \frac{(2n-1)!!}{(2n)!!} \]
+对于后面的双阶乘，由熟知的放缩
+\begin{align*}
+& \left( \frac{1}{2} \cdot \frac{3}{4} \cdots \frac{2n-1}{2n} \right)^2 \\
+={} & \left( \frac{1}{2} \cdot \frac{1}{2} \right) \left(\frac{3}{4} \cdot \frac{3}{4} \right) \cdots \left( \frac{2n-1}{2n} \cdot \frac{2n-1}{2n} \right) \\
+<{} & \left( \frac{1}{2} \cdot \frac{2}{3} \right) \left( \frac{3}{4} \cdot \frac{4}{5} \right) \cdots \left( \frac{2n-1}{2n} \cdot \frac{2n}{2n+1} \right) \\
+={} & \frac{1}{2n+1}
+\end{align*}
+所以$a_n$的估计式两端都以1为极限，由夹逼定理，$a_n$极限为1.
+
+而仍由那估计式，可以得出
+\[ a_n^2< \left( 1+\frac{1}{2\sqrt{2n+1}} \right)^2 <2+\frac{1}{4} \frac{1}{2n+1} < 2+\frac{1}{8n} \]
+由这不等式，仍同证明一中的放缩，同样可证得题目中的不等式。 
+\end{proof}
+
+\begin{exercise}
+  数列$a_n$满足，$a_1=1$，$na_na_{n+1}=1$，求证: 
+  \begin{enumerate}
+  \item
+    \[ \frac{a_{n+2}}{n} = \frac{a_n}{n+1} \]
+  \item
+    \[ 2(\sqrt{n+1}-1) \leqslant \frac{1}{2a_3}+\frac{1}{3a_4}+\cdots+\frac{1}{(n+1)a_{n+2}} \leqslant n \]
+  \end{enumerate}
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4554}]
+
+\exerciseSolvedDate[2017-04-21]
+
+\begin{proof}[证明]
+  首先在$a_{n+1}a_n=\frac{1}{n}$中将$n$替换为$n+1$得$a_{n+2}a_{n}=\frac{1}{n+1}$，这两式相除即得
+\[ \frac{a_{n+2}}{n} = \frac{a_n}{n+1} \]
+第一问得证。
+第二问，通项
+\[ \frac{1}{(k+1)a_{k+2}} = \frac{1}{ka_k} = a_{k+1} \]
+所以只是要证明下式
+\[ 2(\sqrt{n+1}-1) \leqslant a_2+a_3+\cdots+a_{n+1} \leqslant n \]
+这只要能证明下面这个估计就能办到($n>1$)
+\[ 2(\sqrt{n}-\sqrt{n-1}) \leqslant a_n \leqslant 1 \]
+用数学归纳法试了一下，递推存在一点困难，倒是证明更强的放缩容易些($n>1$)
+\[ \frac{1}{\sqrt{n-1}} \leqslant a_n \leqslant 1 \]
+以下就来数学归纳法吧，计算得$a_2=1$，$a_3=\frac{1}{2}$，都符合这不等式，于是假定$a_n$满足这不等式，来看$a_{n+2}$的情况:
+\[ a_{n+2} = \frac{n}{n+1}a_n < a_n \leqslant 1 \]
+同时
+\[ a_{n+2} = \frac{n}{n+1}a_n \geqslant \frac{n}{n+1} \cdot \frac{1}{\sqrt{n-1}} > \frac{1}{\sqrt{n+1}} \]
+于是得证。
+说明：这里数归是从$n$到$n+2$而不是$n+1$是因为，试算了前面几项，发现它是一个锯齿数列，也就是偶数项都向1靠近，奇数项都向0靠近，所以就分别考虑两个子列了。
+\end{proof}
+
+\begin{exercise}
+  数列$a_n$满足: $a_1=1/3$，递推公式为$a_{n+1}=a_n+\frac{a_n^2}{n^2}$，求证:
+  \[ \frac{n}{2n+1} \leqslant a_n \leqslant \frac{2n-1}{2n+1} \]
+\end{exercise}
+
+\begin{proof}[证明]
+  这个递推公式比较有意思，在证出这题目后还可以进一步研究$a_1$的取值对数列的收敛性的影响，因为$a_n=n$是符号这递推式的，而题目的结论表明当$a_1$取$1/3$时数列有上界，显然数列又是递增的，所以是收敛的。
+
+  左边不等式是很松的，因为数列是递增的，而
+  \[ a_4=\frac{30760}{59049}=0.520923\cdots>\frac{1}{2}>\frac{n}{2n+1} \]
+  右端尚未有思路，但是根据程序显示的结果，数列在$a_4$就已经超过0.57，但是直到$a_{100000}$都还没超过0.61，所以此数列增长极其缓慢，从要证的结论来看它有上界，因而有极限，猜测这极限应该小于1，若能证明这一点，则结论便能得到证明。
+\end{proof}
+
+\begin{exercise} 
+  两个数列$a_n$和$b_n$满足: $a_1=0$, $b_1=\frac{1}{2}$，并有递推关系
+  \[ a_{n+1}=\frac{a_n+b_n}{2}, \  b_{n+1}=\sqrt{a_{n+1}b_n} \]
+  求证这两个数列有共同的极限，并求出这个极限。
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4569}]
+
+\begin{proof}[证明一]
+  (解答于 2017-05-02)
+  因为
+\[ \frac{a_{n+1}}{b_{n+1}}=\frac{\frac{a_n+b_n}{2}}{\sqrt{a_{n+1}b_n}} = \frac{\frac{a_n+b_n}{2}}{\sqrt{\frac{a_n+b_n}{2}b_n}} = \sqrt{\frac{1+\frac{a_n}{b_n}}{2}} \]
+所以令$c_n=a_n / b_n$，就有
+\[ c_{n+1}=\sqrt{\frac{1+c_n}{2}} \]
+受半角公式
+\[ \cos{\frac{\theta}{2}}=\sqrt{\frac{1+\cos{\theta}}{2}} \]
+启发，令$c_n=\cos{\theta_n}$，则可取$\theta_{n+1}=\theta_n / 2$，结合$\cos{\theta_1}=c_1=a_1 / b_1=0$可取$\theta_1=\pi / 2$，于是$\theta_n=\pi / 2^n$，所以得到
+\[ a_n=\cos\frac{\pi}{2^n}b_n \]
+再回到$b_n$的递推式，有
+\[ b_{n+1}^2=a_{n+1}b_n=\cos{\frac{\pi}{2^{n+1}}} b_{n+1}b_n\]
+所以
+\[ b_{n+1}=\cos{\frac{\pi}{2^{n+1}}} b_n \]
+于是便不难求得
+\[ b_n=b_1 \cos{\frac{\pi}{2^2}}\cos{\frac{\pi}{2^3}}\cdots \cos{\frac{\pi}{2^n}} \]
+对这个余弦的连乘积，将它乘以$\sin{\frac{\pi}{2^n}}$再利用正弦的二倍角公式便会发生连锁反应，反应的结果便是这连乘积等于$\left( 2^{n-1}\sin{\frac{\pi}{2^n}} \right)^{-1}$，所以
+\[ b_n=\frac{1}{2^n \sin{\frac{\pi}{2^n}}} \]
+而
+\[ a_n=\cos{\frac{\pi}{2^n}}b_n=\frac{1}{2^n}\cot{\frac{\pi}{2^n}} \]
+由熟知的极限$\lim_{x \to 0} \frac{\sin{x}}{x}=1$便知$a_n$和$b_n$有共同的极限$\frac{1}{\pi}$.
+
+补充说明：在令$c_n=\cos{\theta_n}$时尚需证明$|c_n| \leqslant 1$，这利用$c_n$的递推式和初始值$c_1=0$，由数学归纳法便知$0 \leqslant c_n \leqslant 1$，如果初始$c_1>1$，便不能使用余弦了，但却可以使用双曲函数$\cosh{x}=(e^x+e^{-x})/2$，双曲函数有着相同的倍半公式。
+\end{proof}
+
+\begin{proof}[证明二]
+  (解答于 2012-05-18)
+  首先在$a_n$的递推式两边取极限即知它俩如果收敛就必定收敛到相同的极限，将$b_n=2a_{n+1}-a_n$代入$b_n$的递推式中换掉$b_n$和$b_{n+1}$得到
+  \[ (2a_{n+2}-a_{n+1})^{2} = a_{n+1}(2a_{n+1}-a_n) \]
+  展开整理得
+  \[ a_{n+2}^2-a_{n+2}a_{n+1} = \frac{1}{4}(a_{n+1}^2-a_{n+1}a_n) \]
+  逐次把下标推下去，就有
+  \[ a_{n+1}^2-a_{n+1}a_n = \frac{1}{4^{n+1}} \]
+  把它视为关于$a_{n+1}$的二次方程，解之得
+  \[ a_{n+1} = \frac{1}{2} \left( a_n+\sqrt{a_n^2+\frac{1}{4^n}} \right) \]
+令$a_n=1/(2^n \tan{\theta_n})$，代入上式得$\tan{\theta_{n+1}}=\tan{\frac{\theta_n}{2}}$，所以可以取$\theta_{n+1}=\theta_n/2$，进而得$\theta_n=\pi / 2^n$，所以$n>1$时有
+\[ a_n = \frac{1}{2^n \tan{\frac{\pi}{2^n}}} \]
+比较$a_n$的递推式和定义式可得
+\[ b_n = \sqrt{a_n^2+\frac{1}{4^n}} = \frac{1}{2^n \sin{\frac{\pi}{2^n}}} \]
+由熟知的极限$\lim_{x \rightarrow 0} \frac{\sin{x}}{x}=1$即知$a_n$和$b_n$有共同的极限$1/\pi$.
+\end{proof}
+
+\begin{exercise}
+  (isee)\footnote{原帖见 http://kuing.orzweb.net/viewthread.php?tid=4853}
+  如果无穷数列$a_1,a_2,a_3,\ldots $对任意不同的两个正整数$i,j(i<j)$ 都有$|a_i-a_j| \geqslant \dfrac{1}{j}$，那么就称其为“难亲数列”，问题是难亲数列是否一定无界？
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4853}]
+
+\exerciseSolvedDate[2017-09-07]
+
+\begin{proof}[解答]
+  初步想了下，好像是可以的，而且所有点都可以被限制在一个长度为2的闭区间上，当前$n$个点都确定后，$a_{n+1}$就不能落在前$n$个点以每一个点为中心半径为$\dfrac{1}{n+1}$的开邻域内，这些邻域的总长不超过$\dfrac{2n}{n+1}<2$，所以如果前$n$个点都被限制在一个长度为2的闭区间上的话，则这闭区间仍然有空隙可以容得下$a_{n+1}$，因此结论应该是可以的。
+
+  再考虑构造出一个方法，让所有点都落在区间$[0,2]$上，首先让$a_1=0$，$a_2=2$，以后的点的确定，采用反复分割区间取中点的方法:
+
+第一次分割前，区间数目为1，每个区间长度为2，按区间中点分割$a_3=1$，分割后区间数目为2，每个区间长度为1.
+
+第二次分割前，区间数目为2，每个区间长度为1，取各个区间中点为分割$a_4=1/2$，$a_5=3/2$，分割后区间数目为$2^2$，每个区间长度为$\dfrac{1}{2}$.
+
+第三次分割前，区间数目为$2^2$，每个区间长度为$\dfrac{1}{2}$，各个区间中点$a_6=1/4$，$a_7=3/4$,$a_8=5/4$,$a_9=7/4$，分割后区间数目为$2^3$，每个区间长度为$\dfrac{1}{2^2}$.
+
+......
+
+第$n+1$次分割前，区间数目为$2^n$，每个区间长度为$\dfrac{1}{2^{n-1}}$，各个区间中点$a_{2^n+2+i}=\dfrac{2i+1}{2^n}(i=0,1,\cdots,2^n-1)$，分割后区间数目为$2^{n+1}$，每个区间长度为$\dfrac{1}{2^n}$.
+
+按此方法可以确定$a_n$，把$n$改写为$n=2^m+2+i(i=0,1,\cdots,2^m-1)$，于是$m=[\log_2(n-2)]$，$i=n-2^{[\log_2(n-2)]}$,这里中括号是向下取整，在这种表示下，就有
+\[ a_{2^m+2+i}=\frac{2i+1}{2^m} \]
+或者写成
+\[ a_n=\frac{1+2(n-2-2^{[\log_2(n-2)]})}{2^{[\log_2(n-2)]}} \]
+后者其实还不如前一种好看。
+
+在这种分法下，$a_{2^m+2+i}(i=0,1,\cdots,2^m-1)$是第$m+1$次分割产生的分点，而在这一次分割后，每个区间的长度为$\dfrac{1}{2^m}$，所以到这一次分割后为止，所得到的$a_i$中的最大下标是$2^{m+1}+1$，即$i=2^m-1$的那个分点,此时任意两个$a_i$之差都$\geqslant \dfrac{1}{2^m}>\dfrac{1}{2^m+2+i}$，因此，由这分割所确定的数列符合要求。
+\end{proof}
+
+\begin{exercise}
+  数列$\{a_n\}$满足:$a_1=\dfrac{1}{2}$，$a_{n+1}=\dfrac{-a_n^3+3a_n}{2}$，用$S_n$表示它的前$n$项的和，求证: $S_n>n-1$.
+\end{exercise}
+
+\exerciseFrom[\url{http://kuing.orzweb.net/viewthread.php?tid=4952}]
+
+\exerciseSolvedDate[2017-10-21]
+
+\begin{proof}[证明]
+  先证明数列严格增加但永远不会达到1，即对任意正整数$n$总有$0<a_n<a_{n+1}<1$，上归纳法，由
+\[ a_{n+1}-a_n=\frac{1}{2}a_n(1-a_n^2) \]
+可知，由$0<a_n<1$可得出$a_{n+1}>a_n$，又
+\[ 1-a_{n+1}=\frac{1}{2}(a_n^3-3a_n+2)=\frac{1}{2}(1-a_n)^2(2+a_n) \]
+所以由$0<a_n<1$便得出$a_{n+1}<1$，所以数列严格增加但不会超过1.
+
+对递推式取极限可以知道数列将趋于极限1，因此可设$a_n=1-b_n$，则只要证明$b_1+b_2+\cdots+b_n<1$，易得
+\[ b_{n+1}=\frac{1}{2}(3-b_n)b_n^2 \]
+而$b_n=1-a_n >0$，所以
+\[ b_{n+1}<\frac{3}{2}b_n^2 \]
+于是
+\[ \frac{3}{2}b_{n+1} < \left( \frac{3}{2}b_n \right)^2 \]
+上式记为(1)式，所以
+\[ \frac{3}{2}b_n < \left( \frac{3}{2}b_1 \right)^{2^{n-1}} \]
+所以最终
+\[ b_n<\frac{2}{3} \left( \frac{3}{4} \right)^{2^{n-1}} = c_n  \]
+但是很遗憾，$b_1+b_2+c_3=\frac{1}{2}+\frac{5}{16}+\frac{2}{3}\cdot\left( \frac{3}{4} \right)^4>1$，放缩失败。
+
+回到对$b_n$的放缩过程，对(1)式的放缩， 我们尝试不要一直退到$b_1$，试试只退到$b_3$（以下过程在只退到$b_2$的情况下仍然放缩过度），此时有
+\[ b_1=\frac{1}{2}, \  b_2=\frac{5}{16}, \  b_3=\frac{1075}{8192} \]
+于是
+\[ \frac{3}{2}b_n < \left( \frac{3}{2}b_3 \right)^{2^{n-3}} \]
+从而
+\[ b_n<\frac{2}{3} \left( \frac{3225}{16384} \right)^{2^{n-3}}  \]
+而在$n>3$时，有$2^{n-3}\geqslant 2n-6$(利用$n=4,5$得出的割线)，所以在$n>3$时
+\[ b_n<\frac{2}{3} \left( \frac{3225}{16384} \right)^{2n-6} \] 
+于是
+\[ b_1+b_2+\cdots+b_n <  \frac{1}{2} + \frac{5}{16} + \frac{1075}{8192} + \frac{2}{3} \cdot \left( \frac{3225}{16384} \right)^2 \cdot \frac{1}{1-\left( \frac{3225}{16384} \right)^2} < 1 \]
+这里没办法，上了计算器。证毕。
+\end{proof}
+
+\begin{exerciseAdditional}
+1. 后来忽然发现也可以简单点算，把看起来大坨的分数用简单分数来代替就行，在那里得到$n>3$时
+\[ b_n < \frac{2}{3} \left( \frac{3225}{16384} \right)^{2n-6} \]
+括号里那一坨分数接近但小于$\frac{1}{5}$，所以
+\[ b_n < \frac{2}{3} \left( \frac{1}{5} \right)^{2n-6} \]
+而 $b_3=\frac{1075}{8192} $接近但大于$\frac{1}{8}$，于是稍稍把分母放大一点，有
+\[ b_3=\frac{1075}{8192}<\frac{5}{32}  \]
+所以
+\begin{align*}
+b_1+b_2+\cdots+b_n & < \frac{1}{2}+\frac{5}{16} + \frac{1075}{8192} + \frac{2}{3} \cdot \left( \frac{1}{5} \right)^2 \cdot \frac{1}{1-\left( \frac{1}{5} \right)^2} \\
+& < \frac{1}{2}+\frac{5}{16} + \frac{5}{32} + \frac{1}{36} \\
+& < \frac{1}{2}+\frac{5}{16} + \frac{5}{32} + \frac{1}{32} = 1
+\end{align*}
+注意最后一个小于是把最后一个分式的分母从36缩小到32的。
+
+2. 原帖中 kuing 给了一个借助程序得到的等比放缩有点意思，有时间玩玩。
+\end{exerciseAdditional}
+
+\begin{exercise}
+  已知数列$a_n$满足$a_1=1$，以后的项由递推式
+  \[ a_{n+1} = a_n + \frac{1}{a_n^2} \]
+  确定，求证: $30 < a_{9000} < 30.01$.
+\end{exercise}
+
+\begin{proof}[证明]
+  递推式两边三次方
+  \[ a_{n+1}^3 = a_n^3 + 3 + \frac{3}{a_n^3} + \frac{1}{a_n^6} \]
+  显然数列是严格增加的，所以在$n>2$时，$a_n>a_2=2$，于是此时
+  \[ a_n^3+3 < a_{n+1}^3 < a_n^3 + 3 + \frac{3}{2^3}+\frac{1}{2^6}<a_n^3+4 \]
+  因此在$n>3$时有
+  \[ 3n+2<a_n^3<4n \]
+  将这估计式应用到前式的右边，得
+  \[ a_n^3 + 3 + \frac{3}{4n} + \frac{1}{16n^2} < a_{n+1}^3 < a_n^3 + 3 + \frac{3}{3n+2} + \frac{1}{(3n+2)^2} \]
+  于是得
+  \[ a_2^3 + 3(n-2) + \frac{3}{4}\sum_{k=2}^{n-1} \frac{1}{k} + \frac{1}{16}\sum_{k=2}^{n-1} \frac{1}{k^2} < a_n^3 < a_2^3 + 3(n-2) + 3\sum_{k=2}^{n-1} \frac{1}{3k+2} + \sum_{k=2}^{n-1} \frac{1}{(3k+2)^2} \]
+ 接下来对两边的四个求和进行估值，在接下来的过程中需要使用以下不等式。
+  \[ \ln{(n+1)} < \sum_{k=1}^n \frac{1}{k} < 1 + \ln{n} \]
+  显然有
+    \[ \sum_{k=2}^{n-1} \frac{1}{k} > \ln{n} - 1 \]
+    以及
+    \begin{align*}
+      \sum_{k=2}^{n-1} \frac{1}{k^2} & > \sum_{k=2}^{n-1} \frac{1}{k(k+1)} \\
+                                     & = \sum_{k=2}^{n-1} \left( \frac{1}{k} - \frac{1}{k+1} \right) \\
+      & = \frac{1}{2} - \frac{1}{n}
+    \end{align*}
+    因此有$a_n^3$的下界估计式
+    \[ a_n^3 > 3n+2+\frac{3}{4} \ln{n} -\frac{1}{16n} - \frac{23}{32} \]
+    接下来由反比例函数的下凸性有
+  \begin{align*}
+    \sum_{k=2}^{n-1} \frac{1}{3k+2} & < \frac{1}{3} \sum_{k=2}^{n-1} \left( \frac{1}{3k+1} + \frac{1}{3k+2} + \frac{1}{3k+3} \right) \\
+                                & = \frac{1}{3} \sum_{k=7}^{3n} \frac{1}{k} \\
+                                    & < \frac{1}{3} \left( 1+\ln{3n} - \left( 1+\frac{1}{2}+\cdots+\frac{1}{6} \right) \right) \\
+    & < \frac{1}{3} \left( 1+\ln{3n} - \ln{7} \right)
+  \end{align*}
+  以及
+  \begin{align*}
+    \sum_{k=2}^{n-1} \frac{1}{(3k+2)^2} & < \sum_{k=2}^{n-1} \frac{1}{(3k+2)(3k-1)} \\
+                                        & = \frac{1}{3} \sum_{k=2}^{n-1} \left( \frac{1}{3k-1} - \frac{1}{3k+2} \right) \\
+    & = \frac{1}{3} \left( \frac{1}{5} - \frac{1}{3n-1} \right)
+  \end{align*}
+  于是有$a_n^3$的上界估计式
+  \[ a_n^3 < 3n+3 +\ln{3n} - \ln{7} + \frac{1}{3} \left( \frac{1}{5} - \frac{1}{3n-1} \right) \]
+  综合上界和下界，代入$n=9000$得到:
+  \[ 30.0030 < a_{9000} < 30.0042 \]
+ 得到更加精确的结果.
+ \end{proof}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../elementary-math-note"
+%%% End:

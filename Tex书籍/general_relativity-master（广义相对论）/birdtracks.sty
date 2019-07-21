@@ -1,0 +1,42 @@
+% see http://tex.stackexchange.com/questions/97507/typesetting-inline-penrose-cvitanovic-tensor-diagrams-birdtracks/97604
+% If we're producing html output, these aren't invoked; see genrel.m4, which defines macros
+% like __birdvec(x).
+% I should really set things up so bitmaps are generated from tikz diagrams. See
+% http://www.lightandmatter.com/cgi-bin/meki?computer/apps#text_editors,_word_processors,_pdf,tikz
+
+\tikzstyle{arrow}=[draw=black,arrows=-latex]
+\tikzstyle{revarrow}=[draw=black,arrows=latex-]
+
+\newcommand{\birdvec}[1]{%
+\begin{tikzpicture}[baseline=(n0.base)]
+  \node[inner xsep=0em] (n0) at (0, 0) {$#1$};
+  \draw [style=revarrow] (n0.west) to ++(-0.8em,0);
+\end{tikzpicture}
+}
+\newcommand{\birddualvec}[1]{%
+\begin{tikzpicture}[baseline=(n0.base)]
+  \node[inner xsep=0em] (n0) at (0, 0) {$#1$};
+  \draw [style=arrow] (n0.east) to ++(0.8em,0);
+\end{tikzpicture}
+}
+\newcommand{\birdscalarproduct}[2]{
+\begin{tikzpicture}[baseline=(n0.base)]
+    \node[inner xsep=0em] (n0) at (0, 0) {$#1$};
+    \node[inner xsep=0em] (n1) at +([xshift=1.0em]n0.east) {$#2$};
+    \draw [style=arrow] (n0) to (n1);
+\end{tikzpicture}
+}
+\newcommand{\birdflipscalarproduct}[2]{
+\begin{tikzpicture}[baseline=(n0.base)]
+    \node[inner xsep=0em] (n0) at (0, 0) {$#2$};
+    \node[inner xsep=0em] (n1) at +([xshift=1.0em]n0.east) {$#1$};
+    \draw [style=arrow] (n1) to (n0);
+\end{tikzpicture}
+}
+\newcommand{\birdgrad}[1]{%
+\begin{tikzpicture}[baseline=(n0.base)]
+  \node[inner xsep=0em] (n0) at (0, 0) {$#1$};
+  \node [style=circle,draw=black,minimum size=1.3\baselineskip] (c0) at (n0) {};
+  \draw [style=arrow] (c0.east) to ++(0.8em,0);
+\end{tikzpicture}
+}

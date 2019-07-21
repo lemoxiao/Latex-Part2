@@ -1,0 +1,67 @@
+%FDF-1.2
+1 0 obj
+<< /FDF << /JavaScript << /Doc 2 0 R >> >> >>
+endobj
+2 0 obj
+[ (DLJS for Tooltips) 3 0 R ]
+endobj
+3 0 obj
+<<>>
+stream
+  var animace;
+  var fancyTooltipsLoaded = true;
+
+  function CloseTooltips()
+  {
+    try {this.getField("ikona").hidden=true;}catch (e) {}
+    try {app.clearInterval(animace);}catch (e) {}
+  }
+
+  function ImportTooltips()
+  {
+    console.println("importing pictures");
+    for (var i=1;i<=37;i++)
+    {
+      this.insertPages(this.numPages-1,"tooltipy.pdf",(i-1),(i-1));
+      var rozm=this.getPageBox("Crop",this.numPages-1);
+      this.deletePages(this.numPages-1);
+      var p=this.addField("animtiph."+i,"button",0,rozm);
+      p.buttonPosition=position.iconOnly;
+      p.hidden=true;
+      this.getField("animtiph."+i).buttonImportIcon("tooltipy.pdf",(i-1));
+    }
+    console.println("imported 37 pictures");
+    return(1);
+  }
+
+  function nastav(cislo)
+  {
+    var f=this.getField("ikona."+(this.pageNum+1));
+    var g=this.getField("animtiph."+cislo);
+    var sourf=f.rect;
+    var sourg=g.rect;
+    if ((mouseX+sourg[2]-sourg[0])<sourf[2])
+    var percX=100*(mouseX-sourf[0])/((sourf[2]-sourf[0])-(sourg[2]-sourg[0]));
+    else
+    var percX=100*(mouseX-sourf[0]-(sourg[2]-sourg[0]))/((sourf[2]-sourf[0])-(sourg[2]-sourg[0]));
+    var percY=100*(mouseY-sourf[3])/((sourf[1]-sourf[3])-(sourg[1]-sourg[3]));
+    if (percX>100) percX=100;
+    if (percY>100) percY=100;
+    if (percX<0) percX=0;
+    if (percY<0) percY=0;
+    f.buttonAlignX=percX;
+    f.buttonAlignY=percY;
+  }
+
+  function zobraz(cislo)
+  {
+    var f=this.getField("ikona."+(this.pageNum+1));
+    var g=this.getField("animtiph."+cislo);
+    f.hidden=false;
+    f.buttonSetIcon(g.buttonGetIcon());
+  }
+endstream
+endobj
+trailer
+<< /Root 1 0 R >>
+%%EOF

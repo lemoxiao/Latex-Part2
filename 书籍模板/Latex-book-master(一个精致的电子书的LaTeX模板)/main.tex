@@ -1,0 +1,145 @@
+\documentclass[8pt, oneside]{book}
+% geometry : format the page
+\usepackage[papersize={90mm,120mm},left=5mm,right=5mm,top=12mm,bottom=12mm]{geometry}
+% inputenc : specify the file encoding
+\usepackage[utf8]{inputenc}
+% babel : specify the file language
+\usepackage[frenchb]{babel}
+% graphicx : enhance the support of graphics
+\usepackage{graphicx}
+% lastpage : to reference the last page. Usefull for Page x of \pageref{LastPage}
+\usepackage{lastpage}
+% etoolbox : allow complex commands like "if then"
+\usepackage{etoolbox}
+% enumitem : control layout of itemize, enumerate, description
+\usepackage{enumitem}
+% blindtext : to insert random text. Usefull for tests
+\usepackage{blindtext}
+% amsmath : for mathematics and symbols
+\usepackage{amsmath}
+% tikz : to create graphics programmatically
+\usepackage{tikz}
+% pgfornament : to ornate the document
+\usepackage[object=vectorian]{pgfornament}
+
+\newcommand{\corner}[1]{
+	\begin{tikzpicture}[remember picture, overlay]
+	\node[anchor=north west] at (current page.north west){%
+		\pgfornament[width=2cm]{#1}};
+	\node[anchor=north east] at (current page.north east){%
+		\pgfornament[width=2cm,symmetry=v]{#1}};
+	\node[anchor=south west] at (current page.south west){%
+		\pgfornament[width=2cm,symmetry=h]{#1}};
+	\node[anchor=south east] at (current page.south east){%
+		\pgfornament[width=2cm,symmetry=c]{#1}};
+	\end{tikzpicture}%
+}
+
+\usepackage{afterpage}
+\usepackage{xcolor}
+
+\definecolor{coverbackground}{HTML}{FFD700}
+
+\let\footruleskip\undefined %undefine footruleskip
+
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+% Lenny, Rejne
+\usepackage[Lenny]{fncychap}
+\ChTitleVar{\Large}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\cfoot{\pgfornament[width=0.5cm,anchor=south]{2} Page \thepage \hspace{1pt} sur \pageref{LastPage} \pgfornament[width=0.5cm,symmetry=v, anchor=south]{2}}
+
+
+\fancypagestyle{plain}{
+	\fancyhead{}
+	\renewcommand{\headrulewidth}{0pt} 
+}
+
+\fancypagestyle{main}{
+	\fancyhead[C]{\leftmark}
+	\renewcommand{\headrulewidth}{0.1pt} 
+}
+
+\appto\frontmatter{\pagestyle{plain}}
+\appto\mainmatter{\pagestyle{main}}
+
+\renewcommand{\chaptermark}[1]{
+ \markboth{\MakeUppercase{ \chaptername}\ \thechapter. #1}{}}
+
+\usepackage{hyperref}
+
+\hypersetup{
+	bookmarks=true,         % show bookmarks bar?
+	unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+	pdftoolbar=true,        % show Acrobat’s toolbar?
+	pdfmenubar=true,        % show Acrobat’s menu?
+	pdffitwindow=false,     % window fit to page when opened
+	pdfstartview={FitH},    % fits the width of the page to the window
+	pdftitle={Like a Boss : Guide des jeunes professionnels ambitieux},    % title
+	pdfauthor={AZIKA-EROS Christ Michel},     % author
+	pdfsubject={Cet ouvrage apporte des conseils sur la réussite de sa vie professionnelle},   % subject of the document
+	pdfcreator={AZIKA-EROS Christ Michel},   % creator of the document
+	pdfproducer={AZIKA-EROS Christ Michel}, % producer of the document
+	pdfkeywords={Motivation, Reussite, Travail, Etudiant, Vie professionelle}, % list of keywords
+	pdfnewwindow=true,      % links in new PDF window
+	colorlinks=true,       % false: boxed links; true: colored links
+	linkcolor=black,          % color of internal links (change box color with linkbordercolor)
+	citecolor=black,        % color of links to bibliography
+	filecolor=black,      % color of file links
+	urlcolor=black           % color of external links
+}
+
+
+\begin{document}
+
+\author{AZIKA-EROS Christ Michel}
+\title{Like a Boss}
+\date{8 Avril 2017}
+
+\frontmatter
+
+\pagenumbering{Roman}
+
+\begin{titlepage}
+	\pagecolor{coverbackground}\afterpage{\nopagecolor}
+	
+	\corner{63}
+	\centering
+	
+	\begin{center}
+		\vspace{0.8cm}
+		{\LARGE \textbf{LIKE A BOSS} \par}
+		\vspace{0.4cm}
+		\pgfornament[width=5cm]{84}
+		\vspace{0.4cm}
+		{\par \Large Guide des jeunes professionnels ambitieux}
+		\vspace{1.7cm}
+		{\par \large \textbf{AZIKA-EROS} Christ Michel\par}
+		\vspace{0.3cm}
+		\pgfornament[width=2cm,symmetry=h]{69}
+	
+	\end{center} 
+\end{titlepage}
+
+%\clearpage\mbox{}\thispagestyle{empty}\clearpage
+
+\thispagestyle{empty}
+\include{./TeX_files/thanks}
+\tableofcontents
+
+
+\mainmatter
+
+\include{./TeX_files/chapter01}
+\include{./TeX_files/chapter02}
+
+
+\include{./TeX_files/backcover}
+
+\backmatter
+
+% bibliography, glossary and index would go here.
+
+\end{document}

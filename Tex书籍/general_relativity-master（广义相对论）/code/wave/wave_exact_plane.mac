@@ -1,0 +1,16 @@
+load(ctensor);
+ct_coords:[t,x,y,z];
+/* h : A * sin(z-t)*x*y + B*sin(z-t)*(x^2-y^2); */ /* two polzn components need not be sine waves, need not be in phase */
+h : A * sin(z-t)*x*y; /* simpler form makes maxima able to simplify the result to 0 at the end */
+tt : 1-h;
+zz : -1-h;
+zt : h; /* is *half* the line element contribution, since it occurs twice in the metric */
+lg:matrix([tt,0,0,zt],
+          [0,-1,0,0],
+          [0,0,-1,0],
+          [zt,0,0,zz]);
+cmetric();
+ricci(false);
+ric[1,1]; 
+weyl(true);
+riemann(true); /* every element is equal to plus or minus A/2 sin(z - t) */

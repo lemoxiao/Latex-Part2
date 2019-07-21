@@ -1,0 +1,91 @@
+TODO: License
+
+Class schedul problem
+
+At the beginning of university, students need schedule the classes to take.
+However, some advanced classes need pre-requistes, for example, 
+In order to take class ``Operation System'', a student has to take ``Math'',
+``Introduction Algorithms'', and ``Introduction to Computer system'' in
+advance.
+
+All classes are indexed in the course selection system in the below format:
+  Class Signature = Department Name + Course Number
+For example: CSE110, where ``CSE'' means Computer Scince and Engieering and 
+110 stands for ``Introduction to Algorithms''.
+The lower the number, the easier the classes, we recommend to take easy
+classes in early semester.
+
+In order to state all pre-requisites for a course, students can find the 
+information as the following form:
+  Class Information = Class Signature: Class Signature, Class Signature ...
+Where the class signatures after `:' denotes for all pre-requisites classes.
+If there is nothing after `:', it means this class doesn't need any 
+pre-requisites.
+
+Each student gets a list of class information. Let's write a program 
+to help the student schedule the classes.
+
+Note: A student can only take one class at a time, Suppose we use these rules to
+determine which class to take:
+If there are multiple classes can be taken at the same time, we take the one with the
+lowest number, which means we take the easist one first.
+If there are multiple classes with the same number can be taken at the same time, 
+Let's use alphabetic order of department name.
+
+If there are conflict class information, for example A: B and B: A, or A: B
+and there is no entry of class information for B, we return empty result
+to indicate the error.
+
+Some Examples:
+Class Information:
+ CSE121: CSE110
+ CSE110:
+ MATH122:
+Scheduled classes: CSE110, CSE121, MATH122
+
+Class Information:
+ ENGL111: ENGL110
+ ENGL110: ENGL111
+Scheduled classes: Empty because of cylic pre-requistes
+
+Class Information:
+["ENGL111: ENGL110"]
+Scheduled classes: Empty because there is no entry for ENGL110
+
+Class information:
+ CSE258: CSE244 CSE243 INTR100
+ CSE221: CSE254 INTR100
+ CSE254: CSE111 MATH210 INTR100
+ CSE244: CSE243 MATH210 INTR100
+ MATH210: INTR100
+ CSE101: INTR100
+ CSE111: INTR100
+ ECE201: CSE111 INTR100
+ ECE111: INTR100
+ CSE243: CSE254
+ INTR100:
+Scheduled classes:
+INTR100, CSE101, CSE111, ECE111, ECE201, MATH210,
+CSE254, CSE221, CSE243, CSE244, CSE258
+
+Algorithm:
+
+We sort the class information line by line by the following strategy:
+At any time point, Suppose that: 
+  A is the classes we have already sorted;
+  X is the classes we haven't sorted yet;
+  c is the class we are going to insert to A at proper position
+
+function insert(A, c, X)
+  p <- 0  >>> candidate position
+  for each pre-requistes x of c
+    if x exists in A at position p'
+      p <- max(p, p') >>>we must insert c after x in A
+    else
+      >>> recursive:
+      find x in X (Error if not found, it means rules conflict)
+      X' <- remove x from X
+      p  <- insert(A, class-information-of(x), X')
+  insert c to A after position p >>> order by number then department name
+  return the final position of c in A
+  

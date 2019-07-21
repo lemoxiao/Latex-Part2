@@ -1,0 +1,436 @@
+%!TEX root = ../larxxia.tex
+
+\section{Summary of matrices}
+\label{sec:summ}
+
+\begin{itemize}
+\def\index#1{}% turn off indexing
+
+\subsubsection{Matrix operations and algebra}
+
+\item First, some basic terminology (\S\ref{sec:bmt}) corresponds to commands in \script.
+\begin{itemize}
+\itemhi A \bfidx{matrix} is a rectangular array of real numbers, written inside \bfidx{brackets}~\(\begin{bmatrix} \cdots  \end{bmatrix}\)---create in \script\ with \verb|[...;...;...]|.
+
+\itemhi The \bfidx{size} of a matrix is written \(m\times n\) where \(m\)~is the number of rows and \(n\)~is the number of columns---compute with \verb|size(A)| for matrix~\verb|A|.
+If \(m=n\)\,, then it is called a \bfidx{square matrix}.
+
+\item A \bfidx{column vector} means a matrix of size \(m\times 1\) for some~\(m\).
+We often write a column vector horizontally within \bfidx{parentheses}~\((\cdots )\).
+
+\item The numbers appearing in a matrix are called the \bfidx{entries}, \bfidx{elements} or \bfidx{components} of the matrix.
+For a matrix~\(A\), the entry in row~\(i\) and column~\(j\) is denoted by~\(a_{ij}\) ---compute with~\verb|A(i,j)|.
+
+\itemme \(O_{m\times n}\)~denotes the \(m\times n\) zero matrix, \(O_n\)~denotes the square zero matrix of size \(n\times n\)---compute with \verb|zeros(m,n)| and \verb|zeros(n)|, respectively---whereas \(O\)~denotes a zero matrix whose size is apparent from the context.
+
+\itemme The \bfidx{identity matrix}~\(I_n\) denotes a \(n\times n\) square matrix which has zero entries except for the diagonal from the top-left to the bottom-right which are all ones---compute with~\verb|eye(n)|.
+Non-square `identity' matrices are denoted \(I_{m\times n}\)---compute with~\verb|eye(m,n)|.
+The symbol~\(I\) denotes an identity matrix whose size is apparent from the context.
+
+\item In \script, \verb|randn(m,n)|~computes a \(m\times n\) matrix with random entries (distributed Normally, mean zero, standard deviation one).
+
+\item Two matrices are \bfidx{equal}~(\(=\)) if they both have the same size \emph{and} their corresponding entries are equal.
+Otherwise the two matrices are not equal.
+
+\end{itemize}
+
+
+\item Basic matrix operations include the following (\S\ref{sec:amwm}).
+\begin{itemize}
+\item When \(A\) and~\(B\) are both \(m\times n\) matrices, then their \bfidx{sum} or \bfidx{addition}, \(A+B\)\,, is the \(m\times n\) matrix whose \((i,j)\)th~entry is \(a_{ij}+b_{ij}\)\,---compute by \verb|A+B|.  
+Similarly,  the \bfidx{difference} or \bfidx{subtraction} \(A-B\) is the \(m\times n\) matrix whose \((i,j)\)th~entry is \(a_{ij}-b_{ij}\)\,---compute by \verb|A-B|.
+
+\item For an \(m\times n\) matrix~\(A\), the \bfidx{scalar product} by~\(c\), denoted either~\(cA\) or~\(Ac\)---and compute by \verb|c*A| or~\verb|A*c|---is the \(m\times n\) matrix whose \((i,j)\)th~entry is~\(ca_{ij}\).
+
+\itemhi For \(m\times n\) matrix~\(A\) and vector \(\xv\) in~\(\RR^n\), the \bfidx{matrix-vector product}~\(A\xv\)\,---compute by \verb|A*x|---is the following vector in~\(\RR^m\),
+\begin{equation*}
+A\xv:=
+\begin{bmatrix} a_{11}x_1+a_{12}x_2+\cdots+a_{1n}x_n
+\\a_{21}x_1+a_{22}x_2+\cdots+a_{2n}x_n
+\\\vdots
+\\a_{m1}x_1+a_{m2}x_2+\cdots+a_{mn}x_n
+\end{bmatrix}.
+\end{equation*}
+Multiplication of a vector by a square matrix transforms the vector into another vector in the same space.
+
+\itemme In modelling the age structure of populations, the so-called Leslie matrix encodes the birth, ageing, and death (of females) in the population to empower predictions of the future population.
+Such prediction often involves repeated matrix-matrix multiplication, that is, computing the powers of a matrix.
+
+\itemhi For \(m\times n\) matrix~\(A\), and \(n\times p\) matrix~\(B\), the \bfidx{matrix product} \(C=AB\)\,---compute by \verb|C=A*B|---is the \(m\times p\) matrix whose \((i,j)\)th~entry is
+\begin{equation*}
+c_{ij}=a_{i1}b_{1j}+a_{i2}b_{2j}+\cdots+a_{in}b_{nj}\,.
+\end{equation*}
+
+\end{itemize}
+
+\itemme Matrix addition and scalar multiplication satisfy familiar properties (\autoref{thm:pasm}): 
+ \(A+B=B+A\) (commutativity);
+ \((A+B)+C=A+(B+C)\) (associativity);
+ \(A\pm O=A=O+A\);
+ \(c(A\pm B)=cA\pm cB\) (distributivity);
+ \((c\pm d)A=cA\pm dA\) (distributivity);
+ \(c(dA)=(cd)A\) (associativity);
+ \(1A=A\)\,; and 
+ \(0A=O\)\,.
+ 
+\itemme Matrix multiplication also satisfies familiar properties (\autoref{thm:pmm}):
+ \(A(B\pm C)=AB\pm AC\) (distributivity);
+ \((A\pm B)C=AC\pm BC\) (distributivity);
+ \(A(BC)=(AB)C\) (associativity);
+ \(c(AB)=(cA)B=A(cB)\);
+ \(I_mA=A=AI_n\) for \(m\times n\) matrix~\(A\) (multiplicative identity);
+ \(O_mA=O_{m\times n}=AO_n\)  for \(m\times n\) matrix~\(A\);
+ \(A^pA^q=A^{p+q}\), \((A^p)^q=A^{pq}\) and~\((cA)^p=c^pA^p\) for square~\(A\) and integer~\(p,q\).
+ 
+But matrix multiplication is \emph{not} commutative: generally \(AB\neq BA\)\,.
+
+\itemhi The \bfidx{transpose} of an \(m\times n\) matrix~\(A\) is the \(n\times m\) matrix \(B=\tr A\) with entries \(b_{ij}=a_{ji}\) (\autoref{def:mattran})---compute by~\verb|A'|.
+
+A (real) matrix~\(A\) is a \bfidx{symmetric matrix} if \(\tr A=A\) (\autoref{def:matsym}).
+A symmetric matrix must be a square matrix
+
+\itemme The matrix transpose satisfies (\autoref{thm:pot}):
+\(\tr{(\tr A)}=A\);
+\(\tr{(A\pm B)}=\tr A\pm \tr B\);
+\(\tr{(cA)}=c(\tr A)\);
+\(\tr{(AB)}=\tr B\tr A\) (remember to reverse the order);
+\(\tr{(A^p)}=(\tr A)^p\);
+and \(A+\tr A\),  \(\tr AA\) and \(A\tr A\) are symmetric matrices.
+
+
+
+
+
+\subsubsection{The inverse of a matrix}
+
+\itemhi An \bfidx{inverse} of a square matrix~\(A\) is a matrix~\(B\) such that both \(AB=I\) and \(BA=I\) (\autoref{def:invertible}).
+If such a matrix~\(B\) exists, then matrix~\(A\) is called \bfidx{invertible}.
+
+\itemme If \(A\) is an {invertible} matrix, then its \idx{inverse} is unique, and denoted by~\(A^{-1}\) (\autoref{thm:uninv}).
+
+\itemhi For every \(2\times2\) matrix \(A=\begin{bmatrix} a&b\\c&d \end{bmatrix}\), the matrix~\(A\) is {invertible} if and only if the \bfidx{determinant} \(ad-bc\neq0\) (\autoref{thm:2x2det}), in which case
+\begin{equation*}
+A^{-1}=\frac1{ad-bc}\begin{bmatrix} d&-b\\-c&a \end{bmatrix}.
+\end{equation*}
+
+\itemme If a matrix~\(A\) is {invertible}, then  \(A\xv=\bv\) has the {unique solution} \(\xv=A^{-1}\bv\) for every~\(\bv\) (\autoref{thm:invuniqsol}).
+
+\itemme For all invertible matrices~\(A\) and~\(B\), the inverse has the properties (\autoref{thm:invprop}):
+\begin{itemize}
+\item  matrix \(A^{-1}\) is invertible and \((A^{-1})^{-1}=A\)\,;
+\item if scalar \(c\neq0\)\,, then matrix~\(cA\) is invertible and \((cA)^{-1}=\frac1cA^{-1}\);
+\item matrix \(AB\) is invertible and \((AB)^{-1}=B^{-1}A^{-1}\) (remember the reversed order);
+\item matrix \(\tr A\) is invertible and \((\tr A)^{-1}=\tr{(A^{-1})}\);
+\item matrices \(A^p\) are invertible for all \(p=1,2,3,\ldots\) and \((A^p)^{-1}=(A^{-1})^p\).
+\end{itemize}
+
+\item For every {invertible} matrix~\(A\), define \(A^0=I\) and for every positive integer~\(p\) define \(A^{-p}:=(A^{-1})^p=(A^p)^{-1}\)) (\autoref{def:invpow}).
+
+\itemhi The \bfidx{diagonal entries} of an \(m\times n\) matrix~\(A\) are  \(a_{11}\clb a_{22}\clb \ldots\clb a_{pp}\) where \(p=\min(m,n)\).
+A matrix whose non-diagonal entries are all zero is called a \bfidx{diagonal matrix}: \(\diag(\hlist vn)\) denotes the \(n\times n\) square matrix with diagonal entries \hlist vn\,; whereas \(\diag_{m\times n}(\hlist vp)\) denotes an \(m\times n\) matrix with diagonal entries \hlist vp\ (\autoref{def:diag}).
+
+\item For every \(n\times n\) {diagonal matrix}  \(D=\diag(\hlist dn)\), 
+if  \(d_{i}\neq 0\) for \(i=1,2,\ldots,n\)\,, then \(D\)~is {invertible} and the inverse \(D^{-1}=\diag(1/d_{1},1/d_{2},\ldots,1/d_{n})\) (\autoref{thm:idm}).
+
+\item Multiplication by a diagonal matrix just stretches or squashes and/or reflects in the directions of the coordinate axes.
+Consequently, in applications we often choose coordinate systems such that the matrices which appear are diagonal.
+
+\item In \script:
+\begin{itemize}
+\item \index{diag()@\texttt{diag()}}\verb|diag(v)| where \verb|v| is a row/column vector of length~\(p\) generates the \(p\times p\) matrix 
+\begin{equation*}
+\diag(\hlist vp)=\begin{bmatrix} v_1&0&\cdots&0\\
+0&v_2&&\vdots\\ \vdots&&\ddots\\ 0&\cdots&&v_p \end{bmatrix}.
+\end{equation*}
+
+\itemhi In \script\ (but not in algebra), \verb|diag| also does the opposite: for an \(m\times n\) matrix~\(A\) such that both \(m,n\geq2\)\,,  \verb|diag(A)| returns the (column) vector \((a_{11},a_{22},\ldots,a_{pp})\) of diagonal entries where the result vector length \(p=\min(m,n)\).
+
+\itemhi The dot operators \index{./@\texttt{./}}\verb|./| and~\index{.*@\texttt{.*}}\verb|.*| perform element-by-element division and multiplication of two matrices\slash vectors of the same size.
+
+\item \verb|log10(v)| finds the logarithm to base~\(10\) of each component of~\verb|v| and returns the results in a vector of the same size; \index{log()@\texttt{log()}}\verb|log(v)| does the same but for the natural logarithm (not \verb|ln(v)|).
+
+\end{itemize}
+
+
+
+\itemhi A set of non-zero vectors \(\{\hlist\qv k\}\) is called an \bfidx{orthogonal set} if all pairs of distinct vectors in the set are {orthogonal}: that is, \(\qv_i\cdot\qv_j=0\) whenever \(i\neq j\) for \(i,j=1,2,\ldots,k\) (\autoref{def:orthoset}).
+A set of vectors is called an \bfidx{orthonormal set} if it is an {orthogonal set} of {unit vector}s.
+
+\itemhi A square matrix~\(Q\) is called an \bfidx{orthogonal matrix} if \(\tr QQ=I\) (\autoref{def:orthog}).
+Multiplication by an orthogonal matrix is called a \bfidx{rotation and/or reflection}.
+
+\itemme For every square matrix~\(Q\),  the following statements are equivalent (\autoref{thm:orthog}):
+\begin{itemize}
+\item \(Q\)~is an \idx{orthogonal matrix};
+\item the {column vector}s of~\(Q\) form an {orthonormal set}; 
+\item \(Q\)~is {invertible} and \(Q^{-1}=\tr Q\);
+\item \(\tr Q\) is an {orthogonal matrix};
+\item the {row vector}s of~\(Q\) form an {orthonormal set};
+\item multiplication by~\(Q\) preserves all lengths and angles (and hence corresponds to our intuition of a {rotation and/or reflection}).
+\end{itemize}
+
+
+
+
+
+
+
+\subsubsection{Factorise to the singular value decomposition}
+
+\itemhi Every $m\times n$ real matrix~$A$ can be factored into a product of three matrices \(A=\usv\) (\autoref{thm:svd}),
+called a \bfidx{singular value decomposition} (\svd), where
+\begin{itemize}
+		\item $m\times m$ matrix $U=\begin{bmatrix} \uv _1 &\uv_2&\cdots&\uv _m \end{bmatrix}$ is orthogonal, 
+		\item $n\times n$ matrix $V=\begin{bmatrix} \vv_1 &\vv_2&\cdots&\vv_n \end{bmatrix}$ is orthogonal, and      
+        \item  $m\times n$ diagonal matrix~$S$ is zero except for unique non-negative diagonal elements called \bfidx{singular value}s
+$\sigma_1\geq \sigma_2 \geq \cdots \geq \sigma_{\mn}\geq 0$\,.
+\end{itemize}
+The {orthonormal} vectors \(\uv_j\) and~\(\vv_j\) are called \bfidx{singular vector}s.
+
+Almost always use \script\ to find an \svd\ of a given matrix.
+
+\itemhi \autoref{pro:gensol} derives a general solution of the system $A\xv=\bv$ using an \svd.
+\begin{enumerate}
+\item Obtain an \svd\ factorisation \(A=\usv\).
+\item Solve \(U\zv=\bv\) by $\zv=\tr U\bv$ (unique given~\(U\)).
+\itemme To solve \(S\yv=\zv\), identify the non-zero and the zero \idx{singular value}s: suppose \(\sigma_1\geq\sigma_2\geq\cdots\geq\sigma_r>0\) and \(\sigma_{r+1}=\cdots=\sigma_{\min(m,n)}=0\):
+\begin{itemize}
+\item if $z_i\neq0$ for any \(i=r+1,\ldots,m\)\,, then there is {no solution} (the equations are \bfidx{inconsistent});
+\item otherwise determine the $i$th~component of~$\yv$ by
+$y_i=z_i/\sigma_i$ for $i=1,\ldots,r$, and let $y_i$~be a {free variable} for $i=r+1,\ldots,n$\,. 
+\end{itemize}
+
+\item Solve \(\tr V\xv=\yv\) (unique for each~\yv\ given~\(V\)) to derive that a general solution is $\xv=V\yv$.
+\end{enumerate}
+
+\itemhi In \script:
+\begin{itemize}
+\item \index{svd()@\texttt{svd()}}\verb|[U,S,V]=svd(A)| computes the three matrices~\(U\), \(S\) and~\(V\) in a singular value decomposition (\svd) of the \(m\times n\) matrix: \(A=\usv\).
+
+\verb|svd(A)| just reports the singular values in a vector.
+
+\item To extract and compute with a subset of rows\slash columns of a matrix, specify the vector of indices.
+%For example: \verb|V(:,1:r)| selects the first \(r\)~columns of~\(V\); and \verb|S(1:r,1:r)| selects the \(r\times r\) top-left submatrix of~\(S\).
+\end{itemize}
+
+
+\itemme The \bfidx{condition number} of a matrix~\(A\) is the the ratio of the largest to smallest of its {singular value}s: \(\cond A:=\sigma_1/\sigma_{\mn}\) (\autoref{def:condnum}); 
+if \(\sigma_{\mn}=0\)\,, then \(\cond A:=\infty\)\,; 
+also, \(\cond O_{m\times n}:=\infty\)\,.
+
+\itemhi The \bfidx{rank} of a matrix~$A$ is the number of \emph{nonzero} {singular value}s in an~\svd, \(A=\usv\) (\autoref{def:rank}).
+
+\itemme For every matrix~\(A\), let an \svd\ of~\(A\) be~\(\usv\), then the transpose~\(\tr A\) has an \svd\ of \(V(\tr S)\tr U\) (\autoref{thm:ranktr}). 
+Further, \(\rank(\tr A)=\rank A\)\,.
+
+\item For every \(n\times n\) \idx{square matrix}~\(A\), the following statements are equivalent: 
+\begin{itemize}
+\item \(A\) is {invertible};
+\item \(A\xv=\bv\) has a {unique solution} for every \(\bv\) in~\(\RR^n\);
+\item \(A\xv=\ov\) has \emph{only} the zero solution;
+\item all \(n\)~{singular value}s of~\(A\) are nonzero;
+\item the {condition number} of~\(A\) is finite (\verb|rcond|>0);
+\item \(\rank A=n\)\,.
+\end{itemize}
+
+\item The condition number determines the reliability of solutions to linear equations.
+Consider solving \(A\xv=\bv\) for \(n\times n\) matrix~\(A\) with full \(\rank A=n\)\,.  
+When the right-hand side~\bv\ has relative error~\(\epsilon\), then the solution~\xv\ has relative error\({}\leq\epsilon\cond A\)\,, with equality in the worst case (\autoref{thm:erramp}).
+
+
+
+
+
+\subsubsection{Subspaces, basis and dimension}
+
+\itemhi A \bfidx{subspace}~\WW\ of~\(\RR^n\),  is a set of vectors, including \(\ov\in\WW\), such that \WW\ is \bfidx{closed} under addition and scalar multiplication: that is, for all \(c\in\RR\) and \(\uv,\vv\in\WW\), then both \(\uv+\vv\in\WW\) and \(c\uv\in\WW\) (\autoref{def:subspace}).
+
+\item Let \hlist\vv k\ be \(k\)~vectors in~\(\RR^n\),
+then \(\Span\{\hlist\vv k\}\) is a {subspace} of~\(\RR^n\) (\autoref{thm:spansubs}).
+
+\item The \bfidx{column space} of any $m\times n$ matrix~$A$ is the {subspace} of~$\RR^m$ {span}ned by the \(n\)~{column vector}s of~$A$ (\autoref{def:colsp}).
+        
+The \bfidx{row space} of any $m\times n$ matrix~$A$ is the {subspace} of~$\RR^n$ {span}ned by the \(m\)~{row vector}s of~$A$.
+
+\itemme For any $m\times n$ matrix~$A$, define~$\Null(A)$ to be the set of all solutions~$\xv$ to the {homogeneous} system $A\xv=\ov$\,. 
+The set~\(\Null(A)\) is a {subspace} of~$\RR^n$ called the \bfidx{nullspace} of~$A$ (\autoref{thm:homosubsp}).
+
+\itemme An \bfidx{orthonormal basis} for a {subspace}~\WW\ of~\(\RR^n\) is an {orthonormal set} of vectors that span~\WW\ (\autoref{def:orthobasis}).
+
+\itemhi  \autoref{pro:ospan} finds an {orthonormal basis} for the subspace \(\Span\{\hlist\av n\}\), where $\{\hlist\av n\}$ is a set of $n$~vectors in~\(\RR^m\). 
+\begin{enumerate}
+\item Form matrix $A:= \begin{bmatrix} \av_1 & \av_2& \cdots&\av_n \end{bmatrix}$. 
+\item Factorise~\(A\) into an \svd, $A=\usv$\,, let \(\uv_j\)~denote the columns of~$U$ ({singular vector}s), and let \(r=\rank A\) be the number of nonzero {singular value}s.  
+\item Then \(\{\hlist\uv r\}\) is an \idx{orthonormal basis} for the subspace \(\Span\{\hlist\av n\}\).
+\end{enumerate}
+
+\item Singular Spectrum Analysis seeks patterns over time by using an \svd\ to orthonormal bases for `sliding windows' from the data in time (\autoref{eg:orthbapp}).
+
+\item Any two orthonormal bases for a given \idx{subspace} have the same number of vectors (\autoref{thm:sameD}).
+
+\item Let \WW\ be a subspace of~\(\RR^n\), then there exists an orthonormal basis for~\WW\ (\autoref{thm:obaseexists}).
+
+\itemhi For every \WW\ be a \idx{subspace} of~\(\RR^n\), the number of vectors in an \idx{orthonormal basis} for~\WW\ is called the \bfidx{dimension} of~\WW, denoted~\(\dim\WW\) (\autoref{def:dim}).
+By convention, \(\dim\{\ov\}=0\)\,.
+
+\itemme The \idx{row space} and \idx{column space} of a matrix~\(A\) have the same \idx{dimension} (\autoref{thm:rowcolD}).
+Further, given an \svd\ of the matrix, say \(A=\usv\), an \idx{orthonormal basis} for the column space is the first \(\rank A\)~columns of~\(U\), and that for the row space is the first \(\rank A\)~columns of~\(V\).
+
+\item The \bfidx{nullity} of a matrix~\(A\) is the \idx{dimension} of its \idx{nullspace}, and is denoted by \(\nullity(A)\) (\autoref{def:nullity}).
+
+\itemhi For every \(m\times n\) matrix~\(A\),  \(\rank A+\nullity A=n\)\,, the number of columns of~\(A\) (\autoref{thm:rank}).
+
+\itemme For every \(n\times n\) \idx{square matrix}~\(A\), and extending \autoref{thm:ftim1}, the following statements are equivalent (\autoref{thm:ftim2}):
+\begin{itemize}
+\item \(A\) is \idx{invertible};
+\item \(A\xv=\bv\) has a \idx{unique solution} for every \(\bv\in\RR^n\);
+\item \index{homogeneous}\(A\xv=\ov\) has only the zero solution;
+\item all \(n\)~\idx{singular value}s of~\(A\) are nonzero;
+\item the \idx{condition number} of~\(A\) is finite (\(\verb|rcond|>0\));
+\item \(\rank A=n\)\,;
+\item \(\nullity A=0\)\,;
+\item the \idx{column vector}s of~\(A\) span~\(\RR^n\);
+\item the \idx{row vector}s of~\(A\) span~\(\RR^n\).
+\end{itemize}
+
+
+
+
+
+\subsubsection{Project to solve inconsistent equations}
+
+\itemhi \autoref{pro:appsol} computes the `\idx{least square}' approximate solution(s) of \idx{inconsistent} equations $A\xv=\bv$\,:
+\begin{enumerate}
+    \item factorise \(A=\usv\) and set \(r=\rank A\) (relatively small singular values are effectively zero);
+        \item solve \(U\zv=\bv\) by $\zv=\tr U\bv$;
+    
+        \item  set $y_i=z_i/\sigma_i$ for $i=1,\ldots,r$, with  $y_i$~is free for $i=r+1,\ldots,n$\,, and consider \(z_i\) for \(i=r+1,\ldots,n\) as errors; 
+    
+        \item solve \(\tr V\xv=\yv\) to obtain a general approximate solution as $\xv=V\yv$.
+\end{enumerate}
+
+\item A robust way to use the results of pairwise competitions to rate a group of players or teams is to approximately solve the set of equations \(x_i-x_j=\text{result}_{ij}\) where \(x_i\) and~\(x_j\) denote the unknown ratings of the players\slash teams to be determined, and \(\text{result}_{ij}\) is the result or score (to~\(i\) over~\(j\)) when the two compete against each other.
+
+Beware of Arrow's Impossibility Theorem that all 1D ranking systems are flawed!
+
+\itemme All \idx{approximate solution}s obtained by \autoref{pro:appsol} solve the linear system \(A\xv=\tilde\bv\) for the unique \idx{consistent} right-hand side vector~\(\tilde\bv\) that minimises the \idx{distance}~\(|\tilde\bv-\bv|\) (\autoref{thm:appsol}).
+
+\item To fit the best straight line through some data, express as a linear algebra approximation problem.
+Say the task is to find the linear relation between~\(v\) (`vertical' values) and~\(h\) (`horizontal' values), \(v=x_1+x_2h\), for as yet unknown coefficients~\(x_1\) and~\(x_2\).
+Form the system of linear equations from all data points~\((h,v)\) by \(x_1+x_2h=v\), and solve the system via \autoref{pro:appsol}.
+
+In science and engineering one often seeks power laws \(v=c_1h^{c_2}\) in which case take logarithms and use the data to find \(x_1=\log c_1\) and \(x_2=c_2\) via \autoref{pro:appsol}.
+Taking logarithms of equations also empowers forming linear equations to be approximately solved in the computed tomography of medical and industrial \textsc{ct}-scans.
+
+
+\itemhi Obtain the {smallest solution}, whether exact or as an approximation, to a system of \idx{linear equation}s by Procedures~\ref{pro:gensol} or~\ref{pro:appsol}, as appropriate, and setting to \idx{zero} the \idx{free variable}s, \(y_{r+1}=\cdots=y_n=0\) (\autoref{thm:smallsoln}).
+
+\item For application to image analysis, in \script:
+\begin{itemize}
+
+\item \index{reshape()@\texttt{reshape()}}\verb|reshape(A,p,q)| for a \(m\times n\) matrix\slash vector~\(A\), provided \(mn=pq\)\,, generates a \(p\times q\) matrix with entries taken column-wise from~\(A\).  
+Either \(p\) or~\(q\) can be~\verb|[]| in which case \script\ uses \(p=mn/q\) or \(q=mn/p\) respectively.
+
+\item \index{colormap()@\texttt{colormap()}}\verb|colormap(gray)| draws the current figure with 64~shades of gray (\verb|colormap('list')| lists the available colormaps).
+
+\item \index{imagesc()@\texttt{imagesc()}}\verb|imagesc(A)| where \(A\)~is a \(m\times n\) matrix of values draws an \(m\times n\) image using the values of~\(A\) to determine the colour.
+
+\item \index{log()@\texttt{log()}}\verb|log(x)| where \(x\)~is a  matrix, vector or scalar computes the natural \idx{logarithm} to the base~\(e\) of each element, and returns the result(s) as a correspondingly sized matrix, vector or scalar.
+
+\item \index{exp()@\texttt{exp()}}\verb|exp(x)| where \(x\)~is a  matrix, vector or scalar computes the \idx{exponential} of each element, and returns the result(s) as a correspondingly sized matrix, vector or scalar.
+\end{itemize}
+
+
+\item Let \(\uv,\vv\in\RR^n\) and vector \(\uv\neq\ov\)\,, then the \bfidx{orthogonal projection} of~\vv\ onto~\uv\ is
+\(\proj_\uv(\vv):=\uv\frac{\uv\cdot\vv}{|\uv|^2}\) (\autoref{def:orthproj1}).
+When~\uv\ is a unit vector, \(\proj_\uv(\vv):=\uv(\uv\cdot\vv)\).
+
+\itemhi Let \WW\ be a \(k\)-dimensional \idx{subspace} of~\(\RR^n\) with an \idx{orthonormal basis} \(\{\hlist\wv k\}\).
+For every vector \(\vv\in\RR^n\), the \bfidx{orthogonal projection} of vector~\vv\ onto subspace~\WW\ is (\autoref{def:orthproj})
+\begin{equation*}
+\proj_\WW(\vv)=\wv_1(\wv_1\cdot\vv)+\wv_2(\wv_2\cdot\vv)+\cdots+\wv_k(\wv_k\cdot\vv).
+\end{equation*}
+
+\itemme The `\idx{least square}' solution(s) of the system \(A\xv=\bv\) determined by \autoref{pro:appsol} is(are) the solution(s) of \(A\xv=\proj_{\AA}(\bv)\) where \AA~is the \idx{column space} of~\(A\) (\autoref{thm:lsqproj}).
+
+\itemme Let \WW\ be a \(k\)-dimensional \idx{subspace} of~\(\RR^n\) with an \idx{orthonormal basis} \(\{\hlist\wv k\}\), then for every vector \(\vv\in\RR^n\), the \idx{orthogonal projection}
+\(\proj_\WW(\vv)=(W\tr W)\vv\)
+for the \(n\times k\) matrix \(W=\begin{bmatrix} \wv_1&\wv_2&\cdots&\wv_k \end{bmatrix}\) (\autoref{thm:projmat}).
+
+\item Let \WW\ be a \(k\)-dimensional \idx{subspace} of~\(\RR^n\).
+The set of all vectors \(\uv\in\RR^n\) (together with~\ov) that are each orthogonal to all vectors in~\WW\ is called the \bfidx{orthogonal complement}~\(\WW^\perp\) (\autoref{def:orthsubsp}); that is,
+\begin{equation*}
+\WW^\perp=\{\uv\in\RR^n : \uv\cdot\wv=0\text{ for all }\wv\in\WW\}.
+\end{equation*}
+
+\item For every \idx{subspace}~\WW\ of~\(\RR^n\),  the \idx{orthogonal complement}~\(\WW^\perp\) is a \idx{subspace} of~\(\RR^n\) (\autoref{thm:perpnull}).
+Further, the \idx{intersection} \(\WW\cap\WW^\perp=\{\ov\}\).
+
+\itemme For every \(m\times n\) matrix~\(A\), and denoting the column space of~\(A\) by \(\AA=\Span\{\hlist\av n\}\), the orthogonal complement \(\AA^\perp=\Null(\tr A)\) (\autoref{thm:nulltrw}).
+Further, \(\Null(A)\) is the orthogonal complement of the \idx{row space} of~\(A\).
+
+\item Let \WW\ be a \idx{subspace} of~\(\RR^n\), then \(\dim\WW+\dim\WW^\perp=n\) (\autoref{thm:orthrank}).
+
+\item Let \WW\ be a \idx{subspace} of~\(\RR^n\).
+For every vector \(\vv\in\RR^n\), the \bfidx{perpendicular component} of~\vv\  to~\WW\ is the vector
+\(\Perp_\WW(\vv):=\vv-\proj_{\WW}(\vv)\) (\autoref{def:perpn}).
+
+\item Let \WW\ be a \idx{subspace} of~\(\RR^n\), then for every vector \(\vv\in\RR^n\) the \idx{perpendicular component} \(\Perp_\WW(\vv)\in\WW^\perp\) (\autoref{thm:perpn}).
+
+\itemme Let \WW\ be a \idx{subspace} of~\(\RR^n\) and vector \(\vv\in\RR^n\), then there exist unique vectors \(\wv\in\WW\) and \(\nv\in\WW^\perp\) such that vector \(\vv=\wv+\nv\) (\autoref{thm:odt}); this  sum is called an \bfidx{orthogonal decomposition} of~\vv.
+
+\itemme For every vector~\vv\ in~\(\RR^n\), and every subspace~\WW\ in~\(\RR^n\),  \(\proj_\WW(\vv)\) is the closest vector in~\WW\ to~\vv\ (\autoref{thm:bapr}).
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Introducing linear transformations}
+
+\itemme A \idx{transformation}\slash function \(T:\RR^n\to\RR^m\) is called a \bfidx{linear transformation} if (\autoref{def:lintran})
+\begin{itemize}
+\item \(T(\uv+\vv)=T(\uv)+T(\vv)\) for all \(\uv,\vv\in\RR^n\), and
+\item \(T(c\vv)=cT(\vv)\) for all \(\vv\in\RR^n\) and all scalars~\(c\).
+\end{itemize}
+A linear transform maps the unit square to a parallelogram, a unit cube to a parallelepiped, and so on.
+
+\item Let \(A\) be any given \(m\times n\) matrix and define the transformation \(T_A:\RR^n\to\RR^m\)  by the matrix multiplication \(T_A(\xv):=A\xv\) for all \(\xv\in\RR^n\). 
+Then \(T_A\)~is a \idx{linear transformation} (\autoref{thm:mattranlin}). 
+
+\itemme For every \idx{linear transformation}  \(T:\RR^n\to\RR^m\),
+\(T\)~is the transformation corresponding to the \(m\times n\)  matrix (\autoref{thm:matlintran})
+\begin{equation*}
+A=\begin{bmatrix} T(\ev_1)& T(\ev_2)&\cdots&T(\ev_n) \end{bmatrix}.
+\end{equation*}
+This matrix~\(A\), often denoted~\([T]\), is called the \bfidx{standard matrix} of the \idx{linear transformation}~\(T\).
+
+\itemme Recall that in the context of a system of linear equations \(A\xv=\bv\) with \(m\times n\) matrix~\(A\), for every \(\bv\in\RR^m\) \autoref{pro:appsol} finds the smallest solution~\(\xv\in\RR^m\)\ (\autoref{thm:smallsoln}) to the closest consistent system \(A\xv=\tilde\bv\) (\autoref{thm:appsol}).
+\autoref{pro:appsol} forms a \idx{linear transformation} \(T:\RR^m\to\RR^n\), \(\xv=T(\bv)\)\,.
+This linear transformation has an \(n\times m\) \idx{standard matrix}~\(A^+\) called the \bfidx{pseudo-inverse}, or \bfidx{Moore--Penrose inverse}, of matrix~\(A\) (\autoref{thm:lsqlt}).
+
+\item For every \(m\times n\) matrix~\(A\) with \(\rank A=n\) (so \(m\geq n\)), the \idx{pseudo-inverse} \(A^+=(\tr AA)^{-1}\tr A\) (\autoref{thm:pseudonormal}).
+
+\item For every invertible matrix~\(A\), the pseudo-inverse \(A^+=A^{-1}\), the inverse (\autoref{thm:pinvinv}).
+
+\item Let \(T:\RR^n\to\RR^m\) and \(S:\RR^m\to\RR^p\) be \idx{linear transformation}s.  
+Then the composition \(S\circ T:\RR^n\to\RR^p\) is a \idx{linear transformation} with \idx{standard matrix} \([S\circ T]=[S][T]\) (\autoref{thm:stmatcomp}).
+
+\item Let \(S\) and \(T\) be linear transformations from \(\RR^n\) to~\(\RR^n\) (the same dimension).
+If \(S\circ T=T\circ S=I\)\,, the \idx{identity transformation}, then \(S\) and~\(T\) are \bfidx{inverse transformation}s of each other (\autoref{def:invLT}).  
+Further, we say \(S\) and~\(T\) are \bfidx{invertible}.
+
+\itemme Let \(T:\RR^n\to\RR^n\) be an \idx{invertible} \idx{linear transformation}. 
+Then its \idx{standard matrix}~\([T]\) is invertible, and \([T^{-1}]=[T]^{-1}\) (\autoref{thm:invsm}). 
+
+\end{itemize}
+
+
+
+
+
+\makeanswers

@@ -1,0 +1,188 @@
+% This templete is obtained from http://kevindonnelly.org.uk/resources/playscript.tex
+
+\documentclass[11pt,a4paper,oneside]{memoir}  % http://www.ctan.org/tex-archive/macros/latex/contrib/memoir
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{enumitem}  % http://www.ctan.org/tex-archive/macros/latex/contrib/enumitem
+\usepackage{ctex}
+
+\newlength{\drop}  % Without this, the title page will not compile correctly.
+% To avoid using drop, see: http://wiki.lyx.org/LyX/UsingMemoirInLyX
+
+\chapterstyle{demo2}  % See p92 of the Memoir manual.
+
+\pagestyle{myheadings}
+
+\setlength{\parindent}{0pt}
+
+\renewcommand{\printtoctitle}[1]{\centering\Large\bfseries Acts}  % Set the title of the contents page.
+% \renewcommand{\printtoctitle}[1]  % Remove the title from the contents page entirely.
+
+\pagenumbering{gobble} % Remove page numbers until told otherwise.
+
+% Various title pages may be used with the memoir package.  The one below is from ``Some Examples of Title Pages'' (Peter Wilson) at http://www.ctan.org/tex-archive/info/latex-samples/TitlePages.
+
+% Set up the title page.
+\newcommand*{\titleGM}{\begingroup% Gentle Madness title page style
+  \drop = 0.1\textheight
+  \vspace*{\baselineskip}
+  \vfill
+  \hbox{%
+    \hspace*{0.2\textwidth}%
+    \rule{1pt}{\textheight}
+    \hspace*{0.05\textwidth}%
+    \parbox[b]{0.75\textwidth}{
+      \vbox{%
+        % Main title of the play
+        \vspace{\drop}{\noindent\HUGE\bfseries The Rivals}\\
+        %\vspace{\drop}{\noindent\HUGE\bfseries Title of the play \\[0.5\baselineskip] over two lines}\\
+        % Subtitle of the play
+        [2\baselineskip]{\huge\itshape A Comedy}\\
+        %[2\baselineskip]{\Large\itshape Subtitle of the play \\[0.5\baselineskip] over two lines}\\
+        % Author of the play
+        [4\baselineskip]{\Large Richard Brinsley Sheridan}\par\vspace{0.5\textheight}
+        %[4\baselineskip]{\Large First Author \\[0.5\baselineskip] Second Author \\[0.5\baselineskip] Third Author \\}\par\vspace{0.5\textheight}
+        % Publisher and year of publication
+        {\noindent \textbf{John Wilkie} \\[0.5\baselineskip] \textbf{1775}}\\
+        [\baselineskip]
+      }% end of vbox
+    }% end of parbox
+  }% end of hbox
+  \vfill
+  \null
+  \endgroup}
+
+\begin{document}
+  
+  % Print out the title page.
+  \titleGM
+  
+  \pagenumbering{roman} % Start numbering pages with Roman numerals (for the front matter).
+  
+  % Print out the contents page, listing the acts of the play.
+  % You will need to run pdflatex twice before the page numbers show up.
+  \tableofcontents*
+  \clearpage
+  
+  % Print out the characters page, listing the dramatis personae
+  % The starred form of \chapter prevents a chapter number (eg ``One'', ``Two'') being printed before each chapter title (eg ``Characters'', ``Act 1'').
+  \chapter*{CHARACTERS}
+  \begin{center}  % Centre the list of characters.  Comment out this line and \end{}center if centring is not desired.
+    \textbf{Sir Anthony Absolute}, a rich nobleman \\
+    \textbf{Faulkland}, a friend of Sir Anthony's son Jack \\
+    \textbf{Lucius O'Trigger}, an Irish nobleman \\
+    \textbf{Lydia Languish}, a teenage heiress \\
+    \textbf{Mrs Malaprop}, Lydia's guardian \\
+    \vskip 1cm
+    
+    \textbf{Scene}: Bath.
+    \textbf{Time of action}: Within one day.
+  \end{center}
+  
+  % Print out a page with any additional authorial comments, notes on staging, or whatever.
+  \chapter*{PREFACE, NOTES, WHATEVER}
+  
+  % Set up a description list to hold the paragraphs.  Increase the space between the list items, and set the left margin to 0.20cm
+  \begin{description}[itemsep=1ex,leftmargin=0.20cm]
+    
+    % Precede each paragraph with an empty \item[].
+    \item[] The preface to a play seems generally to be considered as a kind of closet-prologue in which the author solicits that indulgence from the reader which he had before experienced from the audience.
+    
+    \item[] I need scarcely add that the circumstance alluded to was the withdrawing of the piece to remove those imprefections which were too obvious to escape reprehension.
+    
+    \item[] With regard to some particular passages which seemed generally disliked, I confess that if I felt any emotion of surprise at the disapprobation, it was not that they were disapproved of, but that I had not before perceived that they deserved it.
+    
+  \end{description}
+  
+  \clearpage
+  \pagenumbering{arabic}  % Start numbering pages with Arabic numerals (for the text of the play).
+  
+  % Generate a running header with the title of the play.
+  \markright{\textsc{Title of the play}}
+  
+  %%%%%%%%%%%%%%%%
+  \chapter*{ACT 1}
+  %%%%%%%%%%%%%%%%
+  % The \chapter* will prevent the the chapters (Acts) being listed in the table of contents, so we need to add them manually.
+  \addcontentsline{toc}{chapter}{Act 1}
+  
+  % The starred form of \section prevents a section number (eg ``1.1'', ``2.3'') being printed before each section title (eg ``Scene 1'', ``Scene 2'').
+  \section*{\textit{SCENE 1}}
+  %\section*{\hfill\textit{SCENE 1}}  % Use this line instead if you want the Scene 1 heading shifted to the right edge of the page.
+  
+  % Set up a description list to hold the dialogue of the scene.  Increase the space between the list items, and set the left margin to 1cm.
+  \begin{description}[itemsep=1ex,leftmargin=1cm]
+    
+    % Where the scene or act begins with stage directions:
+    \item[] \hfill \\
+    \textit{A street in Bath.  Coachman crosses the stage. Enter Fag, looking after him.}
+    
+    % Where the scene or act begins with dialogue, and no stage directions:
+    %\item[] \hfill
+    
+    % Wrap each character's name in \item[].  Wrap in-dialogue directions in \textit{}
+    \item[FAG] \textit{(calls)} What!  Thomas! \textit{(aside)} Sure 'tis he! \textit{(calls)} What!  Thomas!  Thomas!
+    
+    \item[THOMAS] Hey!  Od's life!  Mr Fag!  Give me your hand, my old fellow-servant!
+    
+    \item[FAG] Excuse my glove, Thomas.
+    
+    \item[THOMAS] Sure, and the postillion be all come!
+    
+    % Close the description list at the end of the scene.
+  \end{description}
+  \vskip 1cm  % Put a bit of space between this and the next scene heading.
+  
+  \section*{\textit{SCENE 2}}
+  \begin{description}[itemsep=1ex,leftmargin=1cm]
+    
+    % Where the scene or act begins with dialogue, and no stage directions:
+    \item[] \hfill
+    
+    \item[LYDIA] Heigh-ho!  Did you inquire for \textit{The Delicate Distress}?
+    
+    \item[LUCY] Or \textit{The Memoirs of Lady Woodford}? Yes indeed, ma'am.  I asked everywhere for it; and I might have brought it from Mr Frederick's, but Lady Slattern Lounger, who had just sent it home, had so spoiled and dog's-eared it, it wa'n't fit for a Christian to read.
+    
+  \end{description}
+  \vskip 1cm
+  
+  
+  %%%%%%%%%%%%%%%%
+  \chapter*{ACT 2}
+  %%%%%%%%%%%%%%%%
+  \addcontentsline{toc}{chapter}{Act 2}
+  
+  \section*{\hfill\textit{SCENE 1}}  % The \hfill will shift the scene heading to the right edge of the page.
+  \begin{description}[itemsep=1ex,leftmargin=1cm]
+    \setlength{\parskip}{5pt}
+    
+    \item[] \hfill \\
+    \textit{Absolute's lodgings.}
+    
+    \item[FAG] Sir, while I was there, Sir Anthony came in.  I told him you had sent me to inquire after his health, and to know if he was at leisure to see you.
+    
+    \item[ABSOLUTE] And what did he say on hearing I was at Bath?
+    
+    \item[FAG] Sir, in my life I never saw an elderly gentleman more astonished!
+    
+  \end{description}
+  \vskip 1cm
+  
+  \section*{\hfill\textit{SCENE 2}}
+  \begin{description}[itemsep=1ex,leftmargin=1cm]
+    \setlength{\parskip}{5pt}
+    
+    \item[] \hfill \\
+    \textit{The North Parade.}
+    
+    \item[LUCY] So, I shall have another rival to add to my mistress's list, Captain Absolute.
+    
+    \item[SIR LUCIUS] Hah! My little embassadress!
+    
+    \item[LUCY] \textit{(speaking simply)} O gemini!  And I have been waiting for your worship here on the North.
+    
+  \end{description}
+  \vskip 1cm
+  
+  
+\end{document}

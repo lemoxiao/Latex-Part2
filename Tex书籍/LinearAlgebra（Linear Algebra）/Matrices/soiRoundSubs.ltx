@@ -1,0 +1,21 @@
+% needs \usepackage{pgfplotstable}
+\pgfplotstableread{
+    1.00   -0.36    0.33   -0.25   -0.31
+    2.00   -0.34   -0.25    0.44    0.17
+    3.00    0.08   -0.45   -0.46    0.05
+    4.00    0.40   -0.01    0.27   -0.42
+    5.00    0.24    0.32   -0.04    0.48
+    6.00   -0.32    0.40   -0.20   -0.29
+    7.00   -0.39   -0.19    0.40    0.21
+    8.00    0.00   -0.48   -0.43    0.01
+    9.00    0.41   -0.11    0.28   -0.38
+   10.00    0.32    0.30   -0.07    0.43
+} \temp
+\begin{tikzpicture} 
+\begin{axis}[xlabel={year relative to start of window}
+,ylabel={\soi\ basis vectors (shifted)}]
+\foreach \p in {1,2,3,4} {
+  \addplot+[mark=*] table[x index=0,y expr=\thisrowno{\p}+(\p-1)] {\temp};
+}
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,54 @@
+% cgd-math.def : Math-related definitions
+% vim:ft=tex
+
+% Bold math
+\providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
+
+% Roman type super/sub-scripts
+\providecommand*{\ped}[1]{\ensuremath{_\mathrm{#1}}}
+\providecommand*{\ap}[1]{\ensuremath{^\mathrm{#1}}}
+
+% Encircled character
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+%%%% Math symbols
+
+% The constant 'e'
+\providecommand*{\eu}{\ensuremath{\mathrm{e}}}
+% The imaginary unit 
+\providecommand*{\iu}{\ensuremath{\mathrm{j}}}
+
+\DeclareMathAccent{\ring}{\mathalpha}{operators}{"17}
+% Angstrom
+\providecommand*{\angs}{\ensuremath{\smash{\mathrm{\ring A}}}}
+% Ohm
+\providecommand*{\ohm}{\ensuremath{\mathrm{\ring A}}}
+% Degree
+\providecommand*{\degree}{\ensuremath{^\circ}}
+
+% New operators
+\providecommand{\newoperator}[3]{\newcommand*{#1}{\mathop{#2}#3}}
+\providecommand{\renewoperator}[3]{\renewcommand*{#1}{\mathop{#2}#3}}
+
+% Derivatives
+\providecommand*{\diff}{\@ifnextchar^{\DIfF}{\DIfF^{}}}
+\def\DIfF^#1{\mathop{\mathrm{\mathstrut d}}\nolimits^{#1}\gobblespace}
+\def\gobblespace{\futurelet\diffarg\opspace}
+\def\opspace{%
+        \let\DiffSpace\!%
+        \ifx\diffarg(%
+                \let\DiffSpace\relax
+        \else
+                \ifx\diffarg[%
+                        \let\DiffSpace\relax
+                \else
+                        \ifx\diffarg\{%
+                                \let\DiffSpace\relax
+        \fi\fi\fi\DiffSpace}
+\providecommand*{\deriv}[3][]{\frac{\diff^{#1}#2}{\diff #3^{#1}}}
+\providecommand*{\pDeriv}[3][]{\frac{\partial^{#1}#2}{\partial #3^{#1}}}
+
+\endinput
+
+

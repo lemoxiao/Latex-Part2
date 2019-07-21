@@ -1,0 +1,31 @@
+load(ctensor);
+ct_coords:[t,r,theta,phi];
+/* Rindler, p. 337 */
+phi_t:2*L/r*sin(theta)^2; /* munging either the exponent of r or the exponent of sin theta gives linear L terms in Gphit; changing
+                                sin theta exponent doesn't actually hurt Gtt that much; increasing exp of r helps...because the
+                                approx element phi_t gets smaller!*/
+lg:matrix([(1-2*m/r),0,0,phi_t],
+          [0,-1/(1-2*m/r),0,0],
+          [0,0,-r^2,0],
+          [phi_t,0,0,-r^2*sin(theta)^2]);
+cmetric();   
+einstein(true);
+/* taylor(taylor(ein[4,1]*r^7,L,0,3),r,0,1)/r^7; */
+taylor(ein[1,1],L,0,3); 
+taylor(ein[2,2],L,0,3); 
+taylor(ein[3,3],L,0,3); 
+taylor(ein[1,4],L,0,3); 
+taylor(ein[2,3],L,0,3); 
+/*
+u:sqrt(ein[1,1]^2+ein[2,2]^2+ein[3,3]^2+ein[1,4]^2+ein[2,3]^2);
+taylor(u,L,0,3);
+*/
+/*
+taylor(ein[1,4],L,0,3); 
+taylor(ein[4,1],L,0,3); 
+ein[1,4]-ein[4,1];
+*/
+/*
+taylor(ein[1,1],L,0,3); 
+*/
+christof(mcs);

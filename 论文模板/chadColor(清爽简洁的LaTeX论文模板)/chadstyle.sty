@@ -1,0 +1,113 @@
+%  chadstyle.sty   Chad Jones, 5/1/08
+%
+%  Chad's style file for nice paper format.
+%  Various ideas for this style are taken from
+%    -- Matthias Doepke and Michele Tertilt
+%    -- Tony Roberts
+
+\special{papersize=8.5in,11in}
+%\usepackage{palatino,amssymb,amsfonts,amsmath,latexsym,setspace}
+\usepackage{utopia,amssymb,amsfonts,amsmath,latexsym,setspace}
+\usepackage[dvips]{graphicx}
+\usepackage{natbib,fancyhdr}
+
+
+% example file to change the style of LaTeX
+% Tony Roberts May 2004
+% first colour for latex or pdflatex
+\ifx\pdfoutput\@undefined\usepackage[usenames,dvips]{color}
+\else\usepackage[usenames,dvipsnames]{color}
+% and fix pdf colour problems
+\IfFileExists{pdfcolmk.sty}{\usepackage{pdfcolmk}}{} 
+\fi
+
+% Chad's colors:
+% See http://web.njit.edu/~kevin/rgb.txt.html for possibilities
+\definecolor{ChadDarkBlue}{rgb}{.1,0,.2}  
+\definecolor{ChadBlue}{rgb}{.1,.1,.5}  
+\definecolor{ChadRoyal}{rgb}{.2,.2,.8}  
+%\definecolor{ChadGreen}{rgb}{0,.35,.1}
+%\definecolor{ChadGreen}{rgb}{0,.5,.25}  % Too bright
+%\definecolor{ChadGreen}{rgb}{0,.4,.2}    % Still too bright
+\definecolor{ChadGreen}{rgb}{0,.4,0}    % Dark Green
+%\definecolor{ChadRed}{rgb}{.8,.1,.2}    % Too bright
+\definecolor{ChadRed}{rgb}{.5,0,.5}  % purple
+
+%%% HYPERLINKS %%%%%%%%%%%%%%%%%%%%%
+\usepackage[colorlinks,ps2pdf,breaklinks,
+     bookmarks=false,
+     pdfstartview=Fit,  % for fitting entire page; FitW just fits width
+     pdfview=Fit,       % after traversing a hyperlink
+     linkcolor=ChadRed,
+     urlcolor=ChadGreen,
+     citecolor=Black,
+     hyperfootnotes=false
+         ]{hyperref}
+\usepackage[figure,table]{hypcap} % Correct a problem with hyperref
+\urlstyle{rm} %so it doesn't use a typewriter font for url's.
+
+%%%%%%%%%%%%%%%%%%%%%
+
+
+% Fix title, sections, etc.
+
+\let\LaTeXtitle\title
+\renewcommand{\title}[1]{\LaTeXtitle{\color{ChadBlue}{\LARGE #1}}}
+\renewcommand{\abstractname}{\color{ChadBlue}Abstract}
+\renewcommand{\figurename}{\color{ChadBlue}Figure}
+\renewcommand{\tablename}{\color{ChadBlue}Table}
+
+\let\LaTeX@startsection\@startsection 
+\renewcommand{\@startsection}[6]{\LaTeX@startsection%
+{#1}{#2}{#3}{#4}{#5}{\color{ChadBlue}\raggedright #6}} 
+
+% Fix periods at end of section numbers 
+\renewcommand \thesection {\@arabic\c@section.}
+\renewcommand\thesubsection   {\thesection\@arabic\c@subsection.}
+\renewcommand\thesubsubsection{\thesubsection \@arabic\c@subsubsection.}
+
+
+% Margin, Paragraph Setup
+\onehalfspacing
+\textheight=21.5cm \textwidth=14.95cm \topmargin=-5.5mm
+\oddsidemargin=8mm \evensidemargin=8mm
+%\setlength{\parindent}{0em} 
+%\setlength{\parskip}{1.5ex plus0.5ex minus0.5ex}
+%\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
+
+% This is how to control linespacing using setspace
+% (\singlespacing or doublespacing just call this command)
+\setstretch{1.4}
+
+%% Setting up page headers
+\pagestyle{fancy}
+\rhead[]{\thepage}
+\lhead[\thepage]{}
+\cfoot[]{} 
+\renewcommand{\headrulewidth}{0pt}
+
+\newcommand{\runningheads}[2]{
+   \chead[\color{ChadGreen}{\uppercase {\footnotesize #1}}]  % Author page header
+   {\color{ChadGreen}{\uppercase {\footnotesize #2}}}  % Short title
+  }
+
+% Make hyperlinks jump more accurately
+\makeatletter
+\newcommand\org@hypertarget{}
+\let\org@hypertarget\hypertarget
+\renewcommand\hypertarget[2]{%
+\Hy@raisedlink{\org@hypertarget{#1}{}}#2%
+} \makeatother 
+
+
+% Spacing in Tables and Figures
+%\renewcommand{\tabcolsep}{1pt}   % space between columns
+\renewcommand{\arraystretch}{1.5} % space between rows
+\addtolength{\textfloatsep}{0pt} % space between floats and text
+\addtolength{\abovecaptionskip}{0pt} % space above caption
+\addtolength{\belowcaptionskip}{.15in} % space below caption
+
+\newcommand{\spc}[0]{\vspace{.1in}}
+\newcommand{\fignote}[2]{\begin{center}\parbox[c]{#1}{\footnotesize #2} \end{center}}
+\newcommand{\tabnote}[2]{\begin{center}\parbox[c]{#1}{\footnotesize #2} \end{center}}

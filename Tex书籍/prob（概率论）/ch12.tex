@@ -1,0 +1,1070 @@
+% Modified on 6-4-05.
+
+%\setcounter{chapter}{11}
+
+\chapter{Random Walks}\label{chp 12}  
+
+\section{Random Walks in Euclidean Space}\label{sec 12.1}
+
+\par
+In the last several chapters, we have studied sums of random variables with the goal being
+to describe the distribution and density functions of the sum.  In this chapter, we shall look
+at sums of discrete random variables from a different perspective.  We shall be concerned with
+properties which can be associated with the sequence of partial sums, such as the number of
+sign changes of this sequence, the number of terms in the sequence which equal 0, and the
+expected size of the maximum term in the sequence.
+\par
+We begin with the following definition.
+\begin{definition} 
+ Let $\{X_k\}_{k = 1}^\infty$ be a sequence of independent, identically distributed discrete
+random variables.  For each positive integer $n$, we let $S_n$ denote the sum $X_1 + X_2 +
+\cdots + X_n$.  The sequence $\{S_n\}_{n = 1}^\infty$ is called a \emx {random
+walk.\index{random walk}}  If the common range of the $X_k$'s is ${\mathbf R}^m$, then we say that
+$\{S_n\}$ is a random walk in ${\mathbf R}^m$.
+\end{definition} 
+\par
+We view the sequence of $X_k$'s as being the outcomes of independent experiments.  Since the
+$X_k$'s are independent, the probability of any particular (finite) sequence of outcomes can be
+obtained by multiplying the probabilities that each $X_k$ takes on the specified value in the
+sequence.  Of course, these individual probabilities are given by the common distribution of the
+$X_k$'s.  We will typically be interested in finding probabilities for events involving the
+related sequence of $S_n$'s.  Such events can be described in terms of the $X_k$'s, so their
+probabilities can be calculated using the above idea.
+\par
+There are several ways to visualize a random walk.  One can imagine that a particle is
+placed at the origin in ${\mathbf R}^m$ at time $n = 0$.  The sum $S_n$ represents the position of
+the particle at the end of $n$ seconds.  Thus, in the time interval $[n-1, n]$, the particle
+moves (or jumps) from position $S_{n-1}$ to $S_{n}$.  The vector representing this motion is just
+$S_n - S_{n-1}$, which equals $X_n$.  This means that in a random walk, the jumps are
+independent and identically distributed.  If $m = 1$, for example, then one can imagine a 
+particle on the real line that starts at the origin, and at the end of each second, jumps one
+unit to the right or the left, with probabilities given by the distribution of the $X_k$'s.  If
+$m = 2$, one can visualize the process as taking place in a city in which the streets form square
+city blocks.  A person starts at one corner (i.e., at an intersection of two streets) and goes in
+one of the four possible directions according to the distribution of the $X_k$'s.  If $m = 3$,
+one might imagine being in a jungle gym, where one is free to move in any one of six directions
+(left, right, forward, backward, up, and down).  Once again, the probabilities of these movements
+are given by the distribution of the $X_k$'s.
+\par
+Another model of a random walk (used mostly in the case where the range is ${\mathbf R}^1$) is a
+game, involving two people, which consists of a sequence of independent,
+identically distributed moves.  The sum $S_n$ represents the score of the first person, say,
+after $n$ moves, with the assumption that the score of the second person is $-S_n$.  For
+example, two people might be flipping coins, with a match or non-match representing $+1$ or $-1$,
+respectively, for the first player.  Or, perhaps one coin is being flipped, with a head or tail
+representing $+1$ or $-1$, respectively, for the first player.
+\subsection*{Random Walks on the Real Line}
+We shall first consider the simplest non-trivial case
+of a random walk in ${\mathbf R}^1$, namely the case where the common distribution function of
+the random variables $X_n$ is  given by
+$$
+f_X(x) = \left \{ \begin{array}{ll}
+                        1/2, & \mbox{if $x = \pm 1,$} \\
+                          0, & \mbox{otherwise.} 
+                  \end{array}
+         \right.  
+$$
+This situation corresponds to a fair coin being flipped, with $S_n$ representing the number of
+heads minus the number of tails which occur in the first $n$ flips.  We note that in this
+situation, all paths of length $n$ have the same probability, namely $2^{-n}$.
+\par
+It is sometimes instructive to represent a random walk as a polygonal line, or path, in
+the plane, where the horizontal axis represents time and the vertical axis represents the value
+of $S_n$.  Given a sequence $\{S_n\}$ of partial sums, we first plot the points $(n, S_n)$, and
+then for each $k < n$, we connect $(k, S_k)$ and $(k+1, S_{k+1})$ with a straight line segment.
+The \emx {length} of a path is just the difference in the time values of the beginning
+and  ending points on the path.  The reader is referred to Figure \ref{fig 12.1}.  This
+figure, and the process it illustrates, are identical with the example, given in Chapter
+1, of two people playing heads or tails.
+\putfig{3.5truein}{PSfig1-3}{A random walk of length 40.}{fig 12.1}
+\subsection*{Returns and First Returns}
+We say that an \emx {equalization}\index{equalization} has occurred, or there is a \emx {return
+to the origin}\index{return to the origin} at time $n$, if $S_n = 0$.  We note that this can only
+occur if $n$ is an even integer.  To  calculate the probability of an equalization at time $2m$,
+we  need only count the number of paths of length
+$2m$ which begin and end at the origin.  The number of such paths is clearly
+$${2m \choose m}\ .$$
+Since each path has probability $2^{-2m}$, we have the following theorem.
+\begin{theorem}\label{thm 12.1.1} 
+The probability of a return to
+the origin at time $2m$ is given by 
+$$u_{2m} = {2m \choose m}2^{-2m}\ .$$
+The probability of a return to the origin at an odd time is 0.
+\end{theorem}%\endthm
+A random walk is said to have a \emx {first return} to the origin\index{first return to the
+origin} \index{return to the origin!first} at time
+$2m$ if
+$m > 0$, and
+$S_{2k} \ne 0$ for all $k < m$.  In Figure~\ref{fig 12.1}, the first return occurs at time 2. 
+We define $f_{2m}$ to be the probability of this event.  (We also define $f_0 = 0$.)  One can think of
+the expression
+$f_{2m}2^{2m}$ as the number of paths of length
+$2m$ between the points $(0, 0)$ and $(2m, 0)$ that do not touch the horizontal axis except at
+the endpoints.  Using this idea, it is easy to prove the following theorem.
+\begin{theorem}\label{thm 12.1.2} 
+For $n \ge 1$, the probabilities $\{u_{2k}\}$ and $\{f_{2k}\}$ are related by the equation
+$$u_{2n} = f_0 u_{2n} + f_2 u_{2n-2} + \cdots + f_{2n}u_0\ .$$
+\proof
+There are $u_{2n}2^{2n}$ paths of length $2n$ which have endpoints $(0, 0)$ and $(2n, 0)$.  The
+collection of such paths can be partitioned into $n$ sets, depending upon the time of the
+first return to the origin.  A path in this collection which has a first return to the origin
+at time $2k$ consists of an initial segment from $(0, 0)$ to $(2k, 0)$, in which no interior
+points are on the horizontal axis, and a terminal segment from $(2k, 0)$ to $(2n, 0)$, with no
+further restrictions on this segment.  Thus, the number of paths in the collection which have a
+first return to the origin at time $2k$ is given by
+$$f_{2k}2^{2k}u_{2n-2k}2^{2n-2k} = f_{2k}u_{2n-2k}2^{2n}\ .$$
+If we sum over $k$, we obtain the equation
+$$u_{2n}2^{2n} = f_0u_{2n} 2^{2n} + f_2u_{2n-2}2^{2n} + \cdots + f_{2n}u_0 2^{2n}\ .$$
+Dividing both sides of this equation by $2^{2n}$ completes the proof.
+\end{theorem}
+The expression in the right-hand side of the above theorem should remind the reader of a sum
+that appeared in Definition~\ref{defn 7.1} of the convolution of two distributions.  The
+convolution of two sequences is defined in a similar manner.  The above theorem says that the
+sequence $\{u_{2n}\}$ is the convolution of itself and the sequence
+$\{f_{2n}\}$.  Thus, if we represent each of these sequences by an ordinary generating
+function, then we can use the above relationship to determine the value $f_{2n}$.
+\begin{theorem}\label{thm 12.1.3}
+For $m \ge 1$, the probability of a first return to the origin at time $2m$ is given by
+$$f_{2m} = {{u_{2m}}\over{2m-1}} = {{2m \choose m}\over{(2m-1)2^{2m}}}\ .$$
+\proof
+We begin by defining the generating functions
+$$U(x) = \sum_{m = 0}^\infty u_{2m}x^m$$
+and
+$$F(x) = \sum_{m = 0}^\infty f_{2m}x^m\ .$$
+Theorem~\ref{thm 12.1.2} says that
+\begin{equation} 
+U(x) = 1 + U(x)F(x)\ .
+\label{eq 12.1.1}  
+\end{equation} 
+(The presence of the 1 on the right-hand side is due to the fact that $u_0$ is defined to be 1,
+but Theorem~\ref{thm 12.1.2} only holds for $m \ge 1$.)  We note that both generating functions
+certainly converge on the interval $(-1, 1)$, since all of the coefficients are at most 1 in
+absolute value.  Thus, we can solve the above equation for $F(x)$, obtaining
+$$F(x) = {{U(x) - 1}\over{U(x)}}\ .$$
+Now, if we can find a closed-form expression for the function $U(x)$, we will also have a
+closed-form expression for $F(x)$.  From Theorem~\ref{thm 12.1.1}, we have
+$$U(x) = \sum_{m = 0}^\infty {2m \choose m}2^{-2m}x^m\ .$$
+In Wilf,\footnote{H.~S.~Wilf, \emx {Generatingfunctionology,}\index{WILF, H. S.}
+(Boston: Academic Press, 1990), p. 50.} we find that
+$${1\over{\sqrt {1 - 4x}}} = \sum_{m = 0}^\infty {2m \choose m} x^m\ .$$
+The reader is asked to prove this statement in Exercise~\ref{exer 12.1.1}.  If we replace $x$ by $x/4$
+in the last equation, we see that
+$$U(x) = {1\over{\sqrt {1-x}}}\ .$$
+Therefore, we have
+\begin{eqnarray*}
+F(x) &=& {{U(x) - 1}\over{U(x)}}\\
+     &=& {{(1-x)^{-1/2} - 1}\over{(1-x)^{-1/2}}}\\
+     &=& 1 - (1-x)^{1/2}\ . 
+\end{eqnarray*}
+
+Although it is possible to compute the value of $f_{2m}$ using the Binomial Theorem, it is
+easier to note that $F'(x) = U(x)/2$, so that the coefficients $f_{2m}$ can be found by
+integrating the series for $U(x)$.  We obtain, for $m \ge 1$,
+
+\begin{eqnarray*}
+f_{2m} &=& {u_{2m-2}\over{2m}}\\
+       &=& {2m-2 \choose m-1}\over{m2^{2m-1}}\\
+       &=& {2m \choose m}\over{(2m-1)2^{2m}}\\
+       &=& {u_{2m}\over{2m-1}}\ ,
+\end{eqnarray*}
+
+since
+$${2m-2 \choose m-1} = {m\over{2(2m-1)}}{2m\choose m}\ .$$
+This completes the proof of the theorem.
+\end{theorem}
+\subsection*{Probability of Eventual Return}\index{return to the origin!probability of eventual}
+In the symmetric random walk process in ${\mathbf R}^m$, what is the probability that the particle
+eventually returns to the origin?  We first examine this question in the case that $m = 1$, and
+then we consider the general case.  The results in the next two examples are due to
+P\'olya.\footnote{G.~P\'olya, ``\"Uber eine Aufgabe der Wahrscheinlichkeitsrechnung betreffend
+die Irrfahrt im Strassennetz,'' Math. Ann., vol.~84 (1921), pp. 149-160.}\index{P\'OLYA, G.}
+\begin{example}\label{exam 12.1.0.5}(Eventual Return in ${\mathbf R}^1$)
+One has to approach the idea of eventual return with some care, since the
+sample space seems to be the set of all walks of infinite length, and this set is
+non-denumerable.  To avoid difficulties, we will define $w_n$ to be the probability that a first
+return has occurred no later than time $n$.  Thus, $w_n$ concerns the sample space of all walks
+of length $n$, which is a finite set.  In terms of the $w_n$'s, it is reasonable to define the
+probability that the particle eventually returns to the origin to be 
+$$w_* = \lim_{n \rightarrow \infty} w_n\ .$$
+This limit clearly exists and is at most one, since the sequence $\{w_n\}_{n = 1}^\infty$ is an
+increasing sequence, and all of its terms are at most one.  
+\par
+In terms of the $f_n$ probabilities, we see that
+$$w_{2n} = \sum_{i = 1}^n f_{2i}\ .$$
+Thus, 
+$$w_* = \sum_{i = 1}^\infty f_{2i}\ .$$
+In the proof of Theorem~\ref{thm 12.1.3}, the generating function 
+$$F(x) = \sum_{m = 0}^\infty f_{2m}x^m$$ 
+was introduced.  There it was noted that this series converges for $x \in (-1, 1)$.  In fact, it
+is possible to show that this series also converges for $x = \pm 1$ by using Exercise~\ref{exer
+12.1.4}, together with the fact that
+$$f_{2m} = {{u_{2m}}\over{2m-1}}\ .$$
+(This fact was proved in the proof of Theorem~\ref{thm 12.1.3}.)  Since we also know that 
+$$F(x) = 1 - (1-x)^{1/2}\ ,$$
+we see that 
+$$w_* = F(1) = 1\ .$$
+Thus, with probability one, the particle returns to the origin.
+\par
+An alternative proof of the fact that $w_* = 1$ can be obtained by using the
+results in Exercise~\ref{exer 12.1.2}.
+\end{example}
+\par
+\begin{example}\label{exam 12.1.0.6}(Eventual Return in ${\mathbf R}^m$)
+We now turn our attention to the case that the random walk takes place in more than one dimension.
+We define $f^{(m)}_{2n}$ to be the probability that the first return to the origin in ${\mathbf
+R}^m$ occurs at time $2n$.  The quantity $u^{(m)}_{2n}$ is defined in a similar manner.  Thus,
+$f^{(1)}_{2n}$ and $u^{(1)}_{2n}$ equal $f_{2n}$ and $u_{2n}$, which were defined earlier.  If,
+in addition, we define $u^{(m)}_0 = 1$ and $f^{(m)}_0 = 0$, then one can mimic the proof of
+Theorem~\ref{thm 12.1.2}, and show that for all $m \ge 1$,
+\begin{equation}
+u^{(m)}_{2n} = f^{(m)}_0 u^{(m)}_{2n} + f^{(m)}_2 u^{(m)}_{2n-2} + \cdots +
+f^{(m)}_{2n}u^{(m)}_0\ .
+\label{eq 12.1.1.5}
+\end{equation}
+\par
+We continue to generalize previous work by defining
+$$U^{(m)}(x) = \sum_{n = 0}^\infty u^{(m)}_{2n} x^n$$
+and
+$$F^{(m)}(x) = \sum_{n = 0}^\infty f^{(m)}_{2n} x^n\ .$$
+Then, by using Equation~\ref{eq 12.1.1.5}, we see that
+$$U^{(m)}(x) = 1 + U^{(m)}(x) F^{(m)}(x)\ ,$$
+as before.  These functions will always converge in the interval $(-1, 1)$, since all of their
+coefficients are at most one in magnitude.  In fact, since 
+$$w^{(m)}_* = \sum_{n = 0}^\infty f^{(m)}_{2n} \le 1$$
+for all $m$, the series for $F^{(m)}(x)$ converges at $x = 1$ as well, and $F^{(m)}(x)$ is
+left-continuous at $x = 1$, i.e., 
+$$\lim_{x \uparrow 1} F^{(m)}(x) = F^{(m)}(1)\ .$$
+Thus, we have
+\begin{equation}
+w^{(m)}_* = \lim_{x \uparrow 1} F^{(m)}(x) = \lim_{x \uparrow 1} 
+\frac{U^{(m)}(x) - 1}{U^{(m)}(x)}\ ,
+\label{eq 12.1.1.6}
+\end{equation}
+so to determine $w^{(m)}_*$, it suffices to determine 
+$$\lim_{x \uparrow 1} U^{(m)}(x)\ .$$
+We let $u^{(m)}$ denote this limit.
+\par
+We claim that 
+$$u^{(m)} = \sum_{n = 0}^\infty u^{(m)}_{2n}\ .$$
+(This claim is reasonable; it says that to find out what happens to the function $U^{(m)}(x)$ at
+$x = 1$, just let $x = 1$ in the power series for $U^{(m)}(x)$.)  To prove the claim, we note
+that the coefficients $u^{(m)}_{2n}$ are non-negative, so $U^{(m)}(x)$ increases monotonically on
+the interval $[0, 1)$.  Thus, for each $K$, we have
+$$\sum_{n = 0}^K u^{(m)}_{2n} \le \lim_{x \uparrow 1} U^{(m)}(x) = u^{(m)} \le \sum_{n = 0}^\infty
+u^{(m)}_{2n}\ .$$
+By letting $K \rightarrow \infty$, we see that
+$$u^{(m)} = \sum_{2n}^\infty u^{(m)}_{2n}\ .$$
+This establishes the claim.
+\par
+From Equation~\ref{eq 12.1.1.6}, we see that if $u^{(m)} < \infty$, then the probability of an
+eventual return is
+$$\frac {u^{(m)} - 1}{u^{(m)}}\ ,$$
+while if $u^{(m)} = \infty$, then the probability of eventual return is 1.
+\par
+To complete the example, we must estimate the sum
+$$\sum_{n = 0}^\infty u^{(m)}_{2n}\ .$$  
+In Exercise~\ref{exer 12.1.12}, the reader is asked to show that
+$$u^{(2)}_{2n} = \frac 1 {4^{2n}} {{2n}\choose n}^2\ .$$
+Using Stirling's Formula, it is easy to show that (see Exercise~\ref{exer 12.1.13})
+$${{2n}\choose n} \sim \frac {2^{2n}}{\sqrt {\pi n}}\ ,$$
+so
+$$u^{(2)}_{2n} \sim \frac 1{\pi n}\ .$$
+From this it follows easily that
+$$\sum_{n = 0}^\infty u^{(2)}_{2n}$$
+diverges, so $w^{(2)}_* = 1$, i.e., in ${\mathbf R}^2$, the probability of an eventual return is
+1.
+\par
+When $m = 3$, Exercise~\ref{exer 12.1.12} shows that
+$$u^{(3)}_{2n} = \frac 1{2^{2n}}{{2n}\choose n} \sum_{j,k} 
+\biggl(\frac 1{3^n}\frac{n!}{j!k!(n-j-k)!}\biggr)^2\ .$$
+Let $M$ denote the largest value of 
+$$\frac 1{3^n}\frac {n!}{j!k!(n - j - k)!}\ ,$$
+over all non-negative values of $j$ and $k$ with $j + k \le n$.  It is easy, using Stirling's
+Formula, to show that 
+$$M \sim \frac cn\ ,$$
+for some constant $c$.  Thus, we have
+$$u^{(3)}_{2n} \le \frac 1{2^{2n}}{{2n}\choose n} \sum_{j,k} 
+\biggl(\frac M{3^n}\frac{n!}{j!k!(n-j-k)!}\biggr)\ .$$
+Using Exercise~\ref{exer 12.1.14}, one can show that the right-hand expression is at most
+$$\frac {c'}{n^{3/2}}\ ,$$
+where $c'$ is a constant.  Thus,
+$$\sum_{n = 0}^\infty u^{(3)}_{2n}$$
+converges, so $w^{(3)}_*$ is strictly less than one.  This means that in ${\mathbf R}^3$, the
+probability of an eventual return to the origin is strictly less than one (in fact, it is
+approximately .34).
+\par
+One may summarize these results by stating that one should not get drunk in more than two
+dimensions.
+\end{example}
+
+\subsection*{Expected Number of Equalizations}
+We now give another example of the use of generating functions to find a general formula for
+terms in a sequence, where the sequence is related by recursion relations to other sequences.
+Exercise~\ref{exer 12.1.9} gives still another example.
+\begin{example}(Expected Number of Equalizations)\label{exam
+12.1.1}\index{equalizations!expected number of} 
+In this example, we will derive a formula for the expected number of equalizations in a random
+walk of length $2m$.  As in the proof of Theorem~\ref{thm 12.1.3}, the method has four main parts. 
+First, a recursion is found which relates the $m$th term in the unknown sequence to earlier
+terms in the same sequence and to terms in other (known) sequences.  An example of such
+a recursion is given in Theorem~\ref{thm 12.1.2}.  Second, the recursion is used to derive a
+functional equation involving the generating functions of the unknown sequence and one or more
+known sequences.  Equation~\ref{eq 12.1.1} is an example of such a functional equation.  Third, the
+functional equation is solved for the unknown generating function.  Last, using a device such
+as the Binomial Theorem, integration, or differentiation, a formula for the $m$th coefficient
+of the unknown generating function is found.
+\par
+We begin by defining $g_{2m}$ to be the number of equalizations among all of the random walks
+of length $2m$.  (For each random walk, we disregard the equalization at time 0.)  We
+define $g_0 = 0$.  Since  the number of walks of length $2m$ equals $2^{2m}$, the expected number
+of equalizations among all such random walks is $g_{2m}/2^{2m}$.  Next, we define
+the generating function
+$G(x)$:
+$$G(x) = \sum_{k = 0}^\infty g_{2k}x^k\ .$$
+Now we need to find a recursion which relates the sequence $\{g_{2k}\}$ to one or both of the
+known sequences $\{f_{2k}\}$ and $\{u_{2k}\}$.  We consider $m$ to be a fixed positive integer,
+and consider the set of all paths of length $2m$ as the disjoint union
+$$ E_2 \cup E_4 \cup \cdots \cup E_{2m} \cup H\ ,$$
+where $E_{2k}$ is the set of all paths of length $2m$ with first equalization at time $2k$,
+and $H$ is the set of all paths of length $2m$ with no equalization.  It is easy to show (see
+Exercise~\ref{exer 12.1.3}) that
+$$|E_{2k}| = f_{2k} 2^{2m}\ .$$
+We claim that the number of equalizations among all paths belonging to the set $E_{2k}$ is equal
+to 
+\begin{equation}
+|E_{2k}| + 2^{2k} f_{2k} g_{2m - 2k}\ .
+\label{eq 12.1.2}  
+\end{equation}
+Each path in $E_{2k}$ has one equalization at time $2k$, so the total number of such
+equalizations is just $|E_{2k}|$.  This is the first summand in expression Equation~\ref{eq 12.1.2}. 
+There are $2^{2k} f_{2k}$ different initial segments of length $2k$ among the paths in
+$E_{2k}$.  Each of these initial segments can be augmented to a path of length $2m$ in
+$2^{2m-2k}$ ways, by adjoining all possible paths of length $2m - 2k$.  The
+number of equalizations obtained by adjoining all of these paths to any one initial segment is
+$g_{2m - 2k}$, by definition.  This gives the second summand in Equation~\ref{eq 12.1.2}.  Since $k$
+can range from 1 to $m$, we obtain the recursion
+\begin{equation}  
+g_{2m} = \sum_{k = 1}^m \Bigl(|E_{2k}| + 2^{2k}f_{2k}g_{2m - 2k}\Bigr)\ .
+\label{eq 12.1.3}  
+\end{equation}                                                                        
+\par
+The second summand in the typical term above should remind the reader of a convolution.  In
+fact, if we multiply the generating function $G(x)$ by the generating function 
+$$F(4x) = \sum_{k = 0}^\infty 2^{2k}f_{2k} x^k\ ,$$
+the coefficient of $x^m$ equals
+$$\sum_{k = 0}^m 2^{2k}f_{2k}g_{2m-2k}\ .$$
+Thus, the product $G(x)F(4x)$ is part of the functional equation that we are seeking.  The
+first summand in the typical term in Equation~\ref{eq 12.1.3} gives rise to the sum
+$$2^{2m}\sum_{k = 1}^m f_{2k}\ .$$
+From Exercise~\ref{exer 12.1.2}, we see that this sum is just $(1 - u_{2m})2^{2m}$.    Thus, we need to
+create a generating function whose $m$th coefficient is this term; this generating function is
+$$\sum_{m = 0}^\infty (1- u_{2m})2^{2m} x^m\ ,$$
+or
+$$\sum_{m = 0}^\infty 2^{2m} x^m - \sum_{m = 0}^\infty u_{2m}2^{2m} x^m\ .$$
+The first sum is just $(1-4x)^{-1}$, and the second sum is $U(4x)$.  So, the functional
+equation which we have been seeking is
+$$G(x) = F(4x)G(x) + {1\over{1-4x}} - U(4x)\ .$$
+If we solve this recursion for $G(x)$, and simplify, we obtain
+\begin{equation}  
+G(x) = {1\over{(1-4x)^{3/2}}} - {1\over{(1-4x)}}\ .
+\label{eq 12.1.4}  
+\end{equation}                                                                        
+\par
+We now need to find a formula for the coefficient of $x^m$.  The first summand in 
+Equation~\ref{eq 12.1.4} is $(1/2)U'(4x)$, so the coefficient of $x^m$ in this function is
+$$u_{2m+2} 2^{2m+1}(m+1)\ .$$
+The second summand in Equation~\ref{eq 12.1.4} is the sum of a geometric series with common 
+ratio $4x$, so the coefficient of $x^m$ is $2^{2m}$.  Thus, we obtain
+
+\begin{eqnarray*}
+g_{2m} &=& u_{2m+2}2^{2m+1}(m+1) - 2^{2m}\\
+       &=& {1\over 2}{{2m+2} \choose {m+1}} (m+1)  - 2^{2m}\ .
+\end{eqnarray*}
+
+We recall that the quotient $g_{2m}/2^{2m}$ is the expected number of equalizations among all
+paths of length $2m$.  Using Exercise~\ref{exer 12.1.4}, it is easy to show that
+$${{g_{2m}}\over{2^{2m}}} \sim \sqrt{2\over \pi}\sqrt {2m}\ .$$
+In particular, this means that the average number of equalizations among all paths of length
+$4m$ is not twice the average number of equalizations among all paths of length $2m$.  In order
+for the average number of equalizations to double, one must quadruple the lengths of the random
+walks.
+\end{example}
+It is interesting to note that if we define
+$$M_n = \max_{0 \le k \le n} S_k\ ,$$
+then we have
+$$E(M_n) \sim \sqrt{2\over \pi}\sqrt n\ .$$
+This means that the expected number of equalizations and the expected maximum value for random
+walks of length $n$ are asymptotically equal as $n \rightarrow \infty$.  (In fact, it can be
+shown that the two expected values differ by at most $1/2$ for all positive integers $n$.  See
+Exercise~\ref{exer 12.1.9}.)
+
+\exercises
+\begin{LJSItem}
+ 
+\i\label{exer 12.1.1} Using the Binomial Theorem, show that
+$${1\over{\sqrt {1 - 4x}}} = \sum_{m = 0}^\infty {2m \choose m} x^m\ .$$
+What is the interval of convergence of this power series?
+
+\i\label{exer 12.1.2}
+\begin{enumerate}
+
+\item Show that for $m \ge 1$, 
+$$f_{2m} = u_{2m-2} - u_{2m}\ .$$
+
+\item Using part (a), find a closed-form expression for the sum
+$$f_2 + f_4 + \cdots + f_{2m}\ .$$
+
+\item Using part (b), show that
+$$\sum_{m = 1}^\infty f_{2m} = 1\ .$$
+(One can also obtain this statement from the fact that 
+$$F(x) = 1 - (1-x)^{1/2}\ .)$$
+
+\item Using parts (a) and (b), show that the probability of no equalization in the 
+first $2m$ outcomes equals the probability of an equalization at time $2m$.
+\end{enumerate}
+
+\i\label{exer 12.1.3} Using the notation of Example~\ref{exam 12.1.1}, show that
+$$|E_{2k}| = f_{2k} 2^{2m}\ .$$
+
+\i\label{exer 12.1.4} Using Stirling's Formula, show that 
+$$u_{2m} \sim {1\over{\sqrt {\pi m}}}\ .$$
+
+\i\label{exer 12.1.5} A \emx {lead change}\index{lead change} in a random walk occurs at time
+$2k$ if
+$S_{2k-1}$ and $S_{2k+1}$ are of opposite sign.  
+\begin{enumerate}
+\item Give a rigorous argument which proves that
+among all walks of length $2m$ that have an equalization at time $2k$, exactly half have a lead
+change at time $2k$.
+
+\item  Deduce that the total number of lead changes among all walks of length $2m$ equals
+$${1\over 2}(g_{2m} - u_{2m})\ .$$
+
+\item Find an asymptotic expression for the average number of lead changes in a random walk
+of length $2m$. 
+\end{enumerate}
+
+\i\label{exer 12.1.6} 
+\begin{enumerate}
+\item 
+Show that the probability that a random walk of length $2m$ has a last return to the origin
+\index{last return to the origin}\index{return to the origin!last}
+at time $2k$, where $0 \le k \le m$, equals
+$$
+{{{2k}\choose k}{{2m-2k}\choose {m-k}}\over{2^{2m}}} = u_{2k}u_{2m - 2k}\ .
+$$  
+(The case $k = 0$ consists of all paths that do not
+return to the origin at any positive time.) \emx {Hint}:  A path whose last return to the origin
+occurs at time $2k$ consists of two paths glued together, one path of which is of length $2k$ and
+which begins and ends at the origin, and the other path of which is of length $2m - 2k$ and which
+begins at the origin but never returns to the origin.  Both types of paths can be counted using
+quantities which appear in this section.  
+\item
+Using part (a), show that if $m$ is odd, the probability that a walk of length $2m$ has no
+equalization in the last $m$ outcomes is equal to $1/2$, regardless of the value of $m$.  \emx
+{Hint}:  The answer to part a) is symmetric in $k$ and $m-k$.
+\end{enumerate}
+
+\i\label{exer 12.1.7} Show that the probability of no equalization in a walk of length
+$2m$ equals $u_{2m}$.
+
+\istar\label{exer 12.1.8} Show that
+$$P(S_1 \ge 0,\ S_2 \ge 0,\ \ldots,\ S_{2m} \ge 0) = u_{2m}\ .$$
+\emx {Hint}:  First explain why
+\begin{eqnarray*}
+&&P(S_1 > 0,\ S_2 > 0,\ \ldots,\ S_{2m} > 0) \\
+&& \;\;\;\;\;\;\;\;\;\;\;\;\; = {1\over 2}P(S_1 \ne 0,\ S_2 \ne 0,\ \ldots,\ S_{2m} \ne 0)  \ .
+\end{eqnarray*}
+Then use Exercise~\ref{exer 12.1.7}, together with the observation that if no equalization occurs in the
+first $2m$ outcomes, then the path goes through the point $(1,1)$ and remains on or above the
+horizontal line $x = 1$.
+
+\istar\label{exer 12.1.9} In Feller,\footnote{W.~Feller, \emx {Introduction to Probability
+Theory and its Applications,} vol.~I, 3rd~ed. (New York: John Wiley \& Sons, 1968).} one finds the
+following theorem:  Let $M_n$ be the random variable which gives the maximum value of $S_k$, for
+$1 \le k \le n$.  Define
+$$p_{n, r} = {n\choose {{n+r}\over{2}}}2^{-n}\ .$$
+If $r \ge 0$, then
+$$P(M_n = r) = \left \{ \begin{array}{ll}
+                    p_{n, r}\,,&\mbox{if $r \equiv n\,    (\mbox{mod}\ 2)$}, \\   
+                  p_{n, r+1}\,,&\mbox{if $r \not\equiv n\,(\mbox{mod}\ 2)$}.
+                      \end{array}
+             \right.   
+$$
+
+\begin{enumerate}
+
+\item Using this theorem, show that
+$$E(M_{2m}) = {1\over{2^{2m}}}\sum_{k = 1}^m (4k-1){2m \choose m+k}\ ,$$
+and if $n = 2m+1$, then
+$$E(M_{2m+1}) = {1\over {2^{2m+1}}} \sum_{k = 0}^m (4k+1){2m+1\choose m+k+1}\ .$$
+
+\item
+For $m \ge 1$, define 
+$$r_m = \sum_{k = 1}^m k {2m\choose m+k}$$
+and
+$$s_m = \sum_{k = 1}^m k {2m+1\choose m+k+1}\ .$$
+By using the identity
+$${n\choose k} = {n-1\choose k-1} + {n-1\choose k}\ ,$$
+show that
+$$s_m = 2r_m - {1\over 2}\biggl(2^{2m} - {2m \choose m}\biggr)$$
+and
+$$r_m = 2s_{m-1} + {1\over 2}2^{2m-1}\ ,$$
+if $m \ge 2$.
+
+\item
+Define the generating functions
+$$R(x) = \sum_{k = 1}^\infty r_k x^k$$
+and
+$$S(x) = \sum_{k = 1}^\infty s_k x^k\ .$$
+Show that
+$$S(x) = 2 R(x) - {1\over 2}\biggl({1\over{1- 4x}}\biggr) + {1\over 2}\biggl(\sqrt{1-4x}\biggr)$$
+and
+$$R(x) = 2xS(x) + x\biggl({1\over{1-4x}}\biggr)\ .$$
+
+\item
+Show that
+$$R(x) = {x\over{(1-4x)^{3/2}}}\ ,$$
+and
+$$S(x) = {1\over 2}\biggl({1\over{(1- 4x)^{3/2}}}\biggr) - 
+{1\over 2}\biggl({1\over{1- 4x}}\biggr)\ .$$
+
+\item
+Show that
+$$r_m = m{2m-1\choose m-1}\ ,$$
+and
+$$s_m = {1\over 2}(m+1){2m+1\choose m} - {1\over 2}(2^{2m})\ .$$
+
+\item
+Show that
+$$E(M_{2m}) = {m\over{2^{2m-1}}}{2m\choose m} + {1\over{2^{2m+1}}}{2m\choose m} - {1\over 2}\ ,$$
+and
+$$E(M_{2m+1}) = {{m+1}\over{2^{2m+1}}}{2m+2\choose m+1} - {1\over 2}\ .$$
+The reader should compare these formulas with the expression for \linebreak $g_{2m}/2^{(2m)}$ in
+Example~\ref{exam 12.1.1}.
+\end{enumerate}
+
+\istar\label{exer 12.1.10}
+(from K. Levasseur\footnote{K. Levasseur, ``How to Beat Your Kids at Their
+Own Game," \emx {Mathematics Magazine} vol.~61, no. 5 (December, 1988),
+pp.~301-305.})\index{LEVASSEUR, K.} A parent and his child play the following game.  A deck of $2n$
+cards, $n$ red and $n$ black, is shuffled.  The cards are turned up one at a time.  Before each card
+is turned up, the parent and the child guess whether it will be red or black.  Whoever makes more
+correct guesses wins the game.  The child is assumed to guess each color with the same probability,
+so she will have a score of
+$n$, on average.  The parent keeps track of how many cards of each color have already been
+turned up.  If more black cards, say, than red cards remain in the deck, then the parent will
+guess black, while if an equal number of each color remain, then the parent guesses each
+color with probability 1/2.  What is the expected number of correct guesses that will be made
+by the parent?  \emx {Hint}:  Each of the ${{2n}\choose n}$ possible orderings of red and
+black cards corresponds to a random walk of length $2n$ that returns to the origin at time
+$2n$.  Show that between each pair of successive equalizations, the parent will be right
+exactly once more than he will be wrong.  Explain why this means that the average number of
+correct guesses by the parent is greater than $n$ by exactly one-half the average number of
+equalizations.  Now define the random variable $X_i$ to be 1 if there is an equalization at
+time $2i$, and 0 otherwise.  Then, among all relevant paths, we have
+$$E(X_i) = P(X_i = 1) = \frac{{{2n-2i}\choose{n-i}}{{2i}\choose{i}}}{{{2n}\choose{n}}}\ .$$
+Thus, the expected number of equalizations equals
+$$E\biggl(\sum_{i = 1}^n X_i\biggr) = \frac 1{{{2n}\choose{n}}}\sum_{i = 1}^n 
+{{2n-2i}\choose{n-i}}{{2i}\choose{i}}\ .$$
+One can now use generating functions to find the value of the sum.
+\par
+It should be noted that in a game such as this, a more interesting question than the one
+asked above is what is the probability that the parent wins the game?  For this game, this
+question was answered by D. Zagier.\footnote{D. Zagier, ``How Often Should You Beat
+Your Kids?" \emx{Mathematics Magazine} vol.~63, no.\ 2 (April 1990), pp. 89-92.}\index{ZAGIER, D.} 
+He showed that the probability of winning is asymptotic (for large
+$n$) to the quantity
+$$\frac 12 + \frac 1{2\sqrt 2}\ .$$
+
+\item\label{exer 12.1.11}
+Prove that
+$$u^{(2)}_{2n} = \frac 1{4^{2n}} \sum_{k = 0}^n \frac {(2n)!}{k!k!(n-k)!(n-k)!}\ ,$$
+and
+$$u^{(3)}_{2n} = \frac 1{6^{2n}} \sum_{j,k} \frac {(2n)!}{j!j!k!k!(n-j-k)!(n-j-k)!}\ ,$$
+where the last sum extends over all non-negative $j$ and $k$ with $j+k \le n$.  Also show
+that this last expression may be rewritten as
+$$\frac 1{2^{2n}}{{2n}\choose n} \sum_{j,k} 
+\biggl(\frac 1{3^n}\frac{n!}{j!k!(n-j-k)!}\biggr)^2\ .$$
+
+\item\label{exer 12.1.12}
+Prove that if $n \ge 0$, then
+$$\sum_{k = 0}^n {n \choose k}^2 = {{2n} \choose n}\ .$$
+\emx {Hint}: Write the sum as 
+$$\sum_{k = 0}^n {n \choose k}{n \choose {n-k}}$$
+and explain why this is a coefficient in the product
+$$(1 + x)^n (1 + x)^n\ .$$
+Use this, together with Exercise~\ref{exer 12.1.11}, to show that
+$$u^{(2)}_{2n} = \frac 1{4^{2n}}{{2n}\choose n}\sum_{k = 0}^n {n \choose k}^2 = 
+\frac 1 {4^{2n}} {{2n}\choose n}^2\ .$$
+
+\item\label{exer 12.1.13}
+Using Stirling's Formula, prove that
+$${{2n}\choose n} \sim \frac {2^{2n}}{\sqrt {\pi n}}\ .$$
+
+\item\label{exer 12.1.14}
+Prove that
+$$\sum_{j,k} 
+\biggl(\frac 1{3^n}\frac{n!}{j!k!(n-j-k)!}\biggr) = 1\ ,$$
+where the sum extends over all non-negative $j$ and $k$ such that $j + k \le n$.  \emx {Hint}: 
+Count how many ways one can place $n$ labelled balls in 3 labelled urns.
+
+\item\label{exer 12.1.15}
+Using the result proved for the random walk in ${\mathbf R}^3$ in Example~\ref{exam 12.1.0.6}, 
+explain why the probability of an eventual return in ${\mathbf R}^n$ is strictly less than one,
+for all $n \ge 3$.  \emx {Hint}: Consider a random walk in ${\mathbf R}^n$ and disregard all but
+the first three coordinates of the particle's position.
+
+\end{LJSItem}
+
+\section{Gambler's Ruin\label{sec 12.2}}\index{Gambler's Ruin}
+\par
+In the last section, the simplest kind of symmetric random walk in ${\mathbf R}^1$ was studied. 
+In this section, we remove the assumption that the random walk is symmetric.  Instead, we assume
+that
+$p$ and $q$ are non-negative real numbers with $p+q = 1$, and that the common distribution function
+of the jumps of the random walk is
+$$f_X(x) = \left \{ \begin{array}{ll}
+               p, & \mbox{if $x = 1$},\\ 
+               q, & \mbox{if $x = -1$}.
+                      \end{array}
+             \right.   
+$$ 
+One can imagine the random walk as representing a sequence of tosses of a weighted coin, with a
+head appearing with probability $p$ and a tail appearing with probability $q$.  An alternative
+formulation of this situation is that of a gambler playing a sequence of games against an
+adversary (sometimes thought of as another person, sometimes called ``the house") where, in
+each game, the gambler has probability $p$ of winning.
+
+\subsection*{The Gambler's Ruin Problem}
+
+The above formulation of this type of random walk leads to a problem known as the Gambler's Ruin
+problem.\index{Gambler's Ruin}  This problem was introduced in Exercise~\ref{exer 11.2.22}, but
+we will give the description of the problem again.  A gambler starts with a ``stake" of size~$s$. 
+She plays until her capital reaches the value $M$ or the value 0.  In the language of Markov 
+chains, these two values correspond to absorbing states.  We
+are interested in studying the probability of occurrence of each of these two outcomes.  
+\par
+One can also assume that the gambler is playing against an ``infinitely rich" adversary.  In this
+case, we  would say that there is only one absorbing state, namely when the gambler's stake is 0. 
+Under this assumption, one can ask for the probability that the gambler is eventually ruined. 
+\par
+We begin by defining $q_k$ to be the probability that the gambler's stake reaches 0, i.e.,
+she is ruined, before it reaches $M$, given that the initial stake is $k$.  We note that $q_0 =
+1$ and $q_M = 0$.  The fundamental relationship among the $q_k$'s is the following:
+$$q_k = pq_{k+1} + qq_{k-1}\ ,$$
+where $1 \le k \le M-1$.  This holds because if her stake equals $k$, and she plays one game,
+then her stake becomes $k+1$ with probability $p$ and $k-1$ with probability $q$.  In the first
+case, the probability of eventual ruin is $q_{k+1}$ and in the second case, it is $q_{k-1}$. 
+We note that since $p + q = 1$, we can write the above equation as
+$$p(q_{k+1} - q_k) = q(q_k - q_{k-1})\ ,$$
+or
+$$q_{k+1} - q_k = {q\over p}(q_k - q_{k-1})\ .$$
+From this equation, it is easy to see that
+\begin{equation}
+q_{k+1} - q_k = \biggl({q\over p}\biggr)^k(q_1 - q_0)\ .
+\label{eq 12.2.2}
+\end{equation}
+We now use telescoping sums to obtain an equation in which the only unknown is $q_1$:
+\begin{eqnarray*}
+-1 &=& q_M - q_0 \\
+   &=& \sum_{k = 0}^{M-1} (q_{k+1} - q_k)\ ,
+\end{eqnarray*}
+so
+\begin{eqnarray*}
+-1 &=& \sum_{k = 0}^{M-1} \biggl({q\over p}\biggr)^k(q_1 - q_0)\\
+   &=& (q_1 - q_0) \sum_{k = 0}^{M-1} \biggl({q\over p}\biggr)^k\ .
+\end{eqnarray*}
+If $p \ne q$, then the above expression equals
+$$(q_1 - q_0) {{(q/p)^M - 1}\over{(q/p) - 1}}\ ,$$
+while if $p = q = 1/2$, then we obtain the equation
+$$-1 = (q_1 - q_0) M\ .$$
+For the moment we shall assume that $p \ne q$.   Then we have
+$$q_1 - q_0 = -{{(q/p) - 1}\over{(q/p)^M - 1}}\ .$$
+Now, for any $z$ with $1 \le z \le M$, we have
+\begin{eqnarray*}
+q_z - q_0 &=& \sum_{k = 0}^{z-1} (q_{k+1} - q_k)\\
+          &=& (q_1 - q_0)\sum_{k = 0}^{z-1} \biggl({q\over p}\biggr)^k\\
+          &=& -(q_1 - q_0){{(q/p)^z - 1}\over{(q/p) - 1}}\\
+          &=& -{{(q/p)^z - 1}\over{(q/p)^M - 1}}\ .
+\end{eqnarray*}
+Therefore,
+\begin{eqnarray*}
+q_z &=& 1 - {{(q/p)^z - 1}\over{(q/p)^M - 1}}\\
+    &=& {{(q/p)^M - (q/p)^z}\over{(q/p)^M - 1}}\ .
+\label{eq 12.2.3}
+\end{eqnarray*}
+Finally, if $p = q = 1/2$, it is easy to show that (see Exercise~\ref{exer 12.2.11})
+$$q_z = {{M - z}\over M}\ .$$
+We note that both of these formulas hold if $z = 0$.
+\par
+We define, for $0 \le z \le M$, the quantity $p_z$ to be the probability that the gambler's
+stake reaches $M$ without ever having reached 0.  Since the game might continue indefinitely, it
+is not obvious that $p_z + q_z = 1$ for all $z$.  However, one can use the same method as above
+to show that if $p \ne q$, then
+$$q_z = {{(q/p)^z - 1}\over{(q/p)^M - 1}}\ ,$$
+and if $p = q = 1/2$, then
+$$q_z = {z\over M}\ .$$
+Thus, for all $z$, it is the case that $p_z + q_z = 1$, so the game ends with probability 1.
+
+\subsection*{Infinitely Rich Adversaries}
+
+We now turn to the problem of finding the probability of eventual ruin if the gambler is playing
+against an infinitely rich adversary.  This probability can be obtained by letting $M$ go to
+$\infty$ in the expression for $q_z$ calculated above.  If $q < p$, then the expression approaches
+$(q/p)^z$, and if $q > p$, the expression approaches 1.  In the case $p = q = 1/2$, we recall
+that $q_z = 1 - z/M$.  Thus, if $M \rightarrow \infty$, we see that the probability of eventual
+ruin tends to 1.  
+
+\subsection*{Historical Remarks}
+
+In 1711, De Moivre\index{de MOIVRE, A.}, in his book  \emx{De Mesura Sortis}, gave an ingenious
+derivation of the probability of ruin.  The following description of his argument is taken from
+David.\footnote{F.~N. David, 
+\emx {Games, Gods and Gambling} (London: Griffin, 1962).}\index{DAVID, F. N.}  The notation used
+is as follows:  We imagine that there are two players, A and B, and the probabilities that they
+win a game are $p$ and $q$, respectively.  The players start with $a$ and $b$ counters,
+respectively. 
+\begin{quote}
+Imagine that each player starts with his counters before him in a pile, and that nominal values
+are assigned to the counters in the following manner.  A's bottom counter is given the nominal
+value $q/p$; the next is given the nominal value $(q/p)^2$, and so on until his top counter
+which has the nominal value $(q/p)^a$.  B's top counter is valued $(q/p)^{a+1}$, and so on
+downwards until his bottom counter which is valued $(q/p)^{a+b}$.  After each game the loser's
+top counter is transferred to the top of the winner's pile, and it is always the top counter
+which is staked for the next game.  Then \emx {in terms of the nominal values} B's stake is
+always $q/p$ times A's, so that at every game each player's nominal expectation is nil.  This
+remains true throughout the play; therefore A's chance of winning all B's counters, multiplied
+by his nominal gain if he does so, must equal B's chance multiplied by B's nominal gain.  Thus,
+\begin{equation}
+P_a\biggl(\Bigl({q\over p}\Bigr)^{a+1} + \cdots +
+\Bigl({q\over p}\Bigr)^{a+b}\biggr) =  
+P_b\biggl(\Bigl({q\over p}\Bigr) + \cdots +
+\Bigl({q\over p}\Bigr)^a\biggr)\ .
+\label{eq 12.2.1}
+\end{equation}
+\end{quote}
+\par
+Using this equation, together with the fact that
+$$P_a + P_b = 1\ ,$$
+it can easily be shown that
+$$P_a = {{(q/p)^a - 1}\over{(q/p)^{a+b} - 1}}\ ,$$
+if $p \ne q$, and
+$$P_a = {a\over{a+b}}\ ,$$
+if $p = q = 1/2$.
+\par
+In terms of modern probability theory, de Moivre is changing the values of the counters to make
+an unfair game into a fair game, which is called a martingale.  With the new values, the
+expected fortune of player A (that is, the sum of the nominal values of his counters) after each
+play equals his fortune before the play (and similarly for player B).  (For a simpler martingale
+argument, see Exercise~\ref{exer 12.2.10}.)  De Moivre then uses the fact that when the game ends,
+it is still fair, thus Equation~\ref{eq 12.2.1} must be true.  This fact requires proof, and is
+one of the central theorems in the area of martingale theory.  
+
+\exercises
+\begin{LJSItem}
+ 
+\i\label{exer 12.2.2} In the gambler's ruin problem, assume that the gambler initial stake
+is 1 dollar, and assume that her probability of success on any one game is $p$.  Let $T$ be the
+number of games until 0 is reached (the gambler is ruined).  Show that the  generating
+function for~$T$ is  $$
+h(z) = \frac{1 - \sqrt{1 - 4pqz^2}}{2pz}\ ,
+$$
+and that
+$$
+h(1) = \left \{ \begin{array}{ll}
+              q/p, & \mbox{if $q \leq p$}, \\
+                1, & \mbox{if $q \geq p,$} 
+         \end{array}
+         \right.    
+$$
+and
+$$
+h'(1) = \left \{ \begin{array}{ll}
+               1/(q - p), & \mbox{if $q > p$}, \\
+                  \infty, & \mbox{if $q = p.$}
+         \end{array}
+         \right. 
+$$
+Interpret your results in terms of the time $T$ to reach 0.  (See also 
+Example~\ref{exam 10.1.7}.)
+
+\i\label{exer 12.2.3} Show that the Taylor series expansion for $\sqrt{1 - x}$ is
+$$
+ \sqrt{1 - x} = \sum_{n = 0}^\infty  {{1/2} \choose n} x^n\ ,
+$$
+where the binomial coefficient ${1/2} \choose n$ is
+$$
+{{1/2} \choose n} = \frac{(1/2)(1/2 - 1) \cdots (1/2 - n + 1)}{n!}\ .  
+$$
+Using this and the result of Exercise~\ref{exer 12.2.2}, show that the probability
+that the gambler is ruined on the $n$th step is
+$$
+p_T(n) = \left \{ \begin{array}{ll}
+ \frac{(-1)^{k - 1}}{2p} {{1/2} \choose k} (4pq)^k, & \mbox{if $n = 2k - 1$,} \\
+                                                 0, & \mbox{if $n = 2k$.}
+                  \end{array}
+         \right.   
+$$
+
+\i\label{exer 12.2.4} For the gambler's ruin problem, assume that the
+gambler starts with $k$ dollars.  Let $T_k$ be the time to reach 0 for the
+first time.
+
+\begin{enumerate}
+\item Show that the generating function $h_k(t)$ for~$T_k$ is the $k$th
+power of the generating function for the time $T$ to ruin starting at~1.  \emx{Hint}: Let $T_k
+= U_1 + U_2 +\cdots+ U_k$, where $U_j$ is the time for the walk starting at~$j$ to reach
+$j - 1$ for the first time.
+
+\item Find $h_k(1)$ and $h_k'(1)$ and interpret your results.
+\end{enumerate} 
+
+\i\label{exer 12.2.5} (The next three problems come from Feller.\footnote{W.~Feller, op.\ cit.,
+pg. 367.}) 
+As in the text, assume that $M$ is a fixed positive integer. 
+
+\begin{enumerate}
+\item Show that if a gambler starts with an stake of 0 (and is allowed to have a negative
+amount of money), then the probability that her stake reaches the value of $M$ before it returns
+to 0 equals $p(1 - q_1)$.
+\item Show that if the gambler starts with a stake of $M$ then the probability that her stake
+reaches 0 before it returns to $M$ equals $qq_{M-1}$.
+\end{enumerate}
+
+\i\label{exer 12.2.6} Suppose that a gambler starts with a stake of 0 dollars.
+\begin{enumerate} 
+\item  Show that the probability that her stake never reaches $M$ before returning to 0 equals
+$1 - p(1 - q_1)$.
+
+\item  Show that the probability that her stake reaches the value $M$ exactly $k$ times before
+returning to 0 equals $p(1-q_1)(1 - qq_{M-1})^{k-1}(qq_{M-1})$.  \emx {Hint}:  
+Use Exercise~\ref{exer 12.2.5}.
+\end{enumerate} 
+
+\i\label{exer 12.2.7} In the text, it was shown that if $q < p$, there is a positive probability
+that a gambler, starting with a stake of 0 dollars, will never return to the origin.  Thus, we
+will now assume that $q \ge p$.  Using Exercise~\ref{exer 12.2.6}, show that if a gambler starts with a
+stake of 0 dollars, then the expected number of times her stake equals $M$ before returning to
+0 equals $(p/q)^M$, if $q > p$ and 1, if $q = p$.  (We quote from Feller:  ``The truly amazing
+implications of this result appear best in the language of fair games.  A perfect coin is tossed
+until the first equalization of the accumulated numbers of heads and tails.  The gambler receives
+one penny for every time that the accumulated number of heads exceeds the accumulated number of
+tails by $m$. \emx {The `fair entrance fee' equals 1 independent of $m$.}")
+
+\i\label{exer 12.2.8} In the game in Exercise~\ref{exer 12.2.7}, let $p = q = 1/2$ and $M = 10$.  What
+is the probability that the gambler's stake equals $M$ at least 20 times before it returns to 0?
+
+\i\label{exer 12.2.9} Write a computer program which simulates the game in Exercise~\ref{exer 12.2.7}
+for the case $p = q = 1/2$, and $M = 10$.  
+
+\i\label{exer 12.2.10} In de Moivre's description of the game, we can modify the definition of
+player A's fortune in such a way that the game is still a martingale (and the calculations are
+simpler).  We do this by assigning nominal values to the counters in the same way as de Moivre,
+but each player's current fortune is defined to be just the value of the counter which is being
+wagered on the next game.  So, if player A has $a$ counters, then his current fortune is
+$(q/p)^a$ (we stipulate this to be true even if $a = 0$).  Show that under this definition,
+player A's expected fortune after one play equals his fortune before the play, if $p \ne q$. 
+Then, as de Moivre does, write an equation which expresses the fact that player A's expected
+final fortune equals his initial fortune.  Use this equation to find the probability of ruin of
+player A.
+
+\i\label{exer 12.2.11} Assume in the gambler's ruin problem that $p = q = 1/2$.
+\begin{enumerate}
+\item  Using Equation~\ref{eq 12.2.2}, together with the facts that $q_0 = 1$ and $q_M = 0$,
+show that for $0 \le z \le M$,
+$$q_z = {{M - z}\over M}\ .$$
+\item  In Equation~\ref{eq 12.2.3}, let $p \rightarrow 1/2$ (and since $q = 1 - p$, $q
+\rightarrow 1/2$ as well).  Show that in the limit,
+$$q_z = {{M - z}\over M}\ .$$  \emx {Hint}:  Replace $q$ by $1-p$, and use L'Hopital's rule.
+\end{enumerate}
+
+%We may want to move the next exercise to an earlier chapter.
+\i\label{exer 12.2.12} In American casinos, the roulette wheels have the integers between 1 and
+36, together with 0 and 00.  Half of the non-zero numbers are red, the other half are black, and
+0 and 00 are green.  A common bet in this game is to bet a dollar on red.  If a red number
+comes up, the bettor gets her dollar back, and also gets another dollar.  If a black or green
+number comes up, she loses her dollar.
+\begin{enumerate}
+\item Suppose that someone starts with 40 dollars, and continues to bet on red until either her
+fortune reaches 50 or 0.  Find the probability that her fortune reaches 50 dollars.
+\item How much money would she have to start with, in order for her to have a 95\% chance of
+winning 10 dollars before going broke?
+\item A casino owner was once heard to remark that ``If we took 0 and 00 off of the roulette
+wheel, we would still make lots of money, because people would continue to come in and play
+until they lost all of their money.''  Do you think that such a casino would stay in business?
+\end{enumerate}
+
+\end{LJSItem}
+
+
+
+
+
+ 
+\section{Arc Sine Laws}\label{sec 12.3}\index{arc sine laws}
+\par
+In Exercise~\ref{sec 12.1}.\ref{exer 12.1.6}, the distribution of the time
+of the last equalization in the symmetric random walk was determined.  If we let $\alpha_{2k, 2m}$
+denote the probability that a random walk of length $2m$ has its last equalization at time
+$2k$, then we have
+$$\alpha_{2k, 2m} = u_{2k}u_{2m-2k}\ .$$
+We shall now show how one can approximate the distribution of the $\alpha$'s with a simple
+function.  We recall that 
+$$u_{2k} \sim {1\over{\sqrt {\pi k}}}\ .$$
+Therefore, as both $k$ and $m$ go to $\infty$, we have
+$$\alpha_{2k, 2m} \sim {1\over{\pi \sqrt{k(m-k)}}}\ .$$
+This last expression can be written as
+$${1\over{\pi m \sqrt{(k/m)(1 - k/m)}}}\ .$$
+Thus, if we define 
+$$f(x) = {1\over{\pi \sqrt{x(1-x)}}}\ ,$$
+for $0 < x < 1$, then we have
+$$\alpha_{2k, 2m} \approx {1\over m}f\biggl({k\over m}\biggr)\ .$$
+The reason for the $\approx$ sign is that we no longer require that $k$ get large.  This means
+that we can replace the discrete $\alpha_{2k, 2m}$ distribution by the continuous density $f(x)$ on
+the interval $[0, 1]$ and obtain a good approximation.  In particular, if $x$ is a fixed real
+number between 0 and 1, then we have
+$$\sum_{k < xm}\alpha_{2k, 2m} \approx \int_0^x f(t)\,dt\ .$$
+It turns out that $f(x)$ has a nice antiderivative, so we can write
+$$\sum_{k < xm}\alpha_{2k, 2m} \approx {2\over \pi}\arcsin \sqrt x\ .$$  
+\index{arc sine laws}
+One can see from the graph of this last function that it has a minimum at $x = 1/2$ and is
+symmetric about that point.  As noted in the exercise, this implies that half of the walks of
+length $2m$ have no equalizations after time $m$, a fact which probably would not be guessed.
+\par
+It turns out that the arc sine density comes up in the answers to many other questions
+concerning random walks on the line.  Recall that in Section~\ref{sec 12.1}, a random walk could be
+viewed as a polygonal line connecting $(0,0)$ with $(m, S_m)$.  Under this interpretation, we
+define $b_{2k, 2m}$ to be the probability that a random walk of length $2m$ has exactly $2k$ of
+its $2m$ polygonal line segments above the $t$-axis.  
+\par
+The probability $b_{2k, 2m}$ is frequently interpreted in terms of a two-player game.  (The
+reader will recall the game Heads or Tails, in Example~\ref{exam 1.3}.)  Player A is said to be in
+the lead at time
+$n$ if the random walk is above the
+$t$-axis at that time, or if the random walk is on the $t$-axis at time $n$ but above the
+$t$-axis at time
+$n-1$.  (At time 0, neither player is in the lead.)  One can ask what is the most probable number
+of times that player A is in the lead, in a game of length $2m$.  Most people will say that the
+answer to this question is $m$.  However, the following theorem says that $m$ is the least likely
+number of times that player A is in the lead, and the most likely number of times in the
+lead is 0 or $2m$.
+\begin{theorem}\label{thm 12.3.1}
+If Peter and Paul play a game of Heads or Tails of length $2m$, the probability that Peter will
+be in the lead exactly $2k$ times is equal to
+$$
+\alpha_{2k, 2m}\ .
+$$
+%\end{theorem}
+\proof
+To prove the theorem, we need to show that
+\begin{equation}  
+b_{2k, 2m} = \alpha_{2k, 2m}\ .
+\label{eq 12.3.1}  
+\end{equation}
+Exercise~\ref{sec 12.1}.\ref{exer 12.1.7} shows that $b_{2m, 2m} = u_{2m}$ and $b_{0, 2m} = u_{2m}$,
+so we only need to prove that Equation~\ref{eq 12.3.1} holds for $1 \le k \le m-1$.  We can obtain a
+recursion involving the $b$'s and the $f$'s (defined in Section~\ref{sec 12.1}) by counting the
+number of paths of length $2m$ that have exactly $2k$ of their segments above the $t$-axis, where $1
+\le k \le m-1$.  To count this collection of paths, we assume that the first return occurs at time
+$2j$, where
+$1 \le j \le m-1$.  There are two cases to consider.  Either during the first $2j$ outcomes the
+path is above the $t$-axis or below the $t$-axis.  In the first case, it must be true that the
+path has exactly $(2k - 2j)$ line segments above the $t$-axis, between $t = 2j$ and $t = 2m$. 
+In the second case, it must be true that the path has exactly $2k$ line segments above the
+$t$-axis, between $t = 2j$ and $t = 2m$.  
+\par We now count the number of paths of the various types
+described above.  The number of paths of length $2j$ all of whose line segments lie above the
+$t$-axis and which return to the origin for the first time at time $2j$ equals
+$(1/2)2^{2j}f_{2j}$.  This also equals the number of paths of length $2j$ all of whose line
+segments lie below the $t$-axis and which return to the origin for the first time at time $2j$. 
+The number of paths of length $(2m - 2j)$ which have exactly $(2k - 2j)$ line segments above the
+$t$-axis is $b_{2k-2j, 2m-2j}$.  Finally, the number of paths of length $(2m-2j)$ which have
+exactly $2k$ line segments above the $t$-axis is $b_{2k,2m-2j}$.  Therefore, we have
+$$b_{2k,2m} = {1\over 2} \sum_{j = 1}^k f_{2j}b_{2k-2j, 2m-2j} + 
+{1\over 2}\sum_{j = 1}^{m-k} f_{2j}b_{2k, 2m-2j}\ .$$
+\par
+We now assume that Equation~\ref{eq 12.3.1} is true for $m < n$.  Then we have
+
+\begin{eqnarray*}
+b_{2k, 2n} &=& {1\over 2} \sum_{j = 1}^k f_{2j}\alpha_{2k-2j, 2m-2j} + 
+{1\over 2}\sum_{j = 1}^{m-k} f_{2j}\alpha_{2k, 2m - 2j}\\
+&=& {1\over 2}\sum_{j = 1}^k f_{2j}u_{2k-2j}u_{2m-2k} + 
+{1\over 2}\sum_{j = 1}^{m-k} f_{2j}u_{2k}u_{2m - 2j - 2k}\\
+&=& {1\over 2}u_{2m-2k}\sum_{j = 1}^k f_{2j}u_{2k - 2j} +
+{1\over 2}u_{2k}\sum_{j = 1}^{m-k} f_{2j}u_{2m - 2j - 2k}\\
+&=& {1\over 2}u_{2m - 2k}u_{2k} + {1\over 2}u_{2k}u_{2m - 2k}\ ,
+\end{eqnarray*}
+
+where the last equality follows from Theorem~\ref{thm 12.1.2}.  Thus, we have
+$$b_{2k, 2n} = \alpha_{2k, 2n}\ ,$$
+which completes the proof.
+\end{theorem}
+%\putfig{4.5truein}{PSfig12-2}{The arc sine density and times in the lead.}{fig 12.2}
+We illustrate the above theorem by simulating 10{,}000 games of Heads or Tails, with each game
+consisting of 40 tosses.  The distribution of the number of times that Peter is in the lead is
+given in Figure~\ref{fig 12.2}, together with the arc sine density.
+
+\putfig{3.5truein}{PSfig12-2}{Times in the lead.}{fig 12.2}
+
+We end this section by stating two other results in which the arc sine density appears. 
+Proofs of these results may be found in Feller.\footnote{W.~Feller, op.\ cit., pp. 93--94.}
+\begin{theorem}\label{thm 12.3.2}
+Let $J$ be the random variable which, for a given random walk of length $2m$, gives the
+smallest subscript $j$ such that $S_{j} = S_{2m}$.  (Such a subscript $j$ must be even,
+by parity considerations.)  Let $\gamma_{2k, 2m}$ be the probability that $J = 2k$.  Then we
+have
+$$\gamma_{2k, 2m} = \alpha_{2k, 2m}\ .$$
+\end{theorem}
+The next theorem says that the arc sine density is applicable to a wide range of
+situations.  A continuous distribution function $F(x)$ is said to
+be \emx {symmetric} if $F(x) = 1 - F(-x)$.  (If $X$ is a continuous random variable
+with a symmetric distribution function, then for any real $x$, we have $P(X \le x) = P(X
+\ge -x)$.)  We imagine that we have a random walk of length $n$ in which each summand
+has the distribution
+$F(x)$, where $F$ is continuous and symmetric.  The subscript of the \emx {first
+maximum}\index{first maximum of a random walk} of such a walk is the unique subscript $k$ such that 
+$$S_k > S_0,\ \ldots,\ S_k > S_{k-1},\ S_k \ge S_{k+1},\ \ldots,\ S_k \ge S_n\ .$$
+We define the random variable $K_n$ to be the subscript of the
+first maximum.  We can now state the following theorem concerning the random variable $K_n$. 
+\begin{theorem}\label{thm 12.3.3}
+Let $F$ be a symmetric continuous distribution function, and let $\alpha$ be a fixed real number
+strictly between 0 and 1.  Then as $n \rightarrow \infty$, we have
+$$P(K_n < n\alpha) \rightarrow {2\over \pi} \arcsin\sqrt \alpha\ .$$
+\end{theorem}
+\par
+A version of this theorem that holds for a symmetric random walk can also be found in Feller.
+
+\exercises
+\begin{LJSItem}
+
+\i\label{exer 12.3.1} For a random walk of length $2m$, define $\epsilon_k$ to equal 1 if
+$S_k > 0$, or if $S_{k-1} = 1$ and $S_k = 0$.   Define $\epsilon_k$ to equal -1 in all other
+cases.  Thus, $\epsilon_k$ gives the side of the $t$-axis that the random walk is on during the
+time interval $[k-1, k]$.  A ``law of large numbers" for the sequence $\{\epsilon_k\}$ would say
+that for any $\delta > 0$, we would have
+$$P\biggl(-\delta < {{\epsilon_1 + \epsilon_2 + \cdots + \epsilon_n}\over{n}} < \delta \biggr)
+\rightarrow 1$$
+as $n \rightarrow \infty$.  Even though the $\epsilon$'s are not independent, the above assertion
+certainly appears reasonable.  Using Theorem~\ref{thm 12.3.1}, show that if $-1 \le x \le 1$, then
+$$\lim_{n \rightarrow \infty} P\biggl({{\epsilon_1 + \epsilon_2 + \cdots + \epsilon_n}\over{n}}
+< x\biggr) = {2\over{\pi}} \arcsin\sqrt{{{1 + x}\over{2}}}\ .$$
+ 
+\i\label{exer 12.3.2} Given a random walk $W$ of length $m$, with summands 
+\[ \{X_1, X_2, \ldots,X_m\}\ , \]  
+\noindent define the \emx {reversed} random walk to be the walk $W^*$ with
+summands 
+\[ \{X_m, X_{m-1}, \ldots, X_1\}\ . \]  
+\begin{enumerate}
+\item  Show that the $k$th partial sum $S^*_k$ satisfies the equation
+$$S^*_k = S_m - S_{n-k}\ ,$$
+where $S_k$ is the $k$th partial sum for the random walk $W$.
+\item Explain the geometric relationship between the graphs of a random walk and its
+reversal.  (It is not in general true that one graph is obtained from the other by reflecting in a
+vertical line.)
+\item Use parts (a) and (b) to prove Theorem~\ref{thm 12.3.2}.
+\end{enumerate}
+
+\end{LJSItem}
+
+ 

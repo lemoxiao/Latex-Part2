@@ -1,0 +1,22 @@
+/* For convenience, define gamma in terms of v: */
+v:0.1;
+g:1/sqrt(1-v*v);
+/* v:1-g^-2; */
+/* Define Lx as L(x-hat), Lmx as L(-x-hat), etc.: */
+Lx:matrix([g,   g*v,  0,  0],
+         [g*v,  g,    0,  0],
+         [0,        0,        1,  0],
+         [0,        0,        0,  1]);
+Ly:matrix([g,   0,        g*v, 0],
+         [0,        1,        0,       0],
+         [g*v,  0,        g,   0],
+         [0,        0,        0,       1]);
+Lmx:invert(Lx);
+Lmy:invert(Ly);
+P:matrix([0],[1],[0],[0]);
+/*
+float(Lx.P);
+float(Ly.Lx.P);
+*/
+float(Ly.P);
+float(Lx.Ly.P);

@@ -1,0 +1,471 @@
+%TODO 等的使用
+%%TODO 内容问题
+%%FIXME 格式问题
+%%HACK 粗鄙技巧
+%%CODE 代码改进
+
+%TODO——注意事项
+%FIXME：20160422 en dash 与连接号 hyphen （人名中的使用）
+%FIXME：20160621 adobe-garamond 的 semibold 与 bold 使用时需注意。实现方法是将字体文件重命名
+%FIXME：20160625 由于改用 TeX Live 2016，上一条可能失效
+%FIXME：20160625 英文名词改用半角括号
+%FIXME：20160625 Hamilton 函数使用花体 H（\scH）
+%CODE：20160625 每行 80 字符限制，中英文、数字之间加空格
+%% 理想气体、可逆、绝热等公式特殊标注
+%% 绝热：Adiabatic 等压：Isobaric 等容：Isochoric 等温：Isothermal 等熵：Isentropic 等焓：Isenthalpic 多方：Polytropic 准静态：Quasistatic
+
+\documentclass{book}
+%\documentclass[UTF8]{ctexbook}
+
+%TODO——宏包
+%页面格式
+\usepackage{geometry}
+	\geometry{a4paper, twoside, left = 2.54 cm, right = 2.54 cm, top = 3.18 cm, bottom = 3.18 cm, headheight = 3 cm}
+\usepackage{fancyhdr}
+	\fancyhf{}
+	\fancyhead[EL]{\nouppercase{\CJKfamily{楷体} \leftmark}}
+	\fancyhead[OR]{\nouppercase{\CJKfamily{楷体} \rightmark}}
+	\fancyfoot[C]{\thepage}
+	\renewcommand{\headrulewidth}{0 pt}
+
+\usepackage{titlesec}
+%	\newcommand{\sectionbreak}{\clearpage}
+
+%交叉引用、超链接、PDF书签
+\usepackage[hyperfootnotes = false]{hyperref}
+	\hypersetup{
+		bookmarksopen = true,
+		bookmarksopenlevel = 1,
+		pdfborder = 0 0 0
+	}
+%FIXME：防止PDF书签报错（LaTeX入门 p173）
+%%使用 \texorpdfstring{TeX符号}{PDF书签符号}
+%%例：非线性\texorpdfstring{$\sigma$}{σ}模型
+
+%脚注
+\usepackage[stable, perpage]{footmisc}
+\usepackage{pifont}
+	\renewcommand{\thefootnote}{\ding{\numexpr171+\value{footnote}}}
+%\interfootnotelinepenalty = 10000
+
+%数学支持
+\usepackage{amsmath}
+	\numberwithin{equation}{section}
+	\renewcommand{\theequation}{\thesection.\arabic{equation}} %公式编号样式x.x.x
+\usepackage{mathtools}
+\usepackage[adobe-garamond]{mathdesign}
+%\usepackage[urw-garamond]{mathdesign} %免费字体
+\usepackage[ntheorem]{empheq}
+\usepackage{bm}
+%\usepackage{pifont} %已在“脚注”中调用
+	\newcommand{\cmark}{\ding{51}}
+	\newcommand{\xmark}{\ding{55}}
+
+%字体
+\usepackage[no-math]{fontspec}
+	\setmainfont[
+		Ligatures = TeX,
+		BoldFont = AGaramondPro-Semibold.otf,
+%		BoldFont = AGaramondPro-Bold.otf,
+		ItalicFont = AGaramondPro-Italic.otf
+	]{AGaramondPro-Regular.otf}
+%	\setsansfont[
+%		Ligatures = TeX,
+%	]{Source Sans Pro}
+	\setsansfont[
+		Ligatures = TeX,
+		ItalicFont = MyriadPro-It.otf
+	]{MyriadPro-Regular.otf}
+%	\newfontfamily{\helvetica}[
+%		Ligatures = TeX,
+%		BoldFont = HelveticaNeueLTPro-Roman.otf,
+%		ItalicFont = HelveticaNeueLTPro-Roman.otf
+%	]{HelveticaNeueLTPro-Roman.otf}
+%	\newfontfamily{\myriad}[
+%		Ligatures = TeX,
+%		ItalicFont = MyriadPro-It.otf
+%	]{MyriadPro-Regular.otf}
+
+%中文支持
+\usepackage[UTF8, heading = true]{ctex} %必须放在 xeCJK 之前调用，否则会覆盖字体设置
+\usepackage{xeCJK}
+	\xeCJKsetup{
+		AutoFakeBold = false,
+		AutoFakeSlant = false
+	}
+	\setCJKmainfont[
+		BoldFont = 华文中宋,
+		ItalicFont = 方正楷体_GBK,
+		Mapping = fullwidth-stop
+	]{方正书宋_GBK}
+	\setCJKfamilyfont{中宋}[BoldFont = 华文中宋, ItalicFont = 华文中宋, Mapping = fullwidth-stop]{华文中宋}
+	\setCJKfamilyfont{楷体}[BoldFont = 方正楷体_GBK, ItalicFont = 方正楷体_GBK, Mapping = fullwidth-stop]{方正楷体_GBK}
+	\setCJKfamilyfont{仿宋}[BoldFont = 方正仿宋_GBK, ItalicFont = 方正仿宋_GBK, Mapping = fullwidth-stop]{方正仿宋_GBK}
+	\setCJKfamilyfont{黑体}[BoldFont = 方正黑体_GBK, ItalicFont = 方正黑体_GBK, Mapping = fullwidth-stop]{方正黑体_GBK}
+	\newcommand{\myHeavy}{\sffamily \CJKfamily{黑体}}
+%\usepackage[UTF8, heading = true]{ctex}
+	\pagestyle{fancy}
+	\setcounter{secnumdepth}{4}
+	\ctexset{
+		part = {
+			format = {\bfseries \Huge \centering},
+			name = {第, 篇}
+		},
+		chapter = {
+			format = {\bfseries \LARGE \raggedright},
+		},
+		section = {
+			format = {\bfseries \Large \centering},
+		},
+		subsection = {
+			format = {\bfseries},
+			name = {,、\hspace{-1 em}},
+			numbering = true,
+			number = \chinese{subsection},
+		}
+	}
+
+%符号支持
+%\usepackage{gensymb}
+
+%单位
+\usepackage{siunitx}
+	\sisetup{
+		number-math-rm = \ensuremath,
+		inter-unit-product = \ensuremath{{}\cdot{}},
+		group-digits = integer,
+		group-minimum-digits = 4,
+		group-separator = \text{~}
+	}
+
+%项目列表
+\usepackage{enumitem}
+	\SetLabelAlign{leftalignwithindent}{\hspace{2.1 em} \makebox[1.6 em][l]{#1}}
+
+%定理类环境
+\usepackage[thmmarks, amsmath]{ntheorem}
+	\theoremstyle{empty} %不带编号
+	\theoremsymbol{\ensuremath{\Box}}
+		\newtheorem{_myProof}{}
+	
+	\theoremstyle{empty} %不带编号
+	\theoremheaderfont{\myHeavy}
+	\theorembodyfont{\CJKfamily{楷体}}
+	\theoremsymbol{}
+%	\theoremindent \parindent
+		\newtheorem{_myThm}{}
+	
+	\theoremstyle{plain} %带编号
+	\theoremheaderfont{\myHeavy}
+	\theorembodyfont{\normalfont}
+	\theoremsymbol{}
+%	\theoremsymbol{\ensuremath{\triangleleft}}
+		\newtheorem{myExample}{例}[chapter]
+
+%表格
+\usepackage{array}
+	\newcolumntype{M}{>{$}c<{$}} %数学模式，居中
+\usepackage{tabularx}
+	\newcolumntype{Y}{>{\centering\arraybackslash}X} %定宽居中
+\usepackage{booktabs} %三线表
+
+%图片
+\usepackage{graphicx}
+\usepackage{asymptote}
+	\begin{asydef}
+		usepackage("amsmath");
+		usepackage("mathtools");
+		usepackage("mathdesign", "adobe-garamond");
+		usepackage("bm");
+		usepackage("xeCJK");
+			texpreamble("\setCJKmainfont[BoldFont = 华文中宋, ItalicFont = 方正楷体_GBK, Mapping = fullwidth-stop ]{方正书宋_GBK}");
+			texpreamble("\setmainfont{AGaramondPro-Regular.otf}");
+		usepackage("siunitx");
+			texpreamble("\sisetup{
+				number-math-rm = \ensuremath,
+				inter-unit-product = \ensuremath{{}\cdot{}},
+				group-digits = integer,
+				group-minimum-digits = 4,
+				group-separator = \text{~}
+			}");
+		
+		size(6 cm);
+		
+		defaultpen(fontsize(9 pt));
+		
+		pen color1 = rgb(0.368417, 0.506779, 0.709798);
+		pen color2 = rgb(0.880722, 0.611041, 0.142051);
+		pen color3 = rgb(0.560181, 0.691569, 0.194885);
+		pen color4 = rgb(0.922526, 0.385626, 0.209179);
+		pen color5 = rgb(0.647624, 0.378160, 0.614037);
+		pen color6 = rgb(0.772079, 0.431554, 0.102387);
+		pen color7 = rgb(0.363898, 0.618501, 0.782349);
+		pen color8 = rgb(0.972829, 0.621644, 0.073362);
+	\end{asydef}
+
+%浮动体、图标标题
+\renewcommand{\thefigure}{\arabic{chapter}.\arabic{figure}}
+\usepackage{floatrow}
+	\floatsetup[table]{capposition = top}
+\usepackage{caption}
+	\DeclareCaptionFont{myCationFont}{\CJKfamily{楷体} \small}
+	\captionsetup[figure]{
+		font = myCationFont,
+		labelsep = quad,
+		skip = 10 pt,
+		position = bottom
+	}
+	\captionsetup[table]{
+		font = myCationFont,
+		labelsep = quad,
+		skip = 10 pt,
+		position = top
+	}
+
+
+%TODO——自定义环境
+%自定义定理（定律）
+\newenvironment{myThm}[1]
+	{\begin{_myThm}[\hskip 2 em #1]}
+	{\end{_myThm}}
+\newenvironment{myThm*}
+	{\begin{_myThm} \hskip 2 em}
+	{\end{_myThm}}
+%自定义证明（说明）
+\newenvironment{myProof}
+	{\begin{_myProof} \normalfont \small \CJKfamily{仿宋} \hskip 2 em}
+	{\end{_myProof}}
+%自定义列表
+\newenvironment{myEnum1}
+	{\begin{enumerate} [label = \alph*), align = leftalignwithindent, leftmargin = 0 pt, itemsep = 10 pt, parsep = 0 pt, listparindent = 2 em]}
+	{\end{enumerate}}
+\newenvironment{myEnum2}
+	{\begin{enumerate} [label = (\Roman*), align = leftalignwithindent, leftmargin = 2 em, topsep = 0pt, itemsep = 0 pt, parsep = 0 pt, listparindent = 2 em]}
+	{\end{enumerate}}
+%子公式
+\newenvironment{mySubEq}
+	{\subequations \renewcommand{\theequation}{\theparentequation-\alph{equation}}}
+	{\endsubequations
+	\ignorespacesafterend}
+%带框公式
+\newenvironment{boxedEq}
+	{\empheq[box = \fbox]{equation}}
+	{\endempheq}
+%大括号公式
+\newenvironment{braceEq}[1][align]
+	{\mySubEq
+		\setkeys{EmphEqEnv}{#1}
+		\setkeys{EmphEqOpt}{left = \empheqlbrace}
+		\EmphEqMainEnv}
+	{\endEmphEqMainEnv \endmySubEq}
+%自定义表格 {format}{caption}{label}
+\newenvironment{myTable}[4][htb]
+	{\begin{table}[#1] \centering \small \caption{#3} \label{#4} \begin{tabular}{#2}}
+	{\end{tabular} \end{table}}
+
+%TODO——自定义命令
+%\input{Symbols.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%大写正体字母
+\newcommand{\rmY}{\mathrm{Y}}
+
+%大写手写体字母
+\newcommand{\scF}{\mathcal{F}}
+\newcommand{\scH}{\mathcal{H}}
+\newcommand{\scI}{\mathcal{I}}
+\newcommand{\scJ}{\mathcal{J}}
+\newcommand{\scL}{\mathcal{L}}
+\newcommand{\scP}{\mathcal{P}}
+\newcommand{\scR}{\mathcal{R}}
+\newcommand{\scS}{\mathcal{S}}
+
+%小写希腊字母
+\renewcommand{\a}{\alpha}
+\renewcommand{\b}{\beta}
+\newcommand{\g}{\gamma}
+\renewcommand{\d}{\delta}
+\newcommand{\e}{\epsilon}
+\newcommand{\ve}{\varepsilon}
+\newcommand{\z}{\zeta}
+\newcommand{\h}{\eta}
+\newcommand{\q}{\theta}
+\renewcommand{\th}{\theta}
+\newcommand{\vq}{\vartheta}
+\newcommand{\vth}{\vartheta}
+\renewcommand{\i}{\iota}
+\renewcommand{\k}{\varkappa} %这两个是相反的
+\newcommand{\vk}{\kappa} %这两个是相反的
+\renewcommand{\l}{\lambda}
+\renewcommand{\m}{\mu}
+\newcommand{\n}{\nu}
+\newcommand{\x}{\xi}
+%\renewcommand{\p}{\pi} %\p 已定义为正体π
+\newcommand{\vp}{\varpi}
+\renewcommand{\r}{\rho}
+\newcommand{\vr}{\varrho}
+\newcommand{\s}{\sigma}
+\newcommand{\vs}{\varsigma}
+\renewcommand{\t}{\tau}
+\renewcommand{\u}{\upsilon}
+\newcommand{\f}{\phi}
+\renewcommand{\j}{\varphi}
+\newcommand{\vf}{\varphi}
+\renewcommand{\c}{\chi}
+\newcommand{\y}{\psi}
+\renewcommand{\o}{\omega}
+\newcommand{\w}{\omega}
+
+%大写希腊字母
+\renewcommand{\G}{\varGamma}
+\newcommand{\D}{\varDelta}
+\newcommand{\Q}{\varTheta}
+\newcommand{\Th}{\varTheta}
+\renewcommand{\L}{\varLambda}
+\newcommand{\X}{\varXi}
+\renewcommand{\P}{\varPi}
+\let \secSymbol = \S
+\renewcommand{\S}{\varSigma}
+\renewcommand{\U}{\varUpsilon}
+\newcommand{\F}{\varPhi}
+\newcommand{\Y}{\varPsi}
+\renewcommand{\O}{\varOmega}
+\newcommand{\W}{\varOmega}
+
+%常数
+\newcommand{\p}{\piup} %圆周率
+\newcommand{\ee}{\mathrm{e}} %自然对数基
+\newcommand{\ii}{\mathrm{i}} %虚数单位
+\newcommand{\hb}{\hbar} %约化Planck常数
+\newcommand{\kB}{k_{\mathrm{B}}} %Boltzmann常数
+\newcommand{\pfs}{\e_0} %真空介电常数 Permittivity of Free Space
+
+%数学修饰符号
+\newcommand{\vecb}[1]{\bm{#1}} %矢量用斜体，根据ISO 80000-2/2009
+\renewcommand{\bar}[1]{\overline{#1}} %上横线
+\newcommand{\tl}[1]{\widetilde{#1}} %弯号
+\newcommand{\op}[1]{\hat{#1}} %量子力学算符
+
+%数学函数
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert} %绝对值
+
+%算子、算符
+%已经调整好前后间距
+\DeclareMathOperator{\incr}{\Delta\!}
+\DeclareMathOperator{\dd}{\mathrm{d}\!} %微分 Differential D
+\DeclareMathOperator{\db}{{\mkern2.5mu\mathchar'26\mkern-11mu\mathrm{d}}\!} %不完全微分 Inexact Differential D; Only for "Adobe Garamond" font!
+\DeclareMathOperator{\pd}{\partial\!} %偏微分 Partial D
+\DeclareMathOperator{\vd}{\deltaup\!} %变分 Variational D
+\DeclareMathOperator{\laplac}{\nabla^2\!} %Laplace算子
+
+%复合数学符号
+\newcommand{\infint}{\int_{-\infty}^{+\infty}} %上下限无穷的积分
+\newcommand{\iTonSum}{\sum_{i = 1}^{n}} %求和 i=1..n
+\newcommand{\iToNSum}{\sum_{i = 1}^{N}} %求和 i=1..N
+\newcommand{\nEnum}[2]{#1 = 1, \, 2, \, \dots, \, #2} %如x=1,2,...,n
+%\newcommand{\coordinateLabel}[2]{#1\text{-}#2} %如p-V坐标
+\newcommand{\myPartial}[3]{\left( \frac{\pd #1}{\pd #2} \right)_{#3}} %带括号的偏微分
+\newcommand{\myPartialDisplay}[3]{\left( \dfrac{\pd #1}{\pd #2} \right)_{#3}}
+
+%重定义符号
+\newcommand{\approach}{\rightarrow} %趋向于
+\newcommand{\eqdef}{\equiv} %定义等号（三线）
+\newcommand{\dotTimes}{\cdot} %点乘
+
+%公式用标点、文字
+\newcommand{\comma}{\text{，}}
+\newcommand{\fullstop}{\text{．}}
+\newcommand{\semicomma}{\text{；}}
+\newcommand{\const}{\text{const.}}
+
+%正文用符号
+%\catcode`\。 = \active
+%\newcommand{。}{．} %句号用句点代替，已用xeCJK的Mapping代替
+%\newcommand{\mySec}{{\fontspec{Times New Roman} \S \,}} %TODO：20160302 冲突；章节符号，Garamond 字体不好看
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%强调
+\newcommand{\emphA}[1]{{\myHeavy #1}}
+\newcommand{\emphB}[1]{{\itshape #1}}
+
+%引入文件
+\let \oldInclude = \include
+\renewcommand{\include}[1]{{\let \clearpage = \relax \oldInclude{#1}}}
+
+%空行
+\newcommand{\blankline}{\mbox{}}
+
+%自定义列表项目（不可删除换行！）
+\newcommand{\myItem}[1]{
+	\item
+	{\bfseries #1}
+	
+	
+}
+
+%引用格式
+\newcommand{\secref}[1]{\secSymbol \ref{#1} }
+\newcommand{\subsecref}[1]{第\ref{#1}小节}
+\newcommand{\egref}[1]{例 \ref{#1}}
+
+%公式标注
+\newcommand{\myTag}[1]{\tag*{\CJKfamily{楷体} [#1]}}
+\newcommand{\myTagNumbering}[1]{\refstepcounter{equation} \tag*{\CJKfamily{楷体} [#1] \, (\theequation)} }
+
+%TODO——标题页
+\title{
+	\vspace{-4 cm}
+	\bfseries
+	热力学与统计物理I
+}
+\author{
+	\CJKfamily{楷体}
+	复旦大学\phantom{空格}陈焱
+}
+\date{
+	\CJKfamily{楷体}
+	\today
+}
+
+\begin{document}
+%	\maketitle
+%	
+%	\frontmatter
+%	{\let \cleardoublepage = \clearpage
+%		\chapter{绪论}
+%			\include{Chapters/Front_Introduction}
+%			
+%		\chapter{符号表}
+%			\include{Chapters/Front_Symbols}
+%			
+%		\chapter{缩略词表}
+%			\include{Chapters/Front_Abbreviations}
+%	}
+%	\mainmatter
+%	\part{热力学}
+		\chapter{热力学基础}
+			\include{Chapters/Chapter1}
+			
+		\chapter{均匀系统的平衡特性}
+			\include{Chapters/Chapter2}
+			
+		\chapter{相变的热力学理论}
+			\include{Chapters/Chapter3}
+			
+%		\chapter{多元复相 热力学第三定律}
+%			\include{Chapters/Chapter4}
+%			
+%	\part{统计物理}
+		\chapter{统计物理学基本概念}
+			\include{Chapters/Chapter5}
+%		
+%		\chapter{三大统计}
+%			\include{Chapters/Chapter6}
+%		
+%		\chapter{系综理论}
+%			\include{Chapters/Chapter7}
+%		
+%		\chapter{相变的统计物理简介}
+%			\include{Chapters/Chapter8}
+		
+\end{document}

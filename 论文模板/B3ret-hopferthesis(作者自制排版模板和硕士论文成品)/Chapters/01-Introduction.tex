@@ -1,0 +1,361 @@
+%- air flow through car
+%- CFD vs. Kuli
+
+%************************************************
+\chapter{Introduction}
+\label{chp:intro}
+%************************************************
+\quotegraffito{Begin at the beginning and go on till you come to the end: then stop.}
+{The King, Alice in Wonderland\protect~\cite{Alice}}
+%
+This chapter starts with describing the primary motivation for this work, the construction of car cooling systems. The engineering task itself is described as well as two auxiliary tools and their respective design processes, namely resistance graphs and \acs{CFD} simulations. Then a hybrid approach using both of these tools and its advantages are discussed. After shortly describing the main dataset of this thesis and other applications of this work, the chapter goes on discussing why results from cluster analysis and image segmentation are hard to apply.
+Finally, the proposed solution is sketched shortly.
+
+
+%===================================================================================
+\section{Construction of car cooling systems}
+Constructing the air side of the cooling system of a car is a difficult task. The cooler and fan have to be designed, sized, and placed under the hood of the car so that all hot components are kept cool. Insufficient design, poor placement or undersizing of the cooler or the fan can lead to overheating of a part. Oversizing the cooler or the fan adds weight and wastes material and underhood space.
+
+All these factors have to be taken into consideration for different \emph{operating points}, \ie, at different speeds and loads. A car driving slowly upwards a steep hill has a high load and must rely on the fan for air intake. 
+\graffito{Old cars like Porsche~911 and Volkswagen Beetle cooled their engines directly with head wind.} A car driving at high speed on a highway also has a high load, but thoughtful construction takes advantage of the speed for air intake. Typical operating points are:
+%
+\begin{description}
+%
+  \item[Stationary car] (\SI{0}{\kmh}): If the car stands still with a running engine, \eg, at traffic lights, only the fan provides cool air to the cooler.
+%
+  \item[Dominant fan influence] (\SIrange{30}{65}{\kmh}): At low speeds like these, the fan still dominates the air intake, but the engine load is higher than for the stationary car. Typically two operation points are chosen in this range.
+%
+  \item[Wind tunnel speed] (\ca\SI{140}{\kmh}): This is the usual speed for aerodynamic measurements in the wind tunnel. The fan has almost no influence on the air intake anymore as the air is pushed under the hood by the high speed.
+%
+  \item[Maximum speed] (\eg, \SI{260}{\kmh}): The maximum speed of the car. The fan is ``overblown'', \ie, it behaves like a resistance for the air pushed under the hood.
+%
+\end{description}
+
+Car designers must ensure proper cooling under all of these conditions. In order to achieve that they must understand the air flow under the hood of the car for all defined operating points. The \emph{underhood air flow} is the entire flow of air between the hood and the base plate from all air inlets to all air outlets. If this flow of air is understood, engineers can base their design decisions, like changing vehicle part placement or adding barriers, on that. This work only covers \emph{static flows}, \ie, the constant air flow observed for stationary boundary conditions. Time-dependent boundary conditions (\eg, an accelerating car) leading to \emph{transient flows} are out of scope.
+
+
+
+%===================================================================================
+\subsection{Expert generated resistance graphs}
+\label{sec:intro:resistance-graphs}
+
+One tool that aids engineers during the design of car cooling systems is \emph{\kuli}\cite{KULI}. The air flow is modeled by a graph with only a few nodes (typically from \numrange{10}{20}), where each vertex represents one part of the space under the hood. Several geometric primitives are available for these vertices, \eg, the fan can be modeled as a cylinder, the cooler as a cuboid and less important geometry as simple points. Edges represent possible air flow and the vertices hold resistance data to compute these air flows.
+
+To generalize this concept, the term \emph{resistance graph} will be used. \graffito{The terms ``resistance~graph'' and ``flow graph'' are not actually used within \kuli.} It denotes the abstract concept of graphs which hold sufficient resistance information to simulate the air flow. The result of simulating a resistance graph is a graph with complete flow information for each vertex and edge, a \emph{flow graph}.
+
+%\deleted{[Figure deleted] shows the \threeD-view of an example \kuli resistance graph within the \kuli \ac{GUI}.}
+
+
+%%\normfigure[pos=h!t,
+%%            %opt={width=0.9\textwidth},
+%%            label={fig:intro:kuli-3d},
+%%            shortcaption={\threeD \kuli graph example.}]
+%%{c-intro-kuli-3d}
+%%{\threeD-view of a \kuli graph within the \kuli \protect\acs{GUI}. The two cylinders at vertex~$5$ model two fans and the plate at vertex~$6$ models the cooler. The other vertices model different kinds of resistances.}
+
+The main advantage of tools based on resistance graphs is the fast simulation of all operating points. \kuli also adds the possibility to simulate the air side and the water side of the cooling system simultaneously. It is therefore a tool for planning the whole cooling system.
+
+The big disadvantage of \kuli is the need to define the graph representation of the air side. This task demands expertise and speculation and can result in various possible representations. The quality of these representations depends on the experience of the engineer and cannot be directly ascertained or compared.
+This leads to a repeatability problem: Different engineers produce different resistance graphs, and it is hard to single out the best representation.
+
+\autoref{fig:intro:designprocess-resistance} explains the role of resistant graph tools like \kuli within the design process. It is clearly shown that all information about the flow comes ultimately from the expert creating the graph. Notice, that additional operation points do not add considerable processing time, because each simulation only takes a few seconds.
+
+\normfigure[pos=tbhp,
+            %opt={width=8.25cm},
+            label={fig:intro:designprocess-resistance},
+            shortcaption={Resistance graph design process.}]
+{intro-designprocess-resistance}
+{Design process using resistance graphs. An expert creates the resistance graph. The air flow is simulated using this graph for several operation points (OP1 to OP6), which requires only a few seconds. The resulting flow graphs for the operation points (ROP1 to ROP6) are then used to guide further design decisions. Design decisions usually lead to changes in the resistance graph and the process starts again.}
+
+
+%===================================================================================
+\subsection{Computational fluid dynamics}
+\label{sec:intro:cfd-simulations}
+
+
+\quotegraffito{The world is continuous, but the mind is discrete.}
+{David Mumford}
+%
+Another important tool for understanding air flows is a \ac{CFD} simulation. Its main idea is to discretize the continuous problem of flow simulation by dividing the simulation volume into small \emph{cells}, called the \emph{grid} or the \emph{mesh}.\footnote{``Mesh'' is the term used in Computer Science whereas ``grid'' or in this case ``unstructured grid'' is the \acs{CFD} community term. They are interchangeable with each other and both will be used throughout the thesis.} For each cell, flow parameters (\eg, velocity, pressure, temperature) are assumed constant. The parameters of each cell are related to the parameters of its neighbor cells by nonlinear equations, namely conservation of mass and conservation of momentum (Navier-Stokes equations). After adding boundary conditions (\eg, outside pressure and car velocity), the flow parameters of each cell are calculated from the system of nonlinear equations by iterative numerical methods, up to a predefined error. This permitted error is the deviation of the calculated boundary condition values to the predefined ones. It can be decreased by increasing the number of iterations of the solver. \autoref{fig:intro:cfd-example} shows the rendered partial result of a \ac{CFD} simulation of the \toyotadataset~\cite{toyotadataset}.\graffito{The Toyota dataset is used throughout this thesis, a detailed explanation can be found in \autoref{sec:intro:toyota-dataset}.} As the term ``\ac{CFD} simulation result'' is cumbersome to use, the shorter term \emph{flow field} will be used to talk about data with this structure and not specifically about the result of a \ac{CFD} simulation.
+
+\normfigure[pos=tbhp,
+           %opt={width=0.9\textwidth},
+           label={fig:intro:cfd-example},
+           shortcaption={\threeD \protect\acs{CFD} example.}]
+{intro-cfd-example}
+{\threeD-view of a \protect\acs{CFD} simulation result subset of the \toyotadataset. The subset is located between an upper front air inlet and the cooler. In the Toyota dataset the parameters (pressure, velocity, and temperature) are assigned to the grid points, not the mesh cells. In this visualization blue lines represent the cell borders (\ie, mesh edges), pressure is indicated by surface color, and velocity is indicated by thick arrows which are colored by magnitude.}
+
+
+The main advantage of \ac{CFD} simulations is their freely definable quality. The resolution of a simulation can easily be increased by reducing the cell sizes and the precision of the result can easily be increased by lowering the permitted error.
+
+The second advantage is that the results of a \ac{CFD} simulation do not rely heavily on user expertise.\footnote{Of course user expertise is needed for defining the mesh, the boundary conditions, and other simulation input.} The simulation result depends only on the \threeD-dataset and the boundary conditions.
+
+One disadvantage of \ac{CFD} simulations is the required computation time for iteratively solving systems of millions of nonlinear equations.\footnote{I was told to be careful when stating \protect\acs{CFD} simulation times, as they can vary greatly. Usually simulation of the Toyota dataset takes from a few hours up to one night on a state-of-the-art workstation.} Notice that for the car cooling use case, one simulation is required for each operation point, due to the different boundary conditions. A resistance graph based simulation on the other hand is finished in mere seconds on a standard PC and multiple executions for different operation points are therefore not a problem.
+
+Another disadvantage of \ac{CFD} simulations is the sheer amount of output data produced. The output is a set of flow parameters at every cell. The main challenge after a \ac{CFD} simulation is therefore understanding the resulting flow field and extracting important information to guide the design of the cooling system.
+
+Methods for visualizing and understanding flow fields are for example false-colored renderings of dataset slices or streamlines. A streamline is a line within a flow field which follows the flow direction at every point, \ie, it is a tangent to the flow direction at every point. Another way to think of streamlines is as the path of a massless particle floating through the field. A streamline is therefore uniquely defined by a \emph{seed point} within a given flow field. The according streamline is created by a \emph{stream tracer} which is tracing the flow field starting at the seed point by employing integration methods. More information on streamline generation can be found in \autoref{sec:theory:stream_tracing}.
+
+\normfigure[pos=tbhp,
+            %opt={width=10cm},
+            label={fig:intro:designprocess-CFD},
+            shortcaption={\protect\acs{CFD} design process.}]
+{intro-designprocess-CFD}
+{Design process using \protect\acs{CFD} simulations. \protect\acs{CFD} simulations are applied to the \threeD-model for each operation point (OP1 to OP6), which takes a few hours per simulation on a standard computer. The results are then visualized and interpreted leading to one result per operation point (ROP1 to ROP6). These results guide further design decisions, which change the \threed-model and require another simulation iteration.}
+
+\autoref{fig:intro:designprocess-CFD} shows the design process when using \ac{CFD} simulations. Since \ac{CFD} simulation takes significantly longer than resistance graph simulation, adding operation points increases computation time significantly. Remember that the design process is iterative, \ie, design decisions usually lead to a different \threed-model and require new simulations.
+
+
+%===================================================================================
+\subsection{\protect\acs{CFD}-derived resistance graphs}
+\label{sec:cfd-graph-approach}
+
+The primary goal of this thesis was to bridge the gap between resistance graph representations and the flow fields which result from \ac{CFD} simulations. 
+Ideally, the result is an algorithm that takes a flow field as input and creates a resistance graph with a few dozen vertices as output.
+
+The global approach for solving this problem is straightforward: In a first step, derive a flow graph from the flow field. From the flow graph, the resistance graph can be generated in the second step. To derive the flow graph the flow field needs to be divided into disjoint regions, \ie, into a partition of the \threeD-mesh. The regions of this partition become the vertices of the graph. Two regions sharing a common boundary surface are connected by an edge, because there is possible flow between them. Additional information like the mean velocity and mean pressure of vertices or the exact flow over edges are attached to the graph elements.
+
+Flow graphs can be generated for any partition with connected regions, but resistance graph simulations are based on the assumption that there is exactly one flow condition at each vertex. Therefore \emph{homogeneous} partitions with respect to the pressure and the velocity field are favorable for computing meaningful resistance graphs. The important observation here is that \ac{CFD} simulation results are highly redundant, \ie, close cells usually have similar flow parameters and can therefore be grouped without losing much information. Stated differently, if the partition consists of homogeneous regions, the lost information due to collapsing cells to one vertex is smaller than for arbitrary regions. \autoref{fig:intro:simple-vector-field} shows a simple vector field partitioned in both a homogeneous and a inhomogeneous region.
+
+\bigdoublefigure[pos=tbhp,
+                  mainlabel={fig:intro:simple-vector-field},
+                  maincaption={A simple \twoD vector field partitioned into two good (left) and two poor (right) regions, from a homogeneity standpoint. The smaller top right copies represent the information reduction after conversion to the flow graph: Each region is represented by only one average velocity. Clearly, the good partition retains more information about the flow field. The poor partition however, is almost as descriptive as using only one region for the whole field (small blue figure).},
+                  mainshortcaption={Good and poor flow partitions.},%
+                  %leftopt={width=0.47\textwidth},
+                  leftlabel={fig:intro:simple-vector-field-homogeneous},
+                  leftcaption={Good, homogeneous partition.},
+                  leftshortcaption={},%
+                  %rightopt={width=0.47\textwidth},
+                  rightlabel={fig:intro:simple-vector-field-nonhomogeneous},
+                  rightcaption={Bad, inhomogeneous partition.},
+                  rightshortcaption={},
+                  spacing={\hspace{1cm}}
+                ]
+{intro-simple-vector-field-good}{intro-simple-vector-field-bad}
+
+
+
+The derivation of resistance graphs from flow graphs is not part of this work, as it depends on the underlying simulation algorithm.\footnote{The research group at \protect\acs{ViF} assumes that \kuli is not capable of handling vertex counts in the hundreds. Therefore the derivation of a \kuli resistance graph from a flow graph was not performed.} It is assumed however that the resistance graph simulation is reversible, \ie, that an algorithm computing a flow graph from a resistance graph can be reversed.
+
+One benefit of such an automated mapping from flow fields to resistance graphs would be deeper understanding of resistance graphs. Instead of relying on experts to create correct resistance graphs, research could be done on ways or rules to create sound graphs using the repeatable results of automatic resistance graph generation.
+
+Another hope of this thesis is that the resistance graph computed from a flow field may produce sufficiently correct simulation results for nearby operating points. This would reduce the number of required \ac{CFD} simulations without losing considerable accuracy. \autoref{fig:intro:designprocess-combined} explains the hybrid design process if this hope is justified. Also notice that if the operation point range is completely covered by \ac{CFD}-derived resistance graphs, additional operation points can be added without significantly increasing the computation time.
+
+
+\bigfigure[pos=tbhp,
+           %width=13.75cm,
+           label={fig:intro:designprocess-combined},
+           shortcaption={Resistance graph design process.}]
+{intro-designprocess-combined}
+{Design process using a few \protect\acs{CFD} simulations and converting them to resistance graphs. \protect\acs{CFD} simulations are applied to the \threeD-model for some operation points (OP2 and OP5), which usually takes a few hours per simulation on a standard workstation. The resulting flow fields of these simulations are then partitioned and converted to flow graphs which again can be converted to a resistance graphs. If the resistance graphs are also valid for similar operation points (\eg, OP1 and OP3 are similar to OP2, OP4, and OP6 are similar to OP5), these similar operation points can be directly simulated using the resistance graphs and computation time can be decreased significantly. The process is an iterative optimization process, \ie, after design changes are made, simulations have to be redone.}
+
+
+%===================================================================================
+\section{The Toyota dataset}
+\label{sec:intro:toyota-dataset}
+
+\graffito{The dataset uses the outside hull of the Prius, but compared to a modern car, the inside looks empty. It turned out that this did not invalidate the applicability to real world problems.}
+The \ac{CFD} simulation results used for this thesis were provided by the research group at \ac{ViF} and are based on the Toyota Prius dataset~\cite{toyotadataset}. \ac{CFD} simulation results for three operation points were provided: 
+At \SI{30}{\kmh}, at \SI{190}{\kmh}, and at \vmax (\SI{262}{\kmh}). The \ac{CFD} result at \vmax is shown in \autoref{fig:intro:toyota-cutout}. The figure also shows a problem with cells outside the hood boundaries, which has to be overcome in preprocessing.
+
+\bigfigure[pos=tbh,
+           %opt={width=0.9\textwidth},
+           label={fig:intro:toyota-cutout},
+           shortcaption={The \toyotadataset.}]
+{intro-toyota-cutout-big}
+{The \toyotadataset used for most demonstrations in this thesis at $\vmax$. The car hood is shown from the front with the three main inlet openings visible. The cut-out was added for illustration purposes. The colors represent velocity magnitude.}
+
+The \threeD unstructured grid is divided into approximately \num{9.1} million cells which are based on approximately \num{8.9} million points. It features four basic cell types, with hexahedra filling most of the space and other cell types filling in the seams and details. The four cell types are shown in \autoref{fig:intro:cell-types}.
+
+\begin{figure}[tbhp]
+	\centering
+	\subfloat[Tetrahedron)]{
+		\includegraphics{intro-tetra}
+	}
+	\subfloat[Pyramid]{
+		\includegraphics{intro-pyramid}
+	}
+	\subfloat[Wedge]{
+		\includegraphics{intro-wedge}
+	}
+	\subfloat[Hexahedron]{
+		\includegraphics{intro-hexahedron}
+	}
+	\caption[Cell types in the \toyotadataset.]{Cell types used within the Toyota dataset's \threeD-mesh.}
+	\label{fig:intro:cell-types}
+\end{figure}
+
+As explained in \autoref{sec:intro:cfd-simulations} the \ac{CFD} simulation computes flow parameters at each cell. At the end of the simulation however, flow parameters are assigned to the grid points -- the corners of the cells -- for the \toyotadataset. Therefore, one can also think of the simulation output as dense point cloud, with fixed flow parameters at every point. From this point of view, the cells only add connectivity information.
+
+Each point of the point cloud carries at least seven values and is therefore at least \num{7}-dimensional. The seven dimensions are made up by three values for its Euclidean position, three values for the velocity vector, and one value for the pressure.
+
+The problems of the dataset and required preprocessing steps are described in the theory and implementation chapters (\autoref{sec:theory:preprocessing} and \autoref{sec:impl:preprocessing}).
+
+%- Motorhaube Toyota
+%- 8M würfelchen (und anderes) -> verstehen
+%- Reduktion auf 100 Knoten (-> später in Results als utopie), wenig Informationsverlust
+%- Clustering
+%- Zeit!!!
+
+
+%===================================================================================
+\section{Understanding \threeD flow fields} \label{sec:intro:understanding-flow-fields}
+
+\quotegraffito{Computers are useless. They can only give you answers.}
+{Pablo Picasso}
+%
+After being introduced to the specific car cooling problem in the previous sections, one might think that the solution to the problem is also very specific. This is not the case. As explained, the key to the solution is an abstract subproblem:
+
+\begin{quote}
+\emph{Given:} A flow field, \ie, a dense mesh of probably millions of elements with assigned velocities and pressures.
+
+Find a sparse flow graph that preserves as much information of the flow field as possible, \ie, a graph where vertices represent homogeneous regions and edges represent flow between these regions.
+\end{quote}
+
+\quotegraffito{The purpose of computation is insight, not numbers.}
+{Richard Hamming}
+%
+Having a solution to this problem not only aids in designing car cooling systems. It also helps in \emph{understanding} flow fields by reducing redundancy and stressing important features. One straightforward application of using flow graphs to understand flow fields is \emph{interactive flow exploration}. \autoref{sec:results:applicability-visualization} shows one example of how flow graphs could be used to build a graph based flow exploration tool. Notice, however, that a flow graph is a good tool for visualizing and understanding the coarse features like volume and mass flow rates or pressure distributions, but it is not suited for analyzing small local features like vortices. A region containing mainly small curls compared to the flow graph resolution is a dead end for flow graphs: Incoming and outgoing volume flow rates are almost zero. Circular flows that are larger than the flow graph resolution on the other hand, can be represented by circles in the flow graph.
+
+
+
+%===================================================================================
+\section{Related research topics}
+\label{sec:intro:related-research-topics}
+
+%\quotegraffito{For every complex problem there is an answer that is clear, simple, and wrong.}{Henry Mencken}
+
+Several research topics are related to partitioning flow fields into homogeneous regions. Two related topics come immediately to mind: \emph{cluster analysis} from statistics and \emph{image segmentation} from image processing. The following subsections shortly explain these research topics and discuss the applicability of their results to flow field partitioning.
+
+
+%===================================================================================
+\subsection{Applicability of cluster analysis}
+\label{sec:intro:appl-cluster}
+
+ There is no exact, commonly agreed on definition for \emph{cluster}. \cauthor{Everitt} even states that ``\ldots it turns out that such formal definition is not only difficult but may even be misplaced.''~\cite{Everitt}. An informal definition might be that cluster analysis tries to \emph{group similar objects} together into clusters, while trying to \emph{separate dissimilar objects}. One important property of all clustering algorithms is that the grouped objects are statistical $n$-dimensional tuples or vectors. Each tuple is usually represented by a point in $n$-dimensional space and ``similarity'' of points is usually defined by a \emph{distance function} between these points. Therefore algorithms from cluster analysis can easily be applied to the \num{7}-dimensional point cloud described in \autoref{sec:intro:toyota-dataset}.
+
+The problem with this approach is that almost all advanced clustering algorithms work \emph{solely} on point clouds (\eg, \kMeans, kernel based methods, density based methods). This implies that they cannot take connectivity information into account. After clustering the point cloud to point clusters, the clusters need to be mapped to the cell grid. Some of the resulting regions in the cell grid might not be connected or some point cluster may even be completely scattered on the cell grid. See \autoref{fig:intro:cluster-problem-split} for a simple example of this problem. To produce the required \emph{compact} clusters \wrt spatial position, the distance measure must therefore put strong emphasis on the spatial distances in \threeD-space between the points. This however limits the algorithm's potential to cluster according to flow parameters. The main problem for utilizing clustering algorithms is therefore to derive a reasonable distance function that accounts both for spatial compactness and flow homogeneity.  
+
+Another problem for using cluster algorithms is existing geometry which separates the dataset, \ie, areas where constructional elements divide the \ac{CFD} volume. As the \ac{CFD} volume only covers the fluid, there are no cells within these constructional elements and no clustering should occur through these parts. As cluster algorithms only use point clouds, small model parts (like thin plates), can easily be ``jumped over'', leading to clusters as shown in \autoref{fig:intro:cluster-problem-part}. 
+
+In addition not all cluster algorithms qualify for the problem because of computational limits (\ie, about \num{8}~million \num{7}-dimensional points).
+
+\bigdoublefigure[pos=tbhp,
+                 mainlabel={fig:intro:cluster-problem},
+                 maincaption={Problems with using cluster analysis approaches to partition a flow field. The left image shows one non-connected cluster (red), which results from too strong emphasis on flow parameters and too weak emphasis on Euclidean distance. The right image shows a cluster (red) going over constructional parts (hatched), because clustering algorithms work on point clouds and do not utilize connectivity information.},
+                 mainshortcaption={Cluster analysis approach problems.},%
+                 %leftopt={width=65mm},
+                 leftlabel={fig:intro:cluster-problem-split},
+                 leftcaption={Non-connected cluster.},
+                 %leftshortcaption={},%
+                 %rightopt={width=65mm},
+                 rightlabel={fig:intro:cluster-problem-part},
+                 rightcaption={Clustering over mesh boundaries.},
+                 %rightshortcaption={},
+                 spacing={\hspace{1cm}}
+                 ]
+{intro-cluster-problem-split}{intro-cluster-problem-part}
+
+The simple problems in \autoref{fig:intro:cluster-problem} can be overcome by splitting the problematic clusters, but more complex cases exist for both of these problems. Despite the mentioned problems, point cluster based approaches are employed to partition flow fields. Some approaches that utilize \kMeans on the mesh points are discussed in \autoref{sec:related:kMeans}.
+
+
+
+%===================================================================================
+\subsection{Applicability of image segmentation}
+
+Image segmentation is the wide field of extracting edges and homogeneous regions from digital images in order to aid image processing and improve image understanding. Although methods of cluster analysis were successfully employed in image segmentation (most prominently \kMeans), many image segmentation algorithms utilize the inherent neighbor information of pixels in images.
+
+Naturally, image segmentation methods which extract homogeneous regions from \twod images could be applicable to \threed \ac{CFD} data partitioning too. The pixels of an image correspond to the cells and the color information corresponds to the attached values (\ie, velocity and pressure).
+
+%The Caterpillar: What size do you want to be?
+%Alice: Oh, I'm not particular as to size, only one doesn't like changing so often, you know.
+The first problem for applying image segmentation algorithms arises from the unstructured grid in \ac{CFD} data. Pixels in images have a uniform structure and neighborhood as well as fixed size. This is not the case for unstructured \threed-grids. More problems arise from the additional dimensions of \ac{CFD} data. The following prominent image segmentation methods can theoretically be adapted to unstructured \threed-data. They are shortly described and their applicability is discussed.
+
+Edge based image segmentation methods try to find the abrupt intensity changes between different regions and use these \emph{edges} to identify the regions. In \threed this means finding complexly shaped surfaces that separate regions, which is geometrically difficult but possible. However, the fact that there are no identifiable abrupt changes in a typical flow field renders these methods useless for flow field partitioning.
+
+%\todo{Add citation for watershed}
+Other approaches that lead to great results in region based image segmentation are watershed algorithms. They interpret gray-level images as topological surface and incrementally increase or decrease water levels. Then merging ``water ponds'' define region borders. The approach is not applicable to \ac{CFD} data firstly because the resulting topology would be at least four-dimensional and secondly because there is no simple method to incorporate all flow information into the single fourth dimension.
+
+%\todo{Look at energy based methods closer to check if statements are completely correct or remove paragraph altogether.}
+Energy based methods, like the influential Mumford-Shah energy functional~\cite{MumfordShah}, minimize a cost function that contains terms for regions, edges, and intensity. This cost function could be extended to work in \threed and it would contain terms for regions, surfaces separating regions and flow information like velocity and pressure. The problem is that minimizing the complex cost function for large \ac{CFD} datasets is expected to be computationally infeasible.% If available computation time and space is of little concern, \eg, in the future or on a super computer, this approach might lead to good solutions, as the cost function is globally minimized over the whole dataset.
+
+Obvious examples of applicable simple image segmentation algorithms are region merging, region growing, and region splitting. They are usually too greedy at a local level to yield good image segmentations and similar results are expected for flow fields.
+A variety of region growing (``rapid flooding'') is used within \cauthor{McKenzie}'s flow field partitioning method~\cite{McKenzie}. %As mentioned earlier the method was reimplemented for comparison purposes and will therefore be covered later.
+A region splitting approach for vector fields was introduced by \cauthor{Heckel}~\cite{Heckel}. Both approaches are described in \autoref{chp:related}.
+
+
+%===================================================================================
+\section{Proposed solution}
+\label{sec:intro:proposed-solution}
+
+\quotegraffito{
+	\raggedright
+	\hspace{0pt}\emph{Alice:} Would you tell me, please, which way I ought to go from here?\\
+	\vspace{0.25\baselineskip}
+	\emph{The Cat:} That depends a good deal on where you want to get to.\\
+	\vspace{0.25\baselineskip}
+	\emph{Alice:} I don't much care where.\\
+	\vspace{0.25\baselineskip}
+	\emph{The Cat:} Then it doesn't much matter which way you go.\\
+	\vspace{0.25\baselineskip}
+	\emph{Alice:} \dots so long as I get somewhere.\\
+	\vspace{0.25\baselineskip}
+	\emph{The Cat:} Oh, you're sure to do that, if only you walk long enough.
+}{Alice in Wonder\-land~\cite{Alice}}
+The previous section has shown that some ideas from cluster analysis possibly lead to good flow field partitions, but their application is not straightforward and difficulties need to be overcome. The main challenge for these approaches is to find a suitable distance function, but a function meeting the requirements is not easy to find. %The difficult part is to incorporate flow parameters (\ie, mainly velocity) into clustering while keeping the resulting clusters spatially compact. See \autoref{sec:related:vector_field_vis} for further discussion.
+
+The proposed solution is completely different from the described standard approaches. It circumvents the problem of finding a distance function in an elegant way, by utilizing \emph{streamlines}. A short introduction on streamlines was already given in the context of \ac{CFD} simulation result interpretation in \autoref{sec:intro:cfd-simulations}. More information can be found in \autoref{sec:theory:stream_tracing}. The important property of streamlines is that they incorporate both spatial information and velocity information in the same geometric primitive (curves in \threed). \autoref{fig:intro:streamline-example} shows a simple example of a flow field and its dense streamline representation.
+In the streamline representation the clustering task becomes obvious: \emph{Find bundles of streamline segments which are parallel}.
+
+\bigdoublefigure[pos=tbhp,
+                 mainlabel={fig:intro:streamline-example},
+                 maincaption={A simple flow field with a separating construction element (hatched triangle). The flow field representation, with velocities at grid points, is presented on the left. The dense streamline representation, with curves conveying information about both location and flow direction, is presented on the right. The task of clustering connected cells with similar flow directions in the flow field can be translated to the task of finding bundles of parallel streamline segments in the streamline representation.},
+                 mainshortcaption={Simple streamline example.},
+                 %leftopt={width=65mm},
+                 leftlabel={fig:intro:streamline-example-cfd},
+                 leftcaption={Flow field representation.},
+                 %leftshortcaption={},%
+                 %rightopt={width=65mm},
+                 rightlabel={fig:intro:streamline-example-streamlines},
+                 rightcaption={Dense streamline representation.},
+                 %rightshortcaption={},
+                 spacing={\hspace{1cm}},
+                 topspace={\vspace{0.3cm}}
+                 ]
+{intro-streamline-example-cfd}{intro-streamline-example-streamlines}
+
+\autoref{fig:intro:streamline-example-clusters} shows two intuitive partitions for the streamline representation of \autoref{fig:intro:streamline-example}. Short bundles of many streamlines, as shown in \autoref{fig:intro:streamline-example-3clusters}, are advantageous for deriving resistance graphs.
+
+Clustering streamline segments also allows finding bent bundles, which are interesting in visualization scenarios (see \autoref{fig:intro:streamline-example-2clusters}).
+
+Building on this idea the following four-step-solution is proposed:
+%
+\begin{enumerate}
+	\item \emph{Dense streamline generation}: Generate dense streamlines, covering the whole flow field, using standard methods.
+%
+	\item \emph{Streamline bundling}: Find bundles of streamline segments which are close and parallel.
+%
+	\item \emph{Region mapping}: Map back the streamline bundles to \ac{CFD} cells to produce a partition of the flow field.
+%
+	\item \emph{Flow graph generation}: Generate the flow graph from the flow field partition by integrating cell values over regions and over interfaces between regions.
+\end{enumerate} 
+
+\bigdoublefigure[pos=tbhp,
+                 mainlabel={fig:intro:streamline-example-clusters},
+                 maincaption={Natural bundlings of the simple streamline example. For resistance graph generation, parallel bundles of streamlines are advantageous (left). For visualization purposes on the other hand, bent bundles like the one shown at the right can be more interesting.},
+                 mainshortcaption={Natural streamline bundlings.},
+                 %leftopt={width=65mm},
+                 leftlabel={fig:intro:streamline-example-3clusters},
+                 %leftcaption={Two clusters.},
+                 %leftshortcaption={},%
+                 %rightopt{width=65mm},
+                 rightlabel={fig:intro:streamline-example-2clusters},
+                 %rightcaption={Three clusters.},
+                 %rightshortcaption={},
+                 spacing={\hspace{1cm}}
+                 ]
+{intro-streamline-example-3clusters}{intro-streamline-example-2clusters}
+
+
+
+

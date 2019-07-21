@@ -1,0 +1,2234 @@
+﻿%# -*- coding:utf-8 -*-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{多\TitHspace{.5\ccwd}项\TitHspace{.5\ccwd}式}\label{ch1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{IntroPar}
+\item 本章将介绍数域上的多项式理论．读者如果有机会学习抽象代数中的环论的话，将会对本章的内容有更深刻的理解．%
+\item \ref{ch1se1}~从代数的观点定义了数环与数域，即具有加法与乘法两种运算且满足一定的运算规则的数的集合．%
+\item \ref{ch1se2}~给出了一元多项式环的定义，以及多项式的加法与乘法的基本性质．读者将会看到，多项式有许多性质与整数相类似．%
+\item \ref{ch1se3}~讨论了多项式的整除性以及一组多项式的最大公因式，这里的关键是两个多项式的辗转相除法．%
+\item \ref{ch1se4}~给出了本章的第一个主要定理——唯一析因定理，即每一个多项式都可以唯一地写成不可约多项式的乘积．%
+      读者把它同整数中的算术基本定理进行比较，就可知道这一定理的重要意义．%
+\item 根据唯一析因定理，不可约多项式的地位相当于整数中素数的地位．因此，自然需要一些方法来判定多项式的不可约性．%
+      \ref{ch1se5}~说明了复系数不可约多项式只能是一次多项式，而实系数不可约多项式只能是一次或二次多项式．%
+\item \ref{ch1se6}~给出了最有应用价值的判断整系数多项式不可约性的~Eisenstein~准则．%
+\item \ref{ch1se7}~把一元多项式推广为多元多项式．%
+\item \ref{ch1se8}~含本章的第二个主要定理——对称多项式基本定理，即每一个对称多项式都是基本对称多项式的多项式．
+\end{IntroPar}
+
+\section{整数环与数域}\label{ch1se1}
+
+迄今为止，我们已经接触到的数系有自然数系，整数系，有理数系，实数系与复数系．%
+在这些数系中，都可以进行加法运算与乘法运算．譬如，自然数系中的加法运算是指一
+个对应关系，即对于任意一对自然数~$m$~与~$n$，按照加法，可以确定唯一一个自然
+数与它们对应，这个自然数就是~$m$~与~$n$~的和~$m+n$；而自然数系中的乘法运算
+也是一个对应关系，即对于任意一对自然数~$m$~与~$n$，按照乘法，可以确定唯一一
+个自然数与它们对应，这个自然数就是~$m$~与~$n$~的积~$mn$．%
+
+抽象地说，所谓集合~$S$~中的\emph{代数运算}是指一个对应关系，即对于集合~$S$~中任意一对元素~$a$~与~$b$，
+按照这一对应关系，可以确定集合~$S$~中的唯一一个元素~$c$~与它们对应．%
+例如，复数的加，减，乘，除四则运算都是复数系中的代数运算．%
+
+一个集合引进了代数运算，这些代数运算往往具有某些性质．%
+例如，整数系的加法运算与乘法运算具有以下的性质：
+
+\begin{enumitems}
+\item[(A1)]加法结合律
+\[
+(a+b)+c=a+(b+c)\sid
+\]
+\item[(A2)]加法交换律
+\[
+a+b=b+a\sid
+\]
+\item[(A3)]有整数~$0$，它具有性质：
+\[
+a+0=0+a=a\sid
+\]
+\item[(A4)]对每个整数~$a$，总有负数~$-a$，使得
+\[
+a+(-a)=(-a)+a=0\sid
+\]
+\item[(M1)]乘法结合律
+\[
+(ab)c=a(bc)\sid
+\]
+\item[(M2)]乘法交换律
+\[
+ab=ba\sid
+\]
+\item[(M3)]有整数~$1$，它具有性质，
+\[
+a1=1a=a\sid
+\]
+\item[(D)]加乘分配律
+\[
+a(b+c)=ab+ac\cid
+\]
+其中~$a,b$~和~$c$~是任意整数．
+\end{enumitems}
+
+集合~$S$~的每一种代数运算所适合的一些最基本的性质，以及不同代数运算之间最
+基本的联系便构成了界定这些代数运算的\emph{公理}．例如，上面提到的整数的加法与
+乘法就适合结合律，交换律以及加乘分配律等．%
+
+把整数系连同加法与乘法运算的特性抽象化，便引出以下的定义．%
+
+\begin{definition}
+在集合~$R$~中规定两种代数运算，一种称为\emph{加法}运算，即对于集合~$R$~中任意一对元素~$a$~与~$b$，
+按照加法运算，集合~$R$~中有唯一一个元素~$a+b$~与它们对应，元素~$a+b$~称为~$a$~与~$b$~的\emph{和}．%
+另一种称为\emph{乘法}运算，即对于集合~$R$~中任意一对元素~$a$~与~$b$，按照乘法运算，
+集合~$R$~中有唯一一个元素~$ab$~与它们对应，元素~$ab$~称为~$a$~与~$b$~的\emph{积}．%
+
+并且，加法运算与乘法运算适合下列\emph{公理}：对于~$R$~中任意元素~$a,b$~与~$c$，有
+
+\begin{descitems}
+\item[(A1)~加法结合律]
+\[
+(a+b)+c=a+(b+c)\sid
+\]
+
+\item[(A2)~加法交换律]
+\[
+a+b=b+a\sid
+\]
+
+\item[(A3)~存在零元素] $R$~中存在一个元素，它称为~$R$~的\emph{零元素}，记作~$0$，使得
+\[
+a+0=0+a=a\sid
+\]
+
+\item[(A4)~存在负元素] 对于~$R$~中每个元素~$a$，存在元素~$b$，使
+得
+\[
+a+b=b+a=0\cid
+\]
+元素~$b$~称为元素~$a$~的\emph{负元素}，记为~$-a$；%
+
+\item[(M1)~乘法结合律]
+\[
+a(bc)=(ab)c\sid
+\]
+
+\item[(M2)~乘法交换律]
+\[
+ab=ba\sid
+\]
+
+\item[(M3)~存在单位元素]$R$~中存在一个元素，它称为\emph{单位元素}，记为~$1$，使得
+\[
+a1=1a=a\sid
+\]
+
+\item[(D)~加乘分配律]
+\[
+a(b+c)=ab+ac\cid
+\]
+\end{descitems}
+则集合~$R$~称为\emph{交换环}．
+\end{definition}
+
+容易验证，整数系是一个交换环，它称为整数环，记为~$\mZ$．%
+另外，有理数系，实数系与复数系也都是交换环，它们都是复数系的子集合．%
+
+凡复数系的子集合，如果对复数的加法与乘法成为交换环，则称为\emph{数环}．%
+
+应当指出，有理数系，实数系和复数系的乘法运算所具有的性质有些是和整数环的乘法
+性质不同的．例如，在整数环中，对于非零整数~$a\ne \pm1$，不存在整数~$b$，使得~$ab=ba=1$；%
+但在实数环中，对于非零实数~$a$，一定存在实数~$b$，使得~$ab=ba=1$．为区别起见，引进以下的定义．%
+
+\begin{definition}
+设~$\mF$~是至少有两个元素的交换环．如果对于~$\mF$~中每个非零元素~$a$，存在元
+素~$b\in\mF$，使得~$ab=ba=1$，则~$b$~称为~$a$~的\emph{逆元素}，记作~$a^{-1}$．%
+这时交换环~$\mF$~称为\emph{域}．
+\end{definition}
+
+例如，有理数系，实数系与复数系都是域，它们依次称为有理数域，实数域与复数域，
+并依次记为~$\mQ$，$\mR$~和~$\mC$．%
+
+如果复数域~$\mC$~的子集合~$\mF$~对复数的加法与乘法成为一个域，则~$\mF$~称为\emph{数域}．%
+
+可以验证，复数域的子集合
+\[
+\mQ\Brackb{\sqrt2\,}=\Braceb{a+b\sqrt2\mid a,b\in\mQ }
+\]
+对复数的加法与乘法成为一个域，所以，$\mQ\Brackb{\sqrt2\,}$~是一个数域．%
+
+\begin{exercise}
+\item 记~$\mQ\Brackb{\sqrt 2\,}=\Braceb{a+b\sqrt2\mid a,b\in\mQ}$．验证~$\mQ\Brackb{\sqrt 2\,}$~是数域．%
+\item 记~$\mZ\Brackb{\sqrt 2\,}=\Braceb{a+b\sqrt2\mid a,b\in\mZ}$．验证~$\mZ\Brackb{\sqrt 2\,}$~是数环．%
+      $\mZ\Brackb{\sqrt 2\,}$~是数域吗？
+\item 设~$\mF$~是数域，$a,b$~和~$c$~是~$\mF$~中的任意三个元素，证明下列性质成立．%
+\begin{enumitemcols}
+  \item 如果~$a+b=a+c$，则~$b=c$；%
+  \item 定义~$a-b=a+(-b)$，则~$a+(b-a)=b\sid$
+  \item $a0=0a=0$；%
+  \item $(-1)a=-a$；%
+  \item 如果~$ab=0$，则~$a=0$，或~$b=0$．
+\end{enumitemcols}
+\item 设~$\mF$~是所有有序实数对~$(a,b)$~的集合，其中~$a,b\in\mR$．%
+\begin{question}
+  \item\label{s1xt1} 如果集合~$\mF$~的加法与乘法分别定义为
+      \[
+        (a,b)+(c,d)=(a+c,b+d)\cid\quad(a,b)(c,d)=(ac,bd)\cid
+      \]
+      那么~$\mF$~是否成为域？
+\item\label{s1xt2} 如果~$\mF$~的加法与乘法分别定义为
+      \[
+        (a,b)+(c,d)=(a+c,b+d)\cid\quad(a,b)(c,d)=(ac-bd,ad+bc)\cid
+      \]
+      那么~$\mF$~是否成为域？
+\item 如果~$\mF$~表示所有有序复数对的集合；加法与乘法仍如~\ref{s1xt1}~与~\ref{s1xt2}~那样规定，结论又怎样？
+\end{question}
+\item 证明，在交换环的定义中，如果除加法交换律外，其它公理都假定成立，则可以推出加法交换律也成立．%
+      换句话说，在交换环的定义中，加法交换律这一公理可以去掉．
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{一元多项式环}\label{ch1se2}
+在中学里，我们遇到过一次方程与二次方程，它们可以从两方面推广．一方面从次数推广，即推广为~$3$~次，$4$~次以至~$n$~次的方程；%
+另一方面从系数所属的范围推广．由~\ref{ch1se1}~可以看到，系数所属的实数域可以推广为其它的数域．这就引出以下的定义．%
+
+\begin{definition}
+设~$\mF$~是数域，$x$~是未定元，$a_1,a_2,\dotsc,a_n\in\mF$，$a_n\ne0$，$n$~是非负整数．则
+\[
+f(x)=a_nx^n+a_{n-1}x^{n-1}+\dotsb+a_1x+a_0
+\]
+称为\emph{数域~$\mF$~上的一元多项式}，数域~$\mF$~上的一元多项式~$f(x)$~的全体所成的集合记为~$\mF[x]$．%
+其中~$a_ix^i$~称为多项式~$f(x)$~的~\emph{$i$~次项}，数~$a_i$~称为~$f(x)$~的~\emph{$i$~次项系数}．%
+
+特别地，$a_0$~称为~$f(x)$~的\emph{常数项}，$a_nx^n$~称为~$f(x)$~的\emph{首项}（或\emph{最高次项}），%%
+$a_n$~称为~$f(x)$~的\emph{首项系数}．如果~$a_n=1$，则~$f(x)$~称为\emph{首一多项式}．%
+
+非负整数~$n$~称为~$f(x)$~的\emph{次数}，记为~$\deg f(x)$．%
+
+如果多项式~$f(x)$~的系数全为零，则~$f(x)$~称为\emph{零多项式}，这时仍记为~$0$．约定零多项式的次数为~$-\infty$．%
+注意，零次多项式不是零多项式．有时也称零次多项式为\emph{纯量多项式}．
+\end{definition}
+
+如果上述定义中，把数域~$\mF$~改成数环，则~$f(x)$~称为\emph{数环~$\mF$~上的一元多项式}，其它的规定是相同的．%
+
+设
+\[
+\begin{aligned}
+f(x)&=a_nx^n+a_{n-1}x^{n-1}+\dotsb+ a_1x+a_0, &  a_n &\ne 0\sid\\
+g(x)&=b_mx^m+b_{m-1}x^{n-1}+\dotsb+ b_1x+b_0, &  b_m &\ne 0
+\end{aligned}
+\]
+是数域~$\mF$~上的两个多项式．如果~$f(x)$~与~$g(x)$~适合~$a_i=b_i$，$i=0,1,2,\dotsc$，则~$f(x)$~与~$g(x)$~称为\emph{相等}，
+记为~$f(x)=g(x)$．%
+
+多项式~$f(x)$~与~$g(x)$~的\emph{和~$f(x)+g(x)$}~定义为多项式
+\[
+(a_0+b_0)+(a_1+b_1)x+(a_2+b_2)x^2+\dotsb\cid
+\]
+即多项式~$f(x)+g(x)$~的~$i$~次项系数为~$a_i+b_i$，$i=1,2,\dotsc$．其中
+当~$n\ge m$~时，约定~$g(x)$~的系数~$b_{m+1},b_{m+2},\dotsc,b_n$~都
+为零，而当~$n<m$~时，约定~$f(x)$~的系数~$a_{n+1},a_{n+2},\dotsc,a_m$~都为零．于是便定义了多项式的加法．容易看出，
+\[
+\deg\Parenb{f(x)+g(x)}\le \max\Braceb{\deg f(x),~\deg g(x)}\pid
+\]
+
+容易验证，多项式的加法满足以下公理．设多项式~$f(x),g(x),h(x)\in\mF[x]$，则
+
+\begin{descitems}
+\item[(A1)~加法结合律]\mbox{}
+\[
+\Parenb{f(x)+g(x)}+h(x)=f(x)+\Parenb{g(x)+h(x)}\sid
+\]
+
+\item[(A2)~加法交换律]\mbox{}
+\[
+f(x)+g(x)=g(x)+f(x)\sid
+\]
+
+\item[(A3)~存在零元素]即存在零多项式~$0\in\mF[x]$，使得
+\[
+f(x)+0=0+f(x)=f(x)\sid
+\]
+
+\item[(A4)~存在负元素]对每个多项式
+\[
+f(x)=a_nx^n+a_{n-1}x^{n-1}+\dotsb+a_1x+a_0\cid
+\]
+都存在多项式
+\[
+-f(x)=-a_nx^n-a_{n-1}x^{n-1}-\dotsb-a_1x-a_0\cid
+\]
+它称为多项式~$f(x)$~的\emph{负多项式}，使得
+\[
+f(x)+\Parenb{-f(x)}=\Parenb{-f(x)}+f(x)=0\pid
+\]
+
+对于~$\mF[x]$~中两个多项式~$f(x)$~和~$g(x)$，其\emph{乘积~}$f(x)g(x)$~定义为
+\[
+f(x)g(x)=c_{n+m}x^{n+m}+c_{n+m-1}x^{n+m-1}+\dotsb+c_1x+c_0\cid
+\]
+\begin{align*}
+\prefixtext{其中}
+c_{n+m} & = a_nb_m\cid\\
+c_{n+m-1} & = a_nb_{m-1}+a_{n-1}b_m\cid\\
+&\eqdots[1]\\
+c_i & = \sum_{j+k=i}a_jb_k\cid\\
+&\eqdots[1]\\
+c_0 & =a_0b_0\pid
+\end{align*}
+于是规定了多项式的乘法．因为~$a_n\ne 0$，$b_m\ne 0$，故~$a_nb_m\ne 0$．所以，
+\[
+\deg\Parenb{f(x)g(x)}=\deg f(x)+\deg g(x)\pid
+\]
+
+容易验证，多项式的乘法适合以下的公理．设~$f(x),g(x),h(x)\in\mF[x]$，则
+
+\item[(M1)~乘法结合律]
+\[
+f(x)\Parenb{g(x)h(x)}=\Parenb{f(x)g(x)}h(x)\sid
+\]
+
+\item[(M2)~乘法交换律]
+\[
+f(x)g(x)=g(x)f(x)\sid
+\]
+
+\item[(M3)~存在单位元素]即存在纯量多项式~$e(x)=1$，使得
+\[
+f(x)e(x)=e(x)f(x)=f(x)\sid
+\]
+
+\item[(D)~加乘分配律]\mbox{}
+\[
+f(x)\Parenb{g(x)+h(x)}=f(x)g(x)+f(x)h(x)\pid
+\]
+\end{descitems}
+
+于是根据定义，$\mF[x]$~是交换环，它称为数域~$\mF$~上的\emph{一元多项式环}．%
+
+\begin{exercise}
+\item 设~$f(x),g(x)\in\mF[x]$．证明，当且仅当~$f(x)=0$，或~$g(x)=0$~时，$f(x)g(x)=0$．%
+\item 设~$f(x),g(x),h(x)\in\mF[x]$，且~$f(x)\ne0$．证明，若~$f(x)g(x)=f(x)h(x)$，则~$g(x)=h(x)$．%
+\item 设非零的实系数多项式~$f(x)\,$（即系数都是实数的多项式）满足~$f\Parenb{f(x)}=f^k(x)$，其中~$k$~是给定的正整数．%
+      求多项式~$f(x)$．%
+\item 设非零的实系数多项式~$f(x)$~满足~$f(x^2)=f^2(x)$．求多项式~$f(x)$．%
+\item 设实系数多项式~$f(x)=ax^2+bx+c$，$a\ne0$．证明，对任意给定的正整数~$n$，不存在~$n$~次实系数多项式~$g(x)$，%
+      使得~$f\Parenb{g(x)}=g\Parenb{f(x)}$．\errorq
+\item 设实系数多项式~$P(x)=a_0+a_1x+\dotsb+a_nx^n$~满足
+      \[
+        0\le a_0=a_n\le a_1=a_{n-1}\le\dotsb\le a_{\Floor*{\frac{n}2}}=a_{\Floor*{\frac{n+1}2}}\cid
+      \]
+      所有这样的多项式~$P(x)$~的集合记作~$A(n)$．证明，如果~$P(x)\in A(n)$，$Q(x)\in A(m)$，则乘积
+      \[P(x)Q(x)\in A(n+m)\pid\]
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{整除性与最大公因式}\label{ch1se3}
+数域~$\mF$~上的一元多项式环~$\mF[x]$~是我们遇到的第一个不是由数构成的交换环．%
+它的性质是否与数环，特别是与整数环~$\mZ$~相同？譬如，在整数环~$\mZ$~中，对于任意整数~$a,b\in\mZ$，$b\ne0$，
+总存在唯一一对整数~$q$~和~$r$，$0\le r<\abs* b$，使得~$a=qb+r$．%
+整数环~$\mZ$~的这一性质，多项式环~$\mF[x]$~是否也具有？对此，有
+
+\begin{theorem}[带余除法]\label{zhengchu-thm}
+设多项式~$f(x),g(x)\in\mF[x]$，$g(x)\ne0$．则存在唯一一对多项式~$q(x),r(x)\in\mF[x]$，$\deg r(x)<\deg g(x)$，使得
+\begin{equation}\label{zhengchushi}
+f(x)=q(x)g(x)+r(x)\pid
+\end{equation}
+\end{theorem}
+\begin{proof}
+\emphitem{存在性}设
+\[\begin{aligned}
+f(x)&=a_nx^n+a_{n-1}x^{n-1}+\dotsb+a_1x+a_0\cid & a_n&\ne0\cid\\
+g(x)&=b_mx^m+b_{m-1}x^{m-1}+\dotsb+b_1x+b_0, & b_m&\ne 0\pid
+\end{aligned}\]
+显然，当~$n<m$~时，取~$q(x)=0$，$r(x)=f(x)$，则式~\ref{zhengchushi}~成立．当~$n\ge m$~时，记
+\[
+f(x)-\frac{a_n}{b_m}x^{n-m}g(x)=f_1(x)\cid
+\]
+显然，$\deg f_1(x)<\deg f(x)$．
+
+于是对~$\deg f(x)=n$~用归纳法，则存在多项式~$q_1(x),r(x)\in\mF[x]$，$\deg r(x)<\deg g(x)$，使得
+\[
+f(x)-\frac{a_n}{b_m}x^{n-m}g(x)=f_1(x)=q_1(x)g(x)+r(x)\pid
+\]
+因此，
+\[
+f(x)=\Paren[\Big]{\frac{a_n}{b_m}x^{n-m}+q_1(x)}g(x)+r(x)\pid
+\]
+这表明，如果记~$q(x)=a_nb_m^{-1}x^{n-m}+q_1(x)$，则式~\ref{zhengchushi}~成立．%
+
+\emphitem{唯一性}设~$q_1(x),r_1(x)\in\mF[x]$，$\deg r_1(x)<\deg g(x)$，使得式~\ref{zhengchushi}~成立．%
+则
+\[
+\Parenb{q(x)-q_1(x)}g(x)=r_1(x)-r(x)\pid
+\]
+因此，如果~$q(x)\ne q_1(x)$，则由上式，
+\[
+\deg g(x)<\deg\Parenb{q(x)-q_1(x)}+\deg g(x)=\deg\Parenb{r_1(x)-r(x)}\pid
+\]
+但因~$\deg r(x)<\deg g(x)$，$\deg r_1(x)<\deg g(x)$，因此，
+\[
+\deg\Parenb{r_1(x)-r(x)}<\deg g(x)
+\]
+不可能．所以，$q(x)=q_1(x)$，从而~$r(x)=r_1(x)$．
+\end{proof}
+
+和整数环~$\mZ$~相仿，\ref{zhengchu-thm}~中多项式~$q(x)$~与~$r(x)$~分别称为多项式~$f(x)$~除以~$g(x)$~的\emph{商式}与\emph{余式}．%
+
+应当指出，\ref{zhengchu-thm}~关于商式~$q(x)$~与余式~$r(x)$~的存在性证明是构造性的．%
+换句话说，给定多项式~$f(x)$~与~$g(x)$，$g(x)\ne0$，
+可以按照\ref{zhengchu-thm}~的证明方法求出商式~$g(x)$~与余式~$r(x)$，其过程如下：
+
+当~$\deg f(x)<\deg g(x)$~时，$q(x)=0$，$r(x)=f(x)$．%
+
+当~$\deg f(x)\ge\deg g(x)$~时，记
+\[
+f(x)-\frac{a_n}{b_m}x^{n-m}g(x)=f_1(x)\pid
+\]
+
+如果~$\deg f_1(x)<\deg g(x)$，则
+\[
+f(x)=\frac{a_n}{b_m}x^{n-m}g(x)+f_1(x)\cid
+\]
+此时~$q(x)=a_nb_m^{-1}x^{n-m}$，$r(x)=f_1(x)$．%
+
+如果~$\deg f_1(x)\ge\deg g(x)$，且~$f_1(x)$~的首项系数为~$c_t\ne 0$，$t<\deg f(x)$，则记
+\[
+f_1(x)-\frac{c_t}{b_m}x^{t-m}g(x)=f_2(x)\pid
+\]
+
+如果~$\deg f_2(x)<\deg g(x)$，则
+\[
+f(x)=\Paren[\Big]{\frac{a_n}{b_m}x^{n-m}+\frac{c_t}{b_m}x^{t-m}}g(x)+f_2(x)\cid
+\]
+此时~$q(x)=a_nb_m^{-1}x^{n-m}+c_tb_m^{-1}x^{t-m}$，$r(x)=f_2(x)$．%
+
+如果~$\deg f_2(x)\ge\deg g(x)$，则重复上述过程．于是得到多项式序列~$f(x),\allowbreak f_1(x),\allowbreak\dotsc,\allowbreak f_k(x),\dotsc$，它们适合
+\[
+\deg f(x)>\deg f_1(x)>\deg f_2(x)>\dotsb>\deg f_k(x)>\dotsb\ge\deg g(x)\pid
+\]
+
+由于~$\deg f(x)-\deg g(x)$~是有限的，因此，经有限步后，必有~$\ell$，使得
+\begin{align*}
+f_{\ell-1}(x)  = \frac{d_s}{b_m}x^{s-m}g(x)+f_\ell(x)\cid \qquad
+f_\ell(x)      = \frac{e_h}{b_m}x^{h-m}g(x)+f_{\ell+1}(x)\cid
+\end{align*}
+其中~$d_s$~与~$e_h$~分别是多项式~$f_{\ell-1}(x)$~与~$f_\ell(x)$~的首项系数，$s>h\ge m$，并且
+\[
+\deg f_{\ell+1}(x)<\deg g(x)\pid
+\]
+于是
+\[
+f(x)=\Paren[\Big]{\frac{a_n}{b_m}x^{n-m}+\frac{c_t}{b_m}x^{t-m}+\dotsb+\frac{d_s}{b_m}x^{s-m}
++\frac{e_h}{b_m}x^{h-m}}g(x)+f_{\ell+1}(x)\pid
+\]
+因此，
+\[
+\begin{aligned}
+q(x) & =\frac{a_n}{b_m}x^{n-m}+\frac{c_t}{b_m}x^{t-m}+\dotsb+\frac{d_s}{b_m}x^{s-m}+\frac{e_h}{b_m}x^{h-m}\cid\\[2pt]
+r(x) & =f_{\ell+1}(x)\pid
+\end{aligned}
+\]
+
+上述过程可写成\ref{Euclid-chufa}~的形式，这种算法称为~\emph{Euclid~长除法}．%
+
+\begin{table}
+\newsavebox{\EuclidLiTi}
+\newsavebox{\EuclidChangchu}
+\begin{lrbox}{\EuclidChangchu}
+\begin{math}
+\begin{array}{@{}l@{\hspace*{-6pt}}c@{\hspace*{-7pt}}l@{\hspace*{-11pt}}r@{\hspace*{-14pt}}l@{}}
+&\begin{array}[t]{c} \\ \rlap{\rotatebox[origin=ct]{90}{\underline{$g(x)=b_mx^m+b_{m-1}x^{m-1}+\dotsb+ b_1x+x_0$}}} \end{array}
+&\begin{array}[t]{c} \\ \left.\begin{array}{r}  \\ \\  \end{array}\right) \end{array}
+&\begin{array}[t]{l}
+b_m^{-1}a_nx^{n-m}+b_m^{-1}c_tx^{t-m}+\dotsb+b_m^{-1}d_sx^{s-m}+b_m^{-1}e_hx^{h-m} \\ \hline
+\begin{array}{r}
+  \begin{array}{l@{\hspace{5pt}}r@{{}+{}}r@{{}+\dotsb+{}}r@{}l}
+               & a_nx^n &            a_{n-1}x^{n-1} & a_{n-m}x^{n-m} & {}+\dotsb+a_1x+a_0 \\
+\left.-\right) & a_nx^n & b_m^{-1}a_nb_{m-1}x^{n-1} & b_m^{-1}a_nb_0x^{n-m} \\ \hline \end{array}\\
+\begin{array}{r@{\hspace{5pt}}r@{{}+{}}r@{{}+\dotsb+{}}r@{}l}
+               & c_tx^t &            c_{t-1}x^{t-1} & c_{t-m}t^{t-m} & {}+\dotsb+c_0 \\
+\left.-\right) & c_tx^t & b_m^{-1}c_tb_{m-1}x^{t-1} & b_m^{-1}c_tb_0x^{t-m} \\ \hline \end{array}\\
+\begin{array}{c} \\[-7pt] \rule{2cm}{0pt}\eqdots\rule{3cm}{0pt} \\[-6pt]  \\ \hline \end{array} \\
+\begin{array}{r@{\hspace{5pt}}r@{{}+\dotsb\dotsb+{}}r@{}l}
+               & d_sx^s &     d_{s-m}x^{s-m} & {}+\dotsb+d_0 \\
+\left.-\right) & d_sx^s & b_m^{-1}d_sb_0x^{s-m} \\ \hline  \end{array}\\
+\begin{array}{r@{\hspace{5pt}}r@{{}+\dotsb+{}}r@{}l}
+               & e_hx^h &     e_{h-m}x^{h-m} & {}+\dotsb+e_0 \\
+\left.-\right) & e_hx^h & b_m^{-1}e_hb_0x^{h-m} \\ \hline \end{array} \\
+\begin{array}{c} p_qx^q+\dotsb+p_1x+p_0~(q<m) \end{array}
+\end{array}\end{array}
+& \begin{array}[t]{r@{}}
+\\ f(x) \\ b_m^{-1}a_nx^{n-m}g(x) \\ f_1(x) \\ b_m^{-1}c_tx^{t-m}g(x) \\[3pt] \vdots\enspace \\ \vdots\enspace \\[3pt]
+f_{\ell-1}(x) \\ b_m^{-1}d_sx^{s-m}g(x) \\ f_{\ell}(x) \\ b_m^{-1}e_hx^{h-m}g(x) \\ r(x)=f_{\ell+1}(x) \end{array}
+\end{array}\end{math}
+\end{lrbox}
+\begin{lrbox}{\EuclidLiTi}
+\begin{math}
+\polylongdiv{x^4+3x^3-x^2-4x-3}{3x^3+10x^2+2x-3}
+\end{math}
+\end{lrbox}
+\CenterFloatBoxes
+\begin{floatrow}[5]
+\tablebox{}{\rotatebox{90}{\usebox{\EuclidChangchu}}}
+\tablebox{}{\makebox[1\ccwd][l]{\rotcaption{Euclid~长除法}\label{Euclid-chufa}}}
+\tablebox{}{\rule{.6pt}{.8\wd\EuclidChangchu}}
+\tablebox{}{\rotatebox{90}{\usebox{\EuclidLiTi}}}
+\tablebox{}{\makebox[1\ccwd][l]{\rotcaption{Euclid~长除法（\ref{ltEuclid-chufa}）}\label{Euclid-chufa-LiTi}}}
+\end{floatrow}
+\end{table}
+
+设多项式~$f(x)=a_nx^n+a_{n-1}x^{n-1}+\dotsb+a_1x+a_0\in\mF[x]$，$a\in\mF$．记
+\[
+f(a)=a_na^n+a_{n-1}a^{n-1}+\dotsb+a_1a+a_0\pid
+\]%
+$f(a)$~称为\emph{多项式~$f(x)$~在~$x=a$~处的值}．若~$f(a)=0$，则~$a$~称为\emph{多项式~$f(x)$~的根}．%
+
+\ref{zhengchu-thm}~的一个重要特例是：
+\begin{corollary}[剩余定理]
+设~$f(x)\in\mF[x]$，$a\in\mF$，则存在唯一~$q(x)\in\mF[x]$，使得
+\begin{equation}\label{shengyu}
+f(x)=(x-a)q(x)+f(a)\pid
+\end{equation}
+\end{corollary}
+\begin{proof}
+由\ref{zhengchu-thm}，存在唯一一对多项式~$q(x),r(x)\in\mF[x]$，使得
+\[
+f(x)=(x-a)q(x)+r(x)\cid
+\]
+其中~$\deg r(x)<1$．将~$x=a$~代入，得到~$f(a)=r(x)$．
+\end{proof}
+
+\begin{example}\label{ltEuclid-chufa}
+设~$f(x)=x^4+3x^3-x^2-4x-3$，$g(x)=3x^3+10x^2+2x-3$，求~$f(x)$~除以~$g(x)$~的商式~$q(x)$~和余式~$r(x)$．
+\end{example}
+\begin{solution}
+如\ref{Euclid-chufa-LiTi}~作~Euclid~长除法．由此得到
+\[
+q(x)=\frac13x-\frac19\cid\qquad r(x)=-\frac59x^2-\frac{25}9x-\frac{10}3\pid\qedhere
+\]
+\end{solution}
+
+\begin{definition}
+设非零多项式~$g(x)\in\mF[x]$．如果存在~$q(x)\in\mF[x]$，使得多项式
+\[
+f(x)=g(x)q(x)\cid
+\]
+则多项式~$g(x)$~称为多项式~$f(x)$~的一个\emph{因式}，而多项式~$f(x)$~称为多项式~$g(x)$~的一个\emph{倍式}．%
+这时说多项式~$g(x)$~\emph{整除}多项式~$f(x)$，记为~$g(x)\mdiv f(x)$．%
+否则就说多项式~$g(x)$~\emph{不能整除}多项式~$f(x)$，记作~$g(x)\nmdiv f(x)$．
+\end{definition}
+
+关于多项式的整除性，有以下性质．%
+\begin{property}
+如果~$g(x)\mdiv f(x)$，$h(x)\mdiv g(x)$，则~$h(x)\mdiv f(x)$．
+\end{property}
+
+\begin{property}
+如果~$g(x)\mdiv f_1(x)$，$g(x)\mdiv f_2(x)$，则对任意~$h_1(x),h_2(x)\in\mF[x]$，
+\[
+g(x)\mdiv\Parenb{h_1(x)f_1(x)+h_2(x)f_2(x)}\pid
+\]
+\end{property}
+
+\begin{property}\label{xianghuzhengchu}
+如果~$g(x)\mdiv f(x)$，$f(x)\mdiv g(x)$，则存在非零的数~$\lambda\in\mF$，使得
+\[
+f(x)=\lambda g(x)\pid
+\]
+\end{property}
+
+上述性质请读者自证之．%
+
+\begin{corollary}[因式定理]
+设~$f(x)\in\mF[x]$，$a\in\mF$．则当且仅当~$f(a)=0$~时，
+\[
+(x-a)\mdiv f(x)\pid
+\]
+\end{corollary}
+
+\begin{definition}
+设多项式~$f_1(x),f_2(x),h(x)\in\mF[x]$．如果~$h(x)$~是~$f_1(x)$~与~$f_2(x)$~的因式，则~$h(x)$~称为~$f_1(x)$~与~$f_2(x)$~的
+一个\emph{公因式}．设~$f_1(x)$~与~$f_2(x)$~不全为零．如果首一多项式~$d(x)$~是~$f_1(x)$~与~$f_2(x)$~的公因式，而
+且~$f_1(x)$~与~$f_2(x)$~的每个公因式都是~$d(x)$~的一个因式，则~$d(x)$~称为~$f_1(x)$~与~$f_2(x)$~的\emph{最大公因式}，记为
+\[
+d(x)=\Parenb{f_1(x),f_2(x)}\pid
+\]
+\end{definition}
+
+关于两个不全为零的多项式~$f_1(x)$~与~$f_2(x)$~的最大公因式，有
+\begin{theorem}\label{gcdonlyone}
+任意两个不全为零的多项式~$f_1(x)$~与~$f_2(x)$~的最大公因式~$d(x)$~存在而且唯一．
+\end{theorem}
+\begin{proof}\emphitem{唯一性}
+设~$d_1(x)$~与~$d_2(x)$~都是~$f_1(x)$~与~$f_2(x)$~的最大公因式．由最大公因式的定义，$d_1(x)$~是~$f_1(x)$~与~$f_2(x)$~的一个公因式，
+而~$d_2(x)$~是~$f_1(x)$~与~$f_2(x)$~的最大公因式，因此，$d_1(x)\mdiv d_2(x)$．%
+
+反之，同样有~$d_2(x)\mdiv d_1(x)$．由\ref{xianghuzhengchu}，存在非零的数~$\lambda\in\mF$，使~$d_1(x)=\lambda d_2(x)$．%
+由于~$d_1(x)$~与~$d_2(x)$~都是首一多项式，比较上式两边的首项系数，得到~$\lambda=1$，即~$d_1(x)=d_2(x)$．%
+
+\emphitem{存在性}
+不妨设~$f_2(x)\ne0$．由\ref{zhengchu-thm}，存在多项式~$q_1(x)$~与~$r_1(x)$，使得
+\[
+f_1(x)=q_1(x)f_2(x)+r_1(x)\cid
+\]
+其中~$\deg r_1(x)<\deg f_2(x)$．%
+
+如果~$\deg r_1(x)=-\infty$~为零多项式，则停止．%
+如果~$r_1(x)$~是非零多项式，则由\ref{zhengchu-thm}，存在多项式~$q_2(x)$~与~$r_2(x)$，使得
+\[
+f_2(x)=q_2(x)r_1(x)+r_2(x)\cid
+\]
+其中~$\deg r_2(x)<\deg r_1(x)$．%
+
+如果~$r_2(x)$~是零多项式，则停止．如果~$r_2(x)$~是非零多项式，则重复上述过程．于是得一连串的等式：
+\begin{align}
+f_1(x)&=q_1(x)f_2(x)+r_1(x)\cid\tag*{($1$)}\label{zhanzhuanxiangchu1}\\
+f_2(x)&=q_2(x)r_1(x)+r_2(x)\cid\tag*{($2$)}\label{zhanzhuanxiangchu2}\\
+r_1(x)&=q_3(x)r_2(x)+r_3(x)\cid\tag*{($3$)}\\
+&\eqdots\notag\\
+r_{k-2}(x) &=q_k(x)r_{k-1}(x)+r_k(x)\cid\tag*{($k$)}\\
+&\eqdots\notag\\
+\intertext[0pt]{其中
+\[
+\deg f_2(x)>\deg r_1(x)>\deg r_2(x)>\dotsb>\deg r_k(x)>\dotsb\pid
+\]
+由于~$\deg f_2(x)$~是一个给定的非负整数，因此，存在某个正整数~$\ell$，使得~$r_\ell(x)\ne0$，而~$r_{\ell+1}(x)=0$，即最后必有}
+r_{\ell-2}(x)&=q_{\ell}(x)r_{\ell-1}(x)+r_\ell(x)\cid\tag*{($\ell$)}\label{zhanzhuanxiangchu3}\\
+r_{\ell-1}(x)&=q_{\ell+1}(x)r_\ell(x)\pid\tag*{($\ell+1$)}\label{zhanzhuanxiangchu4}
+\end{align}
+\ref{zhanzhuanxiangchu4}~式表明，$r_\ell(x)\mdiv r_{\ell-1}(x)$．%
+
+因此，由~\ref{zhanzhuanxiangchu3}~式，$r_\ell(x)\mdiv r_{\ell-2}(x)$；%
+再由~($\ell-1$)~式，$r_\ell(x)\mdiv r_{\ell-3}(x)$，等等．于是~$r_\ell(x)$~整除
+\[
+r_{\ell-1}(x)\cid\quad r_{\ell-2}(x)\cid\quad\dotsc\cid\quad r_2(x)\cid\quad r_1(x)\pid
+\]
+因此，由~\ref{zhanzhuanxiangchu2}，$r_\ell(x)\mdiv f_2(x)$．%
+最后，由~\ref{zhanzhuanxiangchu1}~式~$r_\ell(x)\mdiv f_1(x)$．所以~$r_\ell(x)$~是~$f_1(x)$~与~$f_2(x)$~的一个公因式．%
+
+反之，设~$h(x)$~是~$f_1(x)$~与~$f_2(x)$~的一个公因式．由~\ref{zhanzhuanxiangchu1}~式，$h(x)$~是~$r_1(x)$~的因式．%
+再由~\ref{zhanzhuanxiangchu2}~式，$h(x)$~是~$r_2(x)$~的因式，等等．%
+于是~$h(x)$~是~$r_{\ell-2}(x)$~及~$r_{\ell-1}(x)$~的因式．由~\ref{zhanzhuanxiangchu3}~式，$h(x)$~是~$r_\ell(x)$~的一个因式．%
+
+因此，如果~$r_\ell(x)$~的首项系数为~$a$，则由最大公因式的定义，$d(x)=a^{-1}r_\ell(x)$~是~$f_1(x)$~与~$f_2(x)$~的最大公因式．
+\end{proof}
+
+\ref{gcdonlyone}~关于多项式~$f_1(x)$~与~$f_2(x)$~的最大公因式的存在性证明给出了求最大公因式的一个方法，即所谓\emph{辗转相除法}．
+
+其过程如下：设~$f_1(x),f_2(x)\in\mF[x]$，$\deg f_1(x)\ge\deg f_2(x)$．%
+先对~$f_1(x)$~与~$f_2(x)$~用~Euclid~长除法，得到商式~$q_1(x)$~与余式~$r_1(x)$，$\deg r_1(x)<\deg f_2(x)$；%
+在进行长除法时，将商式~$q_1(x)$~记入\ref{biao1}~的右边．%
+
+\newsavebox{\EuclidOne}
+\newsavebox{\EuclidTwo}
+\newsavebox{\EuclidThree}
+\newsavebox{\EuclidFour}
+
+\begin{lrbox}{\EuclidOne}
+\setlength\arraycolsep{4pt}%
+\begin{math}\begin{array}{@{}c|cl|c@{}}
+f_2(x) &    & f_1(x)       & q_1(x) \\
+       & -) & q_1(x)f_1(x) &        \\ \cline{2-3}
+       &    & r_1(x)
+\end{array}\end{math}
+\end{lrbox}
+
+\begin{lrbox}{\EuclidTwo}
+\setlength\arraycolsep{4pt}%
+\begin{math}\begin{array}{@{}c|cl|cl|c@{}}
+q_2(x) &    & f_2(x)       &    & f_1(x)       & q_1(x) \\
+       & -) & q_2(x)r_1(x) & -) & q_1(x)f_2(x) &        \\ \cline{2-5}
+       &    & r_2(x)       &    & r_1(x)       &
+\end{array}\end{math}
+\end{lrbox}
+
+\begin{lrbox}{\EuclidThree}
+\setlength\arraycolsep{4pt}%
+\begin{math}\begin{array}{@{}c|rl|rl|c@{}}
+q_2(x) &   & f_2(x)       &   & f_1(x)       & q_1(x) \\
+       &-) & q_2(x)r_1(x) &-) & q_1(x)f_2(x) & \\ \cline{2-5}
+q_4(x) &   & r_2(x)       &   & r_1(x)       & q_3(x)\\
+       &-) & q_4(x)r_3(x) &-) & q_3(x)r_2(x) & \\ \cline{2-5}
+q_6(x) &   & r_4(x)       &   & r_3(x)       & q_5(x)\\
+\vdots&    & \quad\vdots  &   & \quad\vdots  & \vdots
+\end{array}\end{math}
+\end{lrbox}
+
+\begin{lrbox}{\EuclidFour}
+\setlength\arraycolsep{4pt}%
+\begin{math}
+\begin{array}{@{}c|cl|cl|c@{}}
+&&3x^3+10x^2+2x-3=f_2(x)&&x^4+3x^3-x^2-4x-3=f_1(x)&\dfrac13x\\
+&&&-)& x^4+\frac{10}3x^3+\frac23x^2-x&\\ \cline{4-5}
+-\dfrac{27}5x&&3x^3+10x^2+2x-3=f_2(x)&&-\frac13x^3-\frac53x^2-3x-3& -\dfrac19\\
+&-)&3x^3+15x^2+18x&-)& -\frac13x^3-\frac{10}9x^2-\frac29x+\frac13 & \\ \cline{2-5}
+9&&-5x^2-16x-3&& -\frac59x^2-\frac{25}9x-\frac{10}3=r_1(x)&\\
+&-)&-5x^2-25x-30&&&\\ \cline{2-3}
+&&9x+27=r_2(x)&& -\frac59x^2-\frac{25}9x-\frac{10}3=r_1(x) & -\dfrac5{81}x\\
+&&&-)& -\frac59x^2-\frac53x&\\ \cline{4-5}
+&&9x+27=r_2(x)&& -\frac{10}9x-\frac{10}3&-\dfrac{10}{81}\\
+&&&-)& -\frac{10}9x-\frac{10}3&\\ \cline{4-5}
+&&&&0=r_3(x)&
+\end{array}\end{math}
+\end{lrbox}
+
+\begin{table}
+\begin{floatrow}
+\tablebox{\caption{}\label{biao1}}
+         {\usebox{\EuclidOne}}
+\tablebox{\caption{}\label{biao2}}
+         {\usebox{\EuclidTwo}}
+\end{floatrow}
+\end{table}
+
+如果~$r_1(x)$~是零多项式，则停止．如果~$r_1(x)$~是非零多项式，则对~$f_2(x)$~和~$r_1(x)$~用长除法，
+得到商式~$q_2(x)$~与余式~$r_2(x)$，$\deg r_2(x)<\deg r_1(x)$，在进行长除法时，将商式~$q_2(x)$~记入\ref{biao2}~的左边．%
+
+\begin{table}
+\usebox{\EuclidThree}
+\caption{}\label{biao3}
+\end{table}
+
+如果~$r_2(x)$~是零多项式，则停止．如果~$r_2(x)$~是非零多项式，则对~$r_1(x)$~和~$r_2(x)$~用长除法，
+得到商式~$q_3(x)$~和余式~$r_3(x)$，并把商式~$q_3(x)$~记入\ref{biao3}~的右边．%
+
+如此继续，即可求得~$f_1(x)$~与~$f_2(x)$~的最大公因式．%
+
+\begin{example}\label{ltzzhxch}
+求多项式~$f_1(x)=x^4+3x^3-x^2-4x-3$~与~$f_2(x)=3x^3+10x^2+2x-3$~的最大公因式．
+\end{example}
+\begin{solution}
+如\ref{biao4}~所示，对多项式~$f_1(x)$~和~$f_2(x)$~作辗转相除法．%
+
+\begin{table}\centering
+\usebox{\EuclidFour}
+\caption{辗转相除法（\ref{ltzzhxch}）}\label{biao4}
+\end{table}
+
+因此，$r_2(x)=9x+27$，$r_3(x)=0$．于是，$\Parenb{f_1(x),f_2(x)}=x+3$．
+\end{solution}
+
+\begin{theorem}\label{Euclid-eq}
+设不全为零的多项式~$f(x),g(x)\in\mF[x]$，$d(x)$~是~$f(x)$~与~$g(x)$~的最大公因式．则存在多项式~$u(x),v(x)\in\mF[x]$，使得
+\begin{equation}
+f(x)u(x)+g(x)v(x)=d(x)\pid
+\end{equation}
+\end{theorem}
+\begin{proof}
+记~$f(x)=f_1(x)$，$g(x)=f_2(x)$．由\ref{gcdonlyone}~的证明，存在
+多项式~$q_1(x),\allowbreak q_2(x),\dotsc,\allowbreak q_{k+1}(x)$~和~$r_1(x), r_2(x),\dotsc, r_k(x)$，使得
+\begin{align*}
+f_1(x)&=q_1(x)f_2(x)+r_1(x)\cid\tag*{($1$)}\label{Euclid-eq1}\\
+f_2(x)&=q_2(x)r_1(x)+r_2(x)\cid\tag*{($2$)}\label{Euclid-eq2}\\
+r_1(x)&=q_3(x)r_2(x)+r_3(x)\cid\\
+&\eqdots\notag\\
+r_{k-3}(x)&=q_{k-1}(x)r_{k-2}(x)+r_{k-1}(x)\cid\tag*{($k-1$)}\label{Euclid-eqk-1}\\
+r_{k-2}(x)&=q_k(x)r_{k-1}(x)+r_k(x)\cid\tag*{($k$)}\label{Euclid-eqk}\\
+r_{k-1}(x)&=q_{k+1}(x)r_k(x)\cid\tag*{($k+1$)}
+\end{align*}
+其中
+\[
+\deg f_2(x)>\deg r_1(x)>\deg r_2(x)>\dotsb>\deg r_k(x)\ge0\sid
+\]
+而且~$r_k(x)=\lambda d(x)$，$\lambda$~为~$r_k(x)$~的首项系数．由式~\ref{Euclid-eqk}~得到，
+\[
+\lambda d(x)=r_{k-2}(x)-r_{k-1}(x)q_k(x)\pid
+\]
+设~$u_1(x)=1$，$v_1(x)=-q_k(x)$，上式为
+\[
+\lambda d(x)=r_{k-2} u_1(x)+r_{k-1}(x)v_1(x)\pid
+\]
+把式~\ref{Euclid-eqk-1}~代入上式，得到
+\[
+\lambda d(x)=r_{k-3}(x)v_1(x)+r_{k-2}(x)\Parenb{u_1(x)-q_{k-1}(x)v_1(x)
+}\pid
+\]
+记~$u_2(x)=v_1(x)$，$v_2(x)=u_2(x)-q_{k-1}(x)v_1(x)$，上式即为
+\[
+\lambda d(x)=r_{k-3}(x)u_2(x)+r_{k-2}(x)v_2(x)\pid
+\]
+逐个地把以上等式代入．假设进行了~$k-2$~次，得到
+\[
+\lambda d(x)=f_2(x)u_{k-1}(x)+r_1(x)v_{k-1}(x)\pid
+\]
+最后把式~\ref{Euclid-eq1}~代人上式，得到
+\[
+\lambda d(x)=f_1(x)v_{k-1}(x)+f_2(x)\Parenb{u_{k-1}(x)-q_1(x)v_{k-1}(x)
+}\pid
+\]
+\begin{align*}
+\prefixtext{取}
+u(x)=\lambda^{-1}v_{k-1}(x)\cid\qquad v(x)=\lambda^{-1}\Parenb{u_{k-1}(x)-q_1(x)v_{k-1}(x)}\cid
+\end{align*}
+即得\ref{Euclid-eq}．
+\end{proof}
+
+容易看出，对两个不全为零的多项式~$f(x)$~与~$g(x)$，所有零次多项式都是它们的公因式．%
+如果~$f(x)$~与~$g(x)$~除零次多项式外不含其它的公因式，则~$f(x)$~与~$g(x)$~称为\emph{互素}．%
+
+根据最大公因式的定义可以看出，两个多项式互素的充分必要条件是它们的最大公因式为~$1$．%
+因此，由\ref{Euclid-eq}~直接得到
+\begin{corollary}
+多项式~$f(x)$~与~$g(x)$~互素当且仅当存在~$u(x)$~与~$v(x)$，使得
+\begin{equation}
+f(x)u(x)+g(x)v(x)=1\pid
+\end{equation}
+\end{corollary}
+
+关于两个多项式的互素，有以下性质．%
+\begin{property}
+设~$f(x),g(x),h(x)$~是多项式，$\Parenb{f(x),g(x)}=1$，$\Parenb{f(x),h(x)}=1$，则
+\[
+\Parenb{f(x),g(x)h(x)}=1\pid
+\]
+\end{property}
+\begin{proof}
+因为~$\Parenb{f(x),g(x)}=1$，故存在多项式~$u(x)$~和~$v(x)$，使得
+\[
+f(x)u(x)+g(x)v(x)=1\pid
+\]
+上式两端同乘以~$h(x)$，得到
+\[
+f(x)\Parenb{u(x)h(x)}+\Parenb{g(x)h(x)}v(x)=h(x)\pid
+\]
+
+由此可知，如果多项式~$w(x)$~是~$f(x)$~与~$g(x)h(x)$~的公因式，则~$w(x)$~也是~$f(x)$~与~$h(x)$~的公因式．由
+于~$\Parenb{f(x),h(x)}=1$，因此~$w(x)$~是零次多项式．这表明~$f(x)$~与~$g(x)h(x)$~除零次多项式外不含其它
+公因式，即~$f(x)$~与~$g(x)h(x)$~互素．
+\end{proof}
+\begin{property}
+设~$f(x),g(x)$~与~$h(x)$~是多项式，其中~$\Parenb{g(x),h(x)}=1$，并且~$h(x)\mdiv f(x)g(x)$，则
+\[
+h(x)\mdiv f(x)\pid
+\]
+\end{property}
+
+\begin{proof}
+因为~$\Parenb{g(x),h(x)}=1$，故存在多项式~$u(x)$~与~$v(x)$，使得
+\[
+h(x)u(x)+g(x)v(x)=1\pid
+\]
+上式两端同乘以~$f(x)$，得到
+\[
+h(x)\Parenb{u(x)f(x)}+\Parenb{g(x)f(x)}v(x)=f(x)\pid
+\]
+由此可知，$h(x)\mdiv f(x)$．
+\end{proof}
+
+\begin{property}
+设~$f(x),g(x)$~与~$h(x)$~是多项式，$f(x)\mdiv h(x)$，$g(x)\mdiv h(x)$，且
+\[
+\Parenb{f(x),g(x)}=1\cid
+\]
+则~$f(x)g(x)\mdiv h(x)$．
+\end{property}
+
+\begin{example}\label{ex3}
+求多项式~$u(x)$~和~$v(x)$，使得
+\begin{equation}\label{ex135}
+x^m u(x)+(1-x)^n v(x)=1\pid
+\end{equation}
+\end{example}
+\begin{solution}显然，多项式~$x^m$~与~$(1-x)^n$~互素．%
+所以由\ref{Euclid-eq}，适合式~\ref{ex135}~的多项式~$u(x)$~与~$v(x)$~是存在的．%
+
+如果~$\deg u(x)\ge n$，$\deg v(x)\ge m$，则由\ref{zhengchu-thm}，
+存在多项式~$q_1(x),u_1(x),q_2(x)$~与~$v_1(x)$，$\deg u_1(x)<n$，$\deg v_1(x)<m$，使得
+\[
+u(x)=(1-x)^n q_1(x)+u_1(x)\cid\quad v(x)=x^m q_2(x)+v_1(x)\pid
+\]
+代入式~\ref{ex135}~得到
+\[
+x^m(1-x)^n\Parenb{q_1(x)+q_2(x)}=1-x^m u_1(x)-(1-x)^n v_1(x)\pid
+\]
+比较两端多项式的次数，得到
+\[
+x^m u_1(x)+(1-x)^n v_1(x)=1\pid
+\]
+因此可设~$\deg u(x)<n$，$\deg v(x)<m$．%
+
+设
+\[
+u(x)=\sum_{i=0}^{n-1}a_i(1-x)^i\cid\qquad v(x)=\sum_{j=0}^{m-1}b_jx^j\pid
+\]
+显然，%对于~$i= 0,1,\dotsc,n-1$，$j= 0,1,\dotsc,m-1$，
+\[
+a_i=\frac{(-1)^i}{i!}u^{(i)}(1)\cid\qquad b_j=\frac1{j!}v^{(j)}(0)\pid
+\]
+
+将~$u(x)$~与~$v(x)$~代入式~\ref{ex135}．令~$x=0$，则得到~$b_0=v(0)=1$．%
+令~$x=1$，则得到~$a_0=u(1)=1$．对式~\ref{ex135}~求~$k$~阶微商，得到
+\begin{multline}\label{ex136}
+\sum_{i=0}^k \uC_k^i\frac{m!}{(m-k+i)!}x^{m-k+i}u^{(i)}(x)\\
++\sum_{i=0}^k (-1)^{k-i}\uC_k^i\frac{n!}{(n-k+i)!}(1-x)^{n-k+i}v^{(i)}(x)=0\pid
+\end{multline}
+
+设~$1\le k\le m-1$，则~$m-k+i\ge1$，其中~$i=0,1,\dotsc,k$．在式~\ref{ex136}~中令~$x=0$，得到
+\[
+\sum_{i=0}^k (-1)^{k-i}\uC_k^i\frac{n!}{(n-k+i)!}v^{(i)}(0)=0\pid
+\]
+由此知
+\[
+\sum_{i=0}^k(-1)^i\uC_n^{k-i}b_i=0\pid
+\]
+进而解得~$b_j=\uC_{n+j-1}^j$．于是，
+\[
+v(x)=\sum_{i=0}^{m-1}\uC_{n+j-1}^j x^j\pid
+\]
+
+同样，设~$1\le k\le n-1$，则~$n-k+i\ge1$，其中~$i=0,1,\dotsc,k$．在式~\ref{ex136}~中令~$x=1$，得到
+\[
+\sum_{i=0}^k\uC_k^i\frac{m!}{(m-k+i)!}u^{(i)}(1)=0\pid
+\]
+由此知
+\[
+\sum_{i=0}^k(-1)^i\uC_m^{k-i}a_i=0\pid
+\]
+解得~$a_i=\uC_{m+i-1}^i$．因此，
+\[
+u(x)=\sum_{i=0}^{n-1}\uC_{m+i-1}^i (1-x)^i\pid\qedhere
+\]
+\end{solution}
+
+\begin{remark}
+对于给定多项式~$f(x)$~与~$g(x)$，求多项式~$u(x)$~与~$v(x)$，使得
+\[
+f(x)u(x)+g(x)v(x)=d(x)\cid
+\]
+这里~$d(x)$~是~$f(x)$~与~$g(x)$~的最大公因式，其方法很多的．%
+
+方法之一是，用辗转相除法，求出\ref{Euclid-eq}~的证明中的
+等式~\ref{Euclid-eq1}，\ref{Euclid-eq2}，$\dotsc$，\ref{Euclid-eqk}；%
+然后，如同\ref{Euclid-eq}~的证明，把这里些等式逐个地由后往前代入，即可求出~$u(x)$~与~$v(x)$．%
+
+方法之二是，由于\ref{Euclid-eq}~保证了~$u(x)$~与~$v(x)$~的存在性，因此可以用\emph{待定系数法}．%
+\ref{ex3}~采用的就是待定系数法．
+\end{remark}
+
+最大公因式的概念可以推广到有限多个不全为零的多项式的情形．%
+
+\begin{definition}
+设不全为零的多项式~$f_1(x),f_2(x),\dotsc,f_s(x)\in\mF[x]$，$h(x)\in\mF[x]$．如果对任意~$i=1,2,\dotsc,s$，都有
+\[
+h(x)\mdiv f_i(x)\cid
+\]
+则~$h(x)$~称为~$f_1(x),f_2(x),\dotsc,f_s(x)$~的\emph{公因式}．如果首一多项式~$d(x)\in\mF[x]$~是~$f_1(x),\allowbreak f_2(x),\allowbreak\dotsc,f_s(x)$~的
+公因式，而~$f_1(x),f_2(x),\dotsc,f_s(x)$~的每个公因式都是~$d(x)$~的因式，则~$d(x)$~称为~$f_1(x),f_2(x),\dotsc,f_s(x)$~的%
+\emph{最大公因式}，记为
+\[
+d(x)=\Parenb{f_1(x),f_2(x),\dotsc,f_s(x)}\pid
+\]
+\end{definition}
+
+\begin{theorem}
+不全为零的多项式~$f_1(x),f_2(x),\dotsc,f_s(x)$~的最大公因式存在且唯一，而且
+\begin{equation}\label{mfgcdeq}
+d(x)=\Parenb{f_1(x),f_2(x),\dotsc,f_s(x)}=\Parenb{\Parenb{f_1(x),f_2(x),\dotsc,f_{s-1}(x)},f_s(x)}\pid
+\end{equation}
+\end{theorem}
+\begin{proof}
+先证明最大公因式的存在性与式~\ref{mfgcdeq}~成立．对多项式的个数~$s$~用归纳法．%
+当~$s=2$~时，显然最大公因式存在且式~\ref{mfgcdeq}~成立．%
+
+假设当~$s=k-1$~时最大公因式存在且式~\ref{mfgcdeq}~成立．记~$k-1$~个不全为零的
+多项式~$f_1(x),f_2(x),\dotsc,f_{k-1}(x)$~的最大公因式为~$\mtilde d(x)$．%
+由\ref{gcdonlyone}，多项式~$\widetilde d(x)$~与~$f_k(x)$~的最大公因式存在，记为~$d(x)$．%
+
+显然，$d(x)$~是~$\widetilde d(x)$~与~$f_k(x)$~的公因式．由于~$\widetilde d(x)$~是~$f_1(x),f_2(x),\dotsc,f_{k-1}(x)$~的公因式，
+因此，$d(x)$~是~$f_1(x),f_2(x),\dotsc,f_k(x)$~的公因式．%
+
+另一方面，设~$h(x)$~是~$f_1(x),f_2(x),\dotsc,f_k(x)$~的公因式，
+则~$h(x)$~是~$f_1(x),f_2(x),\allowbreak\dotsc, f_{k-1}(x)$~的公因式，从而~$h(x)$~是~$\widetilde d(x)$~的因式．%
+即~$h(x)$~是~$\widetilde d(x)$~和~$f_k(x)$~的公因式．因此，$h(x)$~也是~$d(x)$~的因式．%
+
+这表明，$d(x)$~是~$f_1(x),f_2(x),\dotsc,f_k(x)$~的最大公因式．即
+\[
+d(x)=\Parenb{\widetilde d(x),f_k(x)}\pid
+\]
+这就证明了~$f_1(x),f_2(x),\dotsc,f_k(x)$~的最大公因式存在而且式~\ref{mfgcdeq}~成立．%
+
+至于唯一性的证明和~$s=2$~的情形是类似的．从略．
+\end{proof}
+
+由式~\ref{mfgcdeq}~与\ref{Euclid-eq}~直接得到，
+
+\begin{corollary}
+设~$d(x)$~是多项式~$f_1(x),f_2(x),\dotsc,f_s(x)\in\mF[x]$~的最大公因式，
+则存在多项式~$u_1(x),u_2(x),\dotsc,u_s(x)\in\mF[x]$，使得
+\begin{equation}\label{mfEuclideq}
+f_1(x)u_1(x)+f_2(x)u_2(x)+\dotsb+f_s(x)u_s(x)=0\pid
+\end{equation}
+\end{corollary}
+
+如果多项式~$f_1(x),f_2(x),\dotsc,f_s(x)$~的公因式只能是零次多项式，则称~$f_1(x),\allowbreak f_2(x),\dotsc,\allowbreak f_s(x)$~是互素的．%
+
+容易看出，多项式~$f_1(x),f_2(x),\dotsc,f_s(x)$~互素的充分必要条件是它们的最大公因式为~$1$．%
+注意，当~$s>2$~时，如果~$f_1(x),f_2(x),\dotsc,f_s(x)$~互素，这些多项式并不一定两两互素．%
+
+\begin{exercise}
+\item 设多项式~$g(x)=x^2-2ax+2$~整除多项式~$f(x)=x^4+3x^2+ax+b$，求~$a$~和~$b$．这里~$a,b\in\mR$．%
+\item 设~$m,n$~和~$p$~为正整数．证明，多项式~$g(x)=x^2+x+1$~整除多项式~$f(x)=x^{3m}+x^{3n+1}+x^{3p+2}$．%
+\item 证明，当~$n=6m+5$~时，多项式~$x^2+xy+y^2$~整除多项式~$(x+y)^n-x^n-y^n$；%
+当~$n=6m+1$~时，多项式~$(x^2+xy+y^2)^2$~整除多项式~$(x+y)^n-x^n-y^n$．这里~$m$~是使~$n>0$~的整数，而~$x$~与~$y$~是实数．%
+\item 求多项式~$f(x)$~与~$g(x)$~的最大公因式．%
+\begin{enumitemcols}
+\item $f(x)=x^4+x^3-3x^2-4x-1$，\item[\relax]$g(x)=x^3+x^2-x-1$；%
+\item $f(x)=x^6+2x^4-4x^3-3x^2+8x-5$，\item[\relax]$g(x)=x^5+x^2-x+1$；%
+\item \rlap{$f(x)=3x^6-x^5-9x^4-14x^3-11x^2-3x-1$，}\item[\relax]$g(x)=3x^5+8x^4+9x^3+15x^2+10x+9$．
+\end{enumitemcols}
+\item 确定多项式~$u(x)$~与~$v(x)$，使得~$f(x)u(x)+g(x)v(x)=d(x)$，其中~$d(x)$~是~$f(x)$~与~$g(x)$~的最大公因式．%
+\begin{enumitemcols}
+\item $f(x)=x^4+2x^3-x^2-4x-2$，\item[\relax]$g(x)=x^4+x^3-x^2-2x-2$；%
+\item $f(x)=3x^5+5x^4-16x^3-6x^2-5x-6$，\item[\relax]$g(x)=3x^4-4x^3-x^2-x-2$；%
+\item $f(x)=3x^3-2x^2+x+2$，\item[\relax]$g(x)=x^2-x+1$；%
+\item $f(x)=x^4-x^3-4x^2+4x+1$，\item[\relax]$g(x)=x^2-x-1$．
+\end{enumitemcols}
+\item 用待定系数法确定多项式~$u(x)$~与~$v(x)$，使得~$f(x)u(x)+g(x)v(x)=1$，其中~$f(x)$~与~$g(x)$~如下：
+\begin{enumitemcols}
+\item $f(x)=x^3$，~~$g(x)=(1-x)^2$；%
+\item $f(x)=x^4$，~~$g(x)=(1-x)^4$；%
+\item $f(x)=x^4-4x^3+1$，~~$g(x)=x^3-3x^2+1$．
+\end{enumitemcols}
+\item 求次数最低的多项式~$u(x)$~与~$v(x)$，使得
+\begin{question}
+\item $(x^4-2x^3-4x^2+6x+1)u(x)+(x^3-5x-3)v(x)=x^4$；%
+\item $(x^4+2x^3+x+1)u(x)+(x^4+x^3-2x^2+2x-1)v(x)=x^3-2x$．
+\end{question}
+\item 求次数最低的多项式~$f(x)$，使得~$f(x)$~被多项式~$(x-1)^2$~除时余式为~$2x$，被多项式~$(x-2)^3$~除时余式为~$3x$．%
+\item 求次数最低的多项式~$f(x)$，使得~$f(x)$~被多项式~$x^4-2x^3-2x^2+10x-7$~除时余式为~$x^2+x+1$，%
+      被多项式~$x^4-2x^3-3x^2+13x-10$~除时余式为~$2x^2-3$．%
+\item 设~$f(x)$~是~$2n+1$~次多项式，$n$~为正整数，$f(x)+1$~被~$(x-1)^n$~整除，
+而~$f(x)-1$~被~$(x+1)^n$~整除．求~$f(x)$．
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{唯一析因定理}\label{ch1se4}
+
+大家知道，在整数环~$\mZ$~中素数起着重要的作用．所谓素数是指，除~$\pm1$~和自身外不含其它因子的整数．%
+整数环~$\mZ$~中每个非零整数都可以分解为若干个素数的乘积，而且不计素因子的正负号和顺序，这种分解是唯一的．%
+
+对数域~$\mF$~上的一元多项式环~$\mF[x]$，也有类似的结论．为了介绍多项式环的唯一析因定理，先引述以下的定义．%
+
+\begin{definition}
+设~$f(x)$~是数域~$\mF$~上的~$n$~次多项式，$n\ge1$．如果存在次数小于~$n$~的多项式~$g(x),h(x)\in\mF[x]$，使得~$f(x)=g(x)h(x)$，
+则多项式~$f(x)$~称为\emph{在~$\mF$~上可约}．%
+如果多项式~$f(x)$~不是在~$\mF$~上可约，则~$f(x)$~称为\emph{在~$\mF$~上不可约}．
+\end{definition}
+
+应当注意，一个多项式在数域~$\mF$~上不可约，在包含数域~$\mF$~的数域~$\mK$~上这个多项式有可能是可约的．%
+例如，多项式~$x^2+1$~在实数域~$\mR$~上不可约，但是，由于
+\[
+x^2+1=(x-\mi)(x+\mi)\cid
+\]
+这里~$\mi^2=-1$．因此多项式~$x^2+1$~在复数域上是可约的．所以，多项式的不可约性是相对给定的数域而言的．%
+
+关于不可约多项式，有以下简单性质．%
+\begin{property}\label{liniar-prime-pol}
+设多项式~$p(x)$~在~$\mF$~上不可约，且~$a$~是~$\mF$~中非零的数，则多项式~$ap(x)$~在~$\mF$~上不可约．
+\end{property}
+\begin{property}
+设多项式~$f(x)\in\mF[x]$，且~$p(x)$~是~$F$~上的不可约多项式，则~$p(x)\mdiv f(x)$，或者~$p(x)$~与~$f(x)$~互素．
+\end{property}
+\begin{proof}设~$f(x)$~与~$p(x)$~不互素，则它们的最大公因式~$d(x)\ne1$，即~$d(x)$~是~$p(x)$~的因式．%
+因为~$p(x)$~在~$\mF$~上不可约，所以~$p(x)=ad(x)$，$a\in\mF$．而~$d(x)$~是~$f(x)$~的因式，
+故~$p(x)$~也是~$f(x)$~的因式，即~$p(x)\mdiv f(x)$．
+\end{proof}
+\begin{property}\label{product-factor-prime}
+设多项式~$f(x),g(x)\in\mF[x]$，$p(x)$~是数域~$\mF$~上的不可约多项式．如果~$p(x)\mdiv f(x)g(x)$，则~$p(x)\mdiv f(x)$，
+或者~$p(x)\mdiv g(x)$．
+\end{property}
+\begin{proof}
+如果~$p(x)\nmdiv f(x)$，则~$\Parenb{p(x),f(x)}=1$．因此，存在多项式~$u(x),v(x)\in\mF[x]$，使得
+\[
+p(x)u(x)+f(x)v(x)=1\pid
+\]
+因此，
+\[
+p(x)\Parenb{u(x)g(x)}+\Parenb{f(x)g(x)}v(x)=g(x)\pid
+\]
+由此即知，$p(x)\mdiv g(x)$．
+\end{proof}
+下面是本节的主要定理．%
+\begin{theorem}[唯一析因定理]\label{weiyixiyin}
+设~$n$~次多项式~$f(x)\in\mF[x]$，则存在数域~$\mF$~上的不可约多项式~$p_1(x),p_2(x),\dotsc,p_s(x)\in\mF[x]$，使得
+\[
+f(x)=p_1(x)p_2(x)\dotsm p_s(x)\pid
+\]
+如果另有不可约多项式~$q_1(x),q_2(x),\dotsc,q_t(x)\in\mF[x]$，使得
+\[
+f(x)=q_1(x)q_2(x)\dotsm q_t(x)\cid
+\]
+则~$s=t$，并且可以适当调动因式的次序，使得
+\[
+q_i(x)=a_ip_i(x)\cid
+\]
+其中~$a_i\in\mF$，$i=1,2,\dotsc,s$．
+\end{theorem}
+
+如果不可约多项式~$p(x)$~整除多项式~$f(x)$，则~$p(x)$~称为~$f(x)$~的\emph{不可约因式}．%
+把多项式~$f(x)$~分解为若干个不可约因式的乘积，称为\emph{对~$f(x)$~施行不可约分解}．%
+于是，\ref{weiyixiyin}~可以简单叙述为：
+
+每个多项式都可以分解为不可约因式的乘积，而且如果不计不可约因式的次序和零次因式，这种不可约分解是唯一的．%
+
+\begin{proof}
+\emphitem{存在性}对多项式的次数~$n$~用归纳法．%
+
+显然，一次多项式在数域~$\mF$~上都是不可约的，因此结论对~$n=1$~成立．%
+假设结论对次数小于~$n$~的多项式都成立，下面证明结论对~$n$~次多项式~$f(x)$~成立．%
+
+如果~$f(x)$~本身在~$\mF$~上不可约，则~$f(x)$~的不可约分解由自身组成；%
+如果~$f(x)$~在~$\mF$~上可约，则存在次数小于~$n$~的多项式~$g(x),h(x)\in\mF[x]$，使得
+\[
+f(x)=g(x)h(x)\pid
+\]
+
+由于~$g(x)$~和~$h(x)$~的次数都小于~$n$，故由归纳假设，
+存在不可约多项式~$p_1(x),\allowbreak p_2(x),\dotsc,\allowbreak p_k(x)$~和~$p_{k+1}(x),\dotsc,p_s(x)\in\mF[x]$，使得
+\[
+g(x)=p_1(x)p_2(x)\dotsm p_k(x)\cid\qquad
+h(x)=p_{k+1}(x)p_{k+2}(x)\dotsm p_s(x)\pid
+\]
+于是，
+\[
+f(x)=p_1(x)p_2(x)\dotsm p_k(x)p_{k+1}(x)\dotsm p_s(x)\pid
+\]
+
+\emphitem{唯一性}
+现在设多项式~$f(x)$~具有两个不可约分解，即设
+\begin{equation}\label{eq141}
+f(x)=p_1(x)p_2(x)\dotsm p_s(x)=q_1(x)q_2(x)\dotsm q_t(x)\pid
+\end{equation}
+
+因为~$q_1(x)$~在~$\mF$~上不可约，并且~$q_1(x)\mdiv p_1(x)p_2(x)\dotsm p_s(x)$，因此，
+由\ref{product-factor-prime}，存在某~$1\le i\le s$~使得~$q_1(x)\mdiv p_i(x)$．%
+适当地调整不可约因式~$p_1(x),p_2(x),\dotsc,p_s(x)$~的次序，可设~$q_1(x)\mdiv p_1(x)$．%
+由于~$p_1(x)$~在~$\mF$~上不可约，因此，存在~$a_1\in\mF$~使得~$p_1(x)=a_1q_1(x)$．%
+于是由式~\ref{eq141}~得到：
+\begin{equation}\label{eq142}
+\Parenb{a_1 p_2(x)}p_3(x)\dotsm p_s(x)=q_2(x)q_3(x)\dotsm q_t(x)=g(x)\pid
+\end{equation}
+
+由\ref{liniar-prime-pol}，$a_1p_2(x)$~在~$\mF$~上不可约．%
+因此式~\ref{eq142}~是次数小于~$n$~的多项式~$g(x)$~的两个不可约分解，
+根据归纳假设得到，$s-1=t-1$，即~$s=t$．并且可适当调整不可约因式~$a_1p_2(x),p_3(x),\dotsc,p_s(x)$~的次序，
+使得
+\[
+q_2(x)=a_2'a_1p_2(x),q_3(x)=a_3p_3(x),\dotsc,q_s(x)=a_sp_s(x)\cid
+\]
+其中~$a_2',a_3,\dotsc,a_s\in\mF$．记~$a_2'a_1=a_2$，则得到~$q_i(x)=a_ip_i(x)$，$i=1,2,\dotsc,s$．
+\end{proof}
+
+应当指出，如果要求数域~$\mF$~上的不可约多项式是首一的，
+则由\ref{weiyixiyin}~直接得到，存在首一不可约多项式~$p_1(x),p_2(x),\dotsc,p_s(x)\in\mF[x]$，
+使得多项式~$f(x)$~可以表为
+\[
+f(x)=a_0p_1(x)p_2(x)\dotsm p_s(x)\cid
+\]
+其中~$a_0$~为~$f(x)$~的首项系数．对于多项式~$f(x)$~的这种不可约分解，除了不可约因式的次序外是唯一的．%
+
+一般地说，出现在多项式~$f(x)$~的一个不可约分解中的不可约因式不一定都不相同．%
+如果不可约因式~$p(x)$~不只出现一次，则~$p(x)$~称为~$f(x)$~的\emph{重因式}，
+否则称为\emph{单因式}．如果~$p(x)$~恰好出现~$k$~次，则~$p(x)$~称为~$f(x)$~的~\emph{$k$~重因式}．%
+
+设多项式~$f(x)$~具有不可约分解
+\begin{equation}\label{eq143}
+f(x)=a_0p_1(x)p_2(x)\dotsm p_s(x)\cid
+\end{equation}
+其中~$p_1(x),p_2(x),\dotsc,p_s(x)$~是不可约的首一多项式，$a_0$~是~$f(x)$~的首项系数．%
+又设分解式~\ref{eq143}~中所有不同的不可约因式为~$p_1(x),p_2(x),\dotsc,p_\ell(x)$，
+它们分别是~$f(x)$~的~$k_1,k_2,\dotsc,k_\ell$~重因式，则式~\ref{eq143}~可以写成
+\begin{equation}\label{eq144}
+f(x)=a_0 p_1^{k_1}(x)p_2^{k_2}(x)\dotsm p_\ell^{k_\ell}(x)\pid
+\end{equation}
+
+设多项式~$f(x)$~和~$g(x)$~的所有不同的首一不可约因式分别为~$h_1(x),h_2(x),\dotsc,\allowbreak h_s(x)$~和~$q_1(x),q_2(x),\dotsc,q_s(x)$．它们的并
+集记为~$\Braceb{p_1(x),p_2(x),\dotsc,p_\ell(x)}$．则~$f(x)$~与~$g(x)$~的不可约分解可以表为
+\begin{align*}
+f(x)&=a_0 p_1^{k_1}(x)p_2^{k_2}(x)\dotsm p_\ell^{k_\ell}(x)\cid\\
+g(x)&=b_0 p_1^{e_1}(x)p_2^{e_2}(x)\dotsm p_\ell^{e_\ell}(x)\cid
+\end{align*}
+其中~$a_0$~与~$b_0$~分别是~$f(x)$~和~$g(x)$~的首项系数，而~$k_i$~与~$e_i$~是非负整数，$i=1,2,\dotsc,\ell$．于是，$f(x)$~与~$g(x)$~的
+最大公因式为
+\[
+\Parenb{f(x),g(x)}=p_1^{m_1}(x)p_2^{m_2}(x)\dotsm p_\ell^{m_\ell}(x)\cid
+\]
+其中~$m_i=\min\Braceb{k_i,e_i}$，$i=1,2,\dotsc,\ell$．%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{实系数与复系数多项式}\label{ch1se5}
+
+系数都是实数或者都是复数的多项式分别称为\emph{实系数}或\emph{复系数多项式}．%
+这节讨论实系数多项式与复系数多项式的唯一析因理论．先证明以下的定理．%
+
+\begin{theorem}\label{root-le-n}
+数域~$\mF$~上的~$n$~次多项式~$f(x)$~在~$\mF$~上至多有~$n$~个不同的根，$n\ge1$．
+\end{theorem}
+\begin{proof}
+设~$a_1,a_2,\dotsc,a_r$~是~$f(x)$~的不同的根，$a_1,a_2,\dotsc,a_r\in\mF$．下面对~$r$~用归纳法证明
+\[
+(x-a_1)(x-a_2)\dotsm(x-a_r)\mdiv f(x)\pid
+\]
+
+事实上，当~$r=1$~时．因为~$a_1$~是~$f(x)$~的根，故由因式定理，$(x-a_1)\mdiv f(x)$．%因此结论对~$r=1$~成立．%
+
+假设结论对~$r-1$~成立，现在证明结论对~$r$~成立．因为~$a_1,a_2,\dotsc,a_{r-1}$~是~$f(x)$~的根，故由归纳
+假设，$(x-a_1)(x-a_2)\dotsm(x-a_{r-1})\mdiv f(x)$，
+\[
+f(x)=(x-a_1)(x-a_2)\dotsm(x-a_{r-1})h(x)\pid
+\]
+其中~$h(x)\in\mF[x]$．由于~$a_r$~为~$f(x)$~的根，故
+\[
+f(a_r)=(a_r-a_1)(a_r-a_2)\dotsm(a_r-a_{r-1})h(a_r)=0\pid
+\]
+因为~$a_1,a_2,\dotsc,a_r$~是~$f(x)$~的不同的根，因此~$a_r-a_i\ne0$，$i=1,2,\dotsc,r-1$．所
+以~$h(a_r)=0$．由因式定理，$h(x)=(x-a_r)g(x)$，于是，
+\[
+f(x)=(x-a_1)(x-a_2)\dotsm(x-a_{r-1})(x-a_r)g(x)\pid\qedhere
+\]
+%%这就证明，如果~$a_1,a_2,\dotsc,a_r$~是~$f(x)$~的不同的根，
+%%则~$(x-a_1)(x-a_2)\dotsm(x-a_r)\mdiv f(x)$．
+\end{proof}
+
+\ref{root-le-n}~并没有告诉我们，$n$~次多项式~$f(x)\in\mF[x]$~一定在数域~$\mF$~上有根．%
+例如，多项式~$x^2+1$~在实数域~$\mR$~上就没有根．但是，当数域~$\mF$~为复数域~$\mC$~时，有
+
+\begin{theorem}[代数基本定理]\label{root-exists}
+任意一个~$n$~次复系数多项式一定有复数根，$n\ge1$．
+\end{theorem}
+
+这个定理是人们早就知道的．直到~1797~年，二十岁的德国大数学家~Gauss~才第一个给出证明．%
+后来~Gauss~又给出三个证明．由于十九世纪以前的代数是以研究代数方程为中心的，
+而这个定理对代数方程论又具有基本重要性，所以人们称它为代数基本定理．%
+这个定理的证明有的涉及复变函数论知识，而初等证明的篇幅又嫌太长，这里就不给出了．%
+
+利用代数基本定理容易证明，
+
+\begin{theorem}\label{root-is-n}
+设~$f(x)$~是任意一个~$n$~次复系数多项式，$n>0$，则~$f(x)$~恰有~$n$~个复数根~$c_1,c_2,\dotsc,c_n$，而且
+\begin{equation}\label{eq151}
+f(x)=a_0(x-c_1)(x-c_2)\dotsm(x-c_n)\cid
+\end{equation}
+其中~$a_0$~是~$f(x)$~的首项系数．
+\end{theorem}
+\begin{proof}
+对多项式~$f(x)$~的次数~$n$~用归纳法．当~$n=1$~时定理显然成立．%
+
+假设定理对次数为~$n-1$~的多项式成立，$f(x)$~是~$n$~次复系数多项式．由代数基本定理，$f(x)$~具有复数根~$c_1$，由因式
+定理，$f(x)=(x-c_1)g(x)$，其中~$g(x)$~为~$n-1$~次复系数多项式．%
+
+由归纳假设，$g(x)$~恰有~$n-1$~个复数根~$c_2,c_3,\dotsc,c_n$，并且
+\[
+g(x)=a_0(x-c_2)(x-c_3)\dotsm(x-c_n)\pid
+\]
+于是，$f(x)=a_0(x-c_1)(x-c_2)\dotsm(x-c_n)$．显然，$c_1,c_2,\dotsc,c_n$~是~$f(x)$~的~$n$~个复数根，
+而且~$a_0$~是~$f(x)$~的首项系数．
+\end{proof}
+
+应当说明，$n$~次多项式~$f(x)$~的~$n$~个根~$c_1,c_2,\dotsc,c_n$~不一定都不相同．%
+如果~$f(x)$~的根~$c$~在~$c_1,c_2,\dotsc,c_n$~中出现~$k$~次，
+则~$c$~称为~$f(x)$~的~\emph{$k$~重根}．$1$~重根称为\emph{单根}．%
+
+设~$n$~次多项式~$f(x)$~的所有不同的根为~$c_1,c_2,\dotsc,c_s$，它们的重数分别为~$\mvec[s]k$，
+则~$f(x)$~的分解式~\ref{eq151}~可以写为
+\[
+f(x)=a_0(x-c_1)^{k_1}(x-c_2)^{k_2}\dotsm(x-c_s)^{k_s}\cid
+\]
+其中正整数~$k_1,k_2,\dotsc,k_s$~适合~$k_1+k_2+\dotsb+k_s=n$．%
+
+我们知道，复系数一次多项式一定是不可约的．\ref{root-exists}~表明，任何~$n$~次复系数多项式~$f(x)$~在复数域上都是可约的，
+其中~$n\ge2$．因此，复系数多项式~$p(x)$~在复数域~$\mC$~上不可约的充分必要条件是~$\deg p(x)=1$．%
+利用这一事实和~\ref{ch1se4}~证明的唯一析因定理，也可以直接得到\ref{root-is-n}．%
+所以，\ref{root-is-n}~是复系数多项式的唯一析因定理．%
+
+下面讨论实系数多项式的不可约分解．%
+\begin{theorem}\label{imroot-is-double}
+实系数多项式~$f(x)$~的复数根共轭成对出现．
+\end{theorem}
+\begin{proof}
+设~$f(x)=a_nx^n+a_{n-1}x^{n-1}+\dotsb+a_1x+a_0$，其中~$a_0,a_1,\dotsc,a_n\in\mR$，且设~$c$~是~$f(x)$~的复数根，则
+\[
+f(c)=a_nc^n+a_{n-1}c^{n-1}+\dotsb+a_1c+a_0=0\pid
+\]
+上式两端取共轭，并注意~$a_i$~是实数，$i=1,2,\dotsc,n$，则得到，
+\[
+ a_n\overline c^n+a_{n-1}\overline c^{n-1}+\dotsb+a_1\overline c+a_0=0\pid
+\]
+其中~$\overline c$~是~$c$~的共轭复数，即~$f(\overline c)=0$．因此，$\overline c$~也是~$f(x)$~的根．
+\end{proof}
+
+对复系数多项式，\ref{imroot-is-double}~并不成立．例如，复系数多项式~$x^2-\mi x=x(x-\mi)$~的根为~$0$~和~$\mi$，它们并不共轭．%
+
+由\ref{imroot-is-double}~可以知道，奇次实系数多项式一定有实数根．%
+
+\begin{theorem}\label{real-coefficient-order}
+实系数多项式~$p(x)$~在实数域上不可约，则~$p(x)$~的次数为~$1$~或~$2$．
+\end{theorem}
+\begin{proof}
+反证法．%
+设~$\deg p(x)=n\ge3$．根据\ref{root-exists}，作为复系数多项式，$p(x)$~具有复数根．%
+如果~$p(x)$~具有实数根~$a$，则由因式定理，
+\[
+p(x)=(x-a)f(x)\cid
+\]
+其中~$f(x)$~是实系数多项式．这表明，$p(x)$~在实数域上可约，与假设矛盾．%
+
+如果~$p(x)$~的根都是复数（不能是实数），则由\ref{imroot-is-double}，$n$~为偶数．%
+设~$n=2k$，$k\ge2$，且设~$c_1,\overline c_1,c_2,\overline c_2,\dotsc,c_k,\overline c_k$~是~$p(x)$~的根．因此，
+\[
+p(x)=a_0(x-c_1)(x-\overline c_1)\dotsm(x-c_k)(x-\overline c_k)\pid
+\]
+
+记
+\[
+p_i(x)=(x-c_i)(x-\overline c_i)=x^2-(c_i+\overline c_i)x+c_i\overline c_i\cid
+\]
+其中~$i=1,2,\dotsc,k$．显然，$p_i(x)$~是实系数的．因此，$p(x)$~在实数域上可约，与假设矛盾．%
+这就证明，$1\le\deg(x)\le 2$．
+\end{proof}
+
+利用二次方程的判别式，容易知道，实二次多项式~$x^2+px+q$~在实数域上不可约的充分必要条件是，它的判别式~$p^2-4q<0$．%
+
+\begin{theorem}%
+$n$~次实系数多项式~$f(x)$~可分解为一次因式和二次不可约因式的乘积，即
+\begin{multline}\label{eq152}
+f(x) = a_0(x-c_1)^{k_1}(x-c_2)^{k_2}\dotsm(x-c_s)^{k_s}\\
+ \times(x^2+p_1x+q_1)^{e_1}(x^2+p_2x+q_2)^{e_2}\dotsm(x 2+p_tx+q_t)^{e_t}\cid
+\end{multline}
+其中~$k_i$~和~$e_j$~是正整数，$1\le i\le s$，$1\le j\le t$，且
+\[
+k_1+k_2+\dotsb+k_s+2(e_1+e_2+\dotsb+e_t)=n\cid
+\]
+而~$a_0$~是~$f(x)$~的首项系数，$c_1,c_2,\dotsc,c_s$，$p_1,p_2,\dotsc,p_t$~和~$q_1,q_2,\dotsc,q_t$~都是实数，并且
+\[
+p_j^2-4q_j<0\pid
+\]
+\end{theorem}
+
+当然，如果~$f(x)$~没有实根，则式~\ref{eq152}~中的一次因式不出现；如果~$f(x)$~的根都是实数，则二次因式不出现．%
+\begin{proof}
+这是~\ref{ch1se4}~中唯一析因定理和\ref{real-coefficient-order}~的直接推论．
+\end{proof}
+
+\begin{exercise}
+\item 把下列复系数多项式分解为一次因式的乘积．%
+\begin{enumitemcols}
+\item $(x+\cos\theta+\mi\sin\theta)^n+(x+\cos\theta-\mi\sin\theta)^n$；
+\item $(x+1)^n-(x-1)^n$；%
+\item $x^n-\uC_{2n}^2 x^{n-1}+\uC_{2n}^4 x^{n-2}+\dotsb+(-1)^n\uC_{2n}^{2n}$；%
+\item $x^{2n}+\uC_{2n}^2 x^{2n-2}(x^2-1)+\uC_{2n}^4 x^{2n-4}(x^2-1)^2+\dotsb+(x^2-1)^n$；%
+\item $x^{2n+1}+\uC_{2n+1}^2 x^{2n-1}(x^2-1)+\uC_{2n+1}^4 x^{2n-3}(x^2-1)^2+\dotsb+x(x^2-1)^n$．
+\end{enumitemcols}
+\item 把下列实系数多项式分解为实的不可约因式的乘积．%
+\begin{enumitemcols}
+\item $x^4+1$；%
+\item $x^6+27$；%
+\item $x^4+4x^3+4x^2+1$；%
+\item $x^{2n}-2x^n+2$；%
+\item $x^4-ax^2+1$，$-2<a<2$；%
+\item $x^{2n}+x^n+1$．
+\end{enumitemcols}
+\item 证明，复系数多项式~$f(x)$~对所有实数~$x$~恒取正值的充分必要条件是，存在没有实数根的复系数多项式~$\varphi(x)$，%
+      使得~$f(x)=\abs*{\varphi(x)}^2$．%
+\item 证明，实系数多项式~$f(x)$~对所有实数~$x$~恒取非负实数值的充分必要条件是，%
+      存在实系数多项式~$\varphi(x)$~和~$\psi(x)$，使得~$f(x)=\varphi^2(x)+\psi^2(x)$．
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{整系数与有理系数多项式}\label{ch1se6}
+
+系数都是整数或者都是有理数的多项式称为\emph{整系数多项式}或\emph{有理系数多项式}．%
+根据\ref{weiyixiyin}，有理系数多项式可以分解为有理系数不可约多项式的乘积，而且不计不可约因式的次序与零次因式，不可约分解
+是唯一的．问题是，如何判定一个有理系数多项式是否在有理数域~$\mQ$~上不可约？
+另外，\ref{weiyixiyin}~（即多项式的唯一析因定理）是对数域~$\mF$~而言的，对整数环~$\mZ$，唯一析因定理是否仍成立，这是本节所要讨论的．%
+
+和数域~$\mF$~上不可约多项式的定义相仿，可以给出不可约整系数多项式的定义．%
+
+设~$n$~是正整数，如果~$n$~次整系数多项式~$f(x)$~可以表为两个次数小于~$n$~的整系数多项式的乘积，则~$f(x)$~称为在
+整数环~$\mZ$~上\emph{不可约}．否则，$f(x)$~称为在整数环~$\mZ$~上\emph{可约}．%
+容易看出，如果整系数多项式~$f(x)$~在~$\mZ$~上可约，则作为有理系数多项式，$f(x)$~在有理数域~$\mQ$~上也可约．%
+反之，如果整系数多项式~$f(x)$~在~$\mQ$~上可约，$f(x)$~是否在~$\mZ$~上也可约？
+
+为了回答这个问题，先引进以下的概念．%
+
+\begin{definition}
+如果整系数多项式~$f(x)=a_0+a_1x+\dotsb+a_nx^n$~的系数~$a_0,a_1,\dotsc,\allowbreak a_n$~的最大公因子为~$1$，则~$f(x)$~称为\emph{本原多项式}．
+\end{definition}
+
+设整系数多项式~$f(x)=a_0+a_1x+\dotsb+a_nx^n$~的系数的最大公因子为
+\[
+d=(a_0,a_1,\dotsc,a_n)\cid
+\]
+则~$a_i=da_i'$，其中~$a_i'\in\mZ$，$i=0,1,\dotsc,n$，并且~$(a_0',a_1',\dotsc,a_n')=1$．因此，
+\[
+f(x)=d(a_0'+a_1'x+\dotsb+a_n'x^n)\pid
+\]
+记~$f_1(x)=a_0'+a_1'x+\dotsb+a_n'x^n$．显然，$f_1(x)$~是本原多项式，并且
+\[
+f(x)=df_1(x)\pid
+\]
+这说明，每个整系数多项式都可以表成系数的最大公因子和本原多项式的乘积．%
+
+\begin{axiom}[Gauss~引理]
+任意两个本原多项式的乘积是本原多项式．
+\end{axiom}
+\begin{proof}
+设~$f(x)=a_0+a_1x+\dotsb+a_nx^n$~与~$g(x)=b_0+b_1x+\dotsb+b_mx^m$~是本原多项式．%
+设~$f(x)g(x)=c_0+c_1x+\dotsb+c_{n+m}x^{n+m}$，其中对于~$k=0,1,\dotsc,n+m$，
+\[
+c_k=a_0b_k+a_1b_{k-1}+\dotsb+a_{k-1}b_1+a_kb_0\cid
+\]
+这里约定，当~$i>m$~时，$b_i=0$，而当~$j>n$~时，$a_j=0$．%
+
+如果~$f(x)g(x)$~不是本原的，则~$(c_0,c_1,\dotsc,c_{n+m})\ne 1$．设素数~$p$~是~$c_0,c_1,\dotsc,\allowbreak c_{n+m}$~的公因子．由于~$f(x)$~是本原的，
+故~$p$~不是~$a_0,a_1,\dotsc,a_n$~的公因子．因此，可设~$a_i$~是~$a_0,a_1,\dotsc,\allowbreak a_n$~中第一个不被~$p$~整除的系数．%
+同理可设~$b_j$~是~$b_0,b_1,\dotsc,b_m$~第一个不被~$p$~整除的系数．%
+
+现在考察~$f(x)g(x)$~的系数
+\[
+c_{i+j}=a_0b_{i+j}+\dotsb+a_{i-1}b_{j+1}+a_ib_j+a_{i+1}b_{j-1}+\dotsb+a_{i+j}b_0\pid
+\]
+由于素数~$p$~整除~$a_0,a_1,\dotsc,a_{i-1}$，$b_0,b_1,\dotsc,b_{j-1}$~和~$c_{i+j}$，因此，$p$~整除~$a_ib_j$．%
+因为~$p$~是素数，故~$p$~整除~$a_i$，或者整除~$b_j$，不可能．因此，
+\[
+(c_0,c_1,\dotsc,c_{n+m})=1\pid \qedhere
+\]
+\end{proof}
+
+\begin{theorem}\label{mqkeyueraarmzkeyue}
+设~$n$~次整系数多项式~$f(x)$~在~$\mZ$~上不可约，则~$f(x)$~在~$\mQ$~不可约．
+\end{theorem}
+\begin{proof}
+设~$f(x)$~在~$\mQ$~上可约，则存在次数小于~$n$~的~$g(x),h(x)\in\mQ[x]$，使得
+\[
+f(x)=g(x)h(x)\pid
+\]
+
+将多项式~$g(x)$~的系数通分，得到~$g(x)=b_1g_1(x)$，$b_1\in\mQ$，$g_1(x)\in\mZ[x]$．%
+而~$g_1(x)$~可以表为系数最大公因子~$d_1$~和本原多项式~$\widetilde g(x)$~的乘积．%
+因此，$g(x)=b\widetilde g(x)$，其中~$b=b_1d_1\in\mQ$．%
+
+同理，$h(x)=c\widetilde h(x)$，$c\in\mQ$，$\widetilde h(x)$~为本原多项式．于是，
+\[
+f(x)=bc\widetilde g(x)\widetilde h(x)\pid
+\]
+
+由~Gauss~引理，$\widetilde g(x)\widetilde h(x)$~是本原多项式，记~$bc=uv^{-1}$，$u,v\in\mZ$．%
+由于~$f(x)$~是整系数多项式，且~$\widetilde g(x)\widetilde h(x)$~是本原的，因此，$v\mdiv u$．%
+所以，$bc\in\mZ$．这就说明，$f(x)$~在~$\mZ$~上可约，但这是一个矛盾．
+\end{proof}
+
+\ref{mqkeyueraarmzkeyue}~说，如果整系数多项式~$f(x)$~在~$\mQ$~上可约，则~$f(x)$~在~$\mZ$~上可约；%
+反之，如果整系数多项式~$f(x)$~在~$\mZ$~上可约，$f(x)$~当然在~$\mQ$~上可约．%
+因此，整系数多项式~$f(x)$~相对于整数环~$\mZ$~和有理数域~$\mQ$~的不可约性是相同的．%
+
+\begin{theorem}\label{keyuefenjie}%
+$n$~次整系数多项式~$f(x)$~可以分解为一个整数和若干个本原不可约多项式的乘积，而且不计因式的次序和符号，
+这种分解是唯一的．
+\end{theorem}
+
+\begin{proof}
+根据数域~$\mF$~上的多项式的唯一析因定理，作为有理系数多项式，$f(x)$~可以表为
+\[
+f(x)=a_0p_1(x)\dotsm p_s(x)\cid
+\]
+其中~$a_0\in\mQ$~是~$f(x)$~的首项系数，诸~$p_i(x)$~是首一有理系数多项式，并且都在~$\mQ$~上不可约．%
+
+如同\ref{mqkeyueraarmzkeyue}~的证明，$p_i(x)=b_iq_i(x)$，其中~$b_i\in\mQ$，而~$q_i(x)$~是本原多项式．%
+
+如果~$q_i(x)$~在~$\mZ$~上可约，则~$q_i(x)$~在~$\mQ$~上可约，从而~$p_i(x)$~在~$\mQ$~可约，不可能．%
+因此，$q_i(x)$~在~$\mZ$~上不可约，$i=1,2,\dotsc,s$．于是，
+\[
+f(x)=a_0b_1\dotsm b_s q_1(x)q_2(x)\dotsm q_s(x)\pid
+\]
+
+和\ref{mqkeyueraarmzkeyue}~的证明相同，可以证明，$a_0b_1\dotsm b_s\in\mZ$．%
+因此，$f(x)$~可以表示为一个整数和若干个本原多项式的乘积．%
+
+现在设
+\[
+f(x)=a_0 p_1(x)p_2(x)\dotsm p_s(x)=b_0q_1(x)q_2(x)\dotsm q_s(x)\cid
+\]
+其中~$a_0,b_0\in\mZ$，$p_1(x),p_2(x),\dotsc,p_s(x)$~和~$q_1(x),q_2(x),\dotsc,q_s(x)$~是本原不可约多项式．%
+根据\ref{mqkeyueraarmzkeyue}，$p_1(x),\dotsc,p_s(x)$~和~$q_1(x),\dotsc,q_s(x)$~在~$\mQ$~上不可约．显
+然，$a_0p_1(x),\allowbreak b_0q_1(x)$~在~$\mQ$~上也不可约．把~$f(x)$~视为有理系数多项式，根据有理数域~$\mQ$~上的多项式的唯一析因定理，$s=t$，并且
+可以适当地调整不可约因式的次序，使得相应的有理系数不可约因式只相差一个有理数因子．为简单计，设
+\[
+a_0p_1(x)=c_1b_0q_1(x), p_2(x)=c_2q_2(x),\dotsc,p_s(x)=c_sq_s(x)\cid
+\]
+其中~$c_1,c_2,\dotsc,c_s\in\mQ$．%
+
+当~$2\le i\le s$~时，由于~$p_i(x)$~与~$q_i(x)$~是本原的，因此，$c_i=\pm1$，即~$p_i(x)=\pm q_i(x)$．%
+由于~$p_1(x)=a_0^{-1}c_1b_0q_1(x)$，且~$p_1(x)$~与~$q_1(x)$~是本原的，因此，$a_0^{-1}c_1b_0=\pm1$，
+即~$a_0=\pm c_1b_0$，所以，$p_1(x)=\pm q_1(x)$．从而~$a_0=\pm b_0$．
+\end{proof}
+
+\begin{theorem}[Eisenstein~判别准则]
+设~$f(x)=a_0+a_1x+\dotsb+a_nx^n\in\mZ[x]$．如果存在素数~$p$，使得~$p\mdiv a_i$，%%
+$i=0,\dotsc,n-1$，但~$p\nmdiv a_n$~且~$p^2\nmdiv a_0$，则~$f(x)$~在~$\mZ$~上不可约．
+\end{theorem}
+\begin{proof}
+反证法．设~$f(x)$~在~$\mZ$~可约，则
+\[
+f(x)=(b_0+b_1x+\dotsb+b_kx^k)(c_0+c_1x+\dotsb+c_lx^\ell)\cid
+\]
+其中~$b_i,c_j\in\mZ$，并且~$k<n$，$\ell<n$，$k+\ell=n$．于是得到，
+\[
+a_r=b_0c_r+b_1c_{r-1}+\dotsb+b_{r-1}c_1+b_rc_0\cid
+\]
+其中~$r=0,1,\dotsc,n$；并且当~$i\ge k+1$~时，约定~$b_k=0$；当~$j\ge \ell+1$~时，约定~$c_j=0$．%
+
+由于~$p\mdiv a_0$，$a_0=b_0c_0$，故~$p\mdiv b_0$，或者~$p\mdiv c_0$．%
+由于~$p^2\nmdiv a_0$，故~$p$~不同时整除~$b_0$~与~$c_0$．因此可设~$p\mdiv b_0$，但~$p\nmdiv c_0$．%
+
+又因为~$p\nmdiv a_n$，故~$p\nmdiv b_k$．所以必有某个~$1\le i_0\le k$，
+使得~$p\mdiv b_i$，$i=0,1,\dotsc,i_0-1$，但~$p\nmdiv b_{i_0}$．%
+由于~$p\nmdiv a_{i_0}$，$p\mdiv b_i$，$i=0,1,\dotsc,i_0-1$，并且
+\[
+a_{i_0}=b_0c_{i_0}+b_1c_{i_0-1}+\dotsb+b_{i_0-1}c_1+b_0c_0\cid
+\]
+故~$p\mdiv b_{i_0}c_0$．因为~$p\nmdiv b_i$，故~$p\mdiv c_0$．与~$p\nmdiv c_0$~的假设相矛盾．
+\end{proof}
+
+利用~Eisenstein~判别准则容易看出，对每个整数~$n\ge2$，都存在~$n$~次多项式~$f(x)\in\mQ[x]$，
+使得，$f(x)$~在~$\mQ$~不可约．例如，多项式~$f(x)=x^n+2\in\mZ[x]$，取~$p=2$，则~$f(x)$~适合~Eisenstein~判别准则的条件，
+因此，$f(x)$~在~$\mZ$~上不可约．根据\ref{mqkeyueraarmzkeyue}，作为有理系数多项式，$f(x)$~在~$\mQ$~上不可约．%
+
+\begin{example}
+设~$p$~是素数．多项式
+\[
+\varPhi_p(x)=x^{p-1}+x^{p-2}+\dotsb+x+1
+\]
+称为\emph{分圆多项式}．证明，分圆多项式~$\varPhi_p(x)$~在~$\mZ$~上（当然也在~$\mQ$~上）不可约．
+\end{example}
+\begin{proof}
+令~$x=y+1$．则
+\begin{align*}
+f(y)&=\varPhi_p(y+1)=\frac{(y+1)^p-1}{(y+1)-1}\\
+&=y^{p-1}+py^{p-2}+\dotsb+\uC_p^{k-1}y^{p-k}+\dotsb+\uC_p^{p-2}y+p\pid
+\end{align*}
+
+显然，$p$~不能整除~$f(y)$~的首项系数，$p^2$~不能整除~$f(y)$~的常数项，但~$p$~整除~$f(y)$~中首项系数外的其它各项．%
+根据~Eisenstein~判别准则，$f(y)$~在~$\mZ$~上不可约．%
+
+如果~$\varPhi_p(x)$~在~$\mZ$~上可约，则
+\[
+\varPhi_p(x)=g(x)h(x)\cid
+\]
+其中~$g(x),h(x)\in\mZ[x]$，且~$\deg g(x)<p-1$，$\deg h(x)<p-1$．于是，
+\[
+f(y)=g(y+1)h(y+1)\pid
+\]
+显然，$g(y+1),h(y+1)\in\mZ[y]$．从而~$f(y)$~在~$\mZ$~上可约，矛盾．
+\end{proof}
+
+\begin{example}
+设~$a_1,a_2,\dotsc,a_n$~是~$n$~个不同的整数．证明，多项式
+\[
+f(x)=(x-a_1)(x-a_2)\dotsm(x-a_n)-1
+\]
+在~$\mQ$~上不可约．
+\end{example}
+\begin{proof}
+设~$f(x)$~在~$\mQ$~上可约，则~$f(x)$~在~$\mZ$~上可约，因此，
+\[
+f(x)=g(x)h(x)\cid
+\]
+其中~$g(x),h(x)\in\mZ[x]$，且~$\deg g(x)<\deg f(x)$，$\deg h(x)<\deg f(x)$．%
+
+由于~$f(a_i)=g(a_i)h(a_i)=-1$，故~$\abs*{g(a_i)}=\abs*{h(a_i)}=1$，且~$g(a_i)+h(a_i)=0$．%
+这表明，多项式~$g(x)+h(x)$~至少有~$n$~个不同的根．%
+
+由于~$\deg g(x)<n$，$\deg h(x)<n$，因此，$\deg(g(x)+h(x))<n$．%
+因此若~$g(x)+h(x)$~是非零多项式，则~$g(x)+h(x)$~的根的个数小于~$n$，不可能．%
+因此，$g(x)+h(x)$~是零多项式，从而~$f(x)=-g^2(x)$．这和~$f(x)$~的首项系数为~$1$~相矛盾．
+\end{proof}
+
+\begin{exercise}
+\item 利用~Eisenstein~判别准则判定下述整系数多项式的不可约性．%
+\begin{enumitemcols}
+\item $x^4-8x^3+12x^2-6x+2$；%
+\item $x^4-x^3+2x+1$；%
+\item $x^4+1$；%
+\item $x^6+x^3+1$；%
+\item $\dps{\sum_{i=0}^{p-1}(x+1)^i}$，其中~$p$~是素数．
+\end{enumitemcols}
+\item 设~$f(x)=a_0x^n+a_1x^{n-1}+\dotsb+a_{n-1}x+a_n$~是整系数多项式，且素数~$p$~适合：
+      $p\nmdiv a_0$，$p\nmdiv a_1$，$\dotsc$，$p\nmdiv a_k$，$p\mdiv a_i$，%
+      $i=k+1,k+2,\dotsc,n$，而~$p^2\nmdiv a_n$．证明，$f(x)$~具有次数不低于~$n-k$~的整系数不可约因式．%
+\item 设
+\[
+f(x)=a_0x^{2n+1}+\dotsb+a_nx^{n+1}+a_{n+1}x^n+\dotsb+a_{2n}x+a_{2n+1}
+\]
+是整系数多项式，且素数~$p$~适合：$p\nmdiv a_0$，$p\mdiv a_i$，$i=1,\dotsc,n$，%%
+$p^2\mdiv a_i$，$i=n+1,\dotsc,2n+1$，但~$p^3\nmdiv a_{2n+1}$．证明~$f(x)$~在~$\mQ$~上不可约．%
+\item 设~$a_1,a_2,\dotsc,a_n$~是~$n$~个不同的整数．证明，多项式
+\[
+f(x)=(x-a_1)^2(x-a_2)^2\dotsm(x-a_n)^2+1
+\]
+在~$\mQ$~上不可约．%
+\item 试给出有理系数多项式~$f(x)=x^4+px^2+q$~在~$\mQ$~上不可约的充分必要条件．%
+\item 设整系数多项式~$f(x)$~在~$x$~的~$4$~个不同整数值上都取值为~$1$，则~$f(x)$~在~$x$~的其它整数值上的值不可能是~$-1$．%
+\item 证明，设正整数~$n\ge12$，并且~$n$~次整系数多项式~$f(x)$~在~$x$~的~$\Floor*{\frac n2}+1$~个以上的整数值上取值为~$\pm 1$，%
+      则~$f(x)$~在~$\mQ$~不可约．次数~$n$~的下界~$12$~是否还可缩小？
+\item 设整系数多项式~$ax^2+bx+1$~在有理数域~$\mQ$~上不可约，并且设
+\[
+\varphi(x)=(x-a_1)(x-a_2)\dotsm(x-a_n)\cid
+\]
+其中~$a_1,a_2,\dotsc,a_n$~是~$n$~个不同的整数，$n\ge7$．证明，多项式
+\[
+f(x)=a\varphi^2(x)+b\varphi(x)+1
+\]
+在~$\mQ$~上不可约．并问次数~$n$~的下界~$7$~是否还可缩小？
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{多元多项式环}\label{ch1se7}
+设~$\mF$~是数域，$x_1,x_2,\dotsc,x_n$~是~$n$~个未定元．设~$\mN$~是所有非负整数的集合．记
+\[
+\mN^n=\Braceb{(k_1,k_2,\dotsc,k_n)\mid k_1,k_2,\dotsc,k_n\in\mN}\pid
+\]
+设~$(k_1,k_2,\dotsc,k_n)\in\mN$，$a_{k_1k_2\dotsm k_n}\in\mF$，则
+\[
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}
+\]
+称为\emph{数域~$\mF$~上的~$n$~元单项式}，$k_1+k_2+\dotsb+k_n$~称为它的\emph{次数}，$a_{k_1k_2\dotsm k_n}$~称为它的\emph{系数}．%
+
+设~$M$~是集合~$\mN^n$~的有限子集合，则
+\[
+f(\mvec x)=\sumsep\sum_{\mathclap{(k_1,k_2,\dotsc, k_n)\in M}}\sumsep
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}
+\]
+称为\emph{数域~$\mF$~上的~$n$~元多项式}，其中~$a_{k_1k_2\dotsm k_n}\in\mF$．%%
+$n$~元多项式~$f(\mvec x)$~的所有单项式的最高次数称为~$f(x_1,x_2,\dotsm,x_n)$~的\emph{次数}，
+记为~$\deg f(\mvec x)$，或简记为~$\deg f$；$a_{k_1k_2\dotsm k_n}$~称为
+项~$a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}$~的\emph{系数}．%
+
+例如，
+\[
+f(x_1,x_2,x_3)=4x_1x_2x_3+\sqrt3\, x_2^3x_3+\pi x_1^3x_2^2
+\]
+是实数域~$\mR$~上的~$5$~次~$3$~元多项式．%
+
+所有数域~$\mF$~上的~$n$~元多项式的集合记为~$\mF[\mvec x]$．%
+
+给定数域~$\mF$~上的~$n$~元多项式~$f(\mvec x)$，可以接照\emph{字典排列法}把它所有的项逐一写出来．设
+\[
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}~\text{和}~
+a_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}
+\]
+是~$f(\mvec x)$~的两个项．如果存在正整数~$i$，$1\le i\le n$，使得~$k_1=\ell_1$，$k_2=\ell_2$，$\dotsc$，%
+$k_{i-1}=\ell_{i-1}$，而~$k_i>\ell_i$，则将项~$a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}$~写在
+项~$a_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\allowbreak\dotsm x_n^{\ell_n}$~之前．%
+
+例如，$3$~元多项式
+\[
+f(x_1,x_2,x_3)=x_1x_2^2x_3^2+x_1^3x_2+x_1x_3^3+x_1^2x_2x_3^2
+\]
+可以按照字典排列写成
+\[
+f(x_1,x_2,x_3)=x_1^3x_2+x_1^2x_2x_3^2+x_1x_2^2x_3^2+x_2x_3^3\pid
+\]
+
+按照字典排列法写在多项式~$f(\mvec x)$~的和式中最前面的项称为~$f(\mvec x)$~的\emph{首项}，
+相应的系数称为~$f(\mvec x)$~的\emph{首项系数}．%
+
+注意，$f(\mvec x)$~的首项不一定是最高次项．%
+
+设~$f(\mvec x)$~与~$g(\mvec x)$~是数域~$\mF$~上的~$n$~元多项式．%
+如果它们的相应项的系数都相等．则~$f(\mvec x)$~与~$g(\mvec x)$~称为\emph{相等}．%
+两个~$n$~元多项式的\emph{和}是以它们相应项的系数之和作为相应项的系数的多项式，记为
+\[
+f(\mvec x)+g(\mvec x)\pid
+\]
+
+具体地说，设
+\[
+\begin{aligned}
+f(\mvec x)&=\sumsep\sum_{\mathclap{(k_1,k_2,\dotsc,k_n)\in M_1}}\sumsep
+                       a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\cid\\
+g(\mvec x)&=\sumsep\sum_{\mathclap{(k_1,k_2,\dotsc, k_n)\in M_2}}\sumsep
+                       b_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\cid
+\end{aligned}
+\]
+其中~$M_1,M_2\subseteq\mN^n$．%
+记~$M=M_1\cup M_2$，当~$(k_1,k_2,\dotsc,k_n)\in M_1$~但~$(k_1,k_2,\dotsc,k_n)\notin M_2$~时，约定~$b_{k_1k_2\dotsm k_n}=0$；%
+而当~$(k_1,k_2,\dotsc,k_n)\notin M_1$，$(k_1,k_2,\dotsc,k_n)\in M_2$~时，约定~$a_{k_1k_2\dotsm k_n}=0$．%
+则~$f(x_1,\dotsc,x_n)$~与~$g(x_1,\dotsc,x_n)$~的和为%%%~$f(x_1,\dotsc,x_n)+g(x_1,\dotsc,x_n)$~
+\[
+f(\mvec x)+g(\mvec x)=\sumsep\sum_{\mathclap{(k_1,k_2,\dotsc, k_n)\in M}}\sumsep
+\Parenb{a_{k_1k_2\dotsm k_n}+b_{k_1k_2\dotsm k_n}}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\pid
+\]
+
+容易看出，
+\[
+\deg\Parenb{f(x_1,\dotsc,x_n)+g(x_1,\dotsc,x_n)}
+\le\max\Braceb{\deg f(x_1,\dotsc,x_n),~\deg g(x_1,\dotsc,x_n)}\pid
+\]
+
+对~$n$~元多项式的加法，容易验证下述公理成立：
+
+\begin{descitems}
+\item[(A1)~结合律]对任意~$f(\mvec x),g(\mvec x)$~和~$h(\mvec x)\in\mF[\mvec x]$，
+\begin{multline*}
+\Parenb{f(\mvec x)+g(\mvec x)}+h(\mvec x) \\*
+=f(\mvec x)+\Parenb{g(\mvec x)+h(\mvec x)}\sid
+\end{multline*}
+
+\item[(A2)~交换律]对任意~$f(\mvec x),g(\mvec x)\in\mF[\mvec x]$，
+\[
+f(\mvec x)+g(\mvec x)=g(\mvec x)+f(\mvec x)\sid
+\]
+
+\item[(A3)~存在零多项式] 每个系数都为零的~$n$~元多项式称为\emph{零多项式}，记为~$0$，同时零多项式的次数约定为~$-\infty$．%
+显然，$0\in\mF[\mvec x]$，并且对任意~$f(\mvec x)\in\mF[\mvec x]$，
+\[
+f(\mvec x)+0=0+f(\mvec x)=f(\mvec x)\sid
+\]
+
+\item[(A4)~存在负多项式]设
+\[
+f(\mvec x)=\sumsep\sum_{\mathclap{(k_1,k_2,\dotsc, k_n)\in M}}\sumsep
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\in\mF[\mvec x]\pid
+\]
+多项式
+\[
+\sumsep[1]\sum_{\mathclap{(k_1,k_2,\dotsc,k_n)\in M}}\sumsep
+\Parenb{-a_{k_1k_2\dotsm k_n}}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\in\mF[\mvec x]
+\]
+称为~$f(\mvec x)$~的\emph{负多项式}．记为~$-f(\mvec x)$．显然，
+\[
+f(\mvec x)+\Parenb{-f(\mvec x)}=0=\Parenb{-f(\mvec x)}+f(\mvec x)\pid
+\]
+\end{descitems}
+
+设
+\begin{align*}
+f(\mvec x)&=\sumsep\sum_{\mathclap{(k_1,k_2,\dotsc, k_n)\in M_1}}\sumsep
+                       a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\cid\\
+g(\mvec x)&=\sumsep\sum_{\mathclap{(\ell_1,\ell_2,\dotsc,\ell_n)\in M_2}}\sumsep
+                       b_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}\cid
+\end{align*}
+是数域~$\mF$~上的~$n$~元多项式．又令~$m_i=k_i+\ell_i$，$i=1,2,\dotsc,n$，且记
+\[
+M=\Braceb{(m_1,m_2,\dotsc,m_n)\mid(k_1,k_2,\dotsc,k_n)\in M_1,(\ell_1,\ell_2,\dotsc,\ell_m)\in M_2}\pid
+\]
+则~$f(\mvec x)$~与~$g(\mvec x)$~的\emph{乘积}~$f(\mvec x)g(\mvec x)$~规定为
+\[
+f(\mvec x)g(\mvec x)=\sumsep\sum_{\mathclap{(m_1,m_2,\dotsc,m_n)\in M}}\sumsep
+c_{m_1m_2\dotsm m_n}x_1^{m_1}x_2^{m_2}\dotsm x_n^{m_n}\cid
+\]
+\begin{align*}
+\prefixtext{其中}
+c_{m_1m_2\dotsm m_n}=\sumsep\sum_{\mathclap{\begin{subarray}{c} 1\le j\le n\\ k_j+\ell_j=m_j \end{subarray}}}\sumsep
+a_{k_1k_2\dotsm k_n}b_{\ell_1\ell_2\dotsm \ell_n}\pid
+\end{align*}
+
+显然，$f(\mvec x)g(\mvec x)\in\mF[\mvec x]$，
+并且其首项系数等于~$f(\mvec x)$~与~$g(\mvec x)$~的首项系数的乘积，即
+\[
+\deg\Parenb{f(\mvec x)g(\mvec x)}=\deg f(\mvec x)+\deg g(\mvec x)\pid
+\]
+
+此外，对~$n$~元多项式的乘法，乘法结合律、乘法交换律以及乘法对加法的分配律成立．%
+同时，对任意~$f(\mvec x)\in\mF[\mvec x]$，均有
+\[
+1\cdot f(\mvec x)=f(\mvec x)=f(\mvec x)
+\cdot1\cid
+\]
+其中~$1$~是数域~$\mF$~上的零次多项式．%
+
+于是，$\mF[\mvec x]$~在上述多项式的加法与乘法下构成一个交换环．%
+它称为数域~$\mF$~上的~\emph{$n$~元多项式环}．%
+
+\begin{exercise}
+\item 设~$f(\mvec x),g(\mvec x)\in\mF[\mvec x]$．证明，如果
+      \[
+        f(\mvec x)g(\mvec x)
+      \]
+      为零多项式，则~$f(\mvec x)$~与~$g(\mvec x)$~至少有一个是零多项式．%
+\item 设~$f(\mvec x),g(\mvec x),h(\mvec x)\in\mF[\mvec x]$．%
+      证明，如果
+      \[
+        f(\mvec x)g(\mvec x)= f(\mvec x)h(\mvec x)\cid
+      \]
+      则~$g(\mvec x)=h(\mvec x)$．%
+\item 验证~$\mF[\mvec x]$~在~$n$~元多项式的加法与乘法下成为一个交换环．
+\end{exercise}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{对称多项式}\label{ch1se8}
+
+设~$\mF[\mvec x]$~是数域~$\mF$~上的~$n$~元多项式环．在~$n$~元多项式中，经常遇到的是所谓对称多项式．其定义如下：
+
+\begin{definition}
+设~$f(\mvec x)\in\mF[\mvec x]$．如果对自然数~$1,2,\dotsc,n$~的任意一个排列~$i_1i_2\dotsm i_n$，
+都有
+\[
+f(x_{i_1},x_{i_2},\dotsc,x_{i_n})=f(\mvec x)\cid
+\]
+则~$f(\mvec x)$~称为~$n$~元\emph{对称多项式}．
+\end{definition}
+
+例如，容易看出，%
+\begin{align*}
+\sigma_1&=x_1+x_2+\dotsb+x_n=\sumsep\sum_{\mathclap{1\le i_1\le n}}\sumsep x_{i_1}\cid\\
+\sigma_2&=x_1x_2+\dotsb+x_1x_n+x_2x_3+\dotsb+x_2x_n+\dotsb+x_{n-1}x_n=\sumsep\sum_{\mathclap{1\le i_1<i_2\le n}}\sumsep
+         x_{i_1}x_{i_2}\cid\\[-5pt]
+&\eqdots\\
+\sigma_k&=\sumsep\sum_{\mathclap{1\le i_1<i_2<\dotsb<i_k\le n}}\sumsep x_{i_1}x_{i_2}\dotsm x_{i_k}\cid\\
+&\eqdots[1.5]\\
+\sigma_n&=x_1x_2\dotsm x_n\cid
+\end{align*}
+都是~$n$~元对称多项式．它们称为~$n$~元\emph{基本对称多项式}．%
+
+可验证，两个~$n$~元对称多项式之和、差与积仍是~$n$~元对称多项式．%
+
+此外，对任意多项式~$f(\mvec x)\in\mF[\mvec x]$，
+如果用基本对称多项式~$\mvec\sigma$~分别替换~$f(\mvec x)$~中的
+未定元~$x_1,x_2,\dotsc,x_n$，得到~$f(\mvec\sigma)$，
+则~$f(\mvec\sigma)$~是一个关于未定元~$x_1,x_2,\dotsc,x_n$~的对称多项式．%
+例如取~$n=3$，$f(x_1,x_2,x_3)=x_1x_2+2x_3\in\mR[x_1,x_2,x_3]$．%
+用~$\sigma_1=x_1+x_2+x_3$，$\sigma_2=x_1x_2+x_1x_3+x_2x_3$~与~$\sigma_3=x_1x_2x_3$~分别替换~$f(x_1,x_2,x_3)$~的
+未定元~$x_1,x_2,x_3$，得到
+\[
+f(\sigma_1,\sigma_2,\sigma_3)=\sigma_1\sigma_2+2\sigma_3=x_1^2x_2+x_1^2x_3+x_1x_2^2+x_1x_3^2+x_2^2x_3+x_2x_3^2+5x_1x_2x_3\cid
+\]
+显然，它是一个三元对称多项式．反之，有
+\begin{theorem}[对称多项式基本定理]\label{sym-pol-onlyone}
+设~$f(\mvec x)$~是数域~$\mF$~上的~$n$~元对称多项式．%
+则存在唯一的多项式~$g(\mvec x)\in\mF[\mvec x]$，使得
+\[
+f(\mvec x)=g(\mvec\sigma)\cid
+\]
+其中~$\mvec\sigma$~是数域~$\mF$~上的~$n$~元基本对称多项式．
+\end{theorem}
+\begin{proof}
+\emphitem{存在性}设对称多项式~$f(\mvec x)$~的首项为
+\[
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\cid
+\]
+则一定有~$k_1\ge k_2\ge\dotsb\ge k_n$．否则，将有某个~$j$，使得~$k_j<k_{j+1}$．%
+由于~$f(\mvec x)$~是对称的，则通过对换未定元~$x_j$~和~$x_{j+1}$~便可着出，$f(\mvec x)$~含有项
+\[
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_{j-1}^{k_{j-1}}x_j^{k_{j+1}}x_{j+1}^{k_j}x_{j+1}^{k_{j+1}}\dotsm x_n^{k_n}\pid
+\]
+显然，按字典排列法它应排在项~$a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}$~之前，
+这和~$a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\allowbreak\dotsm x_n^{k_n}$~为~$f(\mvec x)$~的首项的假设相矛盾．%
+
+取~$n$~元对称多项式~$\varphi_1(\mvec x)$~为
+\[
+\varphi_1(\mvec x)=
+a_{k_1k_2\dotsm k_n}\sigma_1^{k_1-k_2}\sigma_2^{k_2-k_3}\dotsm\sigma_{n-1}^{k_{n-1}-k_n}\sigma_n^{k_n}\pid
+\]
+容易看出，$\sigma_1$，$\sigma_2$，$\dotsc$，$\sigma_n$~的首项依次是~$x_1$，$x_1x_2$，$\dotsc$，$x_1x_2\dotsm x_n$．%
+因此，$\varphi_1(\mvec x)$~的首项为~$a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}$．于是，
+\[
+f_1(\mvec x)=f(\mvec x)-\varphi_1(\mvec x)
+\]
+是数域~$\mF$~上的~$n$~元对称多项式．%
+
+如果~$f_1(\mvec x)$~是零多项式，则~$f(\mvec x)=\varphi_1(\mvec x)$~是
+关于~$\mvec\sigma$~的多项式．%
+
+如果~$f_1(\mvec x)$~是非零多项式，则~$f(\mvec x)$~的
+首项~$a_{k_1k_2\dotsm k_n}x_1^{k_1}\allowbreak x_2^{k_2}\dotsm\allowbreak x_n^{k_n}$~应在~$f_1(\mvec x)$~的
+首项~$b_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}$~之前，
+其中~$\ell_1\ge \ell_2\ge\dotsb\ge \ell_n$．记
+\[
+\varphi_2(\mvec x)=b_{\ell_1\ell_2\dotsm \ell_n}\sigma_1^{\ell_1-\ell_2}\sigma_2^{\ell_2-\ell_3}\dotsm
+\sigma_{n-1}^{\ell_{n-1}-\ell_n}\sigma_n^{\ell_n}\pid
+\]
+则数域~$\mF$~上的~$n$~元对称多项式
+\[
+f_2(\mvec x)=f_1(\mvec x)-\varphi_2(\mvec x)
+\]
+为零多项式，或为非零多项式，并且~$f_1(\mvec x)$~的首项在~$f_2(\mvec x)$~的首项之前．%
+
+设~$f_2(\mvec x)$~为非零多项式．重复上述过程，得到对称多项式序列：
+\begin{align*}
+f_0(\mvec x)&=f(\mvec x)\cid\\
+f_1(\mvec x)&=f_0(\mvec x)-\varphi_1(\mvec x)\cid\\
+\eqdots[1]&\kern2pt\eqdots\\
+f_{i+1}(\mvec x)&=f_i(\mvec x)-\varphi_{i+1}(\mvec x)\cid
+\end{align*}
+其中~$\varphi_{i+1}(\mvec x)$~是关于~$\mvec\sigma$~的多项式，
+而且~$f_i(\mvec x)$~的首项在~$f_{i+1}(\mvec x)$~的首项之前，$i=0,1,\dotsc$．%
+
+设~$f_i(\mvec x)$~的首项为~$c_{m_1m_2\dotsm m_n}x_1^{m_1}x_2^{m_2}\dotsm x_n^{m_n}$，
+则~$m_1\ge m_2\ge\dotsb\ge m_n$，并且由于~$f(\mvec x)$~的首项在~$f_i(\mvec x)$~的首项之前，
+故~$k_1\ge m_1$．%
+
+因为适合~$k_1\ge m_1$~的非负整数~$m_1$~只有有限多个，
+而且对每个适合~$k_1\ge m_1$~的非负整数~$m_1$，适合~$m_1\ge m_2\ge\dotsb\ge m_n$~的~$n$~元
+非负整数组~$(m_1,m_2,\dotsc,m_n)$~也只有有限多个，因此存在某个~$j$，使得~$f_j(\mvec x)=0$．%
+于是，
+\[
+f(x_1,\dotsc,x_n)=\varphi_1(x_1,\dotsc,x_n)+\varphi_2(x_1,\dotsc,x_n)+\dotsb+\varphi_j(x_1,\dotsc,x_n)\pid
+\]
+这就证明，$f(\mvec x)$~可以表为系数在~$\mF$~中的关于~$\mvec\sigma$~的多项式．%
+
+\emphitem{唯一性}设存在~$g(\mvec x),h(\mvec x)\in\mF[\mvec x]$，使得
+\begin{equation}\label{eq181}
+f(\mvec x)=g(\mvec\sigma)=h(\mvec\sigma)\pid
+\end{equation}
+
+设~$g(\mvec x)$~与~$h(\mvec x)$~的首项分别为
+\[
+a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}~\text{与}~%
+b_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}\pid
+\]
+于是，
+\[
+g\Parenb{\sigma_1(\mvec x),\sigma_2(\mvec x),\dotsc,\sigma_n(\mvec x)}
+\]
+的首项为
+\[
+a_{k_1k_2\dotsm k_n}x_1^{k_1}(x_1x_2)^{k_2}\dotsm (x_1x_2\dotsm x_n)^{k_n}=
+a_{k_1k_2\dotsm k_n}x_1^{k_1+k_2+\dotsb+k_n}x_2^{k_2+\dotsb+k_n}\dotsm x_n^{k_n}\cid
+\]
+而
+\[
+h\Parenb{\sigma_1(\mvec x),\sigma_2(\mvec x),\dotsc,\sigma_n(\mvec x)}
+\]
+的首项为
+\[
+b_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1+\ell_2+\dotsb+\ell_n}x_2^{\ell_2+\dotsb+\ell_n}\dotsm x_n^{\ell_n}\pid
+\]
+由式~\ref{eq181}，$a_{k_1k_2\dotsm k_n}=b_{\ell_1\ell_2\dotsm \ell_n}$，并且
+\begin{align*}
+k_1+k_2+\dotsb+k_n&=\ell_1+\ell_2+\dotsb+\ell_n\cid\\
+k_1+k_2+\dotsb+k_{n-1}&=\ell_1+\ell_2+\dotsb+\ell_{n-1}\cid\\
+\eqdots[1]&\eqdots[1]\\
+k_{n-1}+k_n&=\ell_{n-1}+\ell_n\cid\\
+k_n&=\ell_n\pid
+\end{align*}
+由此得到~$k_1=\ell_1$，$k_2=\ell_2$，$\dotsc$，$k_n=\ell_n$．即~$g(\mvec x)$~与~$h(\mvec x)$~具有相同的首项．%
+从~$g(\mvec x)$~与~$h(\mvec x)$~中各减去首项，分别记为~$g_1(\mvec x)$~与~$h_1(\mvec x)$．显然，
+\begin{multline*}
+g_1\Parenb{\sigma_1(\mvec x),\sigma_2(\mvec x),\dotsc,\sigma_n(\mvec x)}\\*
+=h_1\Parenb{\sigma_1(\mvec x),\sigma_2(\mvec x),\dotsc,\sigma_n(\mvec x)}\cid
+\end{multline*}
+
+上式是关于~$x_1,x_2,\dotsc,x_n$~的对称多项式，记为~$f_1(\mvec x)$．%
+
+再对~$f_1(\mvec x)$，$g_1(\mvec x)$~与~$h_1(\mvec x)$~用上述证明，如此继续，
+即可证明
+\[
+g(\mvec x)=h(\mvec x)\qedhere
+\]
+\end{proof}
+
+\ref{sym-pol-onlyone}~中关于存在性部分的证明是构造性的，
+它给出了对称多项式表为关于基本对称多项式~$\mvec\sigma$~的多项式的具体方法．%
+
+各个项次数相等的多项式称为\emph{齐次多项式}，否则称为\emph{非齐次多项式}．%
+
+例如，多项式
+\[
+g(\mvec x)=\sumsep\sum_{\mathclap{1\le i<j\le n}}\sumsep x_i^2x_j
+\]
+是一个三次齐次多项式．%
+
+对于给定的~$m$~次齐次多项式~$f(\mvec x)$，可以把它的同次项归并在一起，得到
+\[
+f(\mvec x)=\sum_{j=0}^m f_j(\mvec x)\cid
+\]
+其中~$f_j(\mvec x)$~是~$j$~次齐次多项式，即~$f(\mvec x)$~可以表为若干个齐次多项式之和．%
+
+把对称多项式~$f(\mvec x)$~表为关于基本对称多项式~$\mvec\sigma$~的多项式，
+除了\ref{sym-pol-onlyone}~所给出的方法外，还可以采用待定系数法，其步骤如下：
+\begin{enumitems}
+\item 把多项式~$f(\mvec x)$~分解为齐次多项式之和．%
+      容易看出，由于~$f(\mvec x)$~是对称的，因此，这些齐次多项式也是对称的；%
+\item 设~$m$~次齐次对称多项式~$f_m(\mvec x)$~的首项是
+      \[
+        a_{k_1k_2\dotsm k_n}x_1^{k_1}x_2^{k_2}\dotsm x_n^{k_n}\cid
+      \]
+      其中~$k_1\ge k_2\ge\dotsb \ge k_n$，并且~$k_1+k_2+\dotsb+k_n=m$．写出所有可能排在~$f_m(\mvec x)$~的首项之后的
+      项~$a_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}$，%
+      其中~$\ell_1\ge \ell_2\ge\dotsb \ge \ell_n$，$\ell_1+\ell_2+\dotsb+\ell_n=m$，%
+      并且存在某个~$j$，使得~$k_1=\ell_1$，$\dotsc$，$k_{j-1}=\ell_{j-1}$，$k_j>\ell_j$，$1\le j\le n$，%
+      这里~$j$~与项~$a_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}$~有关．%
+      所有适合这些条件的~$(\ell_1,\ell_2,\dotsc,\ell_n)\in\mR^n$~的集合记为~$M$；%
+\item 对每个可能出现的项~$a_{\ell_1\ell_2\dotsm \ell_n}x_1^{\ell_1}x_2^{\ell_2}\dotsm x_n^{\ell_n}$~构作一个项
+\[
+A_{\ell_1\ell_2\dotsm \ell_n}\sigma_1^{\ell_1-\ell_2}\sigma_2^{\ell_2-\ell_3}\dotsm
+\sigma_{n-1}^{\ell_{n-1}-\ell_n}\sigma_n^{\ell_n}\cid
+\]
+并令
+\[
+f(\mvec x)=\sumsep\sum_{\mathclap{(\ell_1,\ell_2,\dotsc,\ell_n)\in M}}\sumsep
+A_{\ell_1\ell_2\dotsm \ell_n}\sigma_1^{\ell_1-\ell_2}\sigma_2^{\ell_2-\ell_3}\dotsm
+\sigma_{n-1}^{\ell_{n-1}-\ell_n}\sigma_n^{\ell_n}\cid
+\]
+其中~$A_{\ell_1\ell_2\dotsm \ell_n}$~为待定常数；%
+\item  取~$x_1,x_2,\dotsc,x_n$~的一些特殊值，代人上式，便得到一组
+关于~$A_{\ell_1\ell_2\dotsm \ell_n}$~的方程，解之即得~$A_{\ell_1\ell_2\dotsm \ell_n}$．通常特殊值可以取
+为~$x_1=x_2=\dotsb=x_k=1$，$x_{k+1}=\dotsb=x_n=0$．把它们代入~$\sigma_j(\mvec x)$，得到
+\[
+\sigma_j\Parenb{\underbrace{1,1,\dotsc,1}_{\text{$k$\rlap{~个}}},~0,\dotsc,0}=\biggl\{\begin{array}{cl}
+\uC_k^j, & 1\le j\le k\cid\\
+0      , & k<j\le n \pid
+\end{array}
+\]
+\end{enumitems}
+
+\begin{example}
+把~$n$~元对称多项式
+\[
+f(\mvec x)=\sumsep\sum_{\mathclap{1\le j_1<j_2<j_3\le n}}\sumsep
+\Parenb{x_{j_1}^2x_{j_2}^2x_{j_3}+x_{j_1}^2x_{j_2}x_{j_3}^2+x_{j_1}x_{j_2}^2x_{j_3}^2}
+\]
+表为关于基本对称多项式的多项式，其中~$n\ge5$．
+\end{example}
+\begin{solution}%
+$f(\mvec x)$~本身是~$5$~次齐次对称多项式，它的首项是~$x_1^2x_2^2x_3$．%
+可能出现在它后面的项有~$x_1^2x_2x_3x_4$，$x_1x_2x_3x_4x_5$．令
+\begin{align*}
+f(\mvec x)
+&=\sigma_1^{2-1}\sigma_2^{2-1}\sigma_3^1+A\sigma_1^{2-1}\sigma_2^{1-1}\sigma_3^{1-1}\sigma_4
++B\sigma_1^{1-1}\sigma_2^{1-1}\sigma_3^{1-1}\sigma_4^{1-1}\sigma_5^1\\
+&=\sigma_2\sigma_3+A\sigma_1\sigma_4+B\sigma_5\pid
+\end{align*}
+
+取~$x_1=x_2=x_3=x_4=1$，$x_5=0$．则~$\sigma_1=\uC_4^1=4$，$\sigma_2=\uC_4^2=6$，$\sigma_3=\uC_4^3=4$，%%
+$\sigma_4=\uC_4^4=1$，$\sigma_5=0$，并且~$f(1,1,1,1,0,\dotsc,0)=12$．%
+因此，$12=24+4A$．所以，$A=-3$．%
+
+再取~$x_1=x_2=\dotsb=x_5=1$，$x_6=x_7=\dotsb=x_n=0$．则~$\sigma_1=\uC_5^1=5$，$\sigma_2=\uC_5^2=10$，%%
+$\sigma_3=\uC_5^3=10$，$\sigma_4=\uC_5^4=5$，$\sigma_5=1$，并且~$f(1,1,1,1,1,0,\dotsc,0)=3\uC_5^3=30$．%
+因此，$30=100-3\times 25+B$．所以，$B=5$．%
+
+由此得到，
+\[
+f(\mvec x)=\sigma_2\sigma_3-3\sigma_1\sigma_4+5\sigma_5\pid \qedhere
+\]
+\end{solution}
+
+利用基本对称多项式，可以得到关于一元多项式的根与系数的定理．%
+
+\begin{theorem}[Vi\`eta~定理]\label{vieta}
+设数域~$\mF$~上的~$n$~次多项式
+\[
+f(x)=a_0+a_1x+\dotsb+a_{n-1}x^{n-1}+a_nx^n
+\]
+的根为~$c_1,c_2,\dotsc,c_n$，则对于~$k=0,1,\dotsc,n$，
+\[
+a_k=(-1)^{n-k}\sigma_{n-k}(c_1,c_2,\dotsc,c_n)\cid
+\]
+其中~$a_n=1$，且~$\sigma_0(c_1,c_2,\dotsc,c_n)=1$．
+\end{theorem}
+\begin{proof}
+因为~$c_1,c_2,\dotsc,c_n$~是首一多项式~$f(x)$~的根，所以
+\[
+f(x)=a_0+a_1x+\dotsb+a_{n-1}x^{n-1}+a_nx^n=(x-c_1)(x-c_2)\dotsm (x-c_n)\pid
+\]
+上式右端乘开，并比较上式两端同次项系数，得到
+\begin{align*}
+a_{n-1}&=-(c_1+c_2+\dotsb+c_n)\\
+   &=-\sigma_1(c_1,c_2,\dotsc,c_n)\cid\\
+a_{n-2}&=c_1c_2+c_1c_3+\dotsb+c_1c_n+c_2c_3+\dotsb+c_2c_n+\dotsb+c_{n-1}c_n\\
+   &=\sigma_2(c_1,c_2,\dotsc,c_n)\cid\\
+   &\eqdots\\
+a_k&=(-1)^{n-k}(\!\begin{multlined}[t]
+           c_1\dotsm c_{n-k-1}c_{n-k}+c_1\dotsm c_{n-k-1}c_{n-k+1}+\dotsb+c_1\dotsm c_{n-k-1}c_n\\
+           +c_1\dotsm c_{n-k-2}c_{n-k}c_{n-k+1}+\dotsb+c_1\dotsm c_{n-k-2}c_{n-k}c_n+\dotsb+c_{k+1}c_{k+2}\dotsm c_n)
+    \end{multlined}\\
+   &=(-1)^{n-k}\sigma_{n-k}(c_1,c_2,\dotsc,c_n)\cid\\
+   &\eqdots\\
+a_1&=(-1)^{n-1}(c_1c_2\dotsm c_{n-1}+c_1c_2\dotsm c_{n-2}c_n+c_1c_2\dotsm c_{n-3}c_{n-1}c_n%%%\\&\hphantom{(-1)^{n-k}(}
+   +\dotsb+c_2c_3\dotsm c_n)\\
+   &=(-1)^{n-1}\sigma_{n-1}(c_1,c_2,\dotsc,c_n)\cid\\
+a_0&=(-1)^n(c_1c_2\dotsm c_n)\\
+   &=(-1)^n\sigma_n(c_1,c_2,\dotsc,c_n)\pid\qedhere
+\end{align*}
+\end{proof}
+
+\begin{example}
+证明多项式~$f(x)=x^9+x^7+x^5+x^2+x-1$~的根的平方和为~$-2$．
+\end{example}
+\begin{proof}
+设~$c_1,c_2,\dotsc,c_n$~是~$f(x)$~的根．把~$f(x)$~的根的平方和表为基本对称多项式的多项式，得到
+\[
+\sum_{j=1}^9 c_j^2=\sigma_1^2(c_1,c_2,\dotsc,c_n)-2\sigma_2(c_1,c_2,\dotsc,c_n)\pid
+\]
+
+由\ref{vieta}，$\sigma_1(c_1,c_2,\dotsc,c_n)=0$，$\sigma_2(c_1,c_2,\dotsc,c_n)=1$，于是，%
+\[
+\sum_{j=1}^9 c_j^2=-2\pid \qedhere
+\]
+\end{proof}
+
+在对称多项式中，除基本对称多项式外，还有一组重要的对称多项式，即\emph{等幂和}，
+其定义为，对于~$k=0,1,2,\dotsc$，
+\[
+s_k(\mvec x)=x_1^k+x_2^k+\dotsb+x_n^k\pid
+\]
+
+关于基本对称多项式与等幂和，有
+
+\begin{theorem}[Newton~恒等式]\label{Newton-eq}
+当~$k\ge n$~时，
+\[
+s_k-\sigma_1s_{k-1}+\sigma_2s_{k-2}+\dotsb+(-1)^{n-1}\sigma_{n-1}s_{k-n+1}+(-1)^n\sigma_ns_{k-n}=0\sid
+\]
+当~$k<n$~时，
+\[
+s_k-\sigma_1s_{k-1}+\sigma_2s_{k-2}+\dotsb+(-1)^{k-1}\sigma_{k-1}s_1+(-1)^k k\sigma_k=0\pid
+\]
+\end{theorem}
+\begin{proof}
+将~$x_1,x_2,\dotsc,x_n$~视为常数，考虑多项式
+\[
+f(x)=(x-x_1)(x-x_2)\dotsm (x-x_n)\pid
+\]
+
+由~Vi\`eta~定理，
+\begin{equation}\label{eq182}
+f(x)=\sum_{j=0}^n(-1)^{n-j}\sigma_{n-j}(\mvec x)x^j\pid
+\end{equation}
+因为~$f(x)=(x-x_1)(x-x_2)\dotsm (x-x_n)$，所以
+\[
+f'(x)=f(x)\sum_{i=1}^n\frac1{x-x_i}\pid
+\]
+记
+\[
+g(x)=f(x)\sum_{i=1}^n\frac{x_i^{k+1}}{x-x_i}\cid
+\]
+显然，$\deg g(x)<n$．于是，对任意正整数~$k$，
+\begin{align*}
+x^{k+1}f'(x)-g(x)&=f(x)\sum_{i=1}^n\frac{x^{k+1}-x_i^{k+1}}{x-x_i}\\
+&=f(x)\sum_{i=1}^n(x^k+x^{k-1}x_i+\dotsb+x_i^k)\\
+&=f(x)\sum_{i=1}^n(nx^k+s_1x^{k-1}+\dotsb+s_{k-1}x+s_k)\pid
+\end{align*}
+即
+\[
+x^{k+1}f'(x)=f(x)\sum_{i=1}^n(nx^k+s_1x^{k-1}+\dotsb+s_{k-1}x+s_k)+g(x)\cid
+\]
+其中~$\deg g(x)<n$．将~\ref{eq182}~代入上式，得到
+\begin{equation}\label{eq183}
+\sum_{i=1}^n(-1)^{n-i}i\sigma_{n-i}x^{k+i}=
+\Paren[\Big]{\sum_{j=0}^n(-1)^{n-j}\sigma_{n-j}x^j}\Paren[\Big]{\sum_{i=0}^ks_i x^{k-i}}+g(x)\pid
+\end{equation}
+
+当~$k<n$~时，比较上式两端~$n$~次项系数，得到
+\[
+(-1)^k(n-k)\sigma_k=s_k-\sigma_1s_{k-1}+\dotsb+(-1)^{k-1}\sigma_{k-1}s_1+(-1)^kn\sigma_k\pid
+\]
+
+因此，当~$k<n$~时，
+\[
+s_k-\sigma_1s_{k-1}+\dotsb+(-1)^{k-1}\sigma_{n-1}s_1+(-1)^k k\sigma_k=0\pid
+\]
+
+当~$k\ge n$~时，比较式~\ref{eq183}~两端~$n$~次项系数，得到
+\[
+s_k-\sigma_1s_{k-1}+\dotsb+(-1)^{n-1}\sigma_{n-1}s_{k-n+1}+(-1)^n\sigma_ns_{k-n}=0\pid \qedhere
+\]
+\end{proof}
+
+利用~Newton~恒等式，可以把基本对称多项式表为等幂和的多项式．例如，
+\[
+\sigma_1=s_1\cid\qquad
+\sigma_2=\dfrac{s_1^2-s_2}2\cid\qquad
+\sigma_3=\dfrac{s_1^3-3s_1s_2+2s_3}6\cid
+\]
+等等．于是再利用\ref{sym-pol-onlyone}，即可得到
+\begin{corollary}
+数域~$\mF$~上的~$n$~元对称多项式~$f(\mvec x)$~可以唯一地表为关于等幂和~$s_1,s_2,\dotsc,s_n$~的多项式，
+即存在唯一的~$g(\mvec x)\in\mF[x]$，使得
+\[
+f(\mvec x)=g\Parenb{s_1(\mvec x),s_2(\mvec x),\dotsc,s_n(\mvec x)}\pid
+\]
+\end{corollary}
+
+\begin{exercise}
+\item 把下列对称多项式表为关于基本对称多项式的多项式．
+\begin{enumitemcols}
+\item $(x_1^2+x_2^2)(x_2^2+x_3^2)(x_3^2+x_1^2)$；%
+\item $(2x_1-x_2-x_3)(2x_2-x_3-x_1)(2x_3-x_1-x_2)$；%
+\item $(-x_1+x_2+\dotsb +x_n)(x_1-x_2+\dotsb+x_n)\dotsm(x_1+x_2+\dotsb+x_{n-1}-x_n)$；%
+\item $\displaystyle\sumsep\sum_{\mathclap{1\le i<j\le n}}\sumsep(x_i-x_j)^2\sid$
+\item $\displaystyle\sumsep\sum_{\mathclap{\begin{subarray}{c}1\le i<j\le n\\ k\ne i,j \end{subarray}}}\sumsep(x_i+x_j-x_k)^2\sid$
+\item $\displaystyle\sumsep\sum_{\mathclap{\minor{1&2&\cdots&n\\ i_1&i_2&\cdots& i_n }}}\sumsep
+        \Parenb{a_1x_{i_1}+a_2x_{i_2}+\dotsb+a_nx_{i_n}}^2$，
+\item[]\rlap{\parbox[t]{\totalistcolswidth}{这里的求和号表示对遍历自然
+        数~$1,2,\dotsc,n$~的所有排列~$i_1,i_2,\dotsc,i_n$~求和．\itemstrut}}
+\end{enumitemcols}
+\item 证明，三次实系数方程~$x^3+ax^2+bx+c=0$~的每个根的实部都是负数的充分必要条件为
+\[
+a>0\cid\qquad ab-c>0\cid\qquad c>0\pid
+\]
+\item 设三次方程~$x^3+ax^2+bx+c=0$~的三个根是某个三角形的内角的正弦．证明，%
+      \[
+        a(4ab-a^3-8c)=4c^2\pid
+      \]
+\item 设~$x_1,x_2,\dotsc,x_n$~是多项式~$f(x)=a_0+a_1x+\dotsb+a_{n-1}x^{n-1}+x^n$~的~$n$~个根．%
+      证明，关于~$x_2,x_3,\dotsc,\allowbreak x_n$~的对称多项式可以表为关于~$x_1$~的多项式．%
+\item 求
+\[
+\sum_{i=1}^n\frac{\partial\sigma_k}{\partial x_i}\cid
+\]
+其中求和号后的偏导数表示~$\sigma_k(\mvec x)$~关于~$x_i$~的偏导数．%
+\item 设对称多项式~$f(\mvec x)$~满足
+\[
+f(x_1+a,x_2+a,\dotsc,x_n+a)=f(\mvec x)\cid
+\]
+其中~$a$~是任意常数．设~$f(\mvec x)=g(\mvec\sigma)$．证明
+\[
+n \frac{\partial g}{\partial\sigma_1}+(n-1)\sigma_1\frac{\partial g}{\partial\sigma_2}+\dotsb
++\sigma_{n-1}\frac{\partial g}{\partial\sigma_n}=0\pid
+\]
+\item 把~$n$~元等幂和~$s_1,s_2,\dotsc,s_6$~表为关于~$n$~元基本对称多项式的多项式，其中~$n\ge 6$．%
+\item 把~$n$~元基本对称多项式~$\sigma_4,\sigma_5,\sigma_6$~表为~$n$~元等幂和~$s_1,s_2,\dotsc$~的多项式．%
+\item 把下列~$n$~元对称多项式表为~$n$~元等幂和的多项式，其中~$k$~是正整数．%
+\begin{enumitemcols}[3]
+\item $\displaystyle\sum_{1\le i<j\le n}x_i^kx_j^k\sid$
+\item $\displaystyle\sum_{1\le i<j\le n}(x_i+x_j)^k\sid$
+\item $\displaystyle\sum_{1\le i<j\le n}(x_i-x_j)^{2k}$\pid
+\end{enumitemcols}
+\item 求多项式
+\[
+f(x)=x^n +(a+b)x^{n-1}+(a^2+b^2)x^{n-2}+\dotsb+(a^{n-1}+b^{n-1})x+(a^n+b^n)
+\]
+的根的等幂和~$s_1,s_2,\dotsc,s_n$．%
+\item 自然数~$1,2,\dotsc,n$~的\emph{循环排列}是指排列~$12\dotsb n$~与~$j(j+1)\dotsb n12\dotsb(j-1)$，$j=2,3,\dotsc,n$．%
+如果对于~$1,2,\dotsc,n$~的每个循环排列~$j(j+1)\dotsb n12\dotsb(j-1)$，多项式~$f(x_1,\dotsc,x_n)$~适合
+\[
+f\Parenb{x_j,x_{j+1},\dotsc,x_n,x_1,x_2,\dotsc,x_{j-1}}=f(\mvec x)\cid
+\]
+其中~$j=2,3,\dotsc,n$，则~$f(\mvec x)$~称为在未定元~$x_1,x_2,\dotsc,x_n$~的\emph{循环变换下不变}．%
+证明，循环变换下不变的多项式~$f(\mvec x)$~可表为多项式
+\[
+g_j(\mvec x)=x_1\omega^j+x_2\omega^{2j}+\dotsb+x_n\omega^{nj}
+\]
+的多项式，其中~$j=0,1,\dotsc,n-1$，$\omega,\omega^2,\dotsc,\omega^n$~分别是方程~$x^n=1$~的~$n$~个相异复数根．
+\end{exercise}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\PrintChEndLogo
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

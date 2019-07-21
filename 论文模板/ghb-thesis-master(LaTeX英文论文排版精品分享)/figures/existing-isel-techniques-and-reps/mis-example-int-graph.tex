@@ -1,0 +1,37 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize%
+\begin{tikzpicture}[%
+    every node/.style={%
+      node,
+      inner sep=1pt,
+    },
+    interference/.style={%
+      -,
+      line width=\dataFlowLineWidth,
+    },
+  ]
+
+  \node (m1) {$m_1$};
+  \node [right=.5\nodeDist of m1] (m2) {$m_2$};
+  \node [right=.5\nodeDist of m2] (m3) {$m_3$};
+  \node [right=2\nodeDist of m3] (m4) {$m_4$};
+  \node [position= 140 degrees from m4] (m5) {$m_5$};
+  \node [position=-140 degrees from m4] (m6) {$m_6$};
+  \node [position=  40 degrees from m4] (m7) {$m_7$};
+  \node [position=- 40 degrees from m4] (m8) {$m_8$};
+
+  \begin{scope}[interference]
+    \draw (m6) -- (m4);
+    \draw (m6) -- (m5);
+    \draw (m8) -- (m4);
+    \draw (m8) -- (m7);
+    \draw (m6) -- (m8);
+  \end{scope}
+\end{tikzpicture}%
+\endgroup%

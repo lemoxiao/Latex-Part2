@@ -1,0 +1,153 @@
+%!TEX root = ../larxxia.tex
+
+\section{Summary of matrix approximation}
+\label{sec:summa}
+
+\begin{itemize}
+\def\index#1{}% turn off indexing
+
+
+\subsubsection*{Measure changes to matrices}
+
+\itemhi \autoref{pro:ai} approximates matrices.
+For an image stored as scalars in an \(m\times n\) matrix~\(A\).
+\begin{enumerate}
+\item Compute an \svd\ \(A=\usv\) with \verb|[U,S,V]=svd(A)|.
+\item Choose a desired \idx{rank}~\(k\) based upon the \idx{singular value}s (\autoref{thm:am}): typically there will be \(k\)~`large' \idx{singular value}s and the rest are `small'.
+\item Then the `best' rank~\(k\) approximation to the image matrix~\(A\) is
+\begin{eqnarray*}
+A_k&:=&\sigma_1\uv_1\tr\vv_1+\sigma_2\uv_2\tr\vv_2+\cdots+\sigma_k\uv_k\tr\vv_k
+\\&=&\verb|U(:,1:k)*S(1:k,1:k)*V(:,1:k)'|
+\end{eqnarray*}
+\end{enumerate}
+
+
+\item In \script:
+\begin{itemize}
+\itemme \index{norm()@\texttt{norm()}}\verb|norm(A)| computes the \idx{matrix norm} of \autoref{def:norm}, namely the largest \idx{singular value} of the matrix~\(A\).
+
+Also, \verb|norm(v)| for a vector~\verb|v| computes the \idx{length} \(\sqrt{v_1^2+v_2^2+\cdots+v_n^2}\).
+
+\item \index{scatter()@\texttt{scatter()}}\verb|scatter(x,y,[],c)| draws a 2D scatter plot of points with coordinates in vectors~\verb|x| and~\verb|y|, each point with a colour determined by the corresponding entry of vector~\verb|c|.  
+
+Similarly for \index{scatter3()@\texttt{scatter3()}}\verb|scatter3(x,y,z,[],c)| but in 3D.
+
+\itemme \index{svds()@\texttt{svds()}}\verb|[U,S,V]=svds(A,k)| computes the \(k\)~largest singular values of the matrix~\(A\) in the diagonal of \(k\times k\) matrix~\(S\), and the  \(k\)~columns of~\(U\) and~\(V\) are the corresponding singular vectors.
+
+\item  \index{imread()@\texttt{imread()}}\verb|imread('|filename\verb|')| typically reads an image from a file into an \(m\times n\times 3\) array of red-green-blue values. 
+The values are all `integers' in the range~\([0,255]\).
+
+\itemme \index{mean()@\texttt{mean()}}\verb|mean(A)| of an \(m\times n\) array computes the \(n\)~elements in the row vector of \idx{average}s (the arithmetic mean) over each column of~\(A\).
+
+Whereas \verb|mean(A,p)| for an \(\ell\)-dimensional array~\(A\) of dimension \(m_1\times m_2\times\cdots\times m_\ell\),  computes the mean over the \verb|p|th~index to give an array of size \(m_1\times\cdots\times m_{p-1}\times m_{p+1}\times\cdots\times m_\ell\).
+
+\itemme \index{std()@\texttt{std()}}\verb|std(A)| of an \(m\times n\) array computes the \(n\)~elements in the row vector of the \idx{standard deviation} over each column of~\(A\).
+
+\item  \index{csvread()@\texttt{csvread()}}\verb|csvread('|filename\verb|')| reads data from a file into a matrix.
+When each of the \(m\)~lines in the file is \(n\)~numbers separated by commas, then the result is an \(m\times n\) matrix. 
+
+\item \index{semilogy()@\texttt{semilogy()}}\verb|semilogy(x,y,'o')| draws a point plot of~\(y\) versus~\(x\) with the vertical axis being logarithmic.
+
+\item \index{axis@\texttt{axis}}\verb|axis| sets some properties of a drawn figure:
+\begin{itemize}
+\item \verb|axis equal| ensures horizontal and vertical directions are scaled the same---so here there is no distortion of the image;
+\item \verb|axis off| means that the horizontal and vertical axes are not drawn---so here the image is unadorned.
+\end{itemize}
+\end{itemize}
+
+
+
+
+\itemhi Define the \bfidx{matrix norm} (sometimes called the \idx{spectral norm}) such that for every \(m\times n\) matrix~\(A\), 
+\begin{equation*}
+\norm A:=\max_{|\xv|=1}|A\xv|, 
+\quad\text{equivalently }\norm A=\sigma_1
+\end{equation*}
+the largest \idx{singular value} of the matrix~\(A\) (\autoref{def:norm}).
+This norm usefully measures the `length' or `magnitude' of a matrix, and hence also the `distance' between two matrices as~\(\norm{A-B}\).
+
+\itemme For every \(m\times n\) real matrix~\(A\) (\autoref{thm:norm}):
+\begin{itemize}
+\item \(\norm A=0\) if and only if \(A=O_{m\times n}\)\,;
+\item \(\norm{I_n}=1\)\,;
+\item \(\norm {A\pm B}\leq\norm{A}+\norm B\), for every \(m\times n\) matrix~\(B\)---like a \idx{triangle inequality};
+\item \(\norm{tA}=|t|\norm{A}\)\,;
+\item \(\norm A=\norm{\tr A}\)\,;
+\item \(\norm{Q_mA}=\norm A=\norm{AQ_n}\) for every \(m\times m\) \idx{orthogonal matrix}~\(Q_m\) and every \(n\times n\) \idx{orthogonal matrix}~\(Q_n\);
+\item \(|A\xv|\leq\norm{A}|\xv|\) for all \(\xv\in\RR^n\)---like a \idx{Cauchy--Schwarz inequality}, as is the following;
+\item \(\norm{AB}\leq\norm A\norm B\) for every \(n\times p\) matrix~\(B\).
+\end{itemize}
+
+\itemme Let \(A\) be an \(m\times n\) matrix of \(\rank r\) with \svd\ \(A=\usv\).  
+Then for every \(k< r\) the matrix
+\begin{equation*}
+A_k:=US_k\tr V =\sigma_1\uv_1\tr\vv_1 +\sigma_2\uv_2\tr\vv_2+\cdots +\sigma_k\uv_k\tr\vv_k
+\end{equation*}
+where \(S_k:=\diag(\hlist\sigma k,0,\ldots,0)\), is a \emph{closest} \idx{rank}~\(k\) matrix approximating~\(A\) (\autoref{thm:am}).
+The distance between~\(A\) and~\(A_k\) is \(\norm{A-A_k}=\sigma_{k+1}\)\,.
+
+\item Given a \(m\times n\) data matrix~\(A\) (usually with zero mean when averaged over all rows) with  \svd\ \(A=\usv\), then the \(j\)th column~\(\vv_j\) of~\(V\) is called the \(j\)th~\bfidx{principal vector} and the vector \(\xv_j:=A\vv_j\) is called the \(j\)th~\bfidx{principal components} of the data matrix~\(A\) (\autoref{def:pc}).
+
+\item Using the \idx{matrix norm} to measure `best', the best \(k\)-dimensional summary of the \(m\times n\) data matrix~\(A\) (usually of zero mean) are the first~\(k\) principal components in the directions of the first~\(k\) principal vectors (\autoref{thm:pc}).
+
+\itemme  
+\autoref{pro:pca} considers the case when you have data values consisting of \(n\)~attributes for each of \(m\)~instances: it finds a good \(k\)-dimensional summary\slash view of the data. 
+\begin{enumerate} \sloppy
+\item Form\slash enter the \(m\times n\) data matrix~\(B\).
+\item \index{data scaling}Scale the data matrix~\(B\) to form \(m\times n\) matrix~\(A\):
+\begin{enumerate}
+\item usually make each column have zero mean by subtracting its mean~\(\bar b_j\), algebraically \(\av_j=\bv_j-\bar b_j\)\,;
+\item but ensure each column has the same `physical dimensions', often by dividing by the \idx{standard deviation}~\(s_j\) of each column, algebraically \(\av_j=(\bv_j-\bar b_j)/s_j\)\,.
+\end{enumerate}
+Use \verb|A=(B-ones(m,1)*mean(B))*diag(1./std(B))| to compute in \script.
+\item  Economically compute an \svd\ for the best rank~\(k\) approximation to the scaled data matrix with \index{svds()@\texttt{svds()}}\verb|[U,S,V]=svds(A,k)|.
+\item Then the \(j\)th~column of~\verb|V| is the \(j\)th~\idx{principal vector}, and the \idx{principal components} are the entries of the \(m\times k\) matrix~\verb|A*V|.
+\end{enumerate}
+
+\item Latent Semantic Indexing uses \svd{}s to form useful low-rank approximations to word data and queries.
+
+
+
+\subsubsection*{Regularise linear equations}
+
+\itemhi \autoref{pro:appmat} approximates linear equations.
+Suppose the system of \idx{linear equation} \(A\xv=\bv\) arises from experiment where both the \(m\times n\) matrix~\(A\) and the right-hand side vector~\bv\ are subject to \idx{experimental error}.  
+Suppose the expected error in the matrix entries are of size~\(e\) (here ``\(e\)''~denotes ``error'', not the exponential~\(e\))
+\begin{enumerate}
+\item When forming the matrix~\(A\) and vector~\bv, scale the data so that\index{data scaling} 
+\begin{itemize}
+\item all \(m\times n\)~components in~\(A\) have the same physical units, and they are of roughly the same size; and
+\item similarly for the \(m\) components of~\bv.
+\end{itemize}
+Estimate the error~\(e\) corresponding to this matrix~\(A\).
+ 
+\item Compute an \svd\ \(A=\usv\).
+
+\item Choose `\idx{rank}'~\(k\) to be the number of \idx{singular value}s bigger than the error~\(e\); that is, \(\sigma_1\geq \sigma_2\geq\cdots \geq \sigma_k>e>\sigma_{k+1}\geq \cdots\geq 0\)\,.
+Then the best rank~\(k\) approximation to~\(A\) has \svd
+\begin{eqnarray*}
+A_k&=&US_k\tr V
+\\&=&\sigma_1\uv_1\tr\vv_1+\sigma_2\uv_2\tr\vv_2+\cdots+\sigma_k\uv_k\tr\vv_k
+\\&=&\verb|U(:,1:k)*S(1:k,1:k)*V(:,1:k)'|\,.
+\end{eqnarray*}
+
+\item Solve the approximating \idx{linear equation} \(A_k\xv=\bv\) as in Theorems~\ref{thm:appsol}--\ref{thm:smallsoln} (often as an \idx{inconsistent} set of equations).
+Use the \svd\ \(A_k=US_k\tr V\).
+
+\item Among all the solutions allowed, choose the `best' according to some explicit additional need of the application: often the smallest solution overall; or just as often a solution with the most zero components.
+\end{enumerate}
+
+
+\item In seeking to solve the poorly-posed system \(A\xv=\bv\) for \(m\times n\) matrix~\(A\), 
+a \bfidx{Tikhonov regularisation} is the system \((\tr AA+\alpha^2I_n)\xv=\tr A\bv\) for some chosen \idx{regularisation parameter} value~\(\alpha>0\) (\autoref{def:Tikreg}).
+
+\item Solving the \idx{Tikhonov regularisation}, with parameter~\(\alpha\), of \(A\xv=\bv\) is equivalent to finding the \index{smallest solution}smallest, \idx{least square}, solution of the system \(\tilde A\xv=\bv\) where  
+the matrix~\(\tilde A\) is obtained from~\(A\) by replacing each of its non-zero \idx{singular value}s~\(\sigma_i\) by \(\tilde\sigma_i:=\sigma_i+\alpha^2/\sigma_i\) (\autoref{thm:Tikreg}).
+
+
+
+\end{itemize}
+
+
+
+\makeanswers

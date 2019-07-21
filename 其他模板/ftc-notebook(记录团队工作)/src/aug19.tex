@@ -1,0 +1,210 @@
+ \begin{Meeting}[Preseason]
+      {Programming Chassis Suitable to Test Localization}  
+      {August 19-25}
+      {20 hours}
+      {Nicolas, Zachary}
+      {
+        \TaskInfo{First Iteration Mecanum Drive Module}
+           {aug19: programming chassis first draft}
+           {First attempt at lightweight chassis, worked well but could be made more compact}
+        \TaskInfo{Second Iteration Mecanum Drive and Integration into Chassis}
+           {aug19:programming chassis second draft}
+           {Second attempt is more compact and stronger}
+      }
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% meeting summary, or meeting goal
+% high level description of the goal of the meeting, in a paragraph following the command
+\MeetingSummary
+ 
+The goal of this week is to develop new technology for the season. We
+focus on Mecanum wheels, which we have not used for a long time. Our
+immediate goal is design a platform to learn to program encoder
+wheels. We also want to gain experience in using bear motors, namely
+motors without internal gear boxes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NEW TASK: First Iteration Mecanum Drive Module
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ %1 Strategy; 2 Design; 3 Build; 4 STEM; 5 Software; 6 Team
+\Task{2}[3]
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{Goals}
+\begin{itemize}
+  \item Design a mecanum chassis to use for testing localization and autonomous driving.
+  \item Use the chassis to validate (or invalidate) new design ideas (bare motor drivetrain).
+  \item Low cost.
+ \end{itemize}
+
+\Section{Design Process}
+
+First, we plan components to use for the drive train. We do so by
+first considering our design goals for this robot in order of
+importance, then assessing how we can best accomplish these
+goals. Often, one design choice can satisfy many factors
+simultaneously.
+
+\begin{DescriptionTable}{Factors}{Solutions}%
+    {Design goals for the programming chassis}{table:aug19:goals}
+  %
+  \TableEntryTextItem{Testing New Designs}
+    {
+      \item Incorporate odometry wheels (for position tracking)
+      \item Prototype use of motors without gearboxes (With external reduction)
+      \item Test mecanum wheels 
+    } \\ \hline
+  %
+  \TableEntryTextItem{Low Cost}
+    {
+      \item Use motors without gearboxes: this will allow us to use
+        our classic Neverest 20 motors (which we decommissioned due to
+        their fragile gearboxes).
+      \item Design with mostly plywood, EuroBoard, and 3d printed parts.
+      \item Use Nexus mecanum wheels (already on hand).
+      \item Use EMS22Q Bourns encoder for odometry wheels (least
+        expensive compatible encoder that satisfies the design
+        constraints).  } \\ \hline
+  %
+  \TableEntryTextItem{Analogous to Typical Competition Robots}
+  { 
+    \item Make the robot lightweight, so we can add weight to match
+      any future robot?s weight for testing
+    \item Use Mecanum wheels (we already have test tank chassis, and
+      are looking to experiment with mecanum) }
+  %
+\end{DescriptionTable}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{CAD and Build}
+
+A complete chassis requires 4 identical wheel modules, which contain a
+mecanum wheel and its motor. The CAD model is shown in
+\FigureRef{aug19:first cad}. We CNCed the parts as well as 3D printed
+the large pulley. The result is shown in \FigureRef{aug19:first
+  build}.
+
+\ExplainedPictFigure{src/aug19/first-cad.jpg}[0.4]%
+  {CAD model of mecanum wheel module (first iteration)}{aug19:first cad}
+  {
+  \begin{compactitem}
+    \item Nexus mecanum wheel
+    \item Single belt reduction from bare motor to wheel
+    \item Adjustable tensioner pulley
+    \item EuroBoard side plates
+    \item Churro standoffs
+    \item Extremely compact
+    \end{compactitem}
+  }
+  
+\PictFigure{src/aug19/first-build.jpg}[0.4]%
+  {Prototype of mecanum wheel module (first iteration)}{aug19:first build}%
+  [\Callout{-8, 4}{Unsupported Idle Pulley}{-0.5, -0.5}]         
+
+\begin{DescriptionTable*}{Works}{Need Improvement}%
+  {Conclusion after first build}{table:aug19:improvement}
+  %
+  \TableEntryItemItem{
+    \item Wheel runs smoothly
+    \item Press fit bearings in wheel work flawlessly
+    \item Motor standoffs work well
+    \item EuroBoard is a fantastic prototyping material - cuts easily on the CNC 
+  } {
+    \item Cantilevered idler bearing deforms the EuroBoard under load - %
+      needs support from both sides
+    \item EuroBoard is not very strong - not suitable for competition %
+      robot drivetrain, but works for light 
+  }
+\end{DescriptionTable*}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Section{Conclusion}
+
+The module looks promising, and has already successfully demonstrated
+the effectiveness of using EuroBoard as a prototyping material, though
+we should avoid using it structurally on a competition robot. The
+idler pulley needs to be redesigned with support on either side, and
+we can likely make the entire module even more compact by using a
+slightly shorter belt!
+
+
+With these small modifications, the module is ready to be used on the
+programming chassis. We now need to design the chassis itself, as well
+as mounting points for all the sensors.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NEW TASK Second Iteration Mecanum Drive and Integration into Chassis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\Task[\TaskRef{aug19: programming chassis first draft}]{2}[3]
+
+\Section{Goals}
+\begin{itemize}
+  \item Suggested improvements from \TaskRef{aug19: programming chassis first draft}.
+  \item Design odometry wheel modules.
+  \item Design complete chassis.
+\end{itemize}
+
+\newpage
+
+\Section{Design}
+
+Using the feedback from \TaskRef{aug19: programming chassis first
+  draft}, we redesigned the CAD model for the wheel module, shown in
+\FigureRef{aug19:second cad}. We reused an odometry design, shown in
+\FigureRef{aug19:odometry cad}. The full chassis consists of 4 wheel
+modules and 3 odometry modules. The Chassis CAD is shown in
+\FigureRef{aug19:chassi cad}.
+
+We CNCed the parts as well as 3D printed the large pulley. The result
+is shown in \FigureRef{aug19:first build}.
+
+\ExplainedPictFigure{src/aug19/second-cad.jpg}[0.4]%
+  {CAD model of mecanum wheel module (second iteration)}{aug19:second cad}
+  {
+    Improvements:
+    \begin{compactitem}
+      \item Idler Bearing supported from both sides
+      \item Shorter plate layout
+      \item Slightly smaller pulley on the wheel to avoid scraping on the mat
+    \end{compactitem}
+  }
+  
+\ExplainedPictFigure{src/aug19/encoder-cad.jpg}[0.4]%
+  {CAD model of odometry wheel}{aug19:odometry cad}
+  {
+    Features:
+    \begin{compactitem}
+      \item 38mm omniwheel
+      \item 1024 ppr direct mounted encoder
+      \item Shielding to protect encoder
+      \item Spring-loaded against the mat for improved reliability
+      \item Accurate mounting holes
+    \end{compactitem}
+  }
+
+\ExplainedPictFigure{src/aug19/chassi-cad.jpg}[0.4]%
+  {CAD of entire Chassis}{aug19:chassi cad}
+  {
+    Features:
+    \begin{compactitem}
+      \item Lightweight simple chassis
+      \item Fast Mecanum wheel base
+      \item 3 odometry omniwheels
+      \item 2 light sensors facing the mat
+      \item Plywood base - easy to manufacture
+    \end{compactitem}
+  }
+
+  \PictFigure{src/aug19/build-pict.jpg}[0.7]%
+    {Building of full chassis (second iteration)}{aug19:second build}
+
+
+\end{Meeting}
+
+ 
+

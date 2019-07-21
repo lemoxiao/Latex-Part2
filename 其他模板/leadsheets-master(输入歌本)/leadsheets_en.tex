@@ -1,0 +1,2256 @@
+% !arara: pdflatex: { shell: on , action: nonstopmode }
+% arara: biber
+% arara: pdflatex
+% arara: pdflatex
+% --------------------------------------------------------------------------
+% the LEADSHEETS package
+% 
+%   typesetting leadsheets and songbooks
+%
+% --------------------------------------------------------------------------
+% Clemens Niederberger
+% E-Mail: contact@mychemistry.eu
+% --------------------------------------------------------------------------
+% Copyright 2014-2017 Clemens Niederberger
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Clemens Niederberger.
+% --------------------------------------------------------------------------
+\documentclass[load-preamble+]{cnltx-doc}
+\usepackage{leadsheets,bookmark}
+\setcnltx{
+  package = leadsheets ,
+  info    = Typesetting leadsheets and songbooks ,
+  authors = Clemens Niederberger ,
+  email   = contact@mychemistry.eu ,
+  url     = https://github.com/cgnieder/leadsheets/ ,
+  add-cmds = {
+    choir , chord , chordname ,
+    definesongtitletemplate ,
+    defineversetypetemplate , 
+    expandcode ,
+    ifallsongproperties ,
+    ifanysongproperty ,
+    ifobeylines ,
+    ifsongmeasuring ,
+    ifsongpropertiesequal ,
+    ifsongproperty ,
+    ifversenamed ,
+    ifversenumbered ,
+    ifversestarred ,
+    includeleadsheet ,
+    instruction ,
+    leadsheetstranslate ,
+    lsenparen ,
+    mkchoir ,
+    mkinstruction ,
+    mklsenparen ,
+    mklsenparens ,
+    newversetype ,
+    printsongpropertylist ,
+    setchords ,
+    setleadsheets ,
+    songproperty ,
+    useleadsheetslibraries ,
+    useleadsheetslibrary ,
+    verseafterlabel ,
+    verselabel ,
+    verselabelformat ,
+    versename ,
+    versenumber ,
+    writechord
+  } ,
+  add-silent-cmds = {
+    @itemdepth ,
+    arraybackslash ,
+    endmdframed ,
+    mdframed ,
+    newfontfamily ,
+    newrobustcmd ,
+    musejazz
+  } ,
+  add-envs = {
+    bridge ,
+    chorus , chorus* ,
+    flushleft ,
+    flushright ,
+    info ,
+    interlude ,
+    intro , intro* ,
+    outro , outro * ,
+    prechorus , prechorus* ,
+    solo , solo* ,
+    song ,
+    verse
+  } ,
+  index-setup = { othercode=\footnotesize, level=\section , noclearpage } ,
+  makeindex-setup = {  columns=3, columnsep=1em }
+}
+
+\defbibheading{bibliography}{\section{References}}
+\addbibresource{\jobname.bib}
+
+\usepackage{filecontents}
+\begin{filecontents}{\jobname.bib}
+@book{book:realbook,
+  author    = {Various} ,
+  title     = {The Real Book} ,
+  volume    = {I} ,
+  subtitle  = {C Edition} ,
+  publisher = {Hal Leonard Publishing Corporation} ,
+  isbn      = {978-0634060380} ,
+  date      = {2000-01-01} ,
+  edition   = {6th edition}
+}
+@book{book:newrealbook,
+  author    = {Various} ,
+  title     = {The New Real Book} ,
+  volume    = {I} ,
+  subtitle  = {C Edition} ,
+  publisher = {Ama Verlag} ,
+  isbn      = {978-0961470142} ,
+  date      = {2009-02-12} ,
+  edition   = {1st edition}
+}
+\end{filecontents}
+
+\usepackage{booktabs}
+
+\newidxcmd\library{\code{#1}}[ (library)]
+\AtEndPreamble{%
+  \pdfstringdefDisableCommands{%
+    \def\library*#1{``#1''}%
+  }%
+}
+\newrobustcmd*\musicsymbols{\library{musicsymbols}}
+\newrobustcmd*\chords{\library{chords}}
+\newrobustcmd*\musejazz{\library{musejazz}}
+
+\setchords{format=\libertineLF}
+
+\makeatletter
+\colorlet{property}{cnltxgreen}
+\newenvironment{properties}
+  {%
+    \def\prop{\@cnltx@option@item\propval}%
+    \cnltxlist
+  }
+  {\endcnltxlist}
+
+\newrobustcmd*\propval{\@ifstar{\cnltx@prop@star}{\cnltx@prop@nostar}}
+
+\newrobustcmd*\cnltx@prop@star{%
+  \cnltx@ifdash
+    {\cnltx@prop@aux*\meta}
+    {\cnltx@prop@aux*\marg}%
+}
+\newrobustcmd*\cnltx@prop@nostar{%
+  \cnltx@ifdash
+    {\cnltx@prop@aux{}\meta}
+    {\cnltx@prop@aux{}\marg}%
+}
+\newcommand*\cnltx@prop@aux[4]{%
+  \code{\property#1{#3}\cnltx@isvalue#2{#4}}%
+}
+\makeatother
+
+\newidxcmd\property{\code{\textcolor{property}{#1}}}
+
+\newrobustcmd*\symarg[1]{\textcolor{argument}{\code{#1}}}
+
+\newidxcmd\titletemplate{\textit{\sffamily#1}}[\ (songtitle template)]
+\newidxcmd\versetemplate{\textit{\sffamily#1}}[\ (verse-type template)]
+\newidxcmd\shortcut{\code{#1}}[ (shortcut)]
+\newidxcmd\pkgopt{\code{#1}}[ (package option)]
+\newnote*\packageoption[1]{Package option: \pkgopt{#1}}
+
+\newrobustcmd*\barsymbol{|}
+
+\AfterPackage{hyperref}{%
+\pdfstringdefDisableCommands{%
+  \def\property#1{#1}%
+}}
+
+\renewcommand*\dictumauthorformat[1]{#1}
+\renewcommand*\raggeddictumtext{}
+
+\begin{document}
+
+\part{About the Package}
+\dictum[Tom Waits]{%
+  I like beautiful melodies telling me terrible things.%
+}
+
+\section{License and Requirements}
+
+\license
+
+\leadsheets{} requires the bundles \bnd{l3kernel}~\cite{bnd:l3kernel} and
+\bnd{l3packages}~\cite{bnd:l3packages}  to be available.  It also needs the
+package \pkg{translations}~\cite{pkg:translations}.
+
+\section{Background}
+
+Over the years I repeatedly wanted to typeset simple leadsheets of songs, \ie,
+song lyrics and the corresponding chords\footnote{I also have had the need (or
+  let's say: wish) to typeset leadsheets in the style of the
+  \citetitle{book:realbook} -- but this is a task where other software than
+  \LaTeX{} usually is far easier.}.  This is not too hard with standard
+\LaTeX{} commands and environments but it is not very convenient\ldots{} so
+looking for existing packages is the logical next step and I found two very
+promising packages: \pkg{songs}~\cite{pkg:songs} and
+\pkg{songbook}~\cite{pkg:songbook}.  However, both were note \emph{quite} what
+I wanted.  Just a bit too inflexible in the wrong places, needing tweaking
+here and there, and so on.  On the other hand I had quite some code lying on
+my hard drive with various attempts of typesetting leadsheets.  This package
+is now the attempt to have a clean, documented and customisable version of my
+code\footnote{Plus new things!}.
+
+\section{The Structure of the Package}
+\leadsheets{} is a modular package and consists of several
+libraries\footnote{This did seem like a good idea for maintenance when I first
+  came up with it.  Now I'm not so sure any more but I am way too lazy to
+  change it back.  So here we are\ldots}.  If you just say
+\begin{sourcecode}
+  \usepackage{leadsheets}
+\end{sourcecode}
+then the \library{songs} library is loaded\footnote{Which currently means that
+  \emph{all} libraries are loaded as the \library{songs} library needs them.}.
+If you want to ensure that \emph{every} library is loaded\packageoption{full}
+so you don't have to think about it any more you can use
+\begin{sourcecode}
+  \usepackage[full]{leadsheets}
+\end{sourcecode}
+This actually loads every library except the \library{musejazz} library.
+
+If you instead use\packageoption{minimal}
+\begin{sourcecode}
+  \usepackage[minimal]{leadsheets}
+\end{sourcecode}
+then \emph{no} libraries are loaded.  In this case you have to load the
+libraries yourself in order to use the package.
+\begin{commands}
+  \command{useleadsheetslibraries}[\marg{comma list of libraries}]
+    With this command one or several of \leadsheets' libraries can be loaded.
+  \command{useleadsheetslibrary}[\marg{library}]
+    With this command one of \leadsheets' libraries can be loaded.
+\end{commands}
+
+The libraries are divided into two parts: libraries to be loaded by users and
+auxiliary libraries loaded by other libraries but not to be loaded directly by
+users.
+
+The user-libraries are the following ones:
+\begin{description}
+  \item[\library{musicsymbols}] \packageoption{musicsymbols}This library makes
+    the music symbol font provided by MusiX\TeX{} available as text font.  It
+    is described in part~\ref{part:musicsymbols-library}.
+  \item[\library{chords}] \packageoption{chords}This library defines a
+    few macros for typesetting of chord symbols.  It is described in
+    part~\ref{part:chords-library}.  It also loads the
+    \library{musicsymbols}library.
+  \item[\library{musejazz}] \packageoption{musejazz}extends the \chords\
+    library to use MuseScore's \enquote{MuseJazz} font, see
+    section~\ref{sec:musejazz-libr}.  It loads the \library{chords}
+    library.
+  \item[\library{songs}] \packageoption{songs}This is the \emph{main
+    library}.  It defines everything necessary for the typesetting of the
+    leadsheets.  It currently loads \emph{all other libraries}, \ie, user
+    libraries \emph{and} internal libraries, except for the \library{musejazz}
+    library.  This library is described in part~\ref{part:leadsheets-songs-library}.
+  \item[\library{external}] \packageoption{external}enables to include
+    external leadsheet documents using the \cls{leadsheets} class into a main
+    document, see part~\ref{part:external-leadsheet} for details.
+\end{description}
+Those libraries can also be loaded as a package option.  If you say
+\begin{sourcecode}
+  \usepackage[musicsymbols]{leadsheets}
+\end{sourcecode}
+then \emph{only} the \library{musicsymbols} library is loaded.  Saying
+\begin{sourcecode}
+  \usepackage[songs]{leadsheets}
+\end{sourcecode}
+is the same as using the package \emph{without} any options.  ``Without any''
+also means that neither \library{musicsymbols}, \library{chords} nor
+\library{songs} has been given as class option!
+
+There is also a number of auxiliary libraries which are all needed by
+the \library{songs} library.  The libraries are usually not described in
+sections of their own but as part of the \library{songs} library.  However,
+the following list gives hints to where some of the concepts are explained:
+\begin{description}
+  \item[\library{properties}] This is an auxiliary library not meant to be
+    loaded directly by users.  It defines the necessary macros for song
+    properties.  See section~\ref{sec:song-properties} for more details on the
+    concept.
+  \item[\library{shorthands}] This is an auxiliary library not meant to be
+    loaded directly by users.  It provides means for defining shorthand
+    characters.
+  \item[\library{transposing}]  This is an auxiliary library not meant to be
+    loaded directly by users.  It defines a transposing mechanism for chord
+    symbols.  See section~\ref{sec:transposing} for further details.
+  \item[\library{chordnames}]  This is an auxiliary library not meant to be
+    loaded directly by users.  It defines the necessary macros for printing
+    chords.
+  \item[\library{templates}] This is an auxiliary library not meant to be
+    loaded directly by users.  It defines the necessary macros for
+    \leadsheets' template mechanism.  See section~\ref{sec:templates} for
+    details on the concept.
+  \item[\library{translations}] This is an auxiliary library not meant to be
+    loaded directly by users.  It provides a few translations for a number of
+    printed strings.  See section~\ref{sec:internationalization} for more
+    information.
+\end{description}
+
+\part{The \library*{musicsymbols} Library}\label{part:musicsymbols-library}
+\dictum[Victor Hugo]{%
+  Music expresses that which cannot be said and on which it is impossible to
+  be silent.%
+}
+\vspace*{\baselineskip}\csname @afterheading\endcsname
+
+The \musicsymbols{} library is a very small library that makes the music
+symbol font provided by MusiX\TeX{} available as text font and then uses it to
+define a number of symbols.  This redefines the macros \cs{sharp}, \cs{flat}
+and \cs{natural}.  All defined symbols are listed in
+table~\ref{tab:musicsymbols}.
+
+If you want to use the library standalone then you can say:
+\begin{sourcecode}
+  \usepackage[minimal]{leadsheets}
+  \useleadsheetslibraries{musicsymbols}
+\end{sourcecode}
+
+\musicsymbols{} defines three further commands, namely \cs{musix},
+\cs{textmusix} -- a font switch and a text font command -- and
+\cs{musicsymbol}.  Those commands are meant for internal use only which is why
+they're not explained here.
+
+\begin{table}[htbp]
+  \centering
+  \newcommand*\showsymbol[1]{\cs{#1}&\csuse{#1}}
+  \caption{Symbols defined by \musicsymbols.}
+  \begin{tabular}{llll}
+    \toprule
+      \bfseries Command & \bfseries Symbol &
+      \bfseries Command & \bfseries Symbol \\
+    \midrule
+      \showsymbol{sharp}       & \showsymbol{flat} \\
+      \showsymbol{doublesharp} & \showsymbol{doubleflat} \\
+      \showsymbol{natural} \\
+    \midrule
+      \showsymbol{trebleclef}  & \showsymbol{bassclef} \\
+      \showsymbol{altoclef}    \\
+    \midrule
+      \showsymbol{allabreve}   & \showsymbol{meterC} \\
+    \midrule
+      \showsymbol{wholerest}   & \showsymbol{halfrest} \\
+      \showsymbol{quarterrest} & \showsymbol{eighthrest} \\
+      \showsymbol{sixteenthrest} \\
+    \midrule
+      \showsymbol{Break} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:musicsymbols}
+\end{table}
+
+\musicsymbols{} also defines a number of macros for denoting bars.  Those
+macros are listed in table~\ref{tab:bar-symbols}.
+
+\begin{table}[htbp]
+  \centering
+  \newcommand*\showsymbol[1]{\cs{#1}&\csuse{#1}}
+  \caption{Bar symbols.}
+  \begin{tabular}{llll}
+    \toprule
+      \bfseries Macro & \bfseries Symbol &
+      \bfseries Macro & \bfseries Symbol \\
+    \midrule
+      \showsymbol{normalbar}   & \showsymbol{leftrepeat} \\
+      \showsymbol{rightrepeat} & \showsymbol{leftrightrepeat} \\
+      \showsymbol{doublebar}   & \showsymbol{stopbar} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:bar-symbols}
+\end{table}
+
+There are three macros that can be redefined to adjust the appearance of those
+bars:
+\begin{commands}
+  \command{normalbarwidth}\Default{.02em}
+    The thickness of a bar rule as used in \cs{normalbar}.
+  \command{thickbarwidth}\Default{.15em}
+    The thickness of the thick bar rules as used for example in
+    \cs{leftrepeat} or \cs{stopbar}.
+  \command{interbarwidth}\Default{.1em}
+    The distance between two bar rules as in \cs{doublebar} or \cs{stopbar}.
+\end{commands}
+
+Finally \musicsymbols{} provides a macro for adding an abitrary meter:
+\begin{commands}
+  \command{meter}[\marg{numerator}\marg{denominator}]
+    \sinceversion{0.5}For example \verbcode+\meter{6}{8}+: \meter{6}{8}
+\end{commands}
+
+\clearpage
+\part{The \library*{chords} Library (and the \library*{musejazz}
+  Library)}\label{part:chords-library}
+\dictum[Wes Montgomery]{%
+  I never practice my guitar -- from time to time I just open the case and
+  throw in a piece of raw meat.%
+}
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=.5,trim=0 22cm 10cm 2cm,clip]{ring-of-fire.pdf}
+  \caption{One possible layout for \leadsheets{} mimicking the typewriter
+    style.}
+  \label{fig:leadsheet}
+\end{figure}
+
+\section{The \cs*{writechord} Command}
+
+\chords{} provides the command \cs{writechord}\marg{chord} for convenient
+typesetting of chords:
+
+\begin{example}[side-by-side]
+  \writechord{Bb7(#9)} \writechord{Bbb6}
+  \writechord{C#7(b9)} \writechord{C##13}
+\end{example}
+
+\begin{commands}
+  \command{chordname}[\marg{chord}]
+    Typesetting chords.  Inside the argument every \code{\#} will be replaced
+    by $\sharp$ and every \code{b} is replaced with $\flat$.  Numerals and
+    parentheses are typeset as superscripts.  Everything between parentheses
+    is always a superscript: \verbcode+\writechord{F#7(#11)}+
+    \writechord{F#7(#11)}.
+  \command{writechord}[\marg{chord}]
+    This command can and actually \emph{should} be used for placing chords
+    inline. It transforms the chords according to the options knows the
+    options \option{input-notation} and \option{output-notation}.  This
+    command also transforms the chord according to the options inside of the
+    \env{song} environment \option{transpose} and \option{enharmonic} before
+    printing it, see also page~\pageref{cs:writechord}.
+\end{commands}
+
+There are several token lists that are treated specially inside \cs{writechord}:
+\begin{labeling}[--]{xxxxx}
+  \item[\code{\^{}}] This token is replaced by \cs*{textsuperscript}.
+  \item[\code{ma}] The symbol for major chords.  Per default this is
+    empty. \verbcode+\writechord{Gma}+ \writechord{Gma}.
+  \item[\code{mi}] The symbol for minor chords.  Per default this is
+    \code{m}.  \verbcode+\writechord{Gmi}+ \writechord{Gmi}.
+  \item[\code{o}] The symbol for diminished chords.  Per default this is
+    \code{\cs*{textsuperscript}\Marg{o}}.  \verbcode+\writechord{Go}+
+    \writechord{Go}.
+  \item[\code{+}] The symbol for augmented chords.  Per default this is
+    \code{\cs*{textsuperscript}\Marg{+}}.  \verbcode!\writechord{G+}!
+    \writechord{G+}.
+  \item[\code{/o}] The symbol for half diminished chords.  Per default
+    this is \code{\cs*{textsuperscript}\Marg{\cs*{o}\Marg{}}}.
+    \verbcode+\writechord{G/o}+ \writechord{G/o}.
+  \item[\code{\#}] The \enquote{sharp} symbol.  Per default this is
+    \cs{sharp}.  \verbcode+\writechord{F#}+ \writechord{F#}.
+  \item[\code{\#\#}] The \enquote{double sharp} symbol.  Per default this is
+    \cs{doublesharp}.  \verbcode+\writechord{F##}+ \writechord{F##}.
+  \item[\code{b}] The \enquote{flat} symbol.  Per default this is
+    \cs{flat}.  \verbcode+\writechord{Eb}+ \writechord{Eb}.
+  \item[\code{bb}] The \enquote{double flat} symbol.  Per default this is
+    \cs{doubleflat}.  \verbcode+\writechord{Ebb}+ \writechord{Ebb}.
+  \item[\code{b\#}] Cancelling flat/sharp combination: this is removed.
+  \item[\code{\#b}] Cancelling sharp/flat combination: this is removed.
+  \item[\code{add}] This is superscripted: \verbcode+\writechord{Gadd9}+
+    \writechord{Gadd9}.
+  \item[\code{sus}] This is superscripted: \verbcode+\writechord{Gsus4}+
+    \writechord{Gsus4}.
+  \item[\code{dim}] This is superscripted: \verbcode+\writechord{Gdim5}+
+    \writechord{Gdim5}.
+  \item[\code{maj7}] This is superscripted: \verbcode+\writechord{Gmaj7}+
+    \writechord{Gmaj7}.
+  \item[\code{maj9}] This is superscripted: \verbcode+\writechord{Gmaj9}+
+    \writechord{Gmaj9}.
+\end{labeling}
+
+How these token lists are treated depends on optional settings:
+
+\begin{example}
+  \setchords{
+    major-seven = $\Delta$ ,
+    major-nine  = $\Delta$\textsuperscript{9}
+  }
+  \writechord{Gmaj7} \writechord{Gmaj9}
+  \writechord{G^6} \writechord{G6}
+  \writechord{G7^#5}
+\end{example}
+
+If you want to use the library standalone then you can say:
+\begin{sourcecode}
+  \usepackage[minimal]{leadsheets}
+  \useleadsheetslibraries{chords}
+\end{sourcecode}
+This also loads the \musicsymbols{} library.
+
+\section{Options}
+
+Options are set with the command
+\begin{commands}
+  \command{setchords}[\marg{options}]
+    where \meta{options} is a comma separated list of keyval options.
+\end{commands}
+Actually there's a second possibility: options can also be set with the
+command \cs{setleadsheets} (see section~\ref{sec:options}) if they're preceded
+by \code{chords/} (including the slash).
+
+The options allow detailed customization of how chords are printed.  It
+doesn't change the input syntax.
+
+\begin{options}
+  \keyval{format}{code}\Default
+    Code inserted before a chord within the same group. Can be used for
+    special formatting of the chords, with \cs*{sffamily}, say.
+  \keyval{sharp}{code}\Default{\cs{sharp}}
+    The sharp symbol.
+  \keyval{flat}{code}\Default{\cs{flat}}
+    The flat symbol.
+  \keyval{double-sharp}{code}\Default{\cs{doublesharp}}
+    The double sharp symbol.
+  \keyval{double-flat}{code}\Default{\cs{doubleflat}}
+    The double flat symbol.
+  \keyval{aug}{code}\Default{+}
+    The augmented symbol.
+  \keyval{half-dim}{code}\Default{\cs*{o}\Marg{}}
+    The half-diminished symbol.
+  \keyval{full-dim}{code}\Default{o}
+    The diminished symbol.
+  \keyval{dim}{code}\Default{\cs*{textsuperscript}\Marg{dim}}
+    The token list \code{dim}.
+  \keyval{add}{code}\Default{\cs*{textsuperscript}\Marg{add}}
+    The token list \code{add}.
+  \keyval{sus}{code}\Default{\cs*{textsuperscript}\Marg{sus}}
+    The token list \code{sus}.
+  \keyval{major}{code}\Default
+    The token list \code{ma}.
+  \keyval{minor}{code}\Default{m}
+    The token list \code{mi}.  This option knows a special value.  If you set
+    \keyis{minor}{lowercase} then minor chords are converted to lowercase
+    letters.  This means an input \code{Dmi} becomes \code{d}.
+  \keyval{major-seven}{code}\Default{\cs*{textsuperscript}\Marg{maj7}}
+    The token list \code{maj7}.
+  \keyval{major-nine}{code}\Default{\cs*{textsuperscript}\Marg{maj9}}
+    The token list \code{maj9}.
+\end{options}
+
+There are further options which concern the different notations of the pitches
+\writechord{B} and \writechord{Bb} in German (and a few other European
+countries) and English.
+\begin{options}
+  \keychoice{input-notation}{german,english}\Default{english}
+    If\changedversion{0.2} set to \code{german} B should be input as \code{H}
+    and B~flat as \code{B}. If set to \code{english} B should be input as
+    \code{B} and B~flat as \code{Bb}.
+  \keychoice{output-notation}{german,english}\Default{english}
+    \setchords{output-notation=german}If\changedversion{0.2} set to
+    \code{german} B is output as \writechord{B} and B-flat as \writechord{Bb}.
+  \keyval{german-B}{code}\Default{B}
+    Customize\sinceversion{0.2} the output of B~flat when
+    \keyis{output-notation}{german}.
+  \keyval{german-H}{code}\Default{H}
+    Customize\sinceversion{0.2} the output of B when
+    \keyis{output-notation}{german}.
+\end{options}
+
+Let's see a few examples for the \option{input-notation} and
+\option{output-notation} options.
+
+\begin{example}
+  input and output English:\par
+  \writechord{Bb} \writechord{B} \writechord{B#}\par
+  \writechord{B} \writechord{H} \writechord{H#}\par
+  \medskip
+
+  \setchords{input-notation=german}
+  input German and output English:\par
+  \writechord{Bb} \writechord{B} \writechord{B#}\par
+  \writechord{B} \writechord{H} \writechord{H#}\par
+  \medskip
+
+  \setchords{output-notation=german}
+  input and output German:\par
+  \writechord{Bb} \writechord{B} \writechord{B#}\par
+  \writechord{B} \writechord{H} \writechord{H#}\par
+
+  \medskip
+  \setchords{input-notation=english}
+  input English and output German:\par
+  \writechord{Bb} \writechord{B} \writechord{B#}\par
+  \writechord{B} \writechord{H} \writechord{H#}
+\end{example}
+
+\section{The \library*{musejazz} Library}\label{sec:musejazz-libr}
+
+The \musejazz\ library extends the \chords\ library to use
+MuseScore's\footnote{\url{http://musescore.com/}} font \enquote{MuseJazz} for
+the chord symbols.  The library contains the two lines which explains why it
+requires \LuaLaTeX\ or \XeLaTeX.  Well, and the font, obviously.
+
+\begin{sourcecode}
+  \RequirePackage{fontspec}
+  \newfontfamily\musejazz{MuseJazz}
+\end{sourcecode}
+
+Here is a small example of it's usage and the outcome:
+
+\begin{example}[compile,program=xelatex,max-pages=1,add-frame=false]
+  % compile with LuaLaTeX or XeLaTeX
+  \documentclass[margin=4mm]{standalone}
+  \usepackage{leadsheets}
+  \useleadsheetslibrary{musejazz}
+  \begin{document}
+  \Huge\writechord{Bb7(#9)}\space\writechord{F##9}
+  \end{document}
+\end{example}
+
+\clearpage
+\part{The \library*{songs} Library}\label{part:leadsheets-songs-library}
+\dictum[Jeff Beck]{%
+  I don't care about the rules. If I don't break the rules at least ten
+  times every song then I'm not doing my job.%
+}
+
+\section{Background}
+
+The \leadsheets{} package allows for easy creation of leadsheets but it also
+can be used to create complete songbooks. The basic idea is that songs are
+typeset in the \env{song} environment.  Each song gets a number of properties
+(see section~\ref{sec:song-properties}) that determine how the title of the
+song is typeset.  For the typesetting of the titles a template mechanism is
+used (see section~\ref{sec:title-templates}).  Songs can also be tagged.  The
+tags then allow to typeset only songs matching a list of tags that is
+specified via an option.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.9\linewidth]{liederbuechlein.jpg}
+  \caption{Even before officially publishing this bundle I used it for
+    typesetting a small songbook!}
+  \label{fig:liederbuch}
+\end{figure}
+
+\section{The \env*{song} Environment}
+
+\begin{environments}
+  \environment{song}[\oarg{options}\marg{properties}]
+    The main environment used to typeset songs.  It has a mandatory argument
+    where the song's properties are set
+    (\cf\ section~\ref{sec:song-properties}).  It also has an optional
+    argument for setting options specific to the song.
+\end{environments}
+
+\subsection{A First Example}
+First let's take a look at an example:
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{article}
+  \usepackage{leadsheets}
+  \begin{document}
+
+  \begin{song}{title={Mary Had A Little Lamb}, music={Stevie Ray Vaughan},
+      lyrics={traditional}, tags={srv,blues}}
+  \begin{verse}
+    Mary had a little lamb \\
+    Its fleece was white as snow, yea \\
+    Everywhere the child went \\
+    The little lamb was sure to go, yea
+  \end{verse}
+  \begin{verse}
+    He followed her to school one day \\
+    And broke the teacher's rule \\
+    What a time did they have \\
+    That day at school
+  \end{verse}
+  \end{song}
+  
+  \end{document}
+\end{example}
+
+Per default the songtitle simply is a \cs{section}\sarg{} without any other
+additions.  This is the songtitle template \titletemplate{minimal}, see
+section~\ref{sec:title-templates} for more details on those templates and how
+to create your own.
+
+\subsection{Using the \env*{song} Environment}
+
+Inside the \env{song} environment a number of additional environments are used
+to specify the different parts of a song.  They all are basically the same
+kind of environment, namely an \env*{itemize} environment internally where the
+only \cs*{item} has the name of the environment as option.  The \env{verse}
+environment is a little bit different since verses can be numbered.  If they
+are then each usage of \env{verse} inside \env{song} will step a vers number
+and print it (as option to the internal \cs*{item}).
+
+\begin{environments}
+  \environment{verse}[\oarg{options}]
+    An environment for specifying the verses of a song.
+  \environment{chorus}[\oarg{options}]
+    An environment for specifying the chorus of a song.\\
+    This is the same as \beginenv*\Marg{verse}\Oarg{type=chorus,\meta{options}}.
+  \environment{intro}[\oarg{options}]
+    An environment for specifying the intro of a song.\\
+    This is the same as \beginenv*\Marg{verse}\Oarg{type=intro,\meta{options}}.
+  \environment{interlude}[\oarg{options}]
+    An environment for specifying an interlude of a song.\\
+    This is the same as \beginenv*\Marg{verse}\Oarg{type=interlude,\meta{options}}.
+  \environment{bridge}[\oarg{bridge}]
+    An environment for specifying a bridge of a song.\\
+    This is the same as \beginenv*\Marg{verse}\Oarg{type=bridge,\meta{options}}.
+\end{environments}
+
+These environments and their options are described in more detail in
+sections~\ref{sec:envverse-environment} and~\ref{sec:other-envverse-like}.
+
+\subsection{Options}\label{sec:options}
+
+The options to the \env{song} environment are the same as the general options
+of \leadsheets.  This means you can set the following options either local to
+a song or global for the whole document with this command:
+
+\begin{commands}
+  \command{setleadsheets}[\marg{options}]
+    Setup command for \leadsheets.
+\end{commands}
+
+Although I used the word \enquote{global} above \emph{all options are local to
+  the current scope}!
+
+\begin{options}
+  \keyval{title-template}{template name}\Default{minimal}
+    The songtitle template, see section~\ref{sec:title-templates} for
+    details.
+  \keyval{chord-cs}{cs}\Default{\cs*{chordname}}
+    The command that is used to parse the chords.  See
+    section~\ref{sec:placing-chords} for details.  \meta{cs} needs to be a
+    command that takes a mandatory argument.
+  \keyval{song-format}{code}\Default
+    \meta{code} is inserted \emph{before} the song title at the
+    beginning of the \env{song} environment.
+  \keyval{text-format}{code}\Default
+    \meta{code} is inserted \emph{after} the song title at the
+    beginning of the \env{song} environment.
+  \keyval{before-song}{code}\Default
+    \meta{code}\sinceversion{0.3} is inserted at the beginning of a song
+    \emph{before} the title!
+  \keyval{after-song}{code}\Default
+    \meta{code}\sinceversion{0.3} is inserted after the whole song.
+  \keyval{after-title}{code}\Default
+    \meta{code}\sinceversion{0.3} is inserted after the title of the song but
+    before the body of the environment.
+  % \keybool{numbered}\Default{false}
+  %   Determines wether verses are numbered or not.
+  \keyval{print-tags}{list of tags}
+    A comma separated list of tags. When specified a song will only be printed
+    if it is tagged with at least one of the tags in \meta{list of tags}.
+  \keyval{add-to-reset}{list of counters}
+    A\sinceversion{0.3} comma separated list of counters which should be
+    reset for each song.
+  \keybool{obey-lines}\Default{false}
+    An experimental option.  Use at your own risk!  If set to \code{true} then
+    inside the \env{verse} like environments end-of-lines will be obeyed and
+    start a new line.  This comes with a price when using chords, see
+    section~\ref{sec:placing-chords:caveat}.
+  \keybool{bar-shortcuts}\Default{false}
+    Makes the characters \shortcut{:} and \shortcut{\barsymbol} active inside
+    the \env{song} environment.  See sections~\ref{sec:special-characters}
+    and~\ref{sec:typesetting-bars} for more details.
+  \keybool{disable-measuring}\Default{false}
+    \sinceversion{0.4}This option turns of the song height measuring.  This
+    makes song title template definitions easier (see section~\ref{sec:title-templates} for
+    details).  \emph{The song property \property{height} will be set to 0pt then!}
+\end{options}
+
+\subsection{Song Properties}\label{sec:song-properties}
+
+Songs can have a number of properties which basically are used in songtitle
+templates (see section~\ref{sec:title-templates}).  One specific property,
+\property{tags}, plays a different role, though.
+
+\begin{properties}
+  \prop{title}{title}
+    This is the main title of the song.
+  \prop{subtitle}{subtitle}
+    A subtitle.
+  \prop{short-title}{short song title}
+    A short title (may be useful in a template that writes the titles in
+    \cs*{section}s for a version to be used in the table of contents).
+  \prop{sort-title}{song title}
+    If not set explicitly this property holds the same value as
+    \property{title}.
+  \prop{sort-short-title}{short song title}
+    If not set explicitly this property holds the same value as
+    \property{short-title}.
+  \prop{composer}{composer}
+    The composer of the song.  As of now this accepts an arbitrary entry but
+    maybe this will not be supported any more when indexing will be
+    implemented.  No promises.
+  \prop{sort-composer}{composer}
+    If not set explicitly this property holds the same value as
+    \property{composer}.
+  \prop{lyrics}{writer}
+    Whoever wrote the lyrics if different from the composer.  As of now this
+    accepts an arbitrary entry but maybe this will not be supported any more
+    when indexing will be implemented.  No promises.
+  \prop{sort-lyrics}{writer}
+    If not set explicitly this property holds the same value as
+    \property{writer}.
+  \prop{arr}{arranger}
+    Whoever arranged the song.  As of now this accepts an arbitrary entry but
+    maybe this will not be supported any more when indexing will be
+    implemented.  No promises.
+  \prop{sort-arr}{arranger}
+    If not set explicitly this property holds the same value as
+    \property{arr}.
+  \prop{band}{band}
+    The band who plays or played the song.
+  \prop{sort-band}{band}
+    If not set explicitly this property holds the same value as
+    \property{band}.
+  \prop{interpret}{interpret}
+    The interpret of the song.  As of now this accepts an arbitrary entry but
+    maybe this will not be supported any more when indexing will be
+    implemented.  No promises.
+  \prop{sort-interpret}{interpret}
+    If not set explicitly this property holds the same value as
+    \property{interpret}.
+  \prop{genre}{genre}
+    The genre of the song.
+  \prop{key}{key}
+    The key of the song.  This property is used for transposing and must have
+    a specific format then, see section~\ref{sec:transposing}.
+  \prop{capo}{fret}
+    This property is used for transposing and for the \cs{capo} macro, see
+    sections~\ref{sec:capo-information} and~\ref{sec:transposing} .
+  \prop{tempo}{tempo}
+    The tempo of the song.
+  \prop{tags}{tags}
+    A comma separated list of tags. Those tags play a role for the option
+    \option{print-tags}.  When that option is used a song is only printed if
+    it has at least one of the tags specified in the option.
+\end{properties}
+
+There are three more properties, \property{counter}, \property{ID} and
+\property{height} that cannot be set but are set automatically for each song.
+The \property{counter} simply holds the number of the current song starting
+from \code{1} for the first song.  The \property{ID} currently always is
+\code{song\meta{counter}} where \meta{counter} is the current
+\property{counter} value.  The property \property{height} holds the height of
+the typeset song in pt.  The height is determined by placing the body of the
+respective \env{song} environment in a vertical box and measuring the height
+and depth of the box.  This is done in a measuring phase that can and should
+be tested in a songtitle template definition, see
+section~\ref{sec:title-templates} for details.  \emph{This is important since
+  the property \property{height} is not available in the measuring phase but
+  only afterwards!}  If the option \option{disable-measuring} has been set the
+property \property{height} will have the value~0pt!
+
+In principle all properties can get list of entries where items are separated
+with \code{\visualizespaces{ and }}.  Of course this doesn't make sense for
+each property -- a song does only have one title.  But a song can very well
+have more than one composer: think of the Beatles where most songs were
+written by Paul McCartney and John Lennon\footnote{This is not quite true:
+  most songs were mostly written either by Paul or John but legally usually
+  both are the composers.}.
+
+It is possibly to define further such properties.  For details see
+section~\ref{sec:own-templates}.
+
+\subsection{Special Characters}\label{sec:special-characters}
+Inside the \env{song} environment several characters don't have their usual
+catecory codes:
+\begin{labeling}[--]{xxxxx}
+  \item[\shortcut{\textasciicircum}] category code 13 (active). It is a
+    shortcut for the \cs{chord} command.
+  \item[\shortcut{\_}] category code 13 (active). It is a shortcut for the
+    \cs{writechord} command.
+  \item[\shortcut{\barsymbol}] category code 13 (active).  Used for
+    typesetting bars.
+  \item[\shortcut{:}] category code 13 (active).  Used for typesetting bars.
+  \item[\code{\#}] category code 12 (other).  Used for chord names.
+\end{labeling}
+
+Actually the characters \shortcut{\barsymbol} and \shortcut{:} are \emph{not}
+changed per default.  In order to do that you have to use the option
+\option{bar-shortcuts}.
+
+For details on the usage of the characters \shortcut{\barsymbol} and
+\shortcut{:} see section~\ref{sec:typesetting-bars}.  The usage of chords is
+explained in section~\ref{sec:placing-chords}.
+
+\subsection{Capo Information}\label{sec:capo-information}
+When you set the \property{capo} property the macro \cs{capo} writes
+\begin{center}
+  \GetTranslation{leadsheets/capo}: IV.~\GetTranslation{leadsheets/fret}
+\end{center}
+What it writes \emph{exactly} depends on a few settings: the \property{capo}
+property obviously, which determines the number that is printed.  The
+translations for the \enquote{capo} and \enquote{fret} strings (see
+section~\ref{sec:internationalization} for details) and the setting of the
+following option:
+\begin{options}
+  \keychoice{capo-nr-format}{arabic,roman,Roman}\Default{Roman}
+    The format of the number printed by the \cs{capo} macro.
+  \keyval{capo-nr}{code}\Default{\#1.}
+    The code to print the number.  In the code refer to the number with
+    \code{\#1}.
+\end{options}
+
+\section{The \env*{verse} Environment}\label{sec:envverse-environment}
+
+\begin{environments}
+  \environment{verse}[\oarg{options}]
+    An environment for specifying the verses of a song.
+  \environment{verse*}[\oarg{options}]
+    The same as the \env{verse} environment but will always be unnumbered
+    regardless of any option settings.
+\end{environments}
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{article}
+  \usepackage{leadsheets}
+  \setleadsheets{verse/numbered=true}
+  \begin{document}
+
+  \begin{song}{title=Foo}
+  \begin{verse}
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore\\
+    magna aliquyam erat, sed diam voluptua.
+  \end{verse}
+  \begin{verse*}
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore\\
+    magna aliquyam erat, sed diam voluptua.
+  \end{verse*}
+  \begin{verse}
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore\\
+    magna aliquyam erat, sed diam voluptua.
+  \end{verse}
+  \end{song}
+  
+  \end{document}
+\end{example}
+
+\subsection{Options}\label{sec:verses-options}
+
+The \env{verse} environment and all related environments have the following
+options:
+
+\begin{options}
+  \keyval{format}{code}\Default
+    \meta{code} is inserted at the beginning of the environment and can thus
+    be used to add formatting, \eg, \keyis{format}{\cs*{itshape}}.
+  \keyval{label-format}{code}\Default
+    The same for the environment labels.
+  \keyval{class}{class-name}\Default{default}
+    The\sinceversion{0.2} \env{verse} environment and all related environments
+    all belong to a class, the default class is called \code{default}.  This
+    is of interest when using the \option{remember-chords} and
+    \option{recall-chords} options.\label{option:class}
+\end{options}
+
+This can be used either locally, \ie, as option to the corresponding
+environment, or for all environments of the same type using the setup command
+using the following syntax:
+
+\begin{center}
+  \cs{setleadsheets}\Marg{\meta{env name}/format = \meta{code}}
+\end{center}
+
+\begin{example}
+  \begin{verse}[format=\itshape]
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore\\
+    magna aliquyam erat, sed diam voluptua.
+  \end{verse}
+\end{example}
+
+It is also possible so set the formatting for all related environments at
+once:
+\begin{options}
+  \keyval{verses-format}{code}\Default
+    Sets the format for all \env{verse} like environments.
+  \keyval{verses-label-format}{code}\Default
+    Sets the label format for all \env{verse} like environments.
+\end{options}
+Both options are overwritten if the options for a specific environment are
+set.  That is, if you want all environments to have italic shape except for
+choruses, then you could do
+\begin{sourcecode}
+  \setleadsheets{
+    verses-format = \itshape ,
+    chorus/format =
+  }
+\end{sourcecode}
+
+\section{Placing Chords}\label{sec:placing-chords}
+
+\subsection{The Commands}
+Inside the \env{song} environment the characters \shortcut{\textasciicircum}
+and \code{\_} are active characters\footnote{There are more characters with a
+  special function, see
+  section~\ref{sec:special-characters}}. \shortcut{\textasciicircum} is a
+shortcut for the command \cs{chord}, \shortcut{\_} is a shortcut for
+\cs{writechord}.  Those commands have the following functions:
+
+\begin{commands}
+  \command{chord}[\sarg\symarg{-}\marg{chord}\meta{text}\visiblespace]
+    Places \meta{chord} centered above \meta{text}.  The starred version
+    gobbles the trailing space while the unstarred version does not.  Like the
+    star the dash is optional.  It sets the option \option{smash-next-chord}
+    to \code{true}.  \meta{text} may be empty but the trailing space
+    \emph{must} be there.  If \meta{text} is empty then the chord is place
+    above some horizontal space which can be set with the option
+    \option{empty-chord-dim}.
+  \command{writechord}[\marg{chord}]
+    This command transforms the chord according to the options
+    \option{transpose} and \option{enharmonic} before printing it.  This
+    command can/should be used for placing chords inline or for typesetting
+    the \property{key} property in a template.  The command is used by
+    \cs{chord} for the actual printing.  The command also transforms the
+    chords according to the options \option{input-notation} and
+    \option{output-notation}.\label{cs:writechord}
+\end{commands}
+
+\begin{example}[side-by-side]
+  Text \chord{E7}text \chord*{B7}lon ger text 
+\end{example}
+
+\subsection{Usage}
+Note that per default the width of a chord is not ignored:
+\begin{example}[side-by-side]
+  text \chord{Gbmi7(b5)}text text
+\end{example}
+However, there is an option which sets the width of a chord to zero:
+\begin{options}
+  \keybool{smash-chords}\Default{false}
+    If set to true the width of the chords set with \cs{chord} is set to
+    zero.
+  \keybool{smash-next-chord}\Default{false}
+    If set to true the width of the next chord set with \cs{chord} is set to
+    zero.
+\end{options}
+\begin{example}[side-by-side]
+  \setleadsheets{smash-next-chord=true}
+  text \chord{Gbmi7(b5)}text text \par
+  text \chord{Gbmi7(b5)}text text \par
+  \setleadsheets{smash-chords=true}
+  text \chord{Gbmi7(b5)}text text \par
+  text \chord{Gbmi7(b5)}text text
+\end{example}
+
+Before we forget -- there are more options:
+\begin{options}
+  \keyval{empty-chord-dim}{dim}\Default{1em}
+    The horizontal space that is inserted if the \meta{text} argument of
+    \cs{chord} is empty.
+  \keyval{align-chords}{col}\Default{c}
+    Determines how a chord is aligned with respect to the word it is placed
+    above of.  Valid input is any valid \env*{tabular} column identifier.
+  \keybool{print-chords}\Default{true}
+    If set to false \cs{chord} won't print the chord but will do nothing
+    instead.  This options does not affect \cs{writechord}.
+\end{options}
+
+While \cs{chord} is available in the whole document the
+\code{\textasciicircum} syntax is -- as mentioned before -- only available
+inside of the \env{song} environment.
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 16cm 2cm 4cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{article}
+  \usepackage{leadsheets}
+  \begin{document}
+
+  \begin{song}{title={Mary Had A Little Lamb}, music={Stevie Ray Vaughan},
+      lyrics={traditional}, tags={srv,blues}}
+  \begin{verse}
+    ^{E7} Mary had a little lamb ^{A7} \\
+    Its fleece was white as ^{E7}snow, yea \\
+    Everywhere the child ^{B7}went ^{A7} \\
+    The little lamb was sure to ^{E7}go, yea
+  \end{verse}
+  \begin{verse}
+    ^{E7} He followed her to school one day ^{A7} \\
+    And broke the teacher's ^{E7}rule \\
+    What a time did they ^{B7}have ^{A7} \\
+    That day at ^{E7}school
+  \end{verse}
+  \end{song}
+  
+  \end{document}
+\end{example}
+
+You've probably noticed: chords are printed with \cs{chordname} in the default
+setting.  You can change this with the option \option{chord-cs}.  If you do
+then keep in mind that the input syntax will also change.
+
+\subsection{Caveat}\label{sec:placing-chords:caveat}
+
+If you use \keyis{obey-lines}{true} you have to be careful when you place
+chords.  If you place a chord over the last word in a line
+\begin{sourcecode}
+  ^{F#mi} You've been ^*{B}run nin', ^*{E}hid in' much too ^{A}long.
+\end{sourcecode}
+then the end of line that is used as the mandatory space argument for
+\cs{chord} may not be recognized as an end of line.  Even worse: at the end of
+a \env{verse} like environment this may cause non-obvious errors.  So if
+you're getting in trouble in these cases you should always insert an explicit
+space, \eg. by one of the following methods:
+\begin{sourcecode}
+  ^{F#mi} You've been ^*{B}run nin', ^*{E}hid in' much too ^{A}long. {}
+  ^{F#mi} You've been ^*{B}run nin', ^*{E}hid in' much too ^{A}long. \empty
+  ^{F#mi} You've been ^*{B}run nin', ^*{E}hid in' much too ^{A}long. \relax
+\end{sourcecode}
+
+\subsection{Remembering Chords}\label{sec:remembering-chords}
+\leadsheets{} has the option
+\begin{options}
+  \keybool{remember-chords}\Default{false}
+    If set to \code{true} the chords in the \emph{first} appearance of a
+    \env{verse} like environment are remembered.  In the next appearances of
+    said environment the shortcut \shortcut{\textasciicircum} has changed its
+    meaning and inserts a chord automatically.
+\end{options}
+
+Let's take at look at an example to see what this means:
+\begin{example}
+  \definesongtitletemplate{empty}{}
+  \begin{song}[verse/numbered,remember-chords,title-template=empty]{title=foobar}
+  \begin{verse}
+    ^{G}Lorem ipsum ^{C}dolor sit ^{E7}amet, consetetur ^{Bb7(b5)}sadipscing
+  \end{verse}
+  \begin{verse}
+    ^Lorem ipsum ^dolor sit ^amet, consetetur ^sadipscing
+  \end{verse}
+  \end{song}
+\end{example}
+In this example the chords used in the first \env{verse} environment have been
+remembered and in the second \env{verse} environment the
+\shortcut{\textasciicircum} shortcut inserted the corresponding chords in the
+order they had been specified the first time.  It is important when using this
+that you don't use the \shortcut{\textasciicircum} shortcut in subsequent
+environments more often than the first time.  It will produce an error
+otherwise.  You can use it less, of course.
+
+The \shortcut{\textasciicircum} shortcut still has the \emph{the same} syntax
+as \cs{chord} with one exception: it lacks the mandatory argument
+\meta{chord} (since it's obviously not needed).  It has the optional \sarg{}
+and \code{-}, though, as well as the mandatory space (\visiblespace)!
+
+\emph{Please note that \shortcut{\textasciicircum} \emph{can't} be the last
+  token in a line! It then should be followed by a space an an empty group --
+  similar to the caveat in section~\ref{sec:placing-chords:caveat}.}
+
+Each \env{verse} like environment (see section~\ref{sec:other-envverse-like}
+for more information) is treated uniquely by this mechanism:
+
+\begin{example}
+  \definesongtitletemplate{empty}{}
+  \begin{song}[verse/numbered,remember-chords,title-template=empty]{title=foobar}
+  \begin{verse}
+    ^{G}Lorem ipsum ^{C}dolor sit ^{E7}amet, consetetur ^{Bb7(b5)}sadipscing
+  \end{verse}
+  \begin{chorus}
+    ^{F}Lorem ipsum ^{Gmi}dolor sit amet, consetetur ^{C7}sadipscing
+  \end{chorus}
+  \begin{verse}
+    ^Lorem ipsum ^dolor sit ^amet, consetetur ^sadipscing
+  \end{verse}
+  \begin{chorus}
+    ^Lorem ipsum ^dolor sit amet, consetetur ^sadipscing
+  \end{chorus}
+  \end{song}
+\end{example}
+
+This is important: \env{verse} and \env{verse*} are treated as two different
+environments, the same holds for all starred \env{verse} like environments!
+If you want to recall the chords of a different type of environment, then you
+can use the option \option{recall-chords}:
+
+\begin{example}
+  \definesongtitletemplate{empty}{}
+  \begin{song}[verse/numbered,remember-chords,title-template=empty]{title=foobar}
+  \begin{verse}
+    ^{G}Lorem ipsum ^{C}dolor sit ^{E7}amet, consetetur ^{Bb7(b5)}sadipscing
+  \end{verse}
+  \begin{chorus}
+    ^{F}Lorem ipsum ^{Gmi}dolor sit amet, consetetur ^{C7}sadipscing
+  \end{chorus}
+  \begin{verse}
+    ^Lorem ipsum ^dolor sit ^amet, consetetur ^sadipscing
+  \end{verse}
+  \begin{chorus}[recall-chords=verse-default]
+    ^Lorem ipsum ^dolor sit amet, consetetur ^sadipscing
+  \end{chorus}
+  \end{song}
+\end{example}
+
+\section{Transposing}\label{sec:transposing}
+Provided a song has the property \property{key} \emph{and} the key is given as
+one of the twelve \enquote{usual} keys, \ie, one of the keys given in
+table~\ref{tab:key-signatures}, the chords of a song can be transposed.
+
+\begin{options}
+  \keyval{transpose}{number}
+    Transposes the chords of a song by \meta{number} of semitones.
+    \meta{number} can be a negative number, then the chords are transposed
+    down.
+  \keychoice{enharmonic}{sharp,flat}
+    Suppose you transpose a song in the key of \writechord{E} down a semitone.
+    \leadsheets{} will then transpose to the key of \writechord{Eb}.  It always
+    chooses the key whose signature has less accidentals.  You can force a
+    variant, though, by using this option.  With \keyis{enharmonic}{sharp}
+    \leadsheets{} would have chosen \writechord{D#} instead of \writechord{Eb}.
+  \keybool{transpose-capo}
+    When this is set to true chords are transposed down on semitone per capo
+    fret.
+\end{options}
+
+The transposing mechanism relies on the \chords{} input syntax which means
+that if you change \option{chord-cs} horrible things may happen.  \emph{So
+  don't change \option{chord-cs} and use \option{transpose} at the same time!}
+
+\begin{table}[htbp]
+  \centering
+  \catcode`\#=12
+  \catcode`\!=6
+  \def\showsignature!1{\writechord{!1}&\code{!1}}%
+  \caption{Allowed keys for the \property{key} property.}
+  \begin{tabular}{*{12}{l}}
+    \toprule
+      \bfseries Key & \bfseries Input &
+      \bfseries Key & \bfseries Input &
+      \bfseries Key & \bfseries Input &
+      \bfseries Key & \bfseries Input &
+      \bfseries Key & \bfseries Input &
+      \bfseries Key & \bfseries Input \\
+    \midrule
+      \showsignature{C}   && &
+      \showsignature{Cma} && &
+      \showsignature{Ami} \\
+    \cmidrule(lr){1-4} \cmidrule(lr){5-8} \cmidrule(lr){9-12}
+      \showsignature{G}    & \showsignature{F} &
+      \showsignature{Gma}  & \showsignature{Fma} &
+      \showsignature{Emi}  & \showsignature{Dmi} \\
+      \showsignature{D}    & \showsignature{Bb} &
+      \showsignature{Dma}  & \showsignature{Bbma} &
+      \showsignature{Bmi}  & \showsignature{Gmi} \\
+      \showsignature{A}    & \showsignature{Eb} &
+      \showsignature{Ama}  & \showsignature{Ebma} &
+      \showsignature{F#mi} & \showsignature{Cmi} \\
+      \showsignature{E}    & \showsignature{Ab} &
+      \showsignature{Ema}  & \showsignature{Abma} &
+      \showsignature{C#mi} & \showsignature{Fmi} \\
+      \showsignature{B}    & \showsignature{Db} &
+      \showsignature{Bma}  & \showsignature{Dbma} &
+      \showsignature{G#mi} & \showsignature{Fbmi} \\
+      \showsignature{F#}   & \showsignature{Gb} &
+      \showsignature{F#ma} & \showsignature{Gbma} &
+      \showsignature{D#mi} & \showsignature{Ebmi} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:key-signatures}
+\end{table}
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 16cm 2cm 4cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{article}
+  \usepackage{leadsheets}
+  \begin{document}
+
+  \begin{song}[transpose=2]{title={Mary Had A Little Lamb}, music={Stevie Ray
+        Vaughan}, lyrics={traditional}, tags={srv,blues},key=E}
+  \begin{verse}
+    ^{E7} Mary had a little lamb ^{A7} \\
+    Its fleece was white as ^{E7}snow, yea \\
+    Everywhere the child ^{B7}went ^{A7} \\
+    The little lamb was sure to ^{E7}go, yea
+  \end{verse}
+  \begin{verse}
+    ^{E7} He followed her to school one day ^{A7} \\
+    And broke the teacher's ^{E7}rule \\
+    What a time did they ^{B7}have ^{A7} \\
+    That day at ^{E7}school
+  \end{verse}
+  \end{song}
+  
+  \end{document}
+\end{example}
+
+\section{Other \env*{verse}-like Environments}\label{sec:other-envverse-like}
+Songs can have lots of different kinds of parts: verses, choruses, bridges,
+intros, outros, and so on.  Typographically they're all more or less the same,
+at least for the purpose of this package.  This means we'd ideally have
+environments for all of these parts with a distinct name in order to get a
+clean source.  At the same time these environments should all behave basically
+the same.  This is what the environments described in the following sections
+are for.
+
+\subsection{Available Environments}\label{sec:avail-envir}
+
+\begin{environments}
+  \environment{chorus}[\oarg{options}]
+    An environment for specifying the chorus of a song.
+  \environment{chorus*}[\oarg{options}]
+    The same as \env{chorus} but does not display the label.
+  \environment{intro}[\oarg{options}]
+    An environment for specifying the intro of a song.
+  \environment{intro*}[\oarg{options}]
+    The same as \env{intro} but does not display the label.
+  \environment{interlude}[\oarg{options}]
+    An environment for specifying an interlude of a song.
+  \environment{bridge}[\oarg{bridge}]
+    An environment for specifying a bridge of a song.
+  \environment{info}[\oarg{options}]
+    An environment for specifying arbitrary information.  This environment has
+    no label.
+  \environment{solo}[\oarg{options}]
+    An environment for specifying a solo to a song.
+  \environment{solo*}[\oarg{options}]
+    The same as \env{solo} but does not display the label.
+\end{environments}
+
+\subsection{Own \env*{verse}-like Environments}
+All environments mentioned in the previous section were defined with this
+command:
+\begin{commands}
+  \command{newversetype}[\sarg\marg{environment name}\oarg{default options}]
+    This defines an environment \meta{environment name}.  This environment
+    uses the verse-type template \versetemplate{itemize} (see
+    section~\ref{sec:verse-type-templates}) unless specified differently in
+    the \meta{default options}.  The starred version defines an environment
+    which hides the displayed name.  More precisely: the macro \cs{verselabel}
+    that is used in verse-type template definitions prints nothing in an
+    environment defined with \cs{newversetype}\sarg.
+    
+    This also defines a translation string (see
+    section~\ref{sec:internationalization}) \code{leadsheets/\meta{environment
+        name}} with both an empty translation fallback and English translation
+    unless specified differently with the \option{name} option.
+
+    At last this defines a new counter \meta{environment name} and sets
+    \cs*{the\meta{environment name}} to \code{\cs*{arabic}\Marg{environment
+        name}.}.
+\end{commands}
+
+As mentioned before in section~\ref{sec:verses-options} all environments
+defined this way have the options \option{format} and \option{label-format}.
+They have more options.  Here's a complete list:
+\begin{options}
+  \keyval{format}{code}\Default
+    \meta{code} is inserted at the beginning of the environment and can thus
+    be used to add formatting, \eg, \keyis{format}{\cs*{itshape}}.
+  \keyval{label-format}{code}\Default
+    The same for the environment labels.
+  \keyval{after-label}{code}\Default{:}
+    \meta{code} is inserted in the label after the label text.
+  \keyval{name}{name}\Default
+    The translation fallback and English translation of the environment.  This
+    should only be used with \cs{newversetype}.  Later changes should be made
+    with \cs{DeclareTranslation} (see section~\ref{sec:internationalization}).
+  \keyval{template}{template}\Default{itemize}
+    The verse-type template used for the environment, see
+    section~\ref{sec:verse-type-templates} for details.
+  \keybool{numbered}\Default{false}
+    If set to \code{true} \cs{verselabel} (used in verse-type template
+    definitions, see section~\ref{sec:verse-type-templates}) adds a number
+    after the name.
+  \keybool{named}\Default{true}
+    If set to \code{true} \cs{verselabel} (used in verse-type template
+    definitions, see section~\ref{sec:verse-type-templates}) prints the name
+    of the current environment (as determined by the translation of the
+    corresponding string, see also section~\ref{sec:internationalization}).
+  \keylit{recall-chords}{\meta{environment}-\meta{class}}
+    An option to be used with the \option{remember-chords} mechanism, see
+    section~\ref{sec:remembering-chords} for an example.  If you're not using
+    different classes then \meta{class} needs to be \code{default}, see also
+    page~\pageref{option:class}. The \option{class} to a \env{verse}-like
+    environment allows for example to have verses with different chords which
+    are still counted reguarly together with the \option{remember-chords}
+    option.
+\end{options}
+
+There are also a number of general options for setting the defaults of some
+options for all environments:
+\begin{options}
+  \keyval{verses-format}{code}\Default
+    Sets the format for all \env{verse} like environments.
+  \keyval{verses-label-format}{code}\Default
+    Sets the label format for all \env{verse} like environments.
+  \keyval{verses-after-label}{code}\Default{:}
+    Defeault \meta{code} that is inserted in the label after the label text of
+    \env{verse} like environments.
+\end{options}
+This options only determine the formatting of an environment if the
+corresponding options of the environment hasn't been set.
+
+Let's summarize: the label text of these environments is built of three items
+in the following order:
+\begin{enumerate}
+  \item The \meta{code} set with the corresponding \option{label-format} option.
+  \item The label text as defined as second argument to \cs{newversetype} or
+    as declared through the corresponding translation.
+  \item The \meta{code} set with the corresponding \option{after-label} option.
+\end{enumerate}
+
+\begin{example}
+  \newversetype{foo}{Foo}
+  \setleadsheets{
+    foo/label-format = \bfseries ,
+    foo/after-label  = ~$\Rightarrow$
+  }
+  \begin{foo}
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr,\\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore\\
+    magna aliquyam erat, sed diam voluptua.
+  \end{foo}
+\end{example}
+
+And just to give you some more examples here is how some of the existing
+environments are defined:
+\begin{sourcecode}
+  \newversetype{verse}[ name=Verse, named=false, after-label= ]
+  \newversetype*{verse*}
+  \newversetype{chorus}[ name=Chorus ]
+  \newversetype*{chorus*}
+\end{sourcecode}
+
+\section{Typesetting Bars}\label{sec:typesetting-bars}
+
+Sometimes it can be useful to typeset the chord scheme of a song.  Then one
+should be able to indicate start and beginnings of bars, maybe indicate
+repeats and so on.  While this is obviously possible with the macros provided
+by the \musicsymbols{} package listed in table~\ref{tab:bar-symbols} it may be
+more convenient to have a shorter syntax.  This is why inside the \env{song}
+environment some characters can be made (or are) active (see
+section~\ref{sec:special-characters}).  For the typesetting of bars this are
+the characters \shortcut{:} nor \shortcut{\barsymbol}. Per default they are
+not active, though.  If you want to use the shortcut syntax you have to use
+the option \option{bar-shortcuts}.  Here's a short example that emulates the
+behaviour by setting the characters active explicitly:
+
+\begin{example}[add-sourcecode-options={literate=}]
+  \catcode`|=\active
+  \catcode`:=\active
+  |: repeat | this :|: and | this :| \par
+  | this | part | ends | here || \par
+  | the | song | is over | now |||
+\end{example}
+
+All possibly combinations that have a special definition are shown in the
+example above.  The replacements that are done internally are these:
+\begin{labeling}[--]{xxxxx}
+  \item[\shortcut{\barsymbol}] \cs{normalbar}\cs*{space} (the space is there
+    because otherwise it eats following spaces which would be annoying)
+  \item[\code{|:}] \cs{leftrepeat}
+  \item[\code{:|}] \cs{rightrepeat}
+  \item[\code{:|:}] \cs{leftrightrepeat}
+  \item[\code{||}] \cs{doublebar}
+  \item[\code{|||}] \cs{stopbar}
+\end{labeling}
+
+\section{Templates}\label{sec:templates}
+\subsection{Title Templates}\label{sec:title-templates}
+
+\subsubsection{Background}
+The titles of songs set with the \env{song} environment are displayed
+according to the chosen title template.  It is chosen through the option
+\option{title-template} which can be set with \cs{setleadsheets} or as option
+to a specific \env{song} environment.  \leadsheets{} provides few predefined
+templates and an easy mechanism to define own templates.
+
+\subsubsection{Existing Templates}
+
+Currently \leadsheets{} provides two templates:
+\begin{description}
+  \item[\titletemplate{minimal}] This only typesettes the song title in a
+    \cs{section}\sarg.
+  \item[\titletemplate{tabular}] This typesets the song title in a
+  \cs{section} and prints some song properties in a \env*{tabular} below it.
+  This template needs the \pkg{array}~\cite{pkg:array} package loaded.
+\end{description}
+
+\subsubsection{Own Templates}\label{sec:own-templates}
+The principle is pretty straight forward: templates are defined with the
+following command:
+\begin{commands}
+  \command{definesongtitletemplate}[\marg{name}\marg{code}]
+    This defines the template \meta{name}.
+\end{commands}
+Inside of \meta{code} any code can be used.  The idea is that you use the
+commands presented below to insert song properties where you want them.
+
+First there are two commands related to defining new properties:
+\begin{commands}
+  \command{definesongproperty}[\marg{property}]
+    Defines a new property \meta{property}.  All existing properties have been
+    defined this way.  The command can only be used in the preamble.
+  \command{copysongproperty}[\marg{from}\marg{to}]
+    Copies the values of property \meta{from} to property \meta{to} if
+    property \meta{to} has not been set but property \meta{from} has been.
+    For example all \code{sort-\meta{property}} properties have been treated
+    this way so they have the \meta{property} value as fallback.
+    The command can only be used in the preamble.
+\end{commands}
+
+Then there are a number of commands related to retrieving and using the values
+of properties.  All these commands only make sense inside a title template
+definition (see section~\ref{sec:title-templates}).  Some of the commands are
+expandable which means they can be used in an \cs*{edef} like context, \ie,
+they are also suitable for writing the property values to the table of
+contents or other auxiliary files.
+\begin{commands}
+  \expandable\command{songproperty}[\marg{property}]
+    Retrieves property \meta{property}.
+  \command{printsongpropertylist}[\oarg{code}\marg{property}\marg{between
+    two}\marg{between more}\marg{between last two}]\Default{\cs*{@firstofone}}
+    Prints a property list \meta{property} separated with \meta{between two}
+    if the list contains only two items and separated with \meta{between more}
+    and \meta{between last two} if the list contains more than two items.
+    \meta{code} is placed directly in front of each item and items are
+    surrounded with braces which means that the last token in \meta{code} may
+    be a macro with a mandatory argument.
+  \command{usesongpropertylist}[\oarg{code}\marg{property}\marg{between}]%
+    \Default{\cs*{@firstofone}}
+    Like \cs{printsongpropertylist} but separates items with \meta{between}
+    regardless of the length of the list.
+  \expandable\command{forsongpropertylist}[\marg{property}\marg{code}]
+    Places all items of the property list \meta{property} in the input stream,
+    each item preceded with \meta{code}.  Items are surrounded with braces
+    which means that the last token in \meta{code} may be a macro with a
+    mandatory argument.
+  \expandable\command{ifsongproperty}[\marg{property}\marg{true}\marg{false}]
+    Checks if property \meta{property} has been set.
+  \command{ifanysongproperty}[\Marg{csv list of properties}\marg{true}\marg{false}]
+    \sinceversion{0.4}Checks if any of the properties in \meta{csv list of
+      properties} has been set.
+  \command{ifallsongproperties}[\Marg{csv list of properties}\marg{true}\marg{false}]
+    \sinceversion{0.4}Checks if all of the properties in \meta{csv list of
+      properties} have been set.
+  \command{ifsongpropertiesequal}[\marg{property 1}\marg{property
+    2}\marg{true}\marg{false}]
+    Checks if properties \meta{property 1} and \meta{property 2} have been set
+    to the same value.
+  \expandable\command{ifsongmeasuring}[\marg{true}\marg{false}]
+    \leadsheets{} measures the height of a song body before it typesets it and
+    it can often be necessary in a template to know if the measuring phase is
+    active or not.  For example the song property \property{height} should
+    only be used if \emph{not} in the measuring phase: it's value get's
+    determined there and is not yet available.
+  \command{expandcode}[\marg{code}]
+    Exhaustively expands \meta{code}.  Experienced users won't need this.  It
+    is essentially
+    
+    \cs*{begingroup}\cs*{edef}\cs*{x}\Marg{\cs*{endgroup}\meta{code}}\cs*{x}.
+
+    (More precisely it is a wrapper for the expl3 function \cs*{use:x}.)  This
+    means that any \code{\#} needs to doubled.  Inside the argument of this
+    commands non-robust macros that should not be expanded need to be prefixed
+    with \cs*{noexpand}.
+\end{commands}
+
+With the right template definition you can index composers, interprets, song
+titles, \ldots{}  You can write tables of contents for properties such as song
+titles, and so on, and so on.  \leadsheets{} does not do this for you and it
+may require some experience to create templates which do all this.
+
+\subsubsection{Examples}
+In order to give you an idea on how to use songtitle templates I'll show you
+how the existing ones are defined and one new definition.
+
+\paragraph{The \titletemplate*{minimal} template}
+This is quite short and self-explaining.
+
+\begin{sourcecode}
+  \definesongtitletemplate{minimal}{\section*{\songproperty{title}}}
+\end{sourcecode}
+
+\paragraph{A custom template}
+Now let's see an example for a newly defined template.  It's nearly as simple
+as the \titletemplate{minimal} template.
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{article}
+  \usepackage{leadsheets}
+  \definesongtitletemplate{custom}{
+    \ifsongmeasuring
+      {\section*}
+      {\section}{%
+      \songproperty{title}%
+      \ifsongproperty{music}
+        { (music by \printsongpropertylist{music}{ \& }{, }{ \& })}
+        {}%
+    }
+  }
+  \setleadsheets{title-template = custom}
+  \begin{document}
+
+  \begin{song}{title={Mary Had A Little Lamb}, music={Stevie Ray Vaughan},
+      lyrics={traditional}, tags={srv,blues}}
+  \begin{verse}
+    Mary had a little lamb \\
+    Its fleece was white as snow, yea \\
+    Everywhere the child went \\
+    The little lamb was sure to go, yea
+  \end{verse}
+  \begin{verse}
+    He followed her to school one day \\
+    And broke the teacher's rule \\
+    What a time did they have \\
+    That day at school
+  \end{verse}
+  \end{song}
+  
+  \end{document}
+\end{example}
+
+\paragraph{The \titletemplate*{tabular} template}
+This one is a lot more advanced and demonstrates various of the available
+commands.
+
+\begin{sourcecode}
+  \definesongtitletemplate{tabular}{
+    \ifsongmeasuring
+      {\section*}
+      {\section}%
+      {\songproperty{title}}
+    \begingroup\footnotesize
+    \begin{tabular}{
+        @{}
+        >{\raggedright\arraybackslash}p{.5\linewidth}
+        @{}
+        >{\raggedleft\arraybackslash}p{.5\linewidth}
+        @{}
+      }
+      \ifsongproperty{interpret}
+        {\GetTranslation{leadsheets/interpret}}
+        {}%
+      \ifsongproperty{composer}
+        {%
+          &
+          \GetTranslation{leadsheets/composer}: %
+          \printsongpropertylist{composer}{ \& }{, }{ \& }
+          \ifsongproperty{lyrics}
+            {
+              \\ &
+              \GetTranslation{leadsheets/lyrics}: %
+              \printsongpropertylist{lyrics}{ \& }{, }{ \& }
+            }
+            {}%
+        }
+        {}%
+      \ifsongproperty{interpret}{\\}{\ifsongproperty{composer}{\\}{}}%
+      \ifsongproperty{genre}
+        {& Genre: \songproperty{genre} \\}
+        {}%
+      \ifsongproperty{tempo}
+        {& Tempo: \songproperty{tempo} \\}
+        {}%
+      \ifsongproperty{key}
+        {%
+          & \setchords{
+              major = -\GetTranslation{leadsheets/major} ,
+              minor = -\GetTranslation{leadsheets/minor}
+            }%
+          \GetTranslation{leadsheets/key}: %
+          \expandcode{\writechord{\songproperty{key}}} \\%
+        }
+        {}%
+    \end{tabular}
+    \par\endgroup
+  }
+\end{sourcecode}
+
+A song using the \titletemplate{tabular} template:
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{article}
+  \usepackage{leadsheets}
+  \usepackage{array}
+  \setleadsheets{title-template = tabular}
+  \begin{document}
+
+  \begin{song}{title={Mary Had A Little Lamb}, interpret={Stevie Ray Vaughan},
+      genre={blues}, tags={srv,blues},key=E}
+  \begin{verse}
+    ^{E7} Mary had a little lamb ^{A7} \\
+    Its fleece was white as ^{E7}snow, yea \\
+    Everywhere the child ^{B7}went ^{A7} \\
+    The little lamb was sure to ^{E7}go, yea
+  \end{verse}
+  \begin{verse}
+    ^{E7} He followed her to school one day ^{A7} \\
+    And broke the teacher's ^{E7}rule \\
+    What a time did they ^{B7}have ^{A7} \\
+    That day at ^{E7}school
+  \end{verse}
+  \end{song}
+  
+  \end{document}
+\end{example}
+
+\subsection{Verse-type Templates}\label{sec:verse-type-templates}
+\subsubsection{Background}
+Similar to the songtitles also the \env{verse} like environments are typeset
+using templates.  Defining them is just as easy as for the song titles.
+
+\subsubsection{Existing Templates}
+Currently \leadsheets{} provides only one template:
+\begin{description}
+  \item[\versetemplate{itemize}] Uses an \env*{itemize} environment for
+    typesetting the corresponding environment.
+\end{description}
+
+\subsubsection{Own Templates}
+Own templates can be defined using these commands:
+\begin{commands}
+  \command{defineversetypetemplate}[\marg{name}\marg{begin code}\marg{end code}]
+    This defines the template \meta{name}.
+  \command{verselabel}
+    Used inside \cs{defineversetypetemplate}.  This determines where the label
+    of the environment using the template will be displayed.
+  \command{verselabelformat}
+    Used inside \cs{defineversetypetemplate}.  The format of the current
+    environment as set with the corresponding \option{format} option.
+  \command{verseafterlabel}
+    Used inside \cs{defineversetypetemplate}.  The format of the current
+    environment as set with the corresponding \option{after-label} option.
+  \command{versename}
+    Used inside \cs{defineversetypetemplate}.  This prints the name of the
+    current environment.
+  \command{versenumber}
+    Used inside \cs{defineversetypetemplate}.  Expands to the
+    \cs*{the\meta{environment}} command for the current environment.
+  \command{ifversestarred}[\marg{true}\marg{false}]
+    Can be used inside \cs{defineversetypetemplate} for checking if the
+    current environment was defined by the starred version of
+    \cs{newversetype}.
+  \command{ifversenumbered}[\marg{true}\marg{false}]
+    Can be used inside \cs{defineversetypetemplate} for checking if for the
+    current environment the option \option{numbered} is true or false.
+  \command{ifversenamed}[\marg{true}\marg{false}]
+    Can be used inside \cs{defineversetypetemplate} for checking if for the
+    current environment the option \option{named} is true or false.
+  \command{ifobeylines}[\marg{true}\marg{false}]
+    Checks if for the current song the option \option{obey-lines} is true or
+    false.
+\end{commands}
+Since with \cs{defineversetypetemplate} you define a template for an
+environment it has two argument for code: one for code at the beginning of the
+environment and one for code at the end.  The command \cs{verselabel}
+internally uses the conditionals.  Its definition is equivalent to the
+following:
+
+\begin{sourcecode}
+  \newcommand*\verselabel{%
+    \ifversestarred
+      {}
+      {%
+        \verselabelformat
+        \ifversenamed
+          {%
+            \versename
+            \ifversenumbered{ }{}%
+          }
+          {}%
+        \ifversenumbered
+          {\versenumber}
+          {}%
+        \verseafterlabel
+      }%
+  }
+\end{sourcecode}
+
+\subsubsection{Examples}
+In order to give you an idea on how to use verse-type templates I'll show you
+how the existing ones are defined and a few new definitions.
+
+\paragraph{The \versetemplate*{itemize} template}
+This is how the \versetemplate{itemize} is defined.
+\begin{sourcecode}
+  \makeatletter
+  \defineversetypetemplate{itemize}
+    {%
+      \itemize
+        \@itemdepth=0
+        \ifobeylines
+          {%
+            \setlength{\parskip}{0pt}%
+            \setleadsheets{ obey-lines-parskip = \parsep }%
+          }
+          {}%
+        \item[{\verselabel}]%
+    }
+    {\enditemize}
+  \makeatother
+\end{sourcecode}
+The most interesting part is probably the \cs{ifobeylines} part.  When the
+option \option{obey-lines} is set to true an end of a line inserts a \cs*{par}
+token.  So in order not to get a vertical skip after every line the template
+sets \cs*{parskip} to zero.  With \keyis{obey-lines}{true} an empty line also
+inserts a \cs*{par} token but it also inserts a vertical space according to
+the value set with \option{obey-lines-parskip}.  This option can only be set
+in a verse-type template definition (which is why it isn't documented
+elsewhere).  All \env{verse} like environments initialize the length to the
+current value of \cs*{parskip} \emph{before} the template code is inserted.
+
+\paragraph{A \versetemplate*{flushleft} template}
+An example for a template \versetemplate*{flushleft} that typesets the label
+in the margin:
+\begin{example}
+  \defineversetypetemplate{flushleft}
+    {%
+      \noindent\llap{\verselabel\space}%
+      \flushleft
+      \unskip
+      \vspace*{-\baselineskip}
+      \ifobeylines
+        {%
+          \setlength\parskip{0pt}
+          \setleadsheets{ obey-lines-parskip = .5\baselineskip }
+        }
+        {%
+          \setlength\parskip{.5\baselineskip}
+          \vspace*{-\parskip}
+        }%
+    }
+    {\endflushleft}
+  \begin{chorus}[template=flushleft]
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore \\
+    magna aliquyam erat, sed diam voluptua.
+
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore \\
+    magna aliquyam erat, sed diam voluptua.
+  \end{chorus}
+\end{example}
+
+\paragraph{A \versetemplate*{flushright} template}
+An example for a template \versetemplate*{flushright} that typesets the label
+in the margin:
+\begin{example}
+  \defineversetypetemplate{flushright}
+    {%
+      \noindent\llap{\verselabel\space}%
+      \flushright
+      \unskip
+      \vspace*{-\baselineskip}
+      \ifobeylines
+        {%
+          \setlength\parskip{0pt}
+          \setleadsheets{ obey-lines-parskip = .5\baselineskip }
+        }
+        {%
+          \setlength\parskip{.5\baselineskip}
+          \vspace*{-\parskip}
+        }%
+    }
+    {\endflushright}
+  \begin{chorus}[template=flushright]
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore \\
+    magna aliquyam erat, sed diam voluptua.
+
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore \\
+    magna aliquyam erat, sed diam voluptua.
+  \end{chorus}
+\end{example}
+
+As you can see it's not entirely easy to define a template that suits both
+songs with and without \keyis{obey-lines}{true}.  Personally I would forget
+about that option and not care about it at all in my templates.
+
+\paragraph{A \versetemplate*{framed} template}
+Last but not least an example using the \pkg{mdframed}
+package~\cite{pkg:mdframed} -- just to show you that everything is possible.
+The example adapts one of the examples of \pkg{mdframed}'s manual.
+\begin{example}
+  \defineversetypetemplate{framed}
+    {%
+      \expandcode{%
+        \noexpand\mdframed[
+          \ifversestarred{}{%
+            frametitle={%
+              \noexpand\tikz[baseline=(current bounding box.east),outer sep=0pt]
+                \noexpand\node[anchor=east,rectangle,fill=blue!20,rounded corners=2pt]
+                {\noexpand\strut\noexpand\verselabel};
+            }%
+          },
+          roundcorner = 5pt ,
+          linecolor = blue!20 ,
+          linewidth = 2pt,
+          topline = true,
+          frametitleaboveskip = \dimexpr-\ht\strutbox\relax ,
+        ]%
+      }%
+      \setlength\parindent{0pt}
+      \setlength\parskip{\parsep}
+      \ifobeylines
+        {\setleadsheets{ obey-lines-parskip=\parskip }\setlength\parskip{0pt}}
+        {\vspace*{-\parskip}}%
+    }
+    {%
+      \endmdframed
+      \addvspace{\baselineskip}%
+    }
+  \begin{chorus}[template=framed]
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore \\
+    magna aliquyam erat, sed diam voluptua.
+
+    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \\
+    sed diam nonumy eirmod tempor invidunt ut labore et dolore \\
+    magna aliquyam erat, sed diam voluptua.
+  \end{chorus}
+\end{example}
+
+\section{Internationalization}\label{sec:internationalization}
+
+Th environments described in sections~\ref{sec:envverse-environment}
+and~\ref{sec:other-envverse-like} as well as a few other words used in
+\leadsheets{} are translated with the help of the \pkg{translations}
+package~\cite{pkg:translations}.  All predefined and available translation
+strings are listed in table~\ref{tab:translations}. You can change those
+translations or add translations for other languages with this command:
+\begin{commands}
+  \command*{DeclareTranslation}[\marg{language}\marg{string}\marg{translation}]
+    The command provided by the \pkg{translations} package for translating
+    strings.
+\end{commands}
+Those translations can be used for example in song title templates (see
+section~\ref{sec:title-templates}).  One of the strings listed in
+table~\ref{tab:translations} is a little different: the string
+\code{leadsheets/interpret} is declared as
+\begin{sourcecode}
+  \DeclareTranslation{English}{leadsheets/interpret}
+    {as interpreted by \printsongpropertylist{interpret}{ \& }{, }{ \& }}
+  \DeclareTranslation{German}{leadsheets/interpret}
+    {wie von \printsongpropertylist{interpret}{ \& }{, }{ \& } interpretiert}
+\end{sourcecode}
+which means it uses the song property \property{interpret}.  As a consequence
+it only really can be used inside a \env{song} environment.  In other cases as
+for example in table~\ref{tab:translations} the property part expands to
+nothing (but the spaces around it are of course there).  Also keep in mind
+that \cs{printsongpropertylist} is not expandable.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Predefined translation strings.}
+  \newcommand*\showtranslation[1]{%
+    \texttt{leadsheets/#1} &
+    \GetTranslationFor{English}{leadsheets/#1} &
+    \GetTranslationFor{German}{leadsheets/#1}
+  }
+  \begin{tabular}{lll}
+    \toprule
+      \bfseries String & \bfseries English & \bfseries German \\
+    \midrule
+      \showtranslation{major} \\
+      \showtranslation{minor} \\
+      \showtranslation{chorus} \\
+      \showtranslation{verse} \\
+      \showtranslation{composer} \\
+      \showtranslation{lyrics} \\
+      \showtranslation{key} \\
+      \showtranslation{capo} \\
+      \showtranslation{fret} \\
+      \showtranslation{interpret} \\
+      \showtranslation{intro} \\
+      \showtranslation{interlude} \\
+      \showtranslation{bridge} \\
+      \showtranslation{solo} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:translations}
+\end{table}
+
+\clearpage
+\part{The \library*{external} Library and the \cls*{leadsheet}
+  Class}\label{part:external-leadsheet}
+\dictum[Thelonious Monk]{%
+  Talking about music is like dancing about architecture.%
+}
+
+\section{The Idea}
+
+For\sinceversion{0.5} some users -- like myself -- it may be desirable to
+create leadsheets that can be reused in another document as a compilation of
+songs.  The usual way would be to
+\begin{itemize}
+  \item either solve this manually by copying the \env{song} environment from
+    one document to the other.  This is not ideal, of course.
+  \item place the \env{song} in a file of its own and \cs*{input} it in the
+    different documents.  This is easy and safe but requires a total of three
+    files for two documents.  That's not really a problem, though, so it is a
+    valid way.
+\end{itemize}
+
+\leadsheets{} now provides a third way.  You write the single leadsheet using
+the \cls{leadsheet} class that comes with this package.  Let's call this file
+\code{single.tex} for the following discussion:
+\begin{sourcecode}
+  \documentclass{leadsheet}
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  
+  \begin{document}
+
+  \begin{song}{ ... }
+    ...
+  \end{song}
+
+  \end{document}
+\end{sourcecode}
+
+You can now include this document as is in another file -- let's call it
+\code{multiple.tex}:
+\begin{sourcecode}
+  \documentclass{scrartcl}
+  \usepackage{leadsheets}
+  \useleadsheetslibraries{external}
+
+  \begin{document}
+
+  \includeleadsheet{single.tex}
+  
+  \end{document}
+\end{sourcecode}
+
+Depending on the settings this removes the complete preamble from
+\code{single.tex} and only includes the document body of the file.
+
+\section{The \cls*{leadsheet} Class}\label{sec:leadsheet-class}
+
+The \cls{leadsheet} class is a class file built upon the \cls{scrartcl}
+class.  It defines a song title template \titletemplate{leadsheet}, makes a
+few setup choices
+\begin{sourcecode}
+  \setleadsheets{
+    title-template = leadsheet ,
+    bar-shortcuts ,
+    verse/numbered ,
+    verses-format = ,
+    verses-label-format = \bfseries ,
+    info/format = \itshape ,
+    chorus/format = \itshape
+  }
+\end{sourcecode}
+and sets the header and the footer of the leadsheet pages.
+
+\begin{example}[
+  compile,
+  graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{leadsheet}
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage[ngerman]{babel}
+
+  \begin{document}
+
+  \begin{song}{title={Mary Had A Little Lamb}, music={Stevie Ray Vaughan},
+    interpret={Stevie Ray Vaughan}, lyrics={traditional}, tags={srv,blues}}
+  \begin{verse}
+    Mary had a little lamb \\
+    Its fleece was white as snow, yea \\
+    Everywhere the child went \\
+    The little lamb was sure to go, yea
+  \end{verse}
+  \begin{verse}
+    He followed her to school one day \\
+    And broke the teacher's rule \\
+    What a time did they have \\
+    That day at school
+  \end{verse}
+  \end{song}
+
+  \end{document}
+\end{example}
+
+The header contains \enquote{\meta{song title} (\meta{interpret})} if the
+leadsheet has more than one page in total.  Otherwise it is empty.
+
+The footer contains \enquote{\meta{page} of \meta{pages}} if the leadsheet has
+more than one page in total.  Otherwise it is empty.
+
+The class provides the verse type \env{prechorus}:
+\begin{environments}
+  \environment{prechorus}[\oarg{options}]
+    Environment for marking the pre-chorus of a song.
+\end{environments}
+
+\begin{commands}
+  \command{instruction}[\marg{text}]
+    Short macro to add instructional text.
+  \command{mkinstruction}[\marg{text}]
+    The formatting macro used by \cs{instruction}.  You can redefine it in
+    order to change the appearance.  The default definition is: \\
+    \verbcode+\newcommand*\mkinstruction[1]{\emph{#1}}+
+  \command{choir}[\marg{text}]
+    Short macro to add (background) choir text.
+  \command{mkchoir}[\marg{text}]
+    The formatting macro used by \cs{choir}.  You can redefine it in
+    order to change the appearance.  The default definition is: \\
+    \verbcode+\newcommand*\mkchoir[1]{\instruction{\leadsheetstranslate{choir}: #1}}+
+  \command{lsenparen}[\marg{text}]
+    Short macro to add parentheses around text.  Used internally by
+    \cs{instruction}.
+  \command{mklsenparens}
+    The parentheses setting macro used by \cs{lsenparen}.  You can redefine it
+    in order to change the parentheses.  The default definition is: \\
+    \verbcode+\newcommand*\mklsenparens{[]}+ \\
+    \emph{The definition needs to be expandable and to expand to exactly two
+      tokens or braced groups, one for the opening parenthesis and the second
+      for the closing parenthesis!}
+  \command{mklsenparen}[\marg{openen parenthesis}\marg{closing
+    parenthesis}\marg{text}]
+    The formatting macro used by \cs{lsenparen}.  You can redefine it in
+    order to change the appearance.  The default definition is: \\
+    \verbcode+\newcommand*\mklsenparen[3]{\textup{#1}#3\textup{#2}}+
+\end{commands}
+
+Here is an example that demonstrates \cs{choir} and \cs{instruction}.  (The
+code of the example code has been saved in a file called
+\code{single-leadsheet.tex}.  It is used later on again.)\label{single-leadsheet}
+\begin{example}[compile,graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{leadsheet}
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+
+  \begin{document}
+
+  \begin{song}{title=foobar}
+  \begin{verse}
+    \instruction{keyboard only} \\
+    Lorem ipsum dolor sit amet, consetetur sadipscing \\
+    \choir{sed diam nonumy eirmod tempor invidunt ut labore et dolore}
+  \end{verse}
+  \begin{prechorus}
+    \instruction{+ band} \\
+    Lorem ipsum dolor sit amet, consetetur sadipscing
+  \end{prechorus}
+  \end{song}
+
+  \end{document}
+\end{example}
+  
+\section{The \library*{external} Library}
+
+Loading the \library{external} library allows to include complete leadsheet
+documents (\ie, with preamble) into a main document.  This requires the
+included leadsheet to use the \cls{leadsheet} class (see
+section~\ref{sec:leadsheet-class}).  When the file is included the whole
+preamble of said file will be discarded.  This can be changed with an option
+but then \cs*{usepackage} and \cs*{RequirePackage} will still be disabled and
+simply do nothing in the included file.
+
+\begin{commands}
+  \command{includeleadsheet}[\sarg\oarg{options}\marg{file name}]
+    Include the leadsheet \meta{file name}.  \meta{options} apply locally for
+    the included file.  The file \meta{file name} may include a complete
+    document preamble.
+\end{commands}
+
+\begin{filecontents*}{single-leadsheet.tex}
+\documentclass{leadsheet}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+\begin{song}{title=foobar}
+\begin{verse}
+  \instruction{keyboard only} \\
+  Lorem ipsum dolor sit amet, consetetur sadipscing \\
+  \choir{sed diam nonumy eirmod tempor invidunt ut labore et dolore}
+\end{verse}
+\begin{prechorus}
+  \instruction{+ band} \\
+  Lorem ipsum dolor sit amet, consetetur sadipscing
+\end{prechorus}
+\end{song}
+
+\end{document}
+\end{filecontents*}
+The next example shows the basic usage by inputting the example file mentioned
+on page~\pageref{single-leadsheet}.  \emph{Notice that the formatting setup by
+  the \cls{leadsheets} is not used}.  Also the title template
+\titletemplate{leadsheet} is not defined in this process.
+\begin{example}[compile,graphics={trim={2cm 18cm 2cm 2cm},clip},
+  add-sourcecode-options={literate=}]
+  \documentclass{scrartcl}
+  \usepackage{leadsheets}
+  \useleadsheetslibraries{external}
+
+  \begin{document}
+
+  \includeleadsheet{single-leadsheet}
+  
+  \end{document}  
+\end{example}
+Also notice that the \env{prechorus} environment and the \cs{instruction} and
+\cs{choir} macros \emph{are} available!  \emph{All new macros defined in the
+  \cls{leadsheet} class and described in section~\ref{sec:leadsheet-class} are
+  defined}.  If you do not want this then you can use the starred version of
+\cs{includeleadsheet}.  In this process the preamble of the included file is
+gobbled.  It may be desirable not to have the preamble gobbled, though --
+because of custom macro definitions for example.
+\begin{options}
+  \keybool{gobble-preamble}\Default{true}
+    If set to \code{false} \cs{includeleadsheet} will not gobble the preamble
+    of the file it inputs.  Using this is dangerous: for it to work
+    \cs*{usepackage} and \cs*{RequirePackage} have to be disabled while the
+    file is included.  So including the preamble may lead to more problems
+    than it solves.
+\end{options}
+
+The included leadsheets do not have to be a complete document -- a standard
+tex file only consisting of the \env{song} environments will work just as
+nicely.  Files that are complete documents but are using another class than
+\cls{leadsheet} will lead to errors, though.
+
+\clearpage
+\part{Appendix}
+\dictum[Thelonious Monk]{Wrong is right.}
+\appendix
+
+\end{document}
+

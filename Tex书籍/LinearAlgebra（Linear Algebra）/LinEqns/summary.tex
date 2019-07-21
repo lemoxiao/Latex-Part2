@@ -1,0 +1,104 @@
+%!TEX root = ../larxxia.tex
+
+\section{Summary of linear equations}
+\label{sec:sumle}
+
+\begin{itemize}
+\def\index#1{}% turn off indexing
+
+
+\subsubsection{Introduction to systems of linear equations}
+
+
+\itemhi A \bfidx{linear equation} in the \(n\)~variables \(x_1,x_2,\ldots,x_n\) is an equation that can be written in the form (\autoref{def:lineqn})
+\begin{equation*}
+\lincomb axn=b\,.
+\end{equation*}
+A \bfidx{system} of linear equations is a set of one or more linear equations in one or more variables.
+
+
+\item Algebraic manipulation, such as that for the \gps, can sometimes extract a tractable system of linear equations from an intractable nonlinear problem.
+Often the algebraic manipulation forms equations in an abstract setting where it is difficult to interpret the mathematical quantities---but the effort is worthwhile.
+
+
+
+\subsubsection{Directly solve linear systems}
+
+\itemme The \bfidx{matrix-vector form} of a given system is \(A\xv=\bv\) (\autoref{def:matvecsys}) for the \(m\times n\) \bfidx{matrix} of coefficients
+\begin{equation*}
+A=\begin{bmatrix} a_{11}&a_{12}&\cdots&a_{1n}
+\\a_{21}&a_{22}&\cdots&a_{2n}
+\\\vdots&\vdots&\ddots&\vdots
+\\a_{m1}&a_{m2}&\cdots&a_{mn} \end{bmatrix},
+\end{equation*}
+and vectors \(\xv=(\hlist xn)\) and \(\bv=(\hlist bm)\).
+If \(m=n\), then \(A\)~is called a \bfidx{square matrix}.
+
+\itemhi \autoref{pro:unisol} use \script\ to solve the matrix-vector system \(A\xv=\bv\), for a \idx{square matrix}~\(A\): 
+\begin{enumerate}
+\item form matrix~\(A\) and \idx{column vector}~\(\bv\);
+\item check \verb|rcond(A)| exists and is not too small, \(1\geq\text{good} >10^{-2} >\text{poor} >10^{-4} >\text{bad} >10^{-8} >\text{terrible}\);
+\item if \verb|rcond(A)| is acceptable, then execute \verb|x=A\b| to compute the solution vector~\(\xv\). 
+\end{enumerate}
+Checking \verb|rcond()| avoids many mistakes in applications.
+
+
+\item In \script\ you may need the following.
+\begin{itemize}
+\itemhi \verb|[ ... ; ... ; ... ]| forms both matrices and vectors, or use newlines instead of the semi-colons.
+\itemhi \verb|rcond(A)|  of a \idx{square matrix}~\(A\) \emph{estimates} the reciprocal of the so-called \idx{condition number}.
+\itemhi \verb|x=A\b| computes an `answer' to \(A\xv=\bv\)\,---but it may not be a solution unless \verb|rcond(A)| exists and is not small;
+\item Change an element of an array or vector by assigning a new value with assignments \verb|A(i,j)=...| or \verb|b(i)=...| where \verb|i| and~\verb|j| denote some indices.
+\item For a vector (or matrix) \verb|t| and an exponent~\verb|p|, the operation \verb|t.^p| computes the \verb|p|th~power of each element in the vector.
+\itemme The function \verb|ones(m,1)| gives a (column) vector of \(m\)~ones, \((1,1,\ldots,1)\).
+\end{itemize}
+
+\item For fitting data, generally avoid using polynomials of degree higher than cubic.
+
+
+\item To solve systems by hand we need several more notions.
+The \bfidx{augmented matrix} of the \idx{system} \(A\xv=\bv\) is the matrix \(\begin{bmatrix} A\V \bv \end{bmatrix}\)  (\autoref{def:augmat}).
+
+\item \bfidx{Elementary row operation}s on either a \idx{system} of \idx{linear equation}s or on its corresponding \idx{augmented matrix} do not change the solutions (\autoref{thm:erowop}):
+\begin{itemize}
+\item interchange two equations\slash rows; or
+\item multiply an equation\slash row by a nonzero constant; or
+\item add a multiple of an equation\slash row to another.
+\end{itemize}
+
+\itemme A system of \idx{linear equation}s or (augmented) matrix is in \bfidx{reduced row echelon form} (\rref) when (\autoref{def:rref}) all the following hold:
+  \begin{itemize}
+\item any equations with all zero coefficients, or rows of the matrix consisting entirely of zeros, are at the bottom; 
+\item in each nonzero equation\slash row, the first nonzero coefficient\slash entry is a one (called the \bfidx{leading one}), and is in a variable\slash column to the left of any leading ones below it;
+and
+\item each variable\slash column containing a leading one has zero coefficients\slash entries in every other equation\slash row.\end{itemize}
+A \bfidx{free variable} is any variable which is \emph{not} multiplied by a \idx{leading one} in the algebraic equations.
+
+\itemme Gauss--Jordan elimination solves systems by hand (\autoref{pro:gje}):
+\begin{enumerate}
+\item Write down either the full symbolic form of the \idx{system} of \idx{linear equation}s, or the \idx{augmented matrix} of the system of \idx{linear equation}s.
+\item Use \idx{elementary row operation}s to reduce the \idx{system}\slash{augmented matrix} to \idx{reduced row echelon form}.
+\item If the resulting system is \idx{consistent}, then solve for the leading variables in terms of any remaining \idx{free variable}s.
+\end{enumerate}
+
+\itemhi For every system of linear equations \(A\xv=\bv\)\,, exactly one of the following holds (\autoref{thm:fred}): there is either \idx{no solution}, or a \idx{unique solution}, or \idx{infinitely many solutions}.
+
+\item A system of \idx{linear equation}s is called \bfidx{homogeneous} when the system may be written \(A\xv=\ov\) (\autoref{def:homosys}),
+otherwise the system is termed \bfidx{non-homogeneous}.
+
+\itemme If \(A\xv=\ov\) is a \idx{homogeneous} system of \(m\)~{linear equation}s with \(n\)~variables where \(m<n\)\,, then the system has \idx{infinitely many solutions} (\autoref{thm:feweqns}).
+
+
+
+\subsubsection{Linear combinations span sets}
+
+\itemhi A vector~\vv\ is a \bfidx{linear combination} of vectors \hlist\vv k\ if there are scalars \hlist ck\ (called the \bfidx{coefficient}s) such that \(\vv=\lincomb c\vv k\) (\autoref{def:lincom}).
+
+\item A system of \idx{linear equation}s \(A\xv=\bv\) is \bfidx{consistent} if and only if the right-hand side vector~\bv\ is a \idx{linear combination} of the columns of~\(A\) (\autoref{thm:conlincom}).
+
+\itemhi For any given set of vectors \(S=\{\hlist\vv k\}\), the set of all \idx{linear combination}s of \hlist\vv k\ is called the \bfidx{span} of \hlist\vv k, and is denoted by \(\Span\{\hlist\vv k\}\) or \(\Span S\) (\autoref{def:span}).
+
+\end{itemize}
+
+
+\makeanswers

@@ -1,0 +1,1226 @@
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '03',
+    %q{Kinematics},
+    'ch:kinematics'
+  )
+%>
+
+At this stage, many students raise the following questions, which turn out to be related to
+one another:
+
+\begin{enumerate}
+\item According to Einstein,
+      if observers A and B aren't at rest relative to each other, then A says B's time
+      is slow, but B says A is the slow one. How can this be? If A says B is slow, shouldn't
+      B say A is fast? After all, if I took a pill that sped up my brain, everyone else would
+      seem slow to me, and I would seem fast to them.
+\item Suppose I keep accelerating my spaceship steadily. What happens when I get to the speed of light?
+\item In all the diagrams in section \ref{sec:lorentz-transformation}, the parallelograms have their
+      diagonals stretched and squished by a certain factor, which depends on $v$. What is the interpretation
+      of this factor?
+\end{enumerate}
+
+\vfill
+
+<% begin_sec("How can they both \\ldots ?",4,'how-can-they-both') %>
+
+Figure \figref{symmetric-signals} shows how relativity resolves the first question.
+If A and B had an instantaneous method of communication such as Star Trek's subspace
+radio, then they could indeed resolve the question of who was really slow. 
+
+<%
+  fig(   
+    'symmetric-signals',
+    %q{%
+      Signals don't resolve the dispute over who is really slow.
+    },
+    {
+      'width'=>'wide','sidecaption'=>true
+    }
+  )
+%>
+
+But relativity
+does not allow cause and effect to be propagated outside the light cone, so the best
+they can actually do is to send each other signals at $c$. In \subfigref{symmetric-signals}{1},
+B sends signals to A at time intervals of one hour as measured by B's clock. According to
+A's clock, the signals arrive at an interval that is shorter than one hour as the two spaceships
+approach one another, then longer than an hour after they pass each other and begin to recede.
+As shown in \subfigref{symmetric-signals}{2}, the situation is entirely symmetric if A sends
+signals to B.
+
+Who is really slow? Neither. If A, like many astronauts, cut her teeth as a jet pilot,
+it may occur to her to interpret the observations by analogy with the Doppler effect for sound waves.
+Figure \figref{symmetric-signals} is in fact a valid diagram if the signals are clicks of sound, provided
+that we interpret it as being drawn in the frame of reference of the air. Sound waves travel at
+a fixed speed relative to the air, and the space and time units could be chosen such that the
+speed of \emph{sound} was represented by a slope of $\pm 1$. But A will find that in the relativistic
+case, with signals traveling at $c$, her observations
+of the time intervals are not in quantitative agreement with the predictions she gets by plugging
+numbers into the familiar formulas for the Doppler shift of sound waves. She may then say, ``Ah,
+the analogy with sound isn't quite right. I need to include a correction factor for time dilation,
+since B's time is slow. I'm not slow, of course. I feel perfectly normal.''
+
+
+But her analogy is false and needlessly complicates the situation. In the version with sound waves and
+Galilean relativity, there are three frames of reference involved: A's, B's, and the air's. The
+relativistic version is simpler, because there are only two frames, A's and B's. It's neither helpful
+nor necessary to break down the observations into a factor describing what ``really'' happens and
+a correction factor to account for the relativistic distortions of ``reality.'' All we need to worry about
+is the world-lines and intersections of world-lines shown in the spacetime diagrams, along with the
+metric, which allows us to compute how much proper time is experienced by each observer.
+
+<% end_sec('how-can-they-both') %>
+
+<%
+  fig(   
+    'twin-signals',
+    %q{The twin paradox with signals sent back to earth by the traveling twin.},
+    {
+      'width'=>'wide','sidecaption'=>true
+    }
+  )
+%>
+
+<% begin_sec("The stretch factor is the Doppler shift",nil,'doppler') %>\index{Doppler shift}
+
+Figure \figref{twin-signals} shows
+how the ideas in the preceding section apply to the twin paradox.\index{twin paradox!signals exchanged}
+In \subfigref{twin-signals}{1} we see the situation as described by an impartial observer, who says
+that both twins are traveling to the right. But even the impartial observer agrees that one twin's
+motion is inertial and the other's noninertial, which breaks the symmetry and also allows the twins
+to meet up at the end and compare clocks. For convenience, \subfigref{twin-signals}{2} shows the
+situation in the frame where the earthbound twin is at rest. Both panels of the figure are drawn
+such that the relative velocity of the twins is 3/5, and in panel 2 this is the inverse slope of
+the traveling twin's world-lines. Straightforward algebra and geometry (problem
+\ref{hw:doppler-concrete}, p.~\pageref{hw:doppler-concrete}) shows that in this particular
+example, the period observed by the earthbound twin is increased by a factor of 2. But
+2 is exactly the factor by which the diagonals of the parallelogram are stretched and
+compressed in a Lorentz transformation for a velocity of 3/5. This is true in general:
+the stretching and squishing factors for the diagonals are
+the same as the Doppler shift. We notate this factor as $D$
+(which can stand for either ``Doppler'' or ``diagonal''), and in general it is given by
+\begin{equation*}
+  D(v) = \sqrt{\frac{1+v}{1-v}}
+\end{equation*}
+(problem \ref{hw:doppler-abstract}, p.~\pageref{hw:doppler-abstract}). 
+
+<% self_check('doppler-not-ruler',<<-'SELF_CHECK'
+If you measure with a ruler on figure \subfigref{twin-signals}{2}, you will find that
+the labeled sides of the quadrilateral differ by less than a factor of 2. Why is this?
+  SELF_CHECK
+  ) %>
+
+This expression is
+for the longitudinal Doppler shift, i.e., the case where the source and observer are in motion
+directly away from one another (or toward one another if $v<0$). In the purely transverse case,
+there is a Doppler shift $1/\gamma$ which can be interpreted as simply a measure of time dilation.
+
+<% marg %>
+<%
+  fig(
+    'doppler-identity',
+    %q{Interpretation of the identity $D(v)D(-v)=1$.}
+  )
+%>
+<% end_marg %>
+
+The useful identity $D(v)D(-v)=1$ is trivial to prove algebraically, and has the following interpretation.
+Suppose, as in figure \figref{doppler-identity},
+that A and C are at rest relative to one another, but B is moving relative to them.
+B's velocity relative to A is $v$, and C's relative to B is $-v$.
+At regular intervals, A sends lightspeed ``pings'' to B, who then immediately retransmits them to C.
+The interval between pings accumulates two Doppler shifts, and the result
+is their product $D(v)D(-v)$. But B didn't actually need to receive the
+original signal and retransmit it; the results would have been the same if B had just stayed out of the way.
+Therefore this product must equal 1, so $D(v)D(-v)=1$.
+
+\begin{eg}{Ives-Stilwell experiments}\index{Ives-Stilwell experiments}\label{ives-stilwell}
+The transverse Doppler shift is a characteristic prediction of special relativity, with no
+nonrelativistic counterpart, and Einstein suggested it early on as a test of relativity.
+However, it is difficult to measure with high precision, because the results are sensitive to any error
+in the alignment of the 90-degree angle. Such experiments were eventually performed, with results that confirmed
+relativity,\footnote{See, e.g., Hasselkamp, Mondry, and Scharmann, Zeitschrift f\"ur Physik A: Hadrons and Nuclei 289 (1979) 151.}
+but one-dimensional measurements provided both the earliest tests of the relativistic Doppler shift and the most precise
+ones to date. The first such test was done by Ives and Stilwell in 1938, using the following trick. The relativistic
+expression $D(v) = \sqrt{(1+v)/(1-v)}$ for the Doppler shift has the property that $D(v)D(-v)=1$,
+which differs from the
+nonrelativistic result of $(1+v)(1-v)=1-v^2$. One can therefore accelerate an ion up to a relativistic speed, measure
+both the forward Doppler shifted frequency $f_f$ and the backward one  $f_b$, and compute $\sqrt{f_ff_b}$. According
+to relativity, this should exactly equal the frequency $f_\zu{o}$ measured in the ion's rest frame.
+
+In a particularly exquisite modern version of the Ives-Stilwell idea,\footnote{G.~Saathoff et al., ``Improved Test
+of Time Dilation in Relativity,'' Phys. Rev. Lett. 91 (2003) 190403. A publicly available description of the
+experiment is given in Saathoff's PhD thesis, \url{www.mpi-hd.mpg.de/ato/homes/saathoff/diss-saathoff.pdf}.} 
+Saathoff et al.~circulated $\zu{Li}^+$ ions at $v=.064$ in a storage ring. An electron-cooler technique was
+used in order to reduce the variation in velocity among ions in the beam. Since the identity $D(v)D(-v)=1$
+is independent of $v$, it was not necessary to measure $v$ to the same incredible precision as the frequencies;
+it was only necessary that it be stable and well-defined. The natural line width was 7 MHz, and other experimental
+effects broadened it further to 11 MHz. By curve-fitting the line, it was possible to achieve results good to
+a few tenths of a MHz. The resulting frequencies, in units of MHz, were:
+
+\begin{tabular}{rl}
+$f_f$ & =          $582490203.44 \pm .09$ \\
+$f_b$ & =          $512671442.9  \pm 0.5$ \\
+$\sqrt{f_ff_b}$ &= $546466918.6  \pm 0.3$ \\
+$f_\zu{o}$ &=      $546466918.8  \pm 0.4$ (from previous experimental work) 
+\end{tabular}
+
+\noindent The spectacular agreement with theory has made this experiment a lightning rod for
+anti-relativity kooks.
+
+If one is searching for small deviations from the predictions of special relativity, a natural place to look
+is at high velocities. Ives-Stilwell experiments have been performed at velocities as high as $0.84$, and
+they confirm special relativity.\footnote{MacArthur et al., Phys. Rev. Lett. 56 (1986) 282 (1986)}
+\end{eg}
+<% end_sec('doppler') %>
+
+<% begin_sec("Combination of velocities",nil,'velocity-addition') %>\index{velocity!addition}
+In nonrelativistic physics, velocities add in relative motion. For example, if a boat moves relative to
+a river, and the river moves relative to the land, then the boat's velocity relative to the land
+is found by vector addition. This linear behavior cannot hold relativistically. For example,   
+if a spaceship is moving relative to the earth at velocity $3/5$ (in units with $c=1$),
+and it launches a probe at velocity $3/5$
+relative to itself, we can't have the probe moving at a velocity of $6/5$ relative to the earth, because
+this would be greater than the maximum speed of cause and effect, which is 1.
+To see how to add velocities relativistically, we consider the effect of carrying the two Lorentz
+transformations one after the other, figure \figref{three-fifths-c-twice}.
+<% marg %>
+<%
+  fig(
+    'three-fifths-c-twice',
+    %q{Two Lorentz transformations of $v=3/5$ are applied one after the other. The transformations are
+       represented according to the graphical conventions of section \ref{sec:lorentz-transformation}.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'electrons-limiting-speed',
+    %q{Example \ref{eg:bertozzi-graph}.}
+  )
+%>
+<% end_marg %>
+
+The inverse slope of the left side of each parallelogram indicates its velocity relative to the
+original frame, represented by the square. Since the left side of the final parallelogram has not
+swept past the diagonal, clearly it represents a velocity of \emph{less} than 1, not more.
+To determine the result, we use the fact that the $D$ factors multiply. We chose velocities $3/5$ because
+it gives $D=2$, which is easy to work with. Doubling the long diagonal twice gives an over-all
+stretch factor of 4, and solving the equation $D(v)=4$ for $v$ gives the result, $v=15/17$.
+
+We can now see the answer to question 2 on p.~\pageref{ch:kinematics}. If we keep accelerating
+a spaceship steadily, we are simply continuing the process of acceleration shown in figure
+\figref{three-fifths-c-twice}. If we do this indefinitely, the velocity will approach $c=1$ but never
+surpass it. (For more on this topic of going faster than light, see section \ref{sec:tachyons}.)
+
+\begin{eg}{Accelerating electrons}\label{eg:bertozzi-graph}
+Figure \figref{electrons-limiting-speed} shows the results of a 1964 experiment by Bertozzi in which
+electrons were accelerated by the static electric field $E$ of a Van de Graaff accelerator of
+length $\ell_1$. They were then allowed to fly down a beamline of length $\ell_2=8.4\ \munit$
+without being acted on by any force. The time of flight $t_2$ was used to find the final
+velocity $v=\ell_2/t_2$ to which they had been accelerated. (To make the
+low-energy portion of the graph legible, Bertozzi's highest-energy
+data point is omitted.)
+
+If we believed in Newton's laws, then the electrons would have an acceleration $a_N=Ee/m$, which would
+be constant if, as we pretend for the moment, the field $E$ were constant. (The electric field inside a Van de
+Graaff accelerator is not really quite uniform, but this will turn out not to matter.) The Newtonian
+prediction for the time over which this acceleration occurs is $t_N=\sqrt{2m\ell_1/eE}$.
+An acceleration $a_N$ acting for a time $t_N$ should produce a final velocity
+$a_N t_N=\sqrt{2eV/m}$, where $V=E\ell_1$ is the voltage difference. (By conservation
+of energy, this equation holds even if the field is not constant.) The solid line in the
+graph shows the prediction of Newton's laws, which is that a constant force exerted steadily over
+time will produce a velocity that rises linearly and without limit.
+
+The experimental data, shown as black dots, clearly tell a different story. The velocity asymptotically
+approaches a limit, which we identify as $c$. The dashed line shows the predictions of special relativity,
+which we are not yet ready to calculate because we haven't yet seen how kinetic energy depends on
+velocity at relativistic speeds. The calculation is carried out in
+example \ref{eg:bertozzi} on p.~\pageref{eg:bertozzi}.
+\end{eg}
+
+Note that the relationship between the first and second frames of reference in
+figure \figref{three-fifths-c-twice} is the same as the relationship between the second and third.
+Therefore if a passenger is to feel a steady sensation of acceleration (or, equivalently, if an
+accelerometer aboard the ship is to show a constant reading), then the \emph{proper} time required
+to pass from the first frame to the second must be the same as the \emph{proper} time
+to go from the second to the third. A nice way to express this is to define the \emph{rapidity}\index{rapidity}
+$\eta=\ln D$. Combining velocities means multiplying $D$'s, which is the same as adding their logarithms.
+Therefore we can write the relativistic rule for combining velocities simply as
+\begin{equation*}
+  \eta_c = \eta_1 + \eta_2\eqquad.
+\end{equation*}
+The passengers perceive the acceleration as steady if $\eta$ increase by the same amount per unit of
+proper time. In other words, we can define a proper acceleration $d\eta/d\tau$, which corresponds
+to what an accelerometer measures.\index{acceleration!proper}
+
+Rapidity is convenient and useful, and is very frequently used in particle physics. But in
+terms of ordinary velocities, the
+rule for combining velocities can also be rewritten using identity [9] from section \ref{sec:identities} as
+\begin{equation*}
+  v_c = \frac{v_1+v_2}{1+v_1 v_2}\eqquad.
+\end{equation*}
+
+<% self_check('v-combo-si',<<-'SELF_CHECK'
+How can we tell that this equation is written in natural units? Rewrite it in SI units.
+  SELF_CHECK
+  ) %>
+
+<% end_sec('velocity-addition') %>
+
+<% begin_sec("No frame of reference moving at $c$",nil,'no-c-frame') %>
+We have seen in section \ref{sec:velocity-addition} that no continuous process of acceleration can
+boost a material object to $c$. That is, the subluminal (slower than light) nature
+of a electron or a person is a fundamental feature of its identity and can never be changed.
+Einstein can never get on his motorcycle and drive at $c$ as he imagined when he was a young man,
+so we material beings can never see the world from a frame of reference that travels at $c$.
+
+Our universe does, however, contain ingredients such as light rays, gluons, and gravitational waves
+that travel at $c$, so we might wonder whether these things could be put together to form
+observers who do move at $c$. But this is not possible according to special relativity,
+because if we let $v$ approach infinity, extrapolation of
+figure \figref{three-fifths-c-twice} on p.~\pageref{fig:three-fifths-c-twice} shows that the Lorentz
+transformation would compress all of spacetime onto the light cone, reducing its number of dimensions by 1.
+Distinct points would be merged, which would make it impossible to use this frame to describe the
+same phenomena that a subluminal observer could describe. That is, the transformation would not
+be one-to-one, and this is unacceptable physically.
+<% end_sec('no-c-frame') %>
+
+<% begin_sec("The velocity and acceleration vectors",nil,'v-and-a-vectors') %>
+<% begin_sec("The velocity vector",nil,'v-vector') %>\index{velocity!vector}
+In a freshman course in Newtonian mechanics, we would define a vector as something that has three
+components. Furthermore, we would require it to transform in a certain way under a rotation.
+For example, we could form the collection of numbers $(e,T,\zu{DJIA})$, where $e$ is the fundamental
+charge, $T$ is the temperature in Buffalo, New York, and DJIA measures how the stock market is doing.
+But this would not be a vector, since it doesn't act the right way when rotated (this particular
+``vector'' is invariant under rotations). Figure \figref{playing-card} gives a less silly
+non-example.
+In contradistinction to a vector, a scalar is specified by a single real number and is invariant
+under rotations.
+
+The most basic example of a Newtonian vector was a displacement
+$(\Delta x,\Delta y,\Delta z)$, and from the displacement vector we would go on
+to construct other quantities such as a velocity vector $\vc{v}=\Delta \vc{r}/\Delta t$.
+This worked because in Newtonian mechanics $\Delta t$ was treated as a scalar, and dividing
+a vector by a scalar produces something that again transforms in the right way to be a vector.
+<% marg(100) %>
+<%
+  fig(
+    'playing-card',
+    %q{%
+      A playing card returns to its original state when rotated by 180 degrees. Its orientation,
+      unlike the orientation of an arrow, doesn't behave as a vector, since it doesn't transform
+      in the usual way under rotations. Under a 180-degree rotation, a vector should negate itself
+      rather than coming back to its original state.
+    }
+  )
+%>
+<% end_marg %>
+
+
+Now let's upgrade to relativity, and work through the same steps by analogy.
+When I say ``vector'' in this book, I mean something that in 3+1 dimensions has four components. This
+can also be referred to as a four-vector.\index{four-vector}
+Our only example so far has been the spacetime
+displacement vector $\Delta\vc{r} = (\Delta t,\Delta x,\Delta y,\Delta z)$.
+This vector transforms according to the Lorentz transformation. In general, we require as part
+of the definition of a (four-)vector that it transform in the usual way under both rotations
+and boosts (Lorentz transformations).
+We might now imagine that the next step should be
+to construct a velocity four-vector $\Delta \vc{r}/\Delta t$.
+But relativistically, the quantity $\Delta \vc{r}/\Delta t$ would not transform like a vector, e.g.,
+if $\vc{r}$ was spacelike, then there would be a frame in which we had $\Delta t=0$, and then
+$\Delta \vc{r}/\Delta t$ would be finite in some frames but infinite in others, which is absurd.
+
+To construct a valid vector, we have to divide
+$\Delta \vc{r}$ by a scalar. The only scalar that could be relevant would be the \emph{proper} time
+$\Delta \tau$, and this is indeed how the velocity vector is defined in relativity.
+For an inertial world-line (one with constant velocity),
+we define $\vc{v}=\Delta \vc{r}/\Delta \tau$. The generalization
+to noninertial world-lines requires that we make this definition into a derivative:
+\begin{equation*}
+  \vc{v} = \frac{\der \vc{r}}{\der \tau}
+\end{equation*}
+
+Not all objects have well-defined velocity vectors. For example, consider a ray of light with
+a straight world-line, so that the derivative $\der\ldots/\der\ldots$ is the same as the ratio of finite
+differences $\Delta\ldots/\Delta\ldots$, i.e., calculus isn't needed.
+A ray of light has $v=c$, so
+that applying the metric to any segment of its world-line gives $\Delta\tau=0$. Attempting to calculate
+$\vc{v}=\Delta\vc{r}/\Delta\tau$ then gives something with infinite components.
+We will see in section~\ref{subsec:massless-go-at-c} that 
+\emph{all} massless particles, not just photons, travel at $c$, so the same would apply to them.
+Therefore a velocity vector is only defined for particles whose world-lines
+are timelike, i.e., massive particles.
+
+\begin{eg}{Velocity vector of an object at rest}\label{eg:v-at-rest}
+An object at rest has $\vc{v}=(1,0)$. The first component indicates that
+if we attach a clock to the object with duct tape,
+the proper time measured by
+the clock suffers no time dilation according to an observer in this
+frame, $\der t/\der\tau=1$. The second component tells us that the object's position isn't changing,
+$\der x/\der\tau=0$.
+\end{eg}
+
+<% end_sec('v-vector') %>
+<% begin_sec("The acceleration vector",nil,'a-vector') %>\index{acceleration!vector}
+The acceleration vector is defined as the derivative of the velocity vector with
+respect to proper time,\index{acceleration!vector}
+\begin{equation*}
+  \vc{a}=\frac{\der\vc{v}}{\der\tau}\eqquad.
+\end{equation*}
+It measures the curvature of a world-line.
+Its squared magnitude is the minus the square of the \emph{proper acceleration},\index{proper acceleration}\index{acceleration!proper}
+meaning the acceleration that would be measured by
+an accelerometer carried along that world-line.
+The proper acceleration is only approximately equal to the magnitude of the Newtonian
+acceleration three-vector, in the limit of small velocities.
+
+\begin{eg}{Constant proper acceleration}\label{eg:hyperbolic-motion}
+\egquestion Suppose a spaceship moves so
+that the acceleration is judged to be the constant value $a$ by an observer on board. Find the
+motion $x(t)$ as measured by an observer in an inertial frame.
+<% marg(0) %>
+<%
+  fig(
+    'photon-chasing-spaceship',
+    %q{A spaceship (curved world-line) moves with an acceleration perceived as constant by its passengers.}
+  )
+%>
+<% end_marg %>
+
+\eganswer Let $\tau$ stand for the ship's proper time, and let dots indicate derivatives with respect to $\tau$.
+The ship's velocity has magnitude 1, so
+\begin{equation*}
+  \dot{t}^2-\dot{x}^2 = 1\eqquad.
+\end{equation*}
+An observer who is instantaneously at rest with respect to the ship judges is to have an
+acceleration vector $(0,a)$
+(because the low-velocity limit applies).
+The observer in the $(t,x)$ frame agrees on the magnitude of this vector, so
+\begin{equation*}
+  \ddot{t}^2-\ddot{x}^2=-a^2\eqquad.
+\end{equation*}
+The solution of these differential
+equations is $t=\frac{1}{a}\sinh a\tau$, \linebreak[4] $x=\frac{1}{a}\cosh a\tau$
+(choosing constants of integration so that the expressions take on their simplest forms).
+Eliminating $\tau$ gives
+\begin{equation*}
+  x = \frac{1}{a}\sqrt{1+a^2t^2}\eqquad,
+\end{equation*}
+shown in figure \figref{photon-chasing-spaceship}. The world-line is a hyperbola, and this type of
+motion is sometimes referred to as hyperbolic motion.\index{hyperbolic motion}
+
+As $t$ approaches infinity, $\der x/\der t$ approaches the speed of light.
+In the same limit,  $x$ increases exponentially with proper time, so that
+surprisingly large distances can in theory be traveled within a human lifetime
+(problem \ref{hw:galactic-center}, p.~\pageref{hw:galactic-center}). Some further
+properties of hyperbolic motion are developed in problems
+\ref{hw:hyperbolic-properties}, \ref{hw:hyperbolic-four-vectors}, and \ref{hw:hyperbolic-proj}.
+
+Another interesting feature of this problem is the dashed-line asymptote, which is lightlike.
+Suppose we interpret this as the world-line of a ray of light.
+The ray comes closer and closer to the ship, but will never quite catch up.
+Thus provided that the rocket never stops accelerating, the entire region of spacetime to the
+left of the dashed line is forever hidden from its passengers. That is, an observer who
+undergoes constant acceleration has an \emph{event horizon} --- a boundary that prevents her
+from observing anything on the other side. You may have heard about the event horizon associated
+with a black hole. This example shows that we can have event horizons even when there is no
+gravity at all.\index{event horizon}\index{horizon}\label{event-horizon}
+\end{eg}
+
+<% end_sec('a-vector') %>
+<% begin_sec("Constraints on the velocity and acceleration vectors",nil,'v-a-constraints') %>
+<% begin_sec("Counting degrees of freedom",nil,'v-a-df') %>
+There is something misleading about the foregoing treatment of the velocity and acceleration vectors,
+and the easiest way to see this is by introducing the idea of a 
+\emph{degree of freedom}.\index{degree of freedom}
+Often we can describe a system using a list of real numbers. For the hand on a clock, we only
+need one number, such as 3 o'clock. This is because the hand is constrained to stay in the plane
+of the clock's face and also to keep its tail at the center of the circle. Since one number
+describes its position, we say that it has one degree of freedom. If a hiker wants to know where
+she is on a map, she has two degrees of freedom, which could be specified as her latitude and
+longitude. If she was in a helicopter, there would be no constraint to stay on the earth's surface,
+and the number of degrees of freedom would be increased to three. If we also considered the
+helicopter's velocity to be part of the description of its state, then there would be 
+a total of six degrees of
+freedom: one for each coordinate and one for each component of the velocity vector.
+
+Now suppose that we want to specify a particle's velocity and acceleration. In Newtonian mechanics,
+we would describe these three-vectors as possessing a total of
+six degrees of freedom: $v_x$, $v_y$, $v_z$, $a_x$, $a_y$, and $a_z$.
+Upgrading from Newtonian mechanics to relativity can't change the number of degrees of freedom.
+For example, an electron's acceleration is fully determined by the force we exert on it, and
+we might control that acceleration by placing a proton nearby and producing an electrical attraction.
+The position of the proton (three degrees of freedom for its three coordinates)
+determines the electron's acceleration, so the acceleration has exactly three degrees of freedom as well.
+
+This means that there must be some hidden redundancy in the \emph{eight} components
+of the velocity and acceleration four-vectors. The system only has six degrees of freedom,
+so there must be \emph{two constraints} that we didn't know about. Similarly, I've gone hiking and had
+my GPS unit claim that I was a thousand feet above a lake or three thousand feet under a mountain.
+In those situations there was a constraint that I knew about but that the GPS didn't: that I was on
+the surface of the earth.
+<% marg(-20) %>
+<%
+  fig(
+    'tangent-vector',
+    %q{Both vectors are tangent vectors.}
+  )
+%>
+<% end_marg %>
+<% end_sec('v-a-df') %>
+<% begin_sec("Normalization of the velocity",nil,'v-normalization') %>
+The first constraint arises naturally from a geometrical interpretation of the velocity four-vector,
+shown in
+figure \figref{tangent-vector}. The curve represents the world-line of a particle. The dashed line
+is drawn tangent to the world-line at a certain moment. Under a microscope, the dashed line, which
+represents a possible inertial motion of a particle, is indistinguishable from the solid curve, which
+is noninertial. The dashed line has a slope $\Delta t/\Delta x= 2$, which corresponds to a
+velocity $\Delta x/\Delta t=1/2$. The figure is drawn in $1+1$ dimensions, but in $3+1$
+dimensions we would want to know more than this number. We would want to know the orientation of
+the dashed line in the three spatial dimensions, i.e., not just the speed of the particle but also its
+direction of motion.
+All the desired information can be encapsulated in a vector. Both of the vectors shown in the
+figure are parallel to the dashed line, so even though they have different lengths,
+there is no difference between the velocities they represent. Since we want the particle to have
+a single well-defined vector to represent its velocity, we want to pick one vector from among
+all the vectors parallel to the dashed line, and call that ``the'' velocity vector.
+
+We have already implicitly made this choice.
+It follows from the original definition $\vc{v}=\der\vc{r}/\der \tau$
+that the velocity vector's squared magnitude $v^2=\vc{v}\cdot\vc{v}$ is always equal to 1, even
+though the object whose motion it describes is not moving at the speed of light.
+This, along with the requirement that the velocity vector lie within the future rather than the past
+light cone, uniquely specifies which tangent vector we want.
+The requirement $v^2=1$ is an example of a recurring idea in physics and mathematics called
+normalization.\index{normalization} The idea is that we have some object (a vector, a function, \ldots)
+that could be scaled up or down by any amount, but from among all the possible scales, there is
+only one that is the right one. For example, a gambler might place a horse's chance of winning at
+9 to 1, but a physicist would divide these by 10 in order to normalize the probabilities to
+0.9 and 0.1, the idea being that the total probability should add up to 1. Our definition of the
+velocity vector implies that it is normalized. 
+Thus an alternative, geometrical definition of the velocity vector would have been that it is
+the vector that is tangent to the particle's world-line, future-directed, and normalized to 1.
+
+When we hear something referred to as a ``vector,''
+we usually take this is a statement that it not only transforms as a vector, but also that it adds as a vector.
+But the sum of two velocity vectors would not typically be a valid velocity vector at all, since
+it would not have unit magnitude. This lack of additivity would in any case have been expected because
+velocities don't add linearly in relativity (section \ref{sec:velocity-addition}).
+
+<% self_check('v-invalid-in-other-frame',<<-'SELF_CHECK'
+Velocity vectors are required to have $v^2=1$. 
+If a vector qualifies as a valid velocity vector in some frame, could it be invalid in another frame?
+  SELF_CHECK
+  ) %>
+
+A nice way of thinking about velocity vectors is that
+every such vector represents a potential observer. That is, the velocity vectors are
+the observer-vectors $\vc{o}$ of chapter \ref{ch:spacetime}, but with a normalization requirement $o^2=1$ that
+we did not impose earlier.
+An observer writes her own velocity vector as  $(1,0)$, i.e., as the unit vector in the timelike direction.
+Since we have no notion of adding one observer to another observer, it makes sense that
+velocity vectors don't add relativistically. Similarly, there is no meaningful way to define the
+magnitude of an observer, so it makes sense that the magnitude of a velocity vector carries
+no useful information and can arbitrarily
+be set equal to 1.
+
+Regarding the magnitude,
+note also that the magnitude of a vector is frame-invariant,
+and therefore it wouldn't make sense to imagine that the magnitude of
+an object's four-velocity would produce some number telling you
+how fast the object was going. How fast relative to what? 
+
+If $\vc{u}$ and $\vc{v}$ are both future-directed, properly normalized velocity vectors, 
+and if the signature is $+---$ as in this book, then
+their inner product is $\gamma=\vc{u}\cdot\vc{v}$, the gamma factor,\index{gamma factor!as an inner product}
+introduced in section \ref{subsec:gamma}, p.~\pageref{subsec:gamma}, corresponding their relative
+velocity.
+<% end_sec('v-normalization') %>
+<% begin_sec("Orthogonality of the velocity and acceleration",nil,'v-dot-a-is-zero') %>
+Now for the second of the two constraints deduced on p.~\pageref{subsubsec:v-a-df}.
+
+Suppose an observer claims that at a certain moment in time, a particle has $\vc{v}=(1,0)$ and
+$\vc{a}=(3,0)$. That is, the particle is at rest ($v_x=0$) and its $v_t$ is growing by 3 units per second.
+This is impossible, because after an infinitesimal time interval $\der t$, this rate of change
+will result in $\vc{v}=(1+3\der t,0)$, which is not properly normalized: its magnitude has grown
+from 1 to $1+3\der t$. The observer is mistaken. This is not a possible combination of velocity
+and acceleration vectors. In general (problem \ref{hw:prove-a-dot-v-is-zero},
+p.~\pageref{hw:prove-a-dot-v-is-zero}), we always have the following constraint on the velocity
+and acceleration vectors:\label{a-dot-v-is-zero}
+\begin{equation*}
+  \vc{a}\cdot\vc{v} = 0\eqquad.
+\end{equation*}
+This is analogous to the three-dimensional idea that in uniform circular motion, the
+perpendicularity of the velocity and acceleration three-vectors is what causes the
+velocity vector to rotate without changing its magnitude.
+<% end_sec('v-dot-a-is-zero') %>
+
+<% end_sec('v-a-constraints') %>
+<% end_sec('v-and-a-vectors') %>
+
+<% begin_sec("Some kinematic identities",nil,'identities',{'optional'=>true}) %>
+
+In addition to the relations
+\begin{align*}
+  D(v) &= \sqrt{\frac{1+v}{1-v}} \qquad \text{and} \\
+  v_c &= \frac{v_1+v_2}{1+v_1 v_2}\eqquad,
+\end{align*}
+the following identities can be handy. If stranded on a desert island you should be able
+to rederive them from scratch. Don't memorize them.
+
+\noindent\begin{tabular}{lll}
+{[}1] \enskip $v=(D^2-1)/(D^2+1)$       & {[}5] \enskip $\eta=\ln D$        & {[}10] \enskip $D_c = D_1 D_2$ \\
+{[}2] \enskip $\gamma=(D^{-1}+D)/2$     & {[}6] \enskip $v=\tanh \eta$      & {[}11] \enskip $\eta_c = \eta_1 + \eta_2$ \\
+{[}3] \enskip $v \gamma=(D-D^{-1})/2$   & {[}7] \enskip $\gamma=\cosh \eta$ & {[}12] \enskip $ v_c \gamma_c = (v_1+v_2)\gamma_1 \gamma_2$ \\
+{[}4] \enskip $D(v)D(-v)=1$            & {[}8] \enskip $v \gamma=\sinh \eta$ &  \\
+&\multicolumn{2}{l}{ {[}9] \enskip $\tanh(x+y)=\frac{\tanh x+\tanh y}{1+\tanh x \tanh y}$}
+\end{tabular}
+% checking these:
+% calc -e "v=3/5; g=(1-v^2)^(-1/2); D=sqrt[(1+v)/(1-v)]; (D^2-1)/(D^2+1); (1/D+D)/2; vg; (D-1/D)/2"
+% calc -e "v=3/5; g=(1-v^2)^(-1/2); D=sqrt[(1+v)/(1-v)]; eta=ln D; tanh eta; cosh eta; vg; sinh eta"
+The hyperbolic trig functions are defined as follows:
+\begin{align*}
+  \sinh x &= \frac{e^x-e^{-x}}{2} \\
+  \cosh x &= \frac{e^x+e^{-x}}{2} \\
+  \tanh x &= \frac{\sinh x}{\cosh x}
+\end{align*}
+Their inverses are built in to some calculators and computer software, but they can also be
+calculated using the following relations:
+\begin{align*}
+  \sinh^{-1} x &= \ln\left(x+\sqrt{x^2+1}\right) \\
+  \cosh^{-1} x &= \ln\left(x+\sqrt{x^2-1}\right) \\
+  \tanh^{-1} x &= \frac{1}{2}\ln\left(\frac{1+x}{1-x}\right)
+\end{align*}
+Their derivatives are, respectively, $(x^2+1)^{-1/2}$,
+$(x^2-1)^{-1/2}$, and $(1-x^2)^{-1}$.
+<% end_sec('identities') %>
+
+<% begin_sec("The projection operator",4,'proj',{'optional'=>true}) %>\index{projection operator}
+A frequent source of confusion in relativity is that we write down equations that
+are coordinate-dependent, but forget the dependency. Similarly, it is possible to
+write expressions that are only valid for one choice of signature. The following
+notation, defining a projection operator $P$, is one tool for avoiding these difficulties.
+\begin{equation}
+  P_\vc{o}\vc{r}=\vc{r}-\frac{\vc{r}\cdot\vc{o}}{\vc{o}\cdot\vc{o}}\vc{o}
+\end{equation}
+Usually $\vc{o}$ is the future timelike vector representing a certain observer,
+but the definition can be applied as long as $\vc{o}$ isn't lightlike.
+The idea being expressed is that we want to get rid of any part of $\vc{r}$ that
+is parallel to $\vc{o}$'s arrow of time. In a graph constructed according to
+$\vc{o}$'s Minkowski coordinates, we cast $\vc{r}$'s shadow down perpendicularly
+onto the spacelike axis, or the spacelike three-plane in $3+1$ dimensions.
+This is why $P$ is referred to as a projection operator. The notation sometimes allows
+us to express the things that we would otherwise express by explicitly
+or implicitly constructing and referring to $\vc{o}$'s spacelike Minkowski coordinates.
+$P$ has the following properties:
+
+\begin{enumerate}
+\item $\vc{o}\cdot P_\vc{o}\vc{r} = 0$ \label{proj-orthogonal-property}
+\item $\vc{r}-P_\vc{o}\vc{r}$ is parallel to $\vc{o}$.\label{proj-knock-out-o-property}
+\item $P_\vc{o}\vc{o}=0$\label{proj-self-at-rest-property}
+\item $P_\vc{o}P_\vc{o}\vc{r} = P_\vc{o}\vc{r}$\label{proj-is-a-projection-property}
+\item $P_{c\vc{o}}=P_\vc{o}$
+\item $P_\vc{o}$ is linear, i.e., $P_\vc{o}(\vc{q}+\vc{r})=P_\vc{o}\vc{q}+P_\vc{o}\vc{r}$ and $P_\vc{o}(c\vc{r})=cP_\vc{o}\vc{r}$
+\item $\frac{\der}{\der x} P_\vc{o}\vc{r}=P_\vc{o}\frac{\der\vc{r}}{\der x}$,
+      where $x$ is any variable and $\vc{o}$ doesn't depend on $x$.\label{proj-commutes-with-deriv}
+\item If $\vc{o}$ and $\vc{v}$ are both future timelike, and $|o^2|=1$, then
+      we can express $\vc{v}$ as $\vc{v}=P_\vc{o}\vc{v}+\gamma\vc{o}$, where $\gamma$
+      has the usual interpretation for world-lines that coincide with 
+      these two vectors.\label{proj-split-property}
+\end{enumerate}
+
+All of these hold regardless of whether the signature is $+---$ or $-+++$, and none of them refer to any coordinates.
+Properties \ref{proj-orthogonal-property}
+and \ref{proj-knock-out-o-property} can serve as an alternative, geometrical definition of $P$.
+Property \ref{proj-self-at-rest-property} says that an observer considers herself to be at rest.
+\ref{proj-is-a-projection-property} is a general property of all projection operators. \ref{proj-split-property} 
+splits the vector into its spatial and temporal parts
+according to $\vc{o}$.
+
+Sometimes if we know a position, velocity, or acceleration four-vector, we want to find out
+how these would be measured by a particular observer using clocks and rulers. The following table shows
+how to switch back and forth between the two representations. We use, for example, the notation
+$\vc{v}_\vc{o}$ to mean the velocity vector of the form $(0,v_x,v_y,v_z)$ that would be measured by
+an observer whose velocity vector is $\vc{o}$ (so that the subscript is an ``o'' for ``observer,''
+not a zero). Since this type of vector, expressed in the Minkowski coordinates of observer $\vc{o}$,
+has a zero time component, we refer to it as a three-vector.\index{three-vector}
+In all of these expressions, the velocity vectors $\vc{o}$ and $\vc{v}$ are assumed to be
+normalized, and the signature is assumed to be $+---$ (one implication being that
+$\vc{o}\cdot\vc{v}$ is simply $\gamma$).
+
+\noindent\begin{tabular}{p{53mm}p{53mm}}\label{three-and-four-vec-conversions}
+\emph{finding the three-vector from the four-vector} & \emph{finding the four-vector from the three-vector} \\
+$\vc{x}_\vc{o}=P_\vc{o}\vc{x}$ & \\
+$\vc{v}_\vc{o}=\frac{P_\vc{o}\vc{v}}{\vc{o}\cdot\vc{v}}$
+       & $\vc{v} = \gamma(\vc{o}+\vc{v}_\vc{o})$ \\
+$\vc{a}_\vc{o} = \frac{1}{(\vc{o}\cdot\vc{v})^2}\left[P_\vc{o}\vc{a}-(\vc{o}\cdot\vc{a})\vc{v}_\vc{o}\right]$
+      & $\vc{a} = \gamma^3(\vc{a}_\vc{o}\cdot\vc{v}_\vc{o})\vc{v}+\gamma^2\vc{a}_\vc{o}$,
+           where $\vc{v}$ is found as above
+\end{tabular}
+
+As an example of how these are derived, the three-velocity $\vc{v}_\vc{o}$ is the derivative of
+$\vc{x}_\vc{o}$ with respect to observer $\vc{o}$'s Minkowski time coordinate $t$, whereas the
+four-velocity is defined as the derivative of $\vc{x}$ with respect to the proper time $\tau$ of the world-line
+being observed. Therefore we have 
+\begin{align*}
+ \vc{v}_\vc{o} &= \frac{\der \vc{x}_\vc{o}}{\der t} \\
+               &= \frac{\der P_\vc{o}\vc{x}}{\der t} \\
+\intertext{and applying property \ref{proj-commutes-with-deriv} of the projection operator this becomes}
+ \vc{v}_\vc{o} &= P_\vc{o}\frac{\der \vc{x}}{\der t} \\
+               &= P_\vc{o}\frac{\der \vc{x}}{\der \tau} \frac{\der\tau}{\der t}\\
+               &= \frac{1}{\gamma} P_\vc{o}\frac{\der \vc{x}}{\der \tau}\\
+               &= \frac{1}{\vc{o}\cdot\vc{v}} P_\vc{o}\frac{\der \vc{x}}{\der \tau}\\
+               &= \frac{P_\vc{o}\vc{v}}{\vc{o}\cdot\vc{v}}\eqquad.
+\end{align*}
+The similar but messier derivation of the expression for $\vc{a}_\vc{o}$
+is problem \ref{hw:three-accel-derivation}. In manipulating expressions of this type,
+the identity $\der\gamma/\der t=\gamma^3 \vc{a}_\vc{o}\cdot\vc{v}_\vc{o}$ is often handy
+(problem \ref{hw:gamma-deriv-derivation}).
+
+\begin{eg}{Lewis-Tolman paradox}\label{eg:lewis-tolman}\index{Lewis-Tolman paradox}
+The following example is a form of a paradox
+discussed by Lewis and Tolman in 1909. Figure \figref{lewis-tolman}
+shows the frame of reference of observer $\vc{o}$
+in which identical particles 1 and 2 are at initially rest and
+located at equal distances $\ell$ from the origin along the $y$ and $x$ axes.
+External forces of equal strength act in the directions shown by the arrows so as to produce
+accelerations of magnitude $\alpha$. The system is in rotational equilibrium $\der L/\der t=0$,
+because the rate at which
+particle 1 picks up clockwise angular momentum is the same as the rate at which 2 acquires it
+in the counterclockwise direction.
+<% marg(50) %>
+<%
+  fig(
+    'lewis-tolman',
+    %q{Example \ref{eg:lewis-tolman}.}
+  )
+%>
+<% end_marg %>
+
+Now change to the frame of reference $\vc{o}'$, moving to the right relative to $\vc{o}$ at velocity $v$.
+Particle 2's distance from the origin is Lorentz-contracted from $\ell$ to $\ell/\gamma$, so its angular
+momentum is also reduced by $1/\gamma$. It now appears that the system's total angular momentum is increasing
+in the clockwise sense. How can we have rotational equilibrium in one frame, but not another?
+
+The resolution of the paradox is that the accelerations transform as well. In the original frame
+$\vc{o}$, the four-velocities are $\vc{v}_1=\vc{v}_2=(1,0,0,0)$, and the
+four-accelerations are $\vc{a}_1=(0,\alpha,0,0)$ and $\vc{a}_2=(0,0,\alpha,0)$.
+Applying a Lorentz transformation, we have $\vc{v}_1'=\vc{v}_2'=(\gamma,-\gamma v,0,0)$ and
+\begin{align*}
+  \vc{a}_1' &= \alpha(-\gamma v,\gamma,0,0) \\
+  \vc{a}_2' &= \alpha(0,0,1,0)\eqquad.
+\end{align*}
+Our definition of angular momentum is expressed in terms of \emph{three}-vectors such as
+$\vc{a}_{\vc{o}'1}$ and $\vc{a}_{\vc{o}'2}$, not four-vectors like $\vc{a}_1'$ and $\vc{a}_2'$.
+We have
+\begin{equation*}
+  \frac{\der L'}{\der t'} = m a_{\vc{o}'1x}\ell - m a_{\vc{o}'2y}\frac{\ell}{\gamma}\eqquad.
+\end{equation*}
+Using the relations $\vc{v}_\vc{o}=\gamma^{-1}P_\vc{o}\vc{v}$ and
+$\vc{a}_\vc{o} = \gamma^{-2}\left[P_\vc{o}\vc{a}-(\vc{o}\cdot\vc{a})\vc{v}_\vc{o}\right]$,
+we find
+\begin{align*}
+  v_{\vc{o}'1x} &= -v\eqquad,\\
+  a_{\vc{o}'1x} &= \frac{1}{\gamma^2} [\alpha\gamma-(-\alpha\gamma v)(- v)] 
+                 = \frac{\alpha}{\gamma^3}\eqquad, \\
+\intertext{and}
+  a_{\vc{o}'2y} &= \frac{\alpha}{\gamma^2}\eqquad.
+\end{align*}
+The result is 
+\begin{equation*}
+  \frac{\der L'}{\der t'} = m \frac{\alpha}{\gamma^3}\ell - m \frac{\alpha}{\gamma^2}\frac{\ell}{\gamma}\eqquad,
+\end{equation*}
+which is zero.
+\end{eg}
+<% end_sec('proj') %>
+
+<% begin_sec("Faster-than-light frames of reference?",4,'ftl-frames',{'optional'=>true}) %>
+We recall from section \ref{sec:no-c-frame} that
+special relativity doesn't permit the existence of observers who move at $c$. This is because
+if two observers differ in velocity by $c$, then the Lorentz transformation between them is
+not a one-to-one map, which is physically unacceptable.
+
+But what about a \emph{superluminal} observer, one who moves faster than $c$?
+With charming naivete, the special-effects technicians 
+for Star Trek attempted to show the frame of reference of such an
+observer in scenes where a field of stars rushed past the Enterprise. (Never mind that
+the stars, which pass in front of and behind the spaceship, should actually be a million
+times larger than it.) Actually such an observer  would consider her own world-line, which we call
+spacelike, to be timelike, while the world-line of a star such as our sun, which we consider timelike,
+would be spacelike in her opinion. Our sun's world-line might, for example, be orthogonal to hers, in which case the sun
+would not appear to her
+as an object in motion but rather as a line
+stretching across space, which would wink into existence and then wink back out.
+A typical transformation between our frame and the frame of such an observer would be the map $S$
+defined by 
+$(t',x')=(x,t)$, simply swapping the time and space coordinates. The ``swap'' transformation $S$ is
+one-to-one, and therefore not subject to the objection raised previously to frames moving \emph{at} $c$.
+$S$ happens to be a boost by an infinite velocity, but we can also obtain boosts for velocities
+$c<v<\infty$ and $-\infty<v<-c$ by combining $S$ with a (subluminal) Lorentz transformation; given a
+superluminal world-line $\ell$, we first transform into a frame in which $\ell$ is a line of simultaneity,
+and the we apply $S$.
+
+But this was all in 1+1 dimensions. In 3+1 dimensions, what is the equivalent of $S$? One possibility is
+something like $(t',x',y',z')=(x,t,t,t)$, but this isn't one-to-one. We can't
+squish three dimensions to one or expand one to three without merging points or splitting one
+point into many.
+
+Another possibility would be a one-to-one transformation such as
+$(t',x',y',z')=(x,t,y,z)$. The trouble with this version is that it violates the
+isotropy of spacetime (section \ref{sec:symmetry-postulates}, p.~\pageref{sec:symmetry-postulates}).
+For example, consider the vector $(1,0,1,0)$ in the unprimed coordinates.
+This lies on the light cone, and could point along the world-line of a ray of light.
+After the transformation to the primed coordinates, this vector becomes $(0,1,1,0)$, which points
+along a line of simultaneity. The primed observer says that the speed of light in this direction
+is infinite, and yet there are other directions in which it has a finite value. This clearly
+violates isotropy.
+
+A surprisingly large number of papers, going all the way back to the birth of relativity,
+have been written by people trying to find a way to extend the Lorentz transformations to
+superluminal speeds, and these have all turned out to be failures. In fact, there are
+no-go theorems showing that there can be no such thing as a superluminal
+observer in our 3+1-dimensional universe.\footnote{Gorini, ``Linear Kinematical Groups,'' Commun.~Math.~Phys.~21 (1971) 150.
+Open access via Project Euclid at
+\url{projecteuclid.org/DPubS?service=UI&version=1.0&verb=Display&handle=euclid.cmp/1103857292}.}\textsuperscript{,}%
+\footnote{Andreka et al., ``A logic road from special relativity to general relativity,'' \url{arxiv.org/abs/1005.0960},
+theorem 2.1.}
+
+The nonexistence of FTL \emph{frames} does not immediately rule out the possibility of
+FTL \emph{motion}. (After all, we do have motion at $c$, but no frames moving at $c$.)
+For more about faster-than-light motion in relativity, see section \ref{sec:tachyons},
+p.~\pageref{sec:tachyons}.
+<% end_sec('ftl-frames') %>
+
+<% begin_sec("Thickening of a curve",nil,'thickening',{'optional'=>true}) %>\index{thickening of a curve}
+<% begin_sec("A geometrical interpretation of the acceleration",nil,'accel-thickening') %>
+<% marg %>
+<%
+  fig(
+    'thickened-circle',
+    %q{One-sided thickenings of a circle and a line segment.}
+  )
+%>
+<% end_marg %>
+We've interpreted the acceleration vector as a measure of the curvature of a world-line, but to make
+this more than a tool for visualization, we would have to define what we mean by curvature.
+A good way to approach this is shown in figure \subfigref{thickened-circle}{1}. Here a circle of circumference
+$L$ has been expanded, like a loaf of rising bread, to a circle of greater circumference $L^*$.
+This increase is only because the circle is curved. If we do the same thing with a line segment,
+\subfigref{thickened-circle}{2}, there is no increase in length. The increase in the length
+tells us about the curvature.
+
+Quantitatively, suppose that the thickness of the shaded area is $\Delta h$.
+Then the increase in circumference $\Delta L=L^*-L$ is given by
+\begin{equation*}
+  \frac{1}{L} \frac{\Delta L}{\Delta h} = k\eqquad,
+\end{equation*}
+where $k$ is a measure of curvature, and $k=1/r$ for a circle. We can take this as a definition of the curvature of
+a curve embedded in a two-dimensional Euclidean plane. The
+curves in figure \subfigref{thickened-circle}{1} both have constant curvature, and if we had applied
+our definition to any short segment of them, we would have gotten the same answer. For a curve with varying curvature,
+such as a letter ``S,'' the curvature can be defined as the appropriate limit at any given point, as the length
+of the segment enclosing the point approaches zero.
+Note that we had to pick an orientation for the expansion, i.e., a direction in which to expand. Given this orientation,
+it makes sense to talk about signed values of $h$ and $k$. If we choose the outward orientation for a circle, then
+its $k$ is positive.
+
+An interesting point about this definition is that it is \emph{extrinsic} rather than intrinsic, in the sense
+defined in section \ref{subsec:failure-of-parallelism}, 
+p.~\pageref{subsec:failure-of-parallelism}. That is, it depends on how the curve is embedded in the
+ambient two-dimensional space, and it depends on the Euclidean metric of that space. Because a curve is a one-dimensional
+object, there is nothing internal to the curve that would allow us to define its curvature. Imagine yourself as
+a tiny bug --- so tiny that you are pointlike. If the curve represents your universe, then you can explore it as much
+as you like, but you can never detect any internal evidence of its curvature. This is not the case in two dimensions.
+For example, a bug living on the two-dimensional surface of a sphere can detect its curvature by drawing triangles
+and measuring how much the sum of their interior angles differs from 180 degrees. This would be an \emph{intrinsic}
+measure of curvature. (See problem \ref{hw:pythagorean}, p.~\pageref{hw:pythagorean}.)
+
+<% marg %>
+<%
+  fig(
+    'thickened-world-line',
+    %q{One-sided thickening of a world-line.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'bell-spaceship-paradox',
+    %q{%
+      Bell's spaceship paradox.
+    }
+  )
+%>
+<% end_marg %>
+The definition given above is readily extended from Euclidean space to $1+1$ dimensions of spacetime.
+Figure \figref{thickened-world-line} shows a one-sided thickening of an accelerated world-line.
+Although the shaded area doesn't look uniformly thick to our Euclidean eyes, it is. For example,
+each of the dotted lines is orthogonal to the original world-line on the left, and they all have the
+same length $\Delta h$ as measured by an observer who traces that world-line. That is, each of these lines could
+represent a rigid measuring rod carried by that observer, drawn along a line that that observer considers
+to be a line of simultaneity at that time. In analogy to the Euclidean case, we have
+\begin{equation*}
+  \frac{1}{\tau} \frac{\Delta\tau}{\Delta h} = \frac{1}{a}\eqquad.
+\end{equation*}
+
+<% end_sec('accel-thickening') %>
+<% begin_sec("Bell's spaceship paradox",nil,'bell-spaceship-paradox') %>\index{Bell's spaceship paradox}%
+\index{spaceship paradox}\index{paradox!Bell's spaceship}
+A variation on the situation shown in figure \figref{thickened-world-line} leads to a paradox with philosophical
+implications proposed by John Bell\index{Bell, John}.
+Bell went around the CERN cafeteria proposing the following thought experiment to the physicists eating lunch,
+and he found that nearly all of them got it wrong.
+Let two spaceships accelerate as shown in figure \figref{bell-spaceship-paradox}.
+Each ship is equipped with a yard-arm, and a thread is tied between the two arms,
+\subfigref{bell-spaceship-paradox}{1}. 
+Unaccelerated observer $\vc{o}$ uses Minkowski coordinates $(t,x)$, as shown in \subfigref{bell-spaceship-paradox}{2}.
+The accelerations, as judged by $\vc{o}$, are equal for the two ships as functions of $t$.
+Does the thread break, due
+to Lorentz contraction?
+
+A crucial difference between figures \figref{thickened-world-line} and \subfigref{bell-spaceship-paradox}{2}
+is that in the former, the thickening of the world-line has been carried out along the dotted normals,
+whereas the latter the second world-line is simply a copy of the first that has been shifted to the
+right, parallel to the $x$ axis.
+
+The popular answer in the CERN cafeteria was that the thread would not break, the reasoning being that
+Lorentz contraction is a frame-dependent effect, and no such contraction would be observed 
+in the rockets' frames.
+
+The error in this reasoning is that the accelerations of of the two ships
+were specified to be equal in frame $\vc{o}$,
+not in the frames of the rockets. The Minkowski coordinates
+$(t',x')$ shown in \subfigref{bell-spaceship-paradox}{2}
+correspond to the frame of an inertial observer $\vc{o}'$ who
+is momentarily moving along with the trailing rocket after the acceleration has been going on for a while.
+The $x'$ axis is a line of simultaneity for $\vc{o}'$, and this axis intersects the leading
+ship's world-line at a point that that $\vc{o}$ considers to be \emph{later} in time. Therefore
+$\vc{o}'$ says that the leading ship has reached a higher speed than the trailing one.
+In $\vc{o}'$, the two ships' accelerations are unequal.
+
+We can also see directly from the spacetime diagram that whereas length $L_1$ is 4 units
+as measured by an observer initially at rest relative to the thread, 
+$L_2$ is about 5 units as measured by $\vc{o}'$, who is at rest relative to the trailing end
+of the thread at a later time. Since $L_2$ is greater than the unstressed length $L_1$, the
+thread is under tension.
+
+Figure \subfigref{bell-spaceship-paradox}{3} is more in the spirit of
+Bell's analysis. In frame $\vc{o}$, the thread has initial, unstressed length $L$.
+If the thread had been attached only to the leading ship, then it would have trailed
+behind it, unstressed, with Lorentz-contracted length $L/\gamma$. Since its actual length
+according to $\vc{o}$ is still $L$, it has been stretched relative to its unstressed length.
+
+This paradox relates to
+the difficult philosophical question of whether the time dilation and length contractions predicted by relativity
+are ``real.'' This depends, of course, on what one means by ``real.'' They are frame-dependent, i.e., observers
+in different frames of reference disagree about them. But this doesn't tell us much about their reality, since
+velocities are frame-dependent in Newtonian mechanics, but nobody worries about whether velocities are real.
+Bell took his colleagues' wrong answers as evidence that their intuitions had been misguided by
+the standard way of approaching this question of the reality of Lorentz contractions.
+
+This treatment has one wart on it, which is that we judged the distance between the two ships
+in a frame of reference instantaneously comoving with the trailing ship, but this is slightly
+different from the length as determined in the leading ship's frame. 
+One way to remove this
+wart is to note that the fractional discrepancy $\Delta L_1/L_1$ is of order $v^3$, which is
+of a lower order than the strain in the thread, which is of order $v^2$. To carry out this type
+of error estimation rigorously would however be cumbersome.
+A more elegant and rigorous approach is
+given
+in section \ref{subsec:bell-revisited} on p.~\pageref{subsec:bell-revisited}, where we use fancier techniques
+to show that
+the motion shown in figure \figref{thickened-world-line} is the unique motion that
+allows every portion of the string to move without strain.
+
+This presentation includes ideas contributed by physicsforums users tiny-tim and
+PeterDonis.
+<% end_sec('bell-spaceship-paradox') %>
+<% begin_sec("Deja vu, jamais vu",4,'deja-vu') %>
+<% marg(-10) %>
+<%
+  fig(
+    'deja-vu-again',
+    %q{Deja vu.}
+  )
+%>
+<% end_marg %>
+<% begin_sec("Deja vu all over again",nil,'deja-vu-again') %>
+In example \ref{eg:there-you-go-again} on p.~\pageref{eg:there-you-go-again}, we saw that when an observer
+is accelerated, she may consider an event to be simultaneous with her more than once. That is, given a smooth,
+timelike world-line $\vc{r}(\tau)$ parametrized by proper time, and an event E, which we take to be the origin
+of our coordinate system, there may be more than one time at which $\vc{r}$ is orthogonal to the velocity
+vector $\vc{v}$ (figure \subfigref{deja-vu-again}{1}). As remarked earlier, this is just a problem with applying a particular
+arbitrary labeling convention to a certain example --- not an earthshaking crisis in physics.
+Nevertheless it is of some intrinsic geometric interest to characterize the circumstances under which it can happen.
+We would like to place some kind of bound on how much acceleration is needed and how
+distant E must be.
+
+As a warm-up, consider the analogous problem in Euclidean space, \subfigref{deja-vu-again}{2}.
+Here we have the notion of a tubular neighborhood, which is the greatest thickening of a
+curve W such that no point in it lies on two different normals.\index{tubular neighborhood}
+The tubular neighborhood has a radius $r$, which is the greatest possible
+radius of a non-self-intersecting piece of rope whose central axis coincides with W.
+Normally, as in region A, the rope doesn't intersect itself.
+There are two qualitatively different reasons why the rope could self-intersect. 
+One is local: the radius of curvature of W is too small, as at B, where W coincides with a circle of radius $r$.
+The other is global: two points that are far apart as measured along W
+could be close together in the ambient Euclidean space, as at point C.
+
+If we carry over these ideas to Minkowski space, then the local case,
+\subfigref{deja-vu-again}{3}, is easy to analyze using the techniques we have
+developed. The analog of the radius of curvature is the inverse of the proper acceleration, which suggests that
+we should be able to get a bound on the radius of the tubular neighborhood in terms of the acceleration.
+Define $f(\tau)=\vc{r}\cdot\vc{v}$. At a given point on W, $f$ is minus the Minkowski time coordinate
+that an observer whose world-line is W would assign, at that instant, to E.
+The condition for the type of self-intersection we're discussing
+is that both $f$ and its derivative with respect to proper time $f'$ vanish at the same point on W.
+Differentiating $f$ using the product rule, we
+find $f'=\vc{v}\cdot\vc{v}+\vc{r}\cdot\vc{a}=1+\vc{r}\cdot\vc{a}$ (in the $+---$ signature), so that
+$\vc{r}\cdot\vc{a}=-1$.
+
+We now make use of the fact that both $\vc{a}$ and $\vc{r}$ are orthogonal to W --- the former as a general
+kinematic fact, and the latter because $f=0$. This means that they lie in the plane perpendicular to W.
+The geometry of this plane is Euclidean, so we can apply the
+Euclidean inequality $|\vc{a}\cdot\vc{r}|\le|\vc{a}|\;|\vc{r}|$, where the bars on the left denote
+the absolute value and the ones on the right the magnitudes of the vectors. We therefore
+have $|\vc{a}|\;|\vc{r}|\ge 1$.
+Since $\vc{r}$ is orthogonal to
+W, we can interpret it as the proper distance between E and W. The magnitude of $\vc{a}$ is
+the proper acceleration. Converting to units with $c\ne1$, we have an exact bound of the form
+$(\text{proper distance})(\text{proper acceleration})\ge c^2$.
+In ordinary units $c$ is large, so in this sense E must be distant, and the acceleration large.
+This explains
+why we never encounter such a problem in nonrelativistic physics.
+
+% https://www.physicsforums.com/threads/every-event-is-simultaneous-with-you-at-some-time-proof.829332/
+
+<% end_sec('deja-vu-again') %>
+
+<% begin_sec("That was never now",nil,'jamais-vu') %>
+So far we have
+characterized the circumstances under which simultaneity can fail to be
+unique. Simultaneity can also fail to exist. For example, 
+in the same notation, take W to be the constant-acceleration motion described in
+example \ref{eg:hyperbolic-motion}, p.~\pageref{eg:hyperbolic-motion}, and let E be the event $(-1,0)$.
+Then it can easily be shown (problem \ref{hw:jamais-vu}) that $f(\tau)$ is always positive, so an observer moving along W will
+always consider E to be in her past, never her future. No time exists for her such that she considers
+E to be ``now.'' The function $f$ comes to a maximum somewhere but never crosses zero.
+
+There will always be some neighborhood of W within which we are protected against nonexistence of simultaneity.
+To determine the radius of this neighborhood, we consider an event B that lies
+on the boundary of the neighborhood, and define $f$ in terms of B rather than E.
+Then $f(\tau)=0$ for some $\tau$, but $f$ does not cross over zero, so that either $f\le 0$ everywhere
+or $f\ge 0$ everywhere. At the place where $f(\tau)=0$, we also have $f'(\tau)=0$, and the rest of the
+analysis is the same as before. Therefore the radius of the tubular neighborhood
+determined in that example defines a radius within which simultaneity has both existence and uniqueness.
+
+<% marg(0) %>
+<%
+  fig(
+    'jamais-vu',
+    %q{The boundary point B really is special.}
+  )
+%>
+<% end_marg %>
+
+The interpretation of such a boundary point B is a little funny.
+Figure \figref{jamais-vu} recapitulates the motion described
+in example \ref{eg:hyperbolic-motion}. For this motion, the only point like B is the one labeled $(0,0)$ in the
+Minkowski coordinates used in that derivation.
+Is there really anything special about this point, or is it just a random point that
+we happened to choose as the origin of our coordinate system? An observer moving along this W
+does not believe that any point in spacetime
+accessible to her has any special properties. She has always been accelerating and always will be, so no event she
+can observe or affect can be distinguished from the other events that she could have observed or affected in the same
+way at any earlier or later time. But we can easily show that B \emph{is} special by giving a description of
+it without reference to any coordinates. Let W's causal future be the set of all events that lie in the future light cone
+of some event on W, and similarly for W's causal past. The boundaries of these two sets are W's past and future
+event horizons, and these horizons coincide at only one event,
+which is B. This seems paradoxical, but our observer can neither observe nor affect B, so there is no contradiction.
+<% end_sec('jamais-vu') %>    
+
+<% end_sec('deja-vu') %>
+
+<% end_sec('thickening') %>
+
+<% begin_hw_sec %>
+
+<% begin_hw('run-in-spaceship') %>
+Fred buys a ticket on a spaceship that will accelerate to an ultrarelativistic speed
+$v$ such that $c-v$ is only 6 m/s. Fred was on the track team in high school, so he
+knows he can run about 8 m/s. Once the ship is up to speed, Fred plans to run
+in the forward direction, thereby becoming the first human to exceed the speed of
+light. Other than the possible lack of gravity to allow running, what is wrong
+with Fred's plan?
+<% end_hw %>
+
+<% begin_hw('interpret-v-addition') %>
+(a) In the equation $v_c=(v_1+v_2)/(1+v_1v_2)$ for combination of velocities, interpret
+the case where one of the velocities (but not the other) equals the speed of light.
+(b) Interpret the case where the denominator goes to zero.
+(c) Use the geometric series to rewrite the factor $1/(1+v_1v_2)$, and then expand
+the expression for $v_c$ as a series in $v_1$ and $v_2$, retaining terms up
+to third order in velocity. How does this relate to the correspondence principle?
+<% end_hw %>
+
+<% begin_hw('identities-si') %>
+Determine which of the identities in section \ref{sec:identities} need to be modified in order
+to be valid in units with $c\ne1$, and describe how they should be modified.
+<% end_hw %>
+
+<% begin_hw('lhc-beamstop') %>
+The Large Hadron Collider accelerates counterrotating beams of protons and collides them head-on.
+The beam energy has been gradually increased, and the accelerator is designed to reach a
+maximum energy of 14 TeV, corresponding to a rapidity of 10.3. 
+(a) Find the velocity of the beam.
+(b) In any collision, the kinetic
+energy available to do something inelastic (smash up your car, produce nuclear reactions, \ldots)
+is the energy in the center of mass frame; in any other frame, there is initial kinetic energy that
+must also be present in the final state due to conservation of momentum.
+Suppose that a particular proton in the LHC beam never undergoes a collision with a proton from
+the opposite beam, and instead is wasted by being dumped into a beamstop. Let's say that this
+collision is with a proton in a hydrogen atom left behind by someone's fingerprint.
+Find the velocities of the two protons in
+their common center of mass frame.
+% calc -xe "E=(14 10^12 V)e; m=(938 MV)e; gamma=1+E/m; eta=acosh gamma; v=tanh eta; vv=tanh(eta/2)"
+% ...     v = 0.999999997755801    vv = 0.999933006732748
+<% end_hw %>
+
+<% begin_hw('gps-doppler') %>
+Each GPS satellite is in an orbit with a radius of 26,600 km, with an orbital period of half
+a sidereal day, giving it a velocity of 3.88 km/s. The atomic clock aboard such a satellite
+is tuned to 10.22999999543 MHz, which is chosen so that when the satellite is directly
+overhead, the effect of time dilation (transverse Doppler shift), combined with a general-relativistic
+effect due to gravity, results in a frequency of exactly 10.23 MHz. (GPS started out as a military
+project, and legend has it that the top brass, suspicious of the crazy relativity stuff, demanded
+that the satellites be equipped with a software switch to turn off the correction, just in case the
+physicists were wrong.) There are oscillations
+superimposed onto these static effects due to the longitudinal Doppler shifts as the satellites
+approach and recede from a given observer on the ground. (a) Calculate the maximum Doppler-shifted
+frequency for a hypothetical observer in outer space who is being directly approached by the
+satellite in its orbit. (b) In reality, the greatest possible longitudinal component of the
+velocity is considerably smaller than this due to the geometry. Use the size of the earth to determine this
+velocity and the corresponding maximum frequency.
+<% end_hw %>
+
+<% begin_hw('doppler-concrete') %>
+Verify directly, using the geometry of figure \subfigref{twin-signals}{2} on p.~\pageref{fig:twin-signals}
+that for $v=3/5$, the Doppler shift factor is $D=2$. (Do not simply plug $v=3/5$ into the
+formula $D=\sqrt{(1+v)/(1-v)}$.)
+<% end_hw %>
+
+<% begin_hw('doppler-abstract') %>
+Generalize the numerical calculation of problem \ref{hw:doppler-concrete} to
+prove the general result $D=\sqrt{(1+v)/(1-v)}$.
+<% end_hw %>
+
+<% begin_hw('doppler-taylor') %>
+Expand the relativistic equation for the longitudinal Doppler shift of light
+$D(v)$ in a Taylor series, and find the
+first two nonvanishing terms. Show that these two terms agree with the
+nonrelativistic expression, so that any relativistic effect is of higher
+order in $v$.
+<% end_hw %>
+
+<% begin_hw('prove-a-dot-v-is-zero') %>
+Prove, as claimed on p.~\pageref{a-dot-v-is-zero}, that we must have
+$\vc{a}\cdot\vc{v} = 0$ if the velocity four-vector is to remain properly normalized.
+<% end_hw %>
+
+<% begin_hw('hyperbolic-properties') %>\index{hyperbolic motion}
+Example \ref{eg:hyperbolic-motion} on p.~\pageref{eg:hyperbolic-motion} described the motion of
+an object having constant proper acceleration $a$, the world-line being
+$t=\frac{1}{a}\sinh a\tau$ and $x=\frac{1}{a}\cosh a\tau$ in a particular observer's
+Minkowski coordinates.
+(a) Prove the following results for $\gamma$ and for the
+(three-)velocity and (three-)acceleration measured by this observer.
+\begin{align*}
+  \gamma &= \cosh a\tau \\
+  v &= \tanh a\tau \\
+  \text{acceleration} &= a\cosh^{-3} a\tau
+\end{align*}
+Do the calculations simply by taking the first and second derivatives of position with respect to
+time. You will find the following facts helpful:
+\begin{align*}
+  1-\tanh^2&=\cosh^{-2} \\
+  \frac{\der}{\der x}\tanh x&=\cosh^{-2} x
+\end{align*}
+(b) Interpret the results in the limit of large $\tau$.
+<% end_hw %>
+
+<% begin_hw('hyperbolic-four-vectors') %>
+Example \ref{eg:hyperbolic-motion} on p.~\pageref{eg:hyperbolic-motion} described the motion of
+an object having constant proper acceleration $a$, the world-line being
+$t=\frac{1}{a}\sinh a\tau$ and $x=\frac{1}{a}\cosh a\tau$ in a particular observer's
+Minkowski coordinates.
+Find the corresponding velocity and acceleration four-vectors.
+<% end_hw %>
+
+<% begin_hw('hyperbolic-proj') %>
+Starting from the results of problem \ref{hw:hyperbolic-four-vectors},
+repeat problem \ref{hw:hyperbolic-properties}a using the techniques of section
+\ref{sec:proj} on p.~\pageref{sec:proj}. You will find it helpful to know
+that $1-\tanh^2=\cosh^{-2}$.
+<% end_hw %>
+
+<% begin_hw('v-dot-v') %>
+Let $\vc{v}$ be a future-directed, properly normalized velocity vector.
+Compare the value of $\vc{v}\cdot\vc{v}$ in the $+---$ signature used in this
+book with its value in the signature $-+++$.
+<% end_hw %>
+
+<% begin_hw('gamma-deriv-derivation') %>
+(a) Prove the relation
+$\der\gamma/\der t=\gamma^3 \vc{a}_\vc{o}\cdot\vc{v}_\vc{o}$
+given on p.~\pageref{three-and-four-vec-conversions}, in the special case where 
+the motion is linear.
+(b) Generalize the result to $3+1$ dimensions.
+<% end_hw %>
+
+<% begin_hw('three-accel-derivation') %>
+Derive the identity 
+$\vc{a}_\vc{o} = \frac{1}{(\vc{o}\cdot\vc{v})^2}\left[P_\vc{o}\vc{a}-(\vc{o}\cdot\vc{a})\vc{v}_\vc{o}\right]$
+on p.~\pageref{three-and-four-vec-conversions}.
+<% end_hw %>
+
+<% begin_hw('changing-proper-distance') %>
+Recapitulating the geometry in figure \figref{deja-vu-again} on p.~\pageref{fig:deja-vu-again},
+let W be a smooth, timelike world line, E an event not on W, and $\vc{r}$ the vector from E to
+a point on W, parametrized by proper time $\tau$.
+Define the proper distance $\ell$ between E and a point on W as
+$\ell^2=-(P_\vc{v} \vc{r})^2$, where the square indicates an inner product of the vector with itself,
+and the minus sign is because we use the $+---$ signature.
+Show that $\der(\ell^2)/\der\tau=2(\vc{r}\cdot\vc{v})(\vc{r}\cdot\vc{a})(\vc{v}\cdot\vc{v})$, where
+the final factor is just a signature-dependent sign. Does this make sense
+when W is inertial? Give an example where the derivative vanishes because the first factor is
+zero, and another example where the second factor is the one that vanishes (but $\vc{a}\ne 0$).
+<% end_hw %>
+
+<% begin_hw('jamais-vu') %>
+Consider an observer O moving along a world-line W with
+the constant-acceleration motion defined in example \ref{eg:hyperbolic-motion}, p.~\pageref{eg:hyperbolic-motion}.
+In section \ref{subsec:deja-vu}, p.~\pageref{subsec:deja-vu}, we gave the coordinates of a certain event E that
+was never ``now'' as described by our observer. The purpose of this problem is to analyze this is a more
+elegant and coordinate-invariant way.
+Let P be a point on W, 
+let B be the event described in section \ref{subsec:deja-vu},
+and let $\vc{x}=\overrightarrow{BP}$,
+$\vc{h}=\overrightarrow{BE}$, and
+$\vc{r}=\overrightarrow{EP}$.
+(a) Show that W, which was originally described in a certain set of coordinates, can instead
+by defined by the fact that $\vc{x}\cdot\vc{v}=0$ for every point on W.
+(b) Show that if $\vc{h}$ is timelike, then $\vc{r}\cdot\vc{v}$ is never zero.
+<% end_hw %>   
+
+
+<% end_hw_sec %>
+
+<% end_chapter %>

@@ -1,0 +1,2814 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+
+\chapter{Existing Instruction Selection Techniques and Representations}
+\labelChapter{existing-isel-techniques-and-reps}
+
+With the first publications beginning to appear at the end of the 1960s,
+\gls{instruction selection} has been actively researched for over four decades.
+%
+When surveying these techniques, it was discovered that essentially all apply
+one of four fundamental \glspl!{principle} of \gls{instruction selection}:
+%
+\begin{inlinelist}[itemjoin={, }]
+  \item \gls{macro expansion}
+  \item \gls{tree covering}
+  \item \gls{DAG covering},\!%
+        %
+        \footnote{%
+          \glsunset{DAG}%
+          \Gls{DAG} stands for \glsdesc!{DAG}.
+        }
+        % These to items appear on the same \item in order to get the footnote
+        % to appear on the right place of the comma.
+        and \gls{graph covering}
+\end{inlinelist}.
+%
+The trend of applying these \glspl{principle} over time is shown in
+\refFigure{principles-timeline}.
+%
+\begin{figure}
+  \centering%
+  \def\numTotalPublications{?}% Will be redefined in the file included below
+  \input{figures/existing-isel-techniques-and-reps/principles-timeline-styles}%
+  {%
+    \figureFont\figureFontSize%
+    \input{figures/existing-isel-techniques-and-reps/principles-timeline}%
+  }
+
+  \caption[Principle timeline diagram]%
+          {%
+            Diagram showing how research on instruction selection with
+            respect to the fundamental principles has progressed over time.
+            %
+            With \numTotalPublications~publications in total, the width of each
+            bar indicates the number of relative publications for a given year
+            (\tikz{\node [nothing, fill=black, minimum height=1.25ex,
+                          minimum width=\pgfkeysvalueof{/tikz/bar unit width}]
+                         {}} represents one publication)%
+          }
+  \labelFigure{principles-timeline}
+\end{figure}
+%
+It was also discovered that the capabilities of these techniques can be compared
+in terms of handling \glspl{instruction} with five \glsplshort!{instruction
+  characteristic}.
+%
+The approaches can thus be systematically classified according to their
+\gls{principle} and supported \glspl{instruction characteristic}.
+
+Since a full survey is not needed in order to understand \gls{universal
+  instruction selection} -- which apply \gls{graph covering} -- we examine in
+this chapter only the techniques most relevant to \gls{universal instruction
+  selection}.
+%
+\RefSection{ex-isel-rep-instruction-characteristics} introduces the
+\glspl{instruction characteristic}, and
+\refSectionList{ex-isel-rep-macro-expansion, ex-isel-rep-tree-covering,
+  ex-isel-rep-dag-covering, ex-isel-rep-graph-covering} discusses \gls{macro
+  expansion}, \gls{tree covering}, \gls{DAG covering}, and \gls{graph covering},
+respectively.
+%
+The remaining techniques are discussed in
+\refAppendixRange{macro-expansion}{graph-covering}, and the full survey is also
+available in~\cite{HjortBlindell:2016:Survey}.
+%
+Lastly, \refSection{ex-isel-rep-limitations-of-existing-approaches} discusses
+the limitations of these techniques.
+
+Without loss of generality, we henceforth assume that the input to the
+\gls{instruction selector} consists of a single \gls{function}, which in turn
+consists of many \glspl{basic block} (henceforth referred to as simply
+\glspl!{block}).
+%
+Of these \glspl{block} exactly one represents the \gls{function}'s point of
+entry, called the \gls!{entry block}.
+%
+\Gls{instruction selection} can then be reduced into two subproblems:%
+%
+% LAYOUT FIX:
+% Prevent list to be broken over two pages
+\enlargethispage{1mm}%
+%
+\begin{enumerate}
+  \item Finding all instances of instructions that can implement one or more
+    \glspl{operation} in the \gls{function}.
+    %
+    This problem is called the \gls!{matching problem}.
+  \item Selecting a subset of these instances such that all \glspl{operation}
+    are implemented.
+    %
+    This problem is called the \gls!{selection problem}.
+\end{enumerate}
+%
+Unless the second subproblem is constructed such that it impacts the first --
+and the author has yet to come across a situation where this is required -- both
+subproblems can be solved in isolation without compromising code quality.
+
+
+\section{Instruction Characteristics}
+\labelSection{ex-isel-rep-instruction-characteristics}
+
+An \gls{instruction} can be said to exhibit five \glsplshort{instruction
+  characteristic}:
+%
+\begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+  \item \gls{single-output.ic}
+  \item \gls{multi-output.ic}
+  \item \gls{disjoint-output.ic}
+  \item \gls{inter-block.ic}
+  \item \gls{interdependent.ic}
+\end{inlinelist}.
+%
+The first three \glsplshort{instruction characteristic} form sets of
+\glspl{instruction} that are disjoint from one another, whereas the last two
+\glsplshort{instruction characteristic} can be combined as appropriate with each
+other and with any of the other \glsplshort{instruction characteristic}.
+
+
+\paragraph{Single-Output Instructions}
+
+The simplest kind of \gls{instruction} forms the set of
+\gls!{single-output.ic}[ \glspl{instruction}].
+%
+These produce only a single observable output, in the sense that ``observable''
+means a value that can be accessed through the \gls{assembly code}.
+%
+This includes all \glspl{instruction} that implement a single \gls{operation}
+(such as addition, multiplication, and bit \glspl{operation}), but it also
+includes more complicated \glspl{instruction} that implement several
+\glspl{operation} (such as memory \glspl{operation} with complicated
+\glspl{addressing mode}).
+%
+As long as the observable output constitutes a single value, a
+\gls{single-output.ic} \gls{instruction} can be arbitrarily complex.
+
+This class comprises the majority of \glspl{instruction} in most
+\glspl{instruction set}, and in simple \glspl!{RISC}, such as \gls{MIPS}
+architectures, nearly all \glspl{instruction} are \gls{single-output.ic}
+\glspl{instruction}.
+%
+Naturally, all \glspl{instruction selector} are expected to support this kind of
+\gls{instruction}.
+
+
+\paragraph{Multi-Output Instructions}
+
+As expected from their name, \gls!{multi-output.ic}[ \glspl{instruction}]
+produce more than one observable output from the same input.
+%
+Examples include \instrCode*{divmod}~\glspl{instruction}, which compute both the
+quotient and the remainder of two input values, as well as arithmetic
+\glspl{instruction} that, in addition to computing the result, also set one or
+more \glspl{status flag}.\!%
+%
+\footnote{%
+  A \gls!{status flag} (sometimes also known as a \gls!{condition flag} or a
+  \gls!{condition code}) is a single bit that signifies additional information
+  about the result of a computation, for example if there was a carry overflow
+  or the result was equal to~\num{0}.%
+}
+%
+For this reason such \glspl{instruction} are often said to have side effects,
+but in reality these bits are nothing else but additional output values produced
+by the \gls{instruction}, and will thus be referred to as \gls{multi-output.ic}
+\glspl{instruction}.
+%
+Memory load and store \glspl{instruction}, which access a memory value and then
+increment the address pointer, are also considered \gls{multi-output.ic}
+\glspl{instruction}.
+
+Many architectures such as \gls{X86}, \gls{ARM}, and \gls{Hexagon} provide
+\glspl{instruction} of this class, although they are typically not as common as
+\gls{single-output.ic} \glspl{instruction}.
+
+
+\paragraph{Disjoint-Output Instructions}
+
+\Glspl{instruction} producing many observable output values from many
+different input values are called \gls!{disjoint-output.ic}[
+  \glspl{instruction}].
+%
+These are similar to \gls{multi-output.ic} \glspl{instruction} with the
+exception that all output values in the latter originate from the same input
+values.
+%
+Another way to put it is that if one formed the \glspl{pattern} that correspond
+to each output -- this will be explained in
+\refSection{ex-isel-rep-tree-covering} -- then all these \glspl{pattern} would
+be disjoint from one another.
+%
+This typically includes \gls{SIMD.i} \glspl{instruction}, which execute the same
+\glspl{operation} simultaneously on many distinct input values.
+
+\Gls{disjoint-output.ic} \glspl{instruction} are common in high-throughput
+graphics architectures and \glspl{DSP}, but also appear in \gls{X86} as
+extensions under names like \gls!{SSE} and \gls!{AVX}~\cite{Intel64:2015}.
+%
+Recently, certain \gls{ARM} processors are also equipped with such
+extensions~\cite{ARM11:2008}.
+
+
+\paragraph{Inter-Block Instructions}
+
+\Glspl{instruction} whose behavior essentially spreads across multiple
+\glspl{block} are called \gls!{inter-block.ic}[ \glspl{instruction}].
+%
+Examples of such \glspl{instruction} are those implementing \gls{saturation
+  arithmetic}%
+%
+\footnote{%
+  Recently, a request was made to extend the \gls{LLVM} \gls{compiler} with
+  \glspl!{compiler intrinsic} -- a kind of special \gls{IR} \glspl{operation} --
+  to facilitate selection of such
+  \glspl{instruction}~\cite{LLVM:2015:Intrinsics}.%
+}
+%
+and hardware loop \glspl{instruction}, which repeat a fixed sequence of
+\glspl{operation} a certain number of times.
+
+\Glspl{instruction} with this \glsshort{instruction characteristic} typically
+appear in customized architectures and \glspl{DSP} such as \gls{ARM}'s
+\gls{Cortex-M7}~\cite{ARM:Cortex-M7:2015} and \gls{TI}'s
+\gls{TMS320C55x}~\cite{TI:TMS320C55x:2002}.
+%
+But because of their complexity, capturing the behavior of these
+\glspl{instruction} require sophisticated techniques that are currently not
+available for most \glspl{compiler}.
+%
+Instead, individual \glspl{instruction} are supported either via customized
+\gls{program} optimization routines or through \glspl{compiler intrinsic}.
+%
+If no such routine or \gls{compiler intrinsic} is available, making use of these
+\glspl{instruction} requires the \gls{program} to be written directly in
+\gls{assembly code}.
+
+
+\paragraph{Interdependent Instructions}
+
+The last class is the set of \gls!{interdependent.ic}[ \glspl{instruction}].
+%
+This includes \glspl{instruction} exhibiting additional constraints that appear
+when they are combined with other \glspl{instruction} in certain ways.
+%
+An example includes an \instrCode*{add}~\gls{instruction}, again from the
+\gls{TMS320C55x} \gls{instruction set}, which cannot be combined with an
+\instrCode*{rpt}~instruction if a particular \gls{addressing mode} is used for
+the \instrCode*{add}~instruction.
+
+\Gls{interdependent.ic} \glspl{instruction} are rare and can typically be found
+in complex, heterogeneous architectures such as \glspl{DSP}.
+%
+This is another class of \glspl{instruction} that most \glspl{instruction
+  selector} struggle with, mainly because these \glspl{instruction} typically
+violate the assumptions made by the underlying \gls{instruction selection}
+techniques.
+
+
+\section{Macro Expansion}
+\labelSection{ex-isel-rep-macro-expansion}
+
+The first \gls{principle} to emerge was \gls!{macro expansion}, with
+applications starting to appear in the 1960s.
+%
+In \gls{macro expansion}, the \glspl{instruction} are expressed as
+\glspl!{macro} which consist of two parts:
+%
+\begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+  \item a \gls!{template} to be matched over the \gls{function} under
+    compilation
+  \item an \gls!{expand procedure} to be executed upon the part of the
+    \gls{function} that was matched
+\end{inlinelist}.
+%
+An example of such a procedure is given in \refFigure{macro-example}.
+%
+\begin{filecontents*}{macro-example.c}
+expand($\irAssign{\text{\$3}}{\irAdd{\text{\$1}}{\text{\$2}}}$) {
+  r1 = getRegOf($\$$1);
+  r2 = getRegOf($\$$2);
+  r3 = mkNewReg($\$$3);
+  print "add " + r3 + ", " + r1 + ", " + r2;
+}
+\end{filecontents*}%
+%
+\begin{figure}
+  \centering%
+  \begin{minipage}{.6\textwidth}
+    \lstinputlisting[mathescape]{macro-example.c}
+  \end{minipage}
+
+  \caption[Example of a macro]%
+          {%
+            Example of a macro expanding an IR addition into assembly code.
+            %
+            The template to match is given as argument to \cCode*{expand}, and
+            the procedure to run upon expansion is given as \cCode*{expand}'s
+            body%
+          }
+  \labelFigure{macro-example}
+\end{figure}%
+%
+A \gls!{macro expander} traverses the \gls{function} and tries to match the
+\glspl{template} of the \glspl{macro}, one after another.
+%
+Upon a \gls{match} it executes the corresponding \gls{expand procedure} and then
+resumes the traversal with the next, unmatched part until the entire
+\gls{function} has been expanded.
+%
+Consequently, \glsshort{matching problem} and \glsshort{selection problem} is
+combined into a single task as the first \gls{macro} matched is also the
+selected \gls{macro}.
+
+The main benefit of \gls{macro expansion} is that it is intuitive and
+straightforward to apply.
+%
+Because the \gls{macro expander} is implemented separately from the
+\glspl{macro}, the former can be kept generic and simple while the latter can be
+customized as needed for the \gls{target machine}.
+%
+This also allows the \gls{macro expander} to be void of any \glsshort{target
+  machine}-specific details, thus requiring only the \glspl{macro} to be
+rewritten when retargeting the \gls{compiler} to another \glsshort{target
+  machine}.
+%
+To this end, the \glspl{macro} are typically written in some dedicated language
+to simplify the retargeting task.
+
+But with its simplicity comes two shortcomings.
+%
+Depending on the complexity of the \glspl{macro}, \gls{macro expansion} could
+in principle support all kinds of \glspl{instruction}.
+%
+In practice, however, \glshyphened{macro expansion}[ding] \glspl{instruction
+  selector} are typically limited to \gls{single-output.ic} \glspl{instruction}.
+%
+In addition, they often only expand one \gls{IR}~\gls{operation} at at time,
+resulting in poor code quality.
+%
+Another disadvantage is that because of idiosyncrasies of the dedicated
+language, the \glspl{macro} are often hard to read and understand, making them
+difficult to extend and maintain.
+%
+We call this variant of the principle \gls!{naive.me}[ \gls{macro expansion}].
+
+To mitigate these problems, \gls{macro expansion} can be combined with
+\gls{peephole optimization}.\!%
+%
+\footnote{%
+  A \gls!{peephole optimizer} is a \gls{program} that combines two or more
+  adjacent \glspl{instruction} into a single \gls{instruction}.
+  %
+  The term \emph{peephole} come from the narrow window of \gls{operation}, as a
+  \gls{peephole optimizer} only considers a small number of \glspl{instruction}
+  at a time.
+}
+%
+First, a \gls{naive.me} \gls{macro expander} expands the \gls{function} under
+compilation one \gls{IR}~\gls{operation} at at time.
+%
+Once fully expanded, a \gls{peephole optimizer} runs over the result and
+replaces inefficient sequences of \glspl{instruction} with more competent
+equivalences.
+%
+Consequently, the \glspl{macro} can be divided up into those required for
+correctness -- that is, the simple, single-\gls{operation} \glspl{macro},
+ensuring that code can always be produced -- and those used for efficiency.
+%
+Consequently, the retargeting task becomes simpler and more incremental.
+%
+Due to the people who pioneered the idea, this scheme is known as the
+\gls!{Davidson-Fraser approach}~\cite{DavidsonFraser:1984}.
+
+Because this \gls{principle} has little relevance for \gls{universal instruction
+  selection}, we will not examine applications of \gls{naive.me} \gls{macro
+  expansion} and the \gls{Davidson-Fraser approach} in this chapter.
+
+
+\section{Tree Covering}
+\labelSection{ex-isel-rep-tree-covering}
+
+Beginning of 1970s, a \gls{principle} called \gls!{tree covering} began to
+emerge.
+%
+Unlike \gls{macro expansion}, \gls{tree covering} approaches \gls{instruction
+  selection} as a \gls{graph} problem and, in doing so, separates the
+\gls{selection problem} from the \gls{matching problem}.
+%
+This gives several advantages over \gls{macro expansion}.
+%
+First, capturing the behavior of \glspl{instruction} becomes simpler.
+%
+Second, trade-offs in selecting certain combinations of \glspl{match} can be
+considered, which improves code quality.
+%
+Third, due to \glspl{machine grammar} (to be described shortly), \gls{tree
+  covering} can be based on a formal foundation that enables proof of
+completeness.
+
+
+\subsection{Instruction Selection as a Graph Problem}
+
+First, the \gls{IR} code is transformed into a \gls!{data-flow graph}, where
+\glspl{node} represent \glspl{operation} and \glspl{edge} represent data
+dependencies between the \glspl{operation}.
+%
+\Glspl{data-flow graph} built from the \gls{function} under compilation are
+called \glspl!{expression tree} if they are limited to single, tree-shaped
+expressions, \glspl!{block DAG} if they capture many expressions in a
+\gls{block} as a \gls{DAG}, and \glspl!{function graph} if they capture the data
+flow of entire \glspl{function}.
+%
+An \gls{instruction selector} is \gls!{local.is} if it selects
+\glspl{instruction} for \glspl{expression tree} or \glspl{block DAG}, and
+\gls!{global.is} if it does so for \glspl{function graph}.
+
+Corresponding \glspl{data-flow graph} are also built to represent the
+\glspl{instruction} provided by the \gls{target machine}.
+%
+Such \glspl{data-flow graph} are called either \glspl!{pattern tree},
+\glspl!{pattern DAG}, or \glspl!{pattern graph}, depending on whether they are
+shaped as \glspl{tree}, \glspl{DAG}, or \glspl{graph}, respectively.
+%
+When the shape is clear from the context, they are simply called
+\glspl!{pattern}.
+%
+The set of \glspl{pattern} for a particular \gls{target machine} constitute a
+\gls!{pattern set}.
+
+The \gls{matching problem} can be reduced to finding all instances where a
+\gls{pattern} from the \gls{pattern set} is \gls{subgraph} isomorphic to~$G$,
+where $G$ denotes a \gls{data-flow graph} derived from a \gls{function}.
+%
+Each such instance is called a \gls!{match}, and the set of all \glspl{match}
+constitute a \gls!{match set}, denoted by~$M$.
+%
+Hence, in this context the \gls{matching problem} is referred to as
+\gls!{pattern matching}.
+%
+\Gls{pattern matching} can be done in linear time if both $G$ and all
+\glspl{pattern} are tree-shaped, otherwise it is an NP-complete
+problem~\cite{GareyJohnson:1979,HoffmannODonnell:1982}.
+
+Having found $M$, the \gls{selection problem} -- which in this context is
+referred to as \gls!{pattern selection} -- can be reduced to selecting a set of
+\glspl{match} that \gls{cover}[s]~$G$.
+%
+A subset~\mbox{$M' \subseteq M$} \gls!{cover}[s] $G$ if every \gls{node} in $G$
+appears in at least one match in~$M'$\!.
+%
+Such a subset is called a \gls!{cover}.
+%
+A \gls{cover} is an \gls!{exact.c}[ \gls{cover}] if every \gls{node} in $G$
+appears in exactly one match in the \gls{cover}.
+%
+Most \gls{instruction selection} approaches assume \gls{exact.c}
+\gls{cover}[age].
+%
+Examples of \glspl{cover} are shown in \refFigure{p-match-sel-example}.
+
+\begin{filecontents*}{p-match-sel-example.c}
+x = A[i + 1];
+\end{filecontents*}
+
+\begin{figure}
+  \centering%
+  \subcaptionbox{C code\labelFigure{p-match-sel-example-c}}%
+                {%
+                  \begin{lstpage}{2.6cm}%
+                    \lstinputlisting[language=c]{p-match-sel-example.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Instructions.
+                  %
+                  The $*s$ \mbox{notation} means ``get value at address $s$ in
+                  memory''%
+                  \labelFigure{p-match-sel-example-instrs}%
+                }{%
+                  \figureFontSize%
+                  \begin{tabular}{%
+                                   >{\instrFont{}}r@{\hspace{4pt}}%
+                                   >{$}l<{$}@{ $\leftarrow$ }%
+                                   >{$}l<{$}%
+                                 }
+                    \toprule
+                    mv     & r & \mathit{var}\\
+                    add    & r & s + t\\
+                    mul    & r & s \times t\\
+                    muladd & r & s \times t + u\\
+                    load   & r & *s\\
+                    maload & r & *(s \times t + u)\\
+                    \bottomrule
+                  \end{tabular}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Expression tree and its matches%
+                  \labelFigure{p-match-sel-example-tree}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    p-match-sel-example-tree%
+                  }%
+                }
+
+  \caption[Example of the pattern matching and selection problem]%
+          {%
+            Example demonstrating the pattern matching and selection problem for
+            a program that loads a value from integer array \irVar*{A} at offset
+            \mbox{\irVar*{i} \irCode*{\irAddText{}} \irVar*{1}}.
+            %
+            It is assumed that \irVar*{i} is stored in register, that \irVar*{A}
+            is stored in memory, and that an integer is four~bytes.
+            %
+            Exact covers are \mbox{$\mSet{m_1, \ldots, m_7, m_9}$},
+            \mbox{$\mSet{m_1, \ldots, m_5, m_8, m_9}$}, \mbox{$\mSet{m_1,
+                \ldots, m_5, m_{10}}$}, and \mbox{$\mSet{m_1, \ldots, m_5, m_8,
+                m_9}$} (non-exact covers are ignored for brevity).
+            %
+            Variable assignments need not be explicitly represented as nodes
+            since this information can be propagated from the root node after
+            having found a cover%
+          }
+  \labelFigure{p-match-sel-example}
+\end{figure}
+
+For a given \gls{function} and \gls{target machine}, there often exists many
+valid combinations of \glspl{instruction}. In terms of $G$ and $M$ this means
+there exist many \glspl{cover} of~$G$, which each may result in code where
+quality differs significantly.
+%
+In certain cases, for example, the performance of two sets of selected
+\glspl{instruction} may differ by as much as two orders of
+magnitude~\cite{ZivojnovicEtAl:1994}.
+%
+Consequently, the \gls{pattern selection} problem -- originally defined to
+accept any valid \gls{cover} -- is augmented into an optimization problem called
+\gls!{optimal.ps}[ \gls{pattern selection}], where only \glspl{cover} with
+\glslong{least-cost.c} are accepted.
+%
+The cost of a \gls{cover}~$M'$ is the sum of the costs for the \glspl{match}
+appearing in~$M'$\!, where the cost of a \gls{match} is set to reflect a desired
+characteristic in the generated code.
+
+For example, assume that the \instrCode*{mv}, \instrCode*{add},
+\instrCode*{mul}, and \instrCode*{muladd} \glspl{instruction} in
+\refFigure{p-match-sel-example} all take one cycle to execute whereas the
+\instrCode*{load} and \instrCode*{amload} \glspl{instruction} take five cycles
+to execute.
+%
+Assume further that the \gls{compiler} should maximize performance.
+%
+The corresponding matches \mbox{$m_1, m_2, \ldots, m_8, m_9, m_{10}$} are
+therefore assigned costs \mbox{$0, 1, \ldots, 1, 5, 5$}, respectively ($m_1$ has
+zero cost since variable~\irVar*{i} is already in a \gls{register}).
+%
+Then, of the \gls{exact.c} \glspl{cover} \mbox{$\mSet{m_1, \ldots, m_7, m_9}$},
+\mbox{$\mSet{m_1, \ldots, m_5, m_8, m_9}$}, and \mbox{$\mSet{m_1, \ldots, m_5,
+    m_{10}}$}, only the last \gls{cover} is considered \gls{optimal.ps} as it
+has a total cost of~\num{9} whereas the other two \glspl{cover} have
+costs~\num{11} and~\num{10}, respectively.
+%
+There is typically a strong correlation between the size of a \gls{cover} and
+its cost -- smaller \glspl{cover} typically lead to less cost and ultimately
+better code -- but this depends heavily on the properties of the \gls{target
+  machine}.
+
+For practical reasons, the \gls{instruction set} of a \gls{target machine} must
+be described in a machine-readable format, which we call \gls!{machine
+  description}.
+%
+A common method is to model the \glspl{instruction} as a \gls{machine grammar},
+which we will now describe.
+
+
+\subsection{Machine Grammars}
+\labelSection{machine-grammars}
+
+\Glspl!{machine grammar} (or simply called \gls!{grammar}) are based on
+\glspl{context-free grammar}~\cite{AhoEtAl:2006}, which are typically used for
+describing language syntax.
+%
+A \gls{grammar} consists of \glspl{terminal}, \glspl{nonterminal}, and
+\glspl{rule}.
+%
+In this context, a \gls!{terminal} is a \gls{symbol} representing an
+\gls{operation} (\eg \irCode*{\irAddText}, \irCode*{\irLTText},
+\irCode*{\irLoadText}), and a \gls!{nonterminal} is a \gls{symbol} representing
+an abstract result (\eg $\mNT{Reg}$) produced by the \gls{instruction}.
+%
+To distinguish between the two, \glspl{terminal} are written entirely in lower
+case whereas \glspl{nonterminal} start with a capital letter and are set in
+italics.
+
+A \gls!{rule} describes the behavior of an \gls{instruction} and consists of a
+\gls{production}, a non-negative cost, and an \gls{action}.
+%
+\Glspl!{production} describe how to derive \glspl{nonterminal}, and are written
+as
+%
+\begin{displaymath}
+  \alpha \rightarrow \beta \gamma \ldots
+\end{displaymath}
+%
+where the left-hand side is a single \gls{nonterminal} and the right-hand side
+is a sequence of \glspl{terminal} and \glspl{nonterminal}.
+%
+Each \gls{instruction} gives rise to one or more \glspl{production}, where the
+right-hand side of a \gls{production} captures a \gls{pattern} of the
+\gls{instruction} and the left-hand side denotes the result produced by the
+\gls{instruction}.
+%
+Hence the left-hand and right-hand sides of a \gls{rule} are referred to as the
+\gls{rule}'s \glsshort!{rule result} and \glsshort!{rule pattern}, respectively.
+%
+The \gls!{action} is what to perform when a \gls{rule} is selected.
+%
+Typically this is to emit the corresponding \gls{assembly code}, but it could
+also include other tasks such as bookkeeping.
+%
+The \gls{rule} structure is illustrated in
+\refFigure{machine-grammar-rule-anatomy}, and examples of \glspl{rule} are given
+in \refTable{grammar-rules-example}.
+%
+\begin{figure}
+  \centering%
+  \figureFont\figureFontSize%
+  \begin{displaymath}
+    \underbrace{
+      \overbrace{
+        \overbrace{\mNT{Reg}[1]}^{\text{result}}
+        \rightarrow \;
+        \overbrace{%
+          \irCode{\irAddText} \; \mNT{Reg}[2] \; \irCode{const}%
+        }^{\text{pattern}}%
+      }^{\text{production}}
+      \qquad
+      \overbrace{\text{4}}^{\text{cost}}
+      \qquad
+      \overbrace{
+        \text{emit}~
+        \text{\instrFont{} add \$$\mNT{Reg}[1]$, \$$\mNT{Reg}[2]$, \#const}%
+      }^{\text{action}}
+    }_{\text{rule}}
+  \end{displaymath}
+
+  \vspace*{-\baselineskip}
+
+  \caption{Anatomy of a rule in a machine grammar}
+  \labelFigure{machine-grammar-rule-anatomy}
+\end{figure}
+
+\begin{table}[t]
+  \centering%
+  \figureFontSize%
+  \begin{tabular}{cr@{ $\rightarrow$ }lcl}
+    \toprule
+    \tabhead \# & \multicolumn{2}{c}{\tabhead production} & \tabhead cost
+      & \multicolumn{1}{c}{\tabhead action}\\
+    \midrule
+    1 & $\mNT{Reg}[1]$
+      & $\irCode{\irLoadText} \; \irCode{\irAddText} \; \mNT{Reg}[2] \;
+         \irCode{const}$
+      & 1
+      & emit {\instrFont load \$$\mNT{Reg}[1]$, const(\$$\mNT{Reg}[2]$)}\\
+    2 & $\mNT{Reg}[1]$
+      & $\irCode{\irLoadText} \; \irCode{\irAddText} \; \irCode{const} \;
+         \mNT{Reg}[2]$
+      & 1
+      & emit {\instrFont load \$$\mNT{Reg}[1]$, const(\$$\mNT{Reg}[2]$)}\\
+    3 & $\mNT{Reg}[1]$
+      & $\irCode{\irLoadText} \; \mNT{Reg}[2]$
+      & 1
+      & emit {\instrFont load \$$\mNT{Reg}[1]$, 0(\$$\mNT{Reg}[2]$)}\\
+    \bottomrule
+  \end{tabular}
+
+  \caption[Example of grammar rules]%
+          {%
+            Example of grammar rules corresponding to a
+            \mbox{\instrFont*load \$t, o(\$s)} \gls{instruction} that loads a
+            value from memory at the address given in register~\instrCode*{s},
+            offset by an immediate value~\instrCode*{o}, and stores the loaded
+            value in register~\instrCode*{t}, in one cycle.
+            %
+            The subscripts are only needed for referencing the right
+            nonterminal in the action%
+          }
+  \labelTable{grammar-rules-example}
+\end{table}
+
+To avoid the need for parentheses, the \glspl{production} are typically written
+in \gls!{Polish notation} (for example, \mbox{$1 + (2 + 3)$} is written as
+\mbox{$+ \; 1 + 2 \; 3$}).
+%
+Similarly, the \gls{expression tree} shown in
+\refFigure{p-match-sel-example-tree} can be expressed as
+\mbox{\irFont*\irLoadText{} \irAddText{} \irMulText{} \irAddText{} \irVar{i}
+  \irVar{1} \irVar{4} \irVar{A}}.
+
+With a \gls{grammar} at hand, the \gls{pattern selection} problem becomes
+equivalent to finding a sequence of \gls{rule} applications, called \glspl!{rule
+  reduction}, that reduces the \gls{expression tree} to a given
+\gls{nonterminal}.
+%
+A method for finding the sequence with least cost is described shortly.
+
+
+\paragraph{Normal Form}
+
+To simplify \gls{pattern matching} and \gls{pattern selection}, a \gls{grammar}
+can be rewritten into \gls{normal form.g}~\cite{BalachandranEtAl:1990}.
+%
+A \gls{grammar} is in \gls!{normal form.g} if every \gls{rule} in the
+\gls{grammar} has a \gls{production} in one of the following forms:
+%
+\begin{enumerate}
+  \item \mbox{$\mNT{N} \rightarrow \irCode*{op} \; \mNT{A}[1] \; \mNT{A}[2]
+    \ldots \mNT{A}[n]$}, where \irCode*{op} is a \gls{terminal}, representing an
+    \gls{operation} that takes $n$ arguments, and all $\mNT{A}[i]$ are
+    \glspl{nonterminal}.
+    %
+    Such rules are called \gls!{base.r}[ \glspl{rule}].
+  \item \mbox{$\mNT{N} \rightarrow \irCode*{t}$}, where \irCode*{t} is a
+    \gls{terminal}.
+    %
+    Such rules are also called \gls{base.r} \glspl{rule}.
+  \item \mbox{$\mNT{N} \rightarrow \mNT{A}$}, where $\mNT{A}$ is a
+    \gls{nonterminal}.
+    %
+    Such rules are called \gls!{chain.r}[ \glspl{rule}].
+\end{enumerate}
+
+A \gls{grammar} can be mechanically rewritten into \gls{normal form.g} by
+introducing new \glspl{nonterminal} and breaking down illegal \glspl{rule} into
+multiple, smaller \glspl{rule} until the \gls{grammar} is in \gls{normal
+  form.g}.
+%
+For example, rewriting the \gls{grammar} shown in
+\refTable{grammar-rules-example} into \gls{normal form.g} results in the
+\gls{grammar} shown in \refTable{normal-form-grammar-example}.
+%
+\begin{table}[t]
+  \centering%
+  \figureFontSize%
+  \begin{tabular}{cr@{ $\rightarrow$ }lcl}
+    \toprule
+    \tabhead \# & \multicolumn{2}{c}{\tabhead production} & \tabhead cost
+      & \multicolumn{1}{c}{\tabhead action}\\
+    \midrule
+    1 & $\mNT{Reg}$ & $\irCode{\irLoadText} \; \mNT{A}$
+      & 1
+      & emit {\instrFont load \$$\mNT{Reg}$,
+                               $A.C.\text{const}$(\$$A.\mNT{Reg}$)}\\
+    4 & $\mNT{A}$ & $\irCode{\irAddText} \; \mNT{Reg} \; \mNT{C}$
+      & 0
+      & \\
+    2 & $\mNT{Reg}$ & $\irCode{\irLoadText} \; \mNT{B}$
+      & 1
+      & emit {\instrFont load \$$\mNT{Reg}$,
+                               $B.C.\text{const}$(\$$B.\mNT{Reg}$)}\\
+    5 & $\mNT{B}$ & $\irCode{\irAddText} \; \mNT{C} \; \mNT{Reg}$
+      & 0
+      & \\
+    6 & $\mNT{C}$ & $\irCode{const}$
+      & 0
+      & \\
+    3 & $\mNT{Reg}[1]$ & $\irCode{\irLoadText} \; \mNT{Reg}[2]$
+      & 1
+      & emit {\instrFont load \$$\mNT{Reg}[1]$, 0(\$$\mNT{Reg}[2]$)}\\
+    \bottomrule
+  \end{tabular}%
+
+  \caption[Example of a grammar in normal form]%
+          {%
+            The grammar from \refTable{grammar-rules-example} in normal form.
+            %
+            Nonterminals~$\mNT{A}$,~$\mNT{B}$ and~$\mNT{C}$ and
+            rules~\mbox{\num{4}--\num{6}} are introduced in order to transform
+            rules~\num{1} and~\num{2} into base rules%
+          }
+  \labelTable{normal-form-grammar-example}
+\end{table}
+%
+Note that the new \glspl{rule} have zero cost and no \gls{action} as these are
+only intermediary steps towards enabling reduction of the original \gls{rule}.
+
+Since all \glspl{production} in a \glsshort{normal form.g} \gls{grammar} have at
+most one \gls{terminal}, the \gls{pattern matching} problem becomes trivial
+(simply match the \gls{node} type against the \gls{terminal} in all \gls{base.r}
+\glspl{rule}).
+%
+Otherwise another bottom-up traversal of the \gls{expression tree} would have to
+be made in order to find all \glspl{match}, which can be done in linear time for
+most reasonable \glspl{grammar}~\cite{HoffmannODonnell:1982}.
+%
+As we will see, this also simplifies \gls{pattern selection} as the
+\glspl{pattern} on the right-hand side in all \glspl{production} have uniform
+height.
+
+
+\subsection{Optimal Pattern Selection on Expression Trees}
+
+\textcite{AhoEtAl:1989} introduced a method for finding the \gls{optimal.ps}
+\gls{cover} for any given \gls{expression tree} in linear time, which is also
+the most common and well known technique based on \gls{tree covering}.
+
+The technique is centered around the following assumption.
+%
+Given a \gls{node}~$n$ in an \gls{expression tree} and a \gls{rule}~$r$\!, the
+cost of applying $r$ on $n$ is the cost of $r$ plus the costs of reducing all
+\glspl{child} of $n$ to the appropriate \glspl{nonterminal} appearing on the
+right-hand side of~$r$\!.
+%
+If $r$ is a \gls{chain.r} \gls{rule} then the cost is computed as the cost of
+$r$ plus the cost of reducing $n$ to the \gls{nonterminal} appearing in the
+\glsshort{rule pattern} of~$r$\!.
+%
+The recursive nature of these costs can be exploited using \glsdesc{DP},
+resulting in the algorithm shown in \refAlgorithm{aho-etal-cost-algorithm} which
+computes the least cost of reducing a given \gls{expression tree} to a
+particular \gls{nonterminal}.
+
+\begin{algorithm}[p]
+  \DeclFunction{ComputeCosts}%
+               {expression tree $T$\!, normal-form grammar $G$}%
+  {%
+    $S$ \Assign $\mSetBuilder{s}%
+                             {\text{$s$ is a nonterminal in $G$}}$\;
+    $\mMatrix{C}$ \Assign
+      matrix of size $|T| \times |S|$, costs initialized to $\infty$\;
+    \Call{ComputeCostsRec}{root node of $T$}\;
+    \Return{$\mMatrix{C}$}\;
+    \BlankLine
+    \DeclFunction{ComputeCostsRec}{node $n$}{%
+      \ForEach{child $m$ of $n$}{%
+        \Call{ComputeCostsRec}{$m$}\;
+      }
+      \ForEach{base rule $r \in \text{\Call{FindMatchingRules}{$n$}}$}{%
+        $c$ \Assign \Call{ComputeReductionCost}{$n$\hspace{-.8pt}, $r$}\;
+        $l$ \Assign result of $r$\;
+        \If{$c < \mMatrix{C}[n][l]$.cost}{%
+          $\mMatrix{C}[n][l]$.cost \Assign $c$\;
+          $\mMatrix{C}[n][l]$.rule \Assign $r$\;
+        }
+      }
+      \Repeat{no change to $\mMatrix{C}$}{%
+        \ForEach{chain rule $r \in G$}{%
+          $c$ \Assign \Call{ComputeReductionCost}{$n$\hspace{-.8pt}, $r$}\;
+          $l$ \Assign result of $r$\;
+          \If{$c < \mMatrix{C}[n][l]$.cost}{%
+            $\mMatrix{C}[n][l]$.cost \Assign $c$\;
+            $\mMatrix{C}[n][l]$.rule \Assign $r$\;
+          }
+        }
+      }
+    }
+
+    \BlankLine
+    \DeclFunction{FindMatchingRules}{node $n$}{%
+      $M$ \Assign $\emptyset$\;
+      \ForEach{base rule $r \in G$}{%
+        \If{$\text{terminal in pattern of $r$} = \text{node type of $n$}$}{%
+          $M$ \Assign $M \cup \mSet{r}$\;
+        }
+      }
+      \Return{$M$}\;
+    }
+
+    \BlankLine
+    \DeclFunction{ComputeReductionCost}{node $n$\hspace{-.8pt}, rule $r$}{%
+      $c$ \Assign cost of $r$\;
+      \eIf{$r$ is a chain rule}{%
+        $s$ \Assign nonterminal in pattern of $r$\;
+        $c$ \Assign $c$ $+$ $\mMatrix{C}[n][s]$.cost
+        \tcp*{here cost of node itself is taken instead of its children}
+      }{%
+        \For{$i$ \Assign $1$ \KwTo number of children for $n$}{%
+          $m$ \Assign $i$th child of $n$\;
+          $s$ \Assign $i$th nonterminal in pattern of $r$\;
+          $c$ \Assign $c$ $+$ $\mMatrix{C}[m][s]$.cost\;
+        }
+      }
+      \Return{$c$}\;
+    }
+  }
+
+  \caption[%
+            Algorithm for computing the optimal sequence of rules that reduces
+            the given expression tree to a particular nonterminal%
+          ]{%
+            Computes the optimal sequence of rules that reduces the given
+            expression tree to a particular nonterminal%
+          }
+  \labelAlgorithm{aho-etal-cost-algorithm}
+\end{algorithm}
+
+The algorithm works as follows.
+%
+It first constructs a cost matrix~$\mMatrix{C}$, where rows represent
+\glspl{node} in the \gls{expression tree} and columns represent
+\glspl{nonterminal} in the \gls{grammar}, assumed to be in \gls{normal
+  form.g}.\!%
+%
+\footnote{%
+  The algorithm can be adapted to accept any \gls{grammar} by expanding the
+  \algStyle{FindMatchingRules} and \algStyle{ComputeReductionCost} functions to
+  handle \glspl{rule} of arbitrary form.%
+}
+%
+The cost in each element~\mbox{$\mMatrix{C}[i][j]$} is initialized to infinity,
+indicating that there exists no sequence of \glspl{rule reduction} that reduces
+\gls{node}~$i$ to \gls{nonterminal}~\mbox{$j$\hspace{-1pt}.}
+%
+It then computes the costs by traversing the \gls{expression tree} bottom up.
+%
+At each \gls{node}~$n$ and for each matching \gls{base.r} \gls{rule}~$r$\!, with
+\gls{nonterminal}~$s$ as \glsshort{rule result}, it computes the cost~$c$ of
+applying $r$ at~$n$ to produce~$s$ according to the scheme stated above.
+%
+If $c$ is less than the currently recorded cost for reducing $n$
+to~\mbox{$s$\hspace{-.8pt},} then the cost and \gls{rule} information for $n$ is
+updated accordingly.
+%
+The same is then done for all \gls{chain.r} \glspl{rule} until it reaches a
+fixpoint (which must eventually be reached as all \gls{rule} costs are
+non-negative and an update only occurs when the cost is strictly less).
+%
+Since every \gls{node} is also only processed once, the algorithm runs in linear
+time with respect to the size of the \gls{expression tree}.
+%
+Having computed the costs, the optimal order of \glspl{rule reduction} -- which
+is equivalent to the \gls{least-cost.c} \gls{cover} -- can be found using the
+algorithm shown in \refAlgorithm{aho-etal-select-algorithm}.
+
+\begin{algorithm}[t]
+  \DeclFunction{SelectRules}{expression tree $T$\!,
+                        goal nonterminal $g$,
+                        cost matrix $\mMatrix{C}$}%
+  {%
+    $n$ \Assign root node of $T$\;
+    $r$ \Assign $\mMatrix{C}[n][g]$.rule\;
+    \eIf{$r$ is a chain rule}{%
+      $s$ \Assign result of $r$\;
+      \Call{SelectRules}{$T$, $s$, $\mMatrix{C}$}\;
+    }{%
+      \For{$i$ \Assign $1$ \KwTo number of children for $n$}{%
+        $m$ \Assign $i$th child of $n$\;
+        $s$ \Assign $i$th nonterminal in pattern of $r$\;
+        \Call{SelectRules}{expression tree rooted at $m$\hspace{-.8pt},
+                           $s$\hspace{-.8pt},
+                           $\mMatrix{C}$}\;
+      }
+    }
+    execute actions associated with $r$\;
+  }
+
+  \caption[Algorithm for selecting the optimal sequence of rules]%
+          {%
+            Selects optimal sequence of rules that reduces a given expression
+            tree to a given nonterminal, based on costs computed
+            by \refAlgorithm{aho-etal-cost-algorithm}%
+          }
+  \labelAlgorithm{aho-etal-select-algorithm}
+\end{algorithm}
+
+In many cases this technique produces code of sufficient quality.
+%
+In fact, for architectures with simple \glspl{instruction set}, where the
+\glspl{rule pattern} can naturally be modeled as trees (such as
+\gls{single-output.ic} \glspl{instruction}), it is often optimal or near
+optimal.
+%
+The \gls{MIPS} \gls{instruction set}~\cite{Sweetman:2006}, for example, is one
+such architecture.
+
+
+\subsection{Precomputing Costs and Rule Decisions}
+
+Shortly after \citeauthor{AhoEtAl:1989} published their approach, it was
+recognized that the costs computed by \refAlgorithm{aho-etal-cost-algorithm}
+could be precomputed for any \glspl{expression tree}.
+%
+Hence the \algStyle{ComputeReductionCost} call in
+\refAlgorithm{aho-etal-select-algorithm} can be replaced by a constant-time
+table lookup.
+%
+Although this improvement does not affect the asymptotic time complexity of the
+algorithm, it still significantly reduce the actual runtime.
+%
+Although pioneered by \textcite{HatcherChristopher:1986}, the idea was first
+successfully applied by \textcite{Pelegri-LlopartGraham:1988}, which was later
+improved and simplified by \textcite{BalachandranEtAl:1990} and
+\textcite{Proebsting:1992:BURS}.
+
+The idea is as follows.
+%
+The \gls{expression tree} is traversed bottom up and labeled with a
+\gls!{state}.
+%
+For a given labeled \gls{node}~\mbox{$n$\hspace{-.8pt},} the \gls{state}
+essentially holds enough information to optimally reduce the \gls{expression
+  tree} rooted at~$n$ to any \gls{nonterminal}.
+%
+At first glance it would seem that this requires an infinite number of
+\glspl{state} as \glspl{expression tree} can be of arbitrary size, but this only
+applies if the \emph{full} cost of the entire \gls{expression tree} is taken
+into account.
+%
+When considering the \emph{relative} cost differences between \glspl{rule} for
+any given \gls{node} in the \gls{expression tree}, it is sufficient with a
+finite number of \glspl{state}.
+%
+The algorithm for labeling an \gls{expression tree} is shown in
+\refAlgorithm{opt-pat-sel-labeling-algorithm}.
+%
+\begin{algorithm}[t]
+  \DeclFunction{LabelTree}%
+               {expression tree $T$\!, list $L$ of state tables}%
+  {%
+    $n$ \Assign root node of $T$\;
+    $k$ \Assign number of children for $n$\;
+    \For{$i$ \Assign $1$ \KwTo $k$}{%
+      $m_i$ \Assign $i$th child of $n$\;
+      \Call{LabelTree}{expression tree rooted at $m_i$, $L$}\;
+    }
+    $S$ \Assign $L[\text{terminal corresponding to $n$}]$\;
+    $n$.label \Assign $S[m_1.\text{label}, \ldots, m_k.\text{label}]$\;
+  }
+
+  \caption[%
+            Algorithm for labeling an expression tree for optimal pattern
+            selection%
+          ]{%
+            Labels an expression tree for optimal pattern selection%
+          }
+  \labelAlgorithm{opt-pat-sel-labeling-algorithm}
+\end{algorithm}
+%
+To derive the \gls{rule} selection algorithm, one only needs to adapt
+line~\num{2} in \refAlgorithm{aho-etal-select-algorithm} to perform the
+appropriate table lookups.
+
+The idea for computing the \glspl{state} -- which will only be described briefly
+-- works as follows.
+%
+For each \gls{terminal} representing a $k$-argument \gls{operation}, an
+\mbox{$k$-dimensional} matrix is maintained.
+%
+This is called the \gls{terminal}'s \gls!{state table}, which indicates the
+state to assign such \glspl{node} given the labels of its \glspl{child}.
+%
+First the states for all leaf \glspl{node} are built, considering only
+\gls{base.r} \glspl{rule} with a single \glspl{terminal} on the right-hand side
+in the \gls{production}.
+%
+The costs and \gls{rule} decisions are computed using the same logic as in
+\refAlgorithm{aho-etal-cost-algorithm}, lines~\mbox{\num{8}--\num{21}}.
+%
+The leaf \gls{state} are then pushed onto a queue.
+%
+Each popped \gls{state} is used as the $i$th \gls{child} to all \gls{base.r}
+\glspl{rule} with a non-leaf \glspl{terminal} in combination with all other
+existing \glspl{state}.
+%
+If any combination gives rise to a new set of costs and \gls{rule} decisions,
+then a new \gls{state} is created and pushed onto the queue after having updated
+the \glspl{state table}.
+%
+This process continues until the queue is empty, whereupon all necessary
+\glspl{state} have been built.
+
+
+\subsection{Limitations of Tree Covering}
+
+The main disadvantage of operating on \glspl{expression tree} is that common
+subexpressions have to be either split along the \glspl{edge} or duplicated when
+building the \gls{IR}.
+%
+These transformations are referred to as \gls!{edge splitting} and \gls!{node
+  duplication}, respectively.
+%
+Depending on the \gls{instruction set}, these decisions can prevent selection of
+\glspl{instruction} that would lead to better code quality.
+
+An example illustrating this effect is shown in
+\refFigure{exp-trees-limit-example}.
+%
+\begin{filecontents*}{exp-trees-limit-example.c}
+t = a + b;
+x = c * t;
+y = *((int*) t);
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{C code\labelFigure{exp-trees-limit-example-c}}%
+                {%
+                  \begin{lstpage}{3cm}
+                    \lstinputlisting[language=c]{exp-trees-limit-example.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Instructions.
+                  %
+                  The $*s$ notation means ``get value at address $s$ in
+                  memory''%
+                  \labelFigure{exp-trees-limit-example-instrs}%
+                }%
+                [50mm]%
+                {%
+                  \figureFontSize
+                  \begin{tabular}{%
+                                   >{\instrFont{}}r@{\hspace{4pt}}%
+                                   >{$}l<{$}@{ $\leftarrow$ }%
+                                   >{$}l<{$}%
+                                   c%
+                                 }
+                    \toprule
+                    \multicolumn{3}{c}{\tabhead instruction} & \tabhead cost\\
+                    \midrule
+                    add     & r & s + t & 2\\
+                    mul     & r & s \times t & 3\\
+                    addmul  & r & (s + t) \times u & 4\\
+                    load    & r & *s & 5\\
+                    addload & r & *(s + t) & 5\\
+                    \bottomrule
+                  \end{tabular}%
+                }%
+  \hfill%
+  \mbox{}%
+
+  \vspace{\betweensubfigures}
+
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Expression trees after edge splitting%
+                  \labelFigure{exp-trees-limit-example-trees}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    exp-trees-limit-example-trees%
+                  }%
+                }%
+  \hfill\hfill%
+  \subcaptionbox{%
+                  Block DAG%
+                  \labelFigure{exp-trees-limit-example-dag}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    exp-trees-limit-example-dag%
+                  }%
+                }%
+  \hfill%
+  \mbox{}%
+
+  \caption[Example illustrating the limitation of expression trees]%
+          {%
+            Example illustrating that using block DAGs results in
+            better code compared to using expression trees.
+            %
+            It is assumed variables \irVar*{a}, \irVar*{b}, \irVar*{c}, and
+            \irVar*{t} are stored in registers%
+          }
+  \labelFigure{exp-trees-limit-example}
+\end{figure}
+%
+If the \gls{IR} is represented as trees, where the common subexpression for
+computing \irVar*{t} has its own \gls{expression tree}
+(\refFigure{exp-trees-limit-example-trees}), then matches~\mbox{$m_1, \ldots,
+  m_7$}, and~$m_9$ must be selected, which results in a total cost of \mbox{$0 +
+  \cdots + 0 + 2 + 3 + 5 = 10$}.
+%
+If represented as a \gls{block DAG} (\refFigure{exp-trees-limit-example-dag}),
+then it becomes possible of selecting matches~$m_8$ and~$m_{10}$, resulting in a
+total cost of \mbox{$0 + \cdots + 0 + 4 + 5 = 9$}.
+%
+\Glsshort{node duplication}[ing] the \glspl{node} of the common subexpression
+would, in this case, yield the same \glspl{cover}, but would have resulted in
+suboptimal code in cases where the \instrCode*{addmul} and \instrCode*{addload}
+\glspl{instruction} are not available.
+
+
+\section{DAG Covering}
+\labelSection{ex-isel-rep-dag-covering}
+
+By replacing the \glspl{expression tree} used in \gls{tree covering} with
+\glspl{block DAG}, and allowing \glspl{instruction} to be modeled either as
+\glspl{pattern tree} or \glspl{pattern DAG}, we attain the more general
+\gls{principle} called \gls!{DAG covering}.
+
+\Gls{DAG covering} has several advantages of \gls{tree covering}.
+%
+First, the \gls{block DAG} does not need to be decomposed into \glspl{expression
+  tree}, which compromises code quality.
+%
+Second, it supports use of \glspl{pattern DAG}, which are needed for modeling
+\gls{multi-output.ic} \glspl{instruction}.
+
+But unlike \gls{tree covering}, which can be solved optimally in linear time,
+finding the \gls{least-cost.c} \gls{cover} of a \gls{block DAG} is
+NP-complete~\cite{KoesGoldstein:2008, Proebsting:1995:Proof}.
+%
+The proof is also available in \refAppendix{dag-covering} on
+\refPageOfSection{dc-proof}.
+%
+Consequently, \gls{DAG covering} started to gain traction in the beginning of
+the 1990s after exponential increase in computing power and significant progress
+made in the field of combinatorial optimization enabled such methods to become
+practical for \gls{instruction selection}.
+%
+Most combinatorial approaches support \gls{DAG}-shaped \glspl{pattern}, but
+finding \glspl{match} for such \glspl{pattern} can no longer be done in linear
+time.
+%
+Such approaches therefore typically apply generic \glshyphened{subgraph
+  isomorphism} algorithms when \gls{pattern matching}.
+
+
+\subsection{Pattern Matching as a Subgraph Isomorphism Problem}
+
+\def\mGP{G_{\textsc{p}}}
+\def\mGF{G_{\textsc{f}}}
+\def\mNP{N_{\textsc{p}}}
+\def\mNF{N_{\textsc{f}}}
+\def\mEP{E_{\textsc{p}}}
+\def\mEF{E_{\textsc{f}}}
+
+The \gls!{subgraph isomorphism}[ problem] is to find instances where a
+\gls{graph}~\mbox{$\mGP = \mPair{\mNP}{\mEP}$} is \glsshort{isomorphism} to a
+\gls{subgraph} in another \gls{graph}~\mbox{$\mGF = \mPair{\mNF}{\mEF}$}.
+%
+$\mGP$ is \glsshort!{isomorphism} to $\mGF$ if and only if there exists a
+mapping \mbox{$\mFunDecl{m}{\mNP}{\mNF}$} such that \mbox{$\mPair{n}{o} \in
+  \mEP$} implies \mbox{$\mPair{f(n)}{f(o)} \in \mEF$}.
+%
+In the context of \gls{instruction selection}, $\mGP$ denotes a \gls{pattern},
+$\mGF$ denotes a \gls{graph} derived from a \gls{function}, and $m$ denotes a
+\gls{match}.
+
+The \gls{subgraph isomorphism} problem, which is known to be
+NP-complete~{\cite{Cook:1971}}, appears in many other fields.
+%
+Consequently, much research has been devoted to this problem (see for example
+\cite{Ullmann:1976, CordellaEtAl:2001, GuoEtAl:2003, KrissinelHenrick:2004,
+  SorlinSolnon:2004, Gallagher:2006, FanEtAl:2010, FanEtAl:2011, HinoEtAl:2012,
+  McCreesh:2017}).
+%
+Due to its simplicity, however, most combinatorial approaches apply the
+\gls{VF2}~algorithm, which is described in
+\refSection{ex-isel-rep-vf2-algorithm}.
+
+
+\subsection{Maximum Munch}
+
+The most common approach for greedy \gls{pattern selection} on \glspl{block DAG}
+is called \gls!{maximum munch} (coined by \textcite{Cattell:1978}).
+%
+The idea is to traverse the \gls{block DAG} top down, select the largest
+\gls{pattern} that matches the current \gls{node}, and repeat the process for
+remaining, uncovered parts of the \gls{block DAG}.
+%
+The approach -- which is used in for example \gls{LLVM}~\cite{LattnerAdve:2004}
+-- works well for architectures with a regular \gls{instruction set} and where
+there is a strong correlation between the effectiveness of the \gls{instruction}
+and the size of its \gls{pattern}.
+%
+In addition to being non-optimal, however, it also suffers from the same
+drawback as \glspl{expression tree} regarding whether to select \glspl{cover}
+that effectively \glsshort{edge splitting} or \glsshort{node duplication}[e] the
+common subexpressions.
+
+
+\subsection{Approaches for Balancing Splitting and Duplication}
+\labelSection{ex-isel-rep-balancing-splitting-and-duplication}
+
+Several approaches have been made in attempting to balance \gls{edge splitting}
+and \gls{node duplication}.
+%
+\textcite{FauthEtAl:1994} designed an heuristic algorithm that rewrites the
+\gls{block DAG} into \glspl{expression tree} before \gls{instruction
+  selection}.
+%
+Using a rough estimate of the \gls{cover} cost, the algorithm first favors
+\gls{node duplication} and resorts to \gls{edge splitting} when the former
+becomes too costly.
+%
+Once rewritten, the \glspl{expression tree} are covered using an improved
+variant of \refAlgorithm{aho-etal-cost-algorithm}.
+
+\textcite{Ertl:1999} showed that, for certain \glspl{grammar},
+\refAlgorithm{aho-etal-cost-algorithm} can be adapted to produce optimal
+\glspl{cover} for \glspl{block DAG}.
+%
+The idea is to first compute the costs for each \gls{node} as if the \gls{block
+  DAG} had been rewritten into a \gls{expression tree} using \gls{node
+  duplication}.
+%
+Then, if several \glspl{rule} reduce the same \gls{node} to the same
+\gls{nonterminal}~\mbox{$\mNT{N}$\hspace{-1pt},} then $\mNT{N}$ can be shared
+between the \glspl{rule} whose \glsplshort{rule pattern} all
+contain~\mbox{$\mNT{N}$\hspace{-1pt}.}
+%
+\citeauthor{Ertl:1999} also introduced an algorithm for checking whether
+\gls{optimal.ps} \gls{pattern selection} is guaranteed for a given
+\gls{grammar}.
+
+\textcite{KoesGoldstein:2008} combined the ideas by \citeauthor{FauthEtAl:1994}
+and \citeauthor{Ertl:1999} by introducing a design that first uses
+\refAlgorithm{aho-etal-cost-algorithm} to compute the costs for a \glsshort{node
+  duplication}[ed] \gls{expression tree}.
+%
+Then, at each \gls{node}~$n$ where several \glspl{pattern} in the optimal
+\gls{cover} overlap in the \gls{block DAG}, two costs are estimated:
+%
+\begin{inlinelist}[itemjoin={, }, itemjoin*={, and}]
+  \item the cost incurred by allowing overlap
+  \item the cost incurred by \glsshort{edge splitting}[ting] the \glspl{edge}
+\end{inlinelist}.
+%
+If the latter is cheaper then $n$ is marked as \gls!{fixed.n}, meaning it can
+only be covered by \glspl{pattern} where $n$ is their root \gls{node}.
+%
+Once all such \glspl{node} have been processed, another pass is performed to
+recompute the costs, this time forbidding overlap at \gls{fixed.n} \glspl{node}.
+
+
+\subsection{MIS- and MWIS-based Approaches}
+
+Another approach to modeling \gls{instruction selection} is to model it as a
+problem of finding \glspl{independent set}.
+%
+Given a \gls{graph}~\mbox{$G = \mPair{N\hspace{-1pt}}{E}$,} a set \mbox{$S
+  \subseteq N$} is an \gls!{independent set} if no pairs of
+nodes~\mbox{$m\hspace{-.8pt}, n \in S$} are adjacent in~$G$.
+%
+An \gls{independent set} is called a \gls!{MIS} if no more \glspl{node} can be
+added and still be an \gls{independent set}.
+%
+If each \gls{node} in the graph has a weight, then a \gls!{MWIS} is a \gls{MIS}
+that maximizes/minimizes \mbox{$\sum_n \mWeight(n)$}.
+%
+In general, finding a \gls{MIS} or \gls{MWIS} is
+NP-complete~\cite{GareyJohnson:1979}.
+
+Modeling \gls{instruction selection} as either a \gls{MIS} or \gls{MWIS} problem
+is done as follows.
+%
+After \gls{pattern matching}, an \gls!{interference graph} is constructed where
+a \gls{node} represents a \gls{match} and an \gls{edge} represents overlapping
+between two \glspl{match}.
+%
+If all \glspl{operation} in the \gls{block DAG} or \gls{function graph} can be
+covered by at least one \gls{match}, then a \gls{MIS} of the \gls{interference
+  graph} corresponds to a \gls{cover}.
+%
+Likewise, a \gls{MWIS} corresponds to a \gls{least-cost.c} \gls{cover}.
+%
+An example is shown in \refFigure{mis-example}.
+
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  Block DAG with matches%
+                  \labelFigure{mis-example-dag}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/mis-example-dag%
+                  }%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Interference graph%
+                  \labelFigure{mis-example-int-graph}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    mis-example-int-graph%
+                  }%
+                }%
+  \hfill%
+  \mbox{}
+
+  \caption[Example of modeling pattern selection as a MIS problem]%
+          {%
+            Example of modeling pattern selection as a MIS problem.
+            %
+            Maximal independent sets of the interference graph are
+            \mbox{$\mSet{m_1, \ldots, m_5, m_7}$}, \mbox{$\mSet{m_1, m_2, m_3,
+                m_5, m_8}$}, and \mbox{$\mSet{m_1, m_2, m_3, m_6, m_7}$}, which
+            correspond to exact covers of the block DAG%
+          }
+  \labelFigure{mis-example}
+\end{figure}
+
+
+\paragraph{Applications}
+
+\textcite{ScharwaechterEtAl:2007} appears to have pioneered the modeling of
+\gls{instruction selection} as a \gls{MWIS} problem, although the main
+contribution of their paper is the extension of \glspl{machine grammar} to
+handle \gls{multi-output.ic} \glspl{instruction}.
+%
+The idea is to model such \glspl{instruction} using \gls!{complex.r}[
+  \glspl{rule}], which each consists of multiple \glspl{production} -- one for
+each \glsshort{rule result}.
+%
+\labelPage{extended-machine-grammars}
+%
+In this dissertation, such \glspl{production} and their \glspl{pattern} are
+called \gls!{proxy.r}[ \glspl{rule}]%
+%
+\footnote{%
+  In the original paper, they are called \gls!{split.r}[ \glspl{rule}].%
+}
+%
+and \gls!{proxy.p}[ \glspl{pattern}], respectively, whereas \glspl{rule} with a
+single \gls{production} and their \glspl{pattern} are called \gls!{simple.r}[
+  \glspl{rule}] and \gls!{simple.p}[ \glspl{pattern}], respectively.
+%
+The \gls{rule} structure is also illustrated in
+\refFigure{extended-machine-grammar-rule-anatomy}.
+
+\begin{figure}
+  \centering%
+  \figureFont\figureFontSize%
+  \newcommand{\simplePatternText}{%
+    \trimbox{0 4pt 0 4pt}{%
+      \begin{tabular}{@{}c@{}}
+        simple\\[-1ex]
+        pattern
+      \end{tabular}%
+    }%
+  }
+  \newcommand{\proxyPatternText}{%
+    \trimbox{0 4pt 0 4pt}{%
+      \begin{tabular}{@{}c@{}}
+        proxy\\[-1ex]
+        pattern
+      \end{tabular}%
+    }%
+  }%
+  \begin{displaymath}
+    \underbrace{
+      \mNT{A}
+      \rightarrow
+      \overbrace{
+        \irCode{op} \ldots
+      }^{\text{\simplePatternText}}
+      \quad
+      \text{cost}
+      \quad
+      \text{action}
+    }_{\text{simple rule}}
+    \qquad
+    \underbrace{
+      \langle \mNT{A}, \mNT{B}, \ldots \rangle
+      \rightarrow
+      \overbrace{
+        \langle
+          \:
+          \overbrace{\irCode{op} \ldots}^{\text{\proxyPatternText}},
+          \:
+          \overbrace{\irCode{op} \ldots}^{\text{\proxyPatternText}},
+          \:
+          \ldots
+          \:
+        \rangle
+      }^{\text{complex pattern}}
+      \quad
+      \text{cost}
+      \quad
+      \text{action}
+    }_{\text{complex rule}}
+  \end{displaymath}
+
+  \vspace*{-\baselineskip}
+
+  \caption{Anatomy of simple and complex rules in an extended machine grammar}
+  \labelFigure{extended-machine-grammar-rule-anatomy}
+\end{figure}
+
+The \gls{proxy.p} \glspl{pattern} are matched individually together with the
+\gls{simple.p} \glspl{pattern}.
+%
+After \gls{pattern matching}, \glspl{match} derived from \gls{proxy.p}
+\glspl{pattern} are then either combined -- indicating use of the
+\gls{complex.r} \gls{rule} -- or kept -- indicating use of \glspl{rule} that
+only produce a single result.
+%
+This is done according to a heuristic that estimates the cost saved by using the
+\gls{complex.r} \gls{rule} versus the cost incurred by having to \glsshort{node
+  duplication}[e] \glspl{node} in common subexpressions.
+%
+Once these decisions have been taken, the \gls{interference graph} is built and
+the \gls{MWIS} found using a greedy heuristic~\cite{SakaiEtAl:2003}.
+
+The approach was later extended by \textcite{AhnEtAl:2009} to include scheduling
+dependency conflicts between \gls{complex.p} \glspl{pattern} in order to
+facilitate \gls{register allocation}.
+%
+In both designs, however, the \gls{complex.r} \glspl{rule} can only consist of
+disconnected \glspl{pattern}, hence forbidding sharing of values across the
+\gls{proxy.p} \glspl{pattern}.
+%
+This shortcoming was addressed by \textcite{YounEtAl:2011} by introducing the
+use of index subscripts for \glspl{node} representing the input arguments.
+
+
+\subsection{IP-based Approaches}
+
+Several approaches model \gls{instruction selection} using \gls!{IP} -- often
+also referred to as \gls!{ILP} -- which is a method for solving combinatorial
+optimization problems (see \cite{Wolsey:1998} for an overview).
+%
+Formally, an \gls{IP} problem is defined as follows.
+%
+\begin{definition}[IP]
+  Let $\mVector{c}$ and $\mVector{b}$ be integer vectors, $\mMatrix{A}$ be an
+  integer matrix, and $\mVector{\mVar{x}}$ be a vector of integer
+  \glspl{decision variable}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \begin{array}{rl}
+        \text{\llap{maximize or }minimize}
+      & \mVector{c}^{\mTransp} \mVector{\mVar{x}} \\
+        \text{subject to}
+      & \mMatrix{A} \mVector{\mVar{x}} \leq \mVector{b}, \\
+      & \mMatrix{A} \mVector{\mVar{x}} \in \mathbb{Z}^{n \times n}\!, \\
+        \text{and}
+      & \mVector{\mVar{x}} \in \mathbb{N}^n\!. \\
+    \end{array}
+  \end{displaymath}
+  \labelDefinition{ip}
+\end{definition}
+
+Such problems are NP-complete in general, but extensive research in the field
+has made \gls{IP} a practical tool for solving problems containing tens of
+thousands of \glspl{variable}.
+
+In most \gls{IP}-based approaches, \gls{pattern selection} is modeled as
+%
+\begin{equation}
+  \forall n \in N :
+  \sum_{\mathclap{\substack{m \,\in\, M \text{ \st} \\ n \,\in\, \mCovers(m)}}}
+  \mVector{\mVar{x}}[m] \geq 1,
+  \labelEquation{pattern-selection-in-ip}
+\end{equation}
+%
+where $N$ denotes the set of nodes in a \gls{block DAG}, $M$ denotes the
+\gls{match set}, $\mCovers(m)$ denotes the set of \glspl{node} covered by
+\gls{match}~\mbox{$m$\hspace{-.8pt},} and $\mVector{\mVar{x}}[m]$ is a Boolean
+(\mbox{$\mSet{0, 1}$}) \gls!{decision variable} indicating whether
+\gls{match}~$m$ is selected.
+%
+For \gls{exact.c} \gls{cover}[age], the inequality is replaced with equality.
+%
+When there is no risk of confusion, we refer to \glspl{decision variable} simply
+as \glspl!{variable}.
+
+
+\paragraph{Applications}
+
+Although mostly known for their work in \gls!{integrated.cg}[ \gls{code
+    generation}] -- meaning \gls{instruction selection}, \gls{instruction
+  scheduling} and \gls{register allocation} is solved in unison --
+\textcite{WilsonEtAl:1994} also pioneered the use of \gls{IP} for modeling
+\gls{instruction selection}.
+%
+Their design performs \gls{global.is} \gls{instruction selection} on a
+\gls{function graph} that has been augmented with additional copy
+\glspl{operation} to represent potential \gls{register}
+\glsplshort{spilling.r}.\!%
+%
+\footnote{%
+  \Gls!{spilling.r} is the act of temporarily storing a \gls{register} value to
+  memory in order to free up the \gls{register}.%
+}
+%
+In most cases, not all copies are needed and therefore not all \glspl{operation}
+must be covered.
+%
+Consequently, \citeauthor{WilsonEtAl:1994} model \gls{pattern selection} as
+\mbox{$\sum_m \mVector{\mVar{x}}[m] \leq 1$}.
+
+Another approach for \gls{integrated.cg} \gls{code generation} was made by
+\textcite{BednarskiKessler:2006}, whose design was later reused by
+\citeauthor{ErikssonEtAl:2008}~\cite{ErikssonEtAl:2008, ErikssonKessler:2012}.
+%
+Unlike all other \gls{instruction selection} approaches,
+\citeauthor{BednarskiKessler:2006} combine \gls{pattern matching} and
+\gls{pattern selection}.
+%
+Consequently, in addition to the \glspl{variable} that decide which
+\glspl{match} are selected, their \gls{IP}~model also has \glspl{variable} that,
+for each \gls{match}, maps \glspl{node} and \glspl{edge} in the \gls{block DAG}
+to \glspl{node} and \glspl{edge} in a \gls{pattern}.
+%
+An upper bound on the number of needed \glspl{match} is computed beforehand
+using a heuristic.
+
+An \gls{IP}-based approach for selecting \gls{multi-output.ic} \gls{instruction}
+was introduced by \textcite{LeupersMarwedel:1995, LeupersMarwedel:1996}.
+%
+Each \gls{DAG}-shaped \gls{pattern} of a \gls{multi-output.ic} \gls{instruction}
+is first decomposed into \glspl{tree}, which are used for covering an
+\gls{expression tree}.
+%
+After having found a \gls{least-cost.c} \gls{cover} using
+\refAlgorithm{opt-pat-sel-labeling-algorithm}, the \gls{expression tree} is
+collapsed into a tree of \glspl!{super node}, where each \gls{super node}
+represents a set of \glspl{node} in the \gls{expression tree} covered by the
+same \gls{pattern}.
+%
+The problem is then to try to merge \glspl{super node} such that the combination
+can be implemented using a \gls{multi-output.ic} \gls{instruction}.
+%
+This is often called \gls!{instruction compaction}.
+%
+As there is an abundance of overlap between such combinations,
+\citeauthor{LeupersMarwedel:1995} solve this problem using \gls{IP}.
+
+\textcite{Leupers:2000:SIMD} later introduced another \gls{IP}-based approach
+for selecting \gls{disjoint-output.ic} \glspl{instruction} like \gls{SIMD.i}
+\glspl{instruction}.
+%
+Like before, each \gls{DAG}-shaped \gls{pattern} of a \gls{SIMD.i}
+\gls{instruction} is first decomposed into \glspl{tree}, but now the
+\glspl{tree} are used for covering a \gls{block DAG} that has been transformed
+into \glspl{expression tree} through \gls{edge splitting}.
+%
+The potential of using \gls{disjoint-output.ic} \glspl{instruction} can be
+increased by allowing them to cover \glspl{node} from multiple \glspl{expression
+  tree}, but covering each \gls{tree} individually often leads to suboptimal
+code.
+%
+To address this problem, \citeauthor{Leupers:2000:SIMD} first extended a
+\gls{machine grammar} with additional \glspl{nonterminal} to indicate whether a
+\gls{SIMD.i} \gls{instruction} is used in covering a particular \gls{node} and
+then modified \refAlgorithm{opt-pat-sel-labeling-algorithm} to compute all
+optimal \glspl{cover} instead returning a single solution.
+%
+Once all \gls{least-cost.c} \glspl{cover} have been found for all
+\glspl{expression tree} in a \gls{block}, an \gls{IP}~model is built to decide
+how to make the best use of \gls{SIMD.i} \glspl{instruction} for this
+\gls{block}.
+%
+\citeauthor{Leupers:2000:SIMD}'s model was later extended by
+\textcite{TanakaEtAl:2003} to take \gls{data copying} into account by extending
+the \gls{block DAG} with additional copy \glspl{node}, which is needed for
+architectures with irregular \glspl{instruction set}.
+
+The last \gls{IP}-based approach to be discussed is that of
+\textcite{Gebotys:1997}, who applied to the theory of \glspl{Horn clause} to
+\gls{code generation}.
+%
+A \gls!{Horn clause} is a disjunctive Boolean formula that contains at most one
+positive (non-negated) literal.
+%
+\gls{IP}~models built using \glspl{Horn clause} can be solved in linear
+time~\cite{Hooker:1988}, and \citeauthor{Gebotys:1997} exploited this fact in
+developing an \gls{IP}~model where \glspl{Horn clause} are applied to model
+\gls{register allocation} \gls{instruction compaction}.
+%
+\Gls{pattern selection}, however, is still modeled as in
+\refEquation{pattern-selection-in-ip}.
+
+
+\subsection{CP-based Approaches}
+
+\glsreset{CP}
+
+\Gls!{CP} is another method for solving combinatorial optimization problems,
+which is discussed in detail in \refChapter{constraint-programming}.
+%
+Therefore, only a brief introduction will be given here.
+
+Like \gls{IP}, a model in \gls{CP} consists of a set of \glspl{variable}, a set
+of \glspl{constraint} over the \glspl{variable}, and typically also an
+\gls{objective function} to be either minimized or maximized.
+%
+A crucial difference, however, is that \glspl{constraint} are not limited to
+linear equations.
+%
+Instead, relations among multiple \glspl{variable} are modeled using
+\gls{global.c} \glspl{constraint}, which simplifies modeling and improves
+solving.
+
+
+\paragraph{Modeling Pattern Selection Using Global Constraints}
+
+\Gls{pattern selection} can be modeled using a \gls{global.c} \gls{constraint}
+called the \gls!{global cardinality constraint}.
+%
+The \gls{constraint}, referred to as $\mGCC$, constrains the number of
+\glspl{variable} assigned a particular value (which may also be a
+\gls{variable}).
+%
+Given a set \mbox{$v_1, \ldots, v_k$} of values and two sets \mbox{$\mVar{x}_1,
+  \ldots, \mVar{x}_n$} and \mbox{$\mVar{c}_1, \ldots, \mVar{c}_k$} of
+\glspl{variable}, the \gls{constraint} holds if, for each \mbox{$i = 1, \ldots,
+  k$}, exactly $\mVar{c}_i$ \glspl{variable} in the set \mbox{$\mVar{x}_1,
+  \ldots, \mVar{x}_n$} are assigned value~$v_i$ (see also \refDefinition{gcc} on
+\refPageOfDefinition{gcc}).
+%
+For example, \mbox{$\mGCC(\mTuple{5, \mVar{c}_1 =0} \hspace{-1pt}, \mTuple{3,
+    \mVar{c}_2 = 1} \hspace{-1pt}, \mVar{x}_1 = 2, \mVar{x}_2 =3)$} holds
+because no $\mVar{x}$~\gls{variable} is assigned value~\num{5} and exactly one
+$\mVar{x}$~\gls{variable} is assigned value~\num{3}.
+%
+Similarly, \mbox{$\mGCC(\mTuple{3, \mVar{c}_1 \in \mSet{0, 2}} \hspace{-1pt},
+  \mVar{x}_1 = 2, \mVar{x}_2 = 3)$} does not holds because either none or both
+$\mVar{x}$~\glspl{variable} must be assigned value~\num{3}.
+
+To model \gls{exact.c} \gls{pattern selection} using $\mGCC$, two new sets of
+\glspl{variable} are needed.
+%
+Assume that $N$ denotes the set of \glspl{node} to be covered, $M$ denotes the
+\gls{match set}, and $\mCovers(m)$ denotes the set of \glspl{node} covered by
+\gls{match}~\mbox{$m$\hspace{-.8pt}.}
+%
+Then, \gls{variable} \mbox{$\mVar{match}_n \in \mSetBuilder{m}{m \in M, n \in
+    \mCovers(m)}$} decides which \gls{match} covers \gls{node}~$n$, and
+\gls{variable} \mbox{$\mVar{count}_m \in \mSet{0, |\mCovers(m)|}$} decides how
+many \glspl{node} are covered by \gls{match}~\mbox{$m$\hspace{-.8pt}.}
+%
+Hence each match covers either no \glspl{node} or all \glspl{node} in its
+\gls{pattern}.
+%
+With these \glspl{variable}, \gls{pattern selection} can be modeled as
+%
+\begin{equation}
+  \mGCC(
+    \cup_{m \,\in\, M} \mTuple{m\hspace{-.8pt}, \mVar{count}_m} \hspace{-1pt},
+    \cup_{n \,\in\, N} \, \mVar{match}_n
+  ),
+  \labelEquation{pattern-selection-using-gcc}
+\end{equation}
+%
+which, according to \textcite{FlochEtAl:2010}, offers stronger \gls{propagation}
+than \refEquation{pattern-selection-in-ip} and thus reduces solving time.
+
+
+\paragraph{Applications}
+
+The use of \gls{CP}-based \gls{instruction selection} appears to have been
+pioneered by \textcite{BashfordLeupers:1999}.
+%
+To generate code for highly irregular \glspl{DSP},
+\citeauthor{BashfordLeupers:1999} used \gls{CP} to model the interactions
+between \gls{instruction selection} and the use of processor resources, such as
+functional units and \glspl{register}.
+%
+Consequently, the approach essentially integrates \gls{instruction selection}
+with a form of \gls{register allocation}.
+%
+Glossing over the details, the approach works as follows.
+%
+For each \gls{operation}, a so-called \gls!{FRT} is built which encodes the
+resource requirements for the operands and the result as well as the cost of
+every \gls{instruction} that may be used to implement such \glspl{operation}.
+%
+Taking a \gls{block DAG} as input, the problem is to cover all \glspl{node}
+using \glspl{FRT} such that all resource requirements are fulfilled.
+%
+Special resources are available for \glspl{instruction} that cover multiple
+\glspl{node}, allowing adjacent \glspl{node} to be covered by the same
+\gls{instruction}.
+%
+\citeauthor{BashfordLeupers:1999} used \gls{CP} to solve this problem.
+
+\textcite{MartinEtAl:2009, MartinEtAl:2012} developed a \glsshort{constraint
+  model} that integrates \gls{instruction selection} and \gls{instruction
+  scheduling}.
+%
+Because they target \glspl!{ASIP}, the \glspl{pattern} are not predefined but
+must be found prior to \gls{instruction selection}.
+%
+This is known as the \gls!{ISE}[ problem], which has been widely researched (see
+for example \cite{HuangDespain:1995, NiemannMarwedel:1997, BriskEtAl:2002,
+  KastnerEtAl:2002, AratoEtAl:2003, AtasuEtAl:2003, ClarkEtAl:2003,
+  YuMitra:2004, AtasuEtAl:2005, BennettEtAl:2007, Boulytchev:2007,
+  BauerEtAl:2008, AlmerEtAl:2009, MurrayFranke:2012, Murray:2012}, and see
+\cite{GaluzziBertels:2011} for a survey).
+%
+For this task \citeauthor{MartinEtAl:2009} applied a \gls{CP}-based
+\glshyphened{pattern matching} algorithm, described
+in~\cite{WolinskiKuchcinski:2007}.
+%
+\Gls{pattern selection} is modeled as \refEquation{pattern-selection-in-ip} in
+another \glsshort{constraint model}, which was later improved by
+\textcite{FlochEtAl:2010} who replaced the \gls{pattern selection}
+\glspl{constraint} with \refEquation{pattern-selection-using-gcc}.
+%
+The approach was also extended by \textcite{ArslanKuchcinski:2014} for targeting
+\glsunset{VLIW}\gls{VLIW} processors%
+%
+\footnote{%
+  A \glsreset{VLIW}\gls!{VLIW}[ processor] is a processor that executes multiple
+  \glspl{instruction} in parallel, where the schedule has been computed by the
+  \gls{compiler} and is part of the assembly code.%
+}
+%
+with \gls{SIMD.i} \glspl{instruction}.
+%
+Selection of such \glspl{instruction} is done by first splitting the
+\glspl{pattern} into multiple \gls{tree}-shaped \glspl{pattern}, which are
+matched individually, and then enforcing that two selected \glspl{match}
+belonging to the same \gls{instruction} must be scheduled in the same cycle.
+
+\textcite{Beg:2013} developed a \gls{constraint model} that, unlike the
+approaches above, only concerns \gls{instruction selection}.
+%
+Both \gls{pattern matching} and \gls{pattern selection} are integrated into the
+same \gls{constraint model}, and \citeauthor{Beg:2013} also applied
+\refAlgorithm{aho-etal-cost-algorithm} in computing an upper bound on the cost
+in order to improve solving.
+
+
+\subsection{Limitations of DAG Covering}
+
+Although \glspl{DAG covering} addresses the issue of whether to \glsshort{edge
+  splitting} or \glsshort{node duplication}[e] common subexpressions within a
+\gls{block}, the problem still remains for expressions that are spread across
+multiple \glspl{block}.
+%
+To fully address this problem, one must resort to \gls{graph covering}.
+
+This also applies to other situations where decisions made for one \gls{block}
+can inhibit subsequent decisions for other \glspl{block}, such as enforcing
+specific storage locations or value modes.
+%
+For example, \refFigure{block-dags-limit-example} shows a \gls{function} that
+multiplies the elements of two arrays and adds the results.
+%
+\begin{filecontents*}{block-dags-limit-example.c}
+int f(int* A, int* B, int N) {
+  int s = 0;
+  for (int i = 0; i < N; i++) {
+    s = s + A[i] * B[i];
+  }
+  return s;
+}
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \subcaptionbox{C code\labelFigure{block-dags-limit-example-c}}%
+                {%
+                  \begin{lstpage}{56mm}%
+                    \lstinputlisting[language=c]{block-dags-limit-example.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \subcaptionbox{%
+                  Block graphs involving variable~\irVar*{s}.
+                  %
+                  For brevity, the subtrees concerning \irCode*{A[i]}
+                  and \irCode*{B[i]} are not included%
+                  \labelFigure{block-dags-limit-example-dags}%
+                }%
+                [60mm]%
+                {%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    block-dags-limit-example-dags%
+                  }%
+                }
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox%
+    {%
+      Rules.
+      %
+      $\mNT{Null}$ is a dummy nonterminal since \irCode*{\irRetText} does not
+      return anything, yet all productions must have a result.
+      %
+      All rules are assumed to have equal cost.
+      %
+      For brevity, the actions are not included%
+    }%
+    [\textwidth]%
+    {%
+      \figureFontSize%
+      \newcolumntype{L}{@{}l@{}}%
+      \begin{tabular}{r@{ $\rightarrow$ }l@{\hspace{3em}}r@{ $\rightarrow$ }lc}
+        \toprule
+        \multicolumn{5}{c}{\tabhead rules}\\
+        \midrule
+        $\mNT{Reg}$ & \irCode{const}
+          & $\mNT{SReg}$
+          & \multicolumn{2}{L}{%
+              $\irCode{\irMulText} \; \mNT{Reg} \; \mNT{Reg}$%
+            }\\
+        $\mNT{SReg}$ & \irCode{const}
+          & $\mNT{Null}$ & \multicolumn{2}{L}{%
+              $\irCode{\irRetText} \; \mNT{Reg}$%
+            }\\
+        $\mNT{Reg}$ & $\irCode{\irAddText} \; \mNT{Reg} \; \mNT{Reg}$
+          & $\mNT{Reg}$  & $\mNT{SReg}$ & $(r \ll 1)$\\
+        $\mNT{SReg}$ & $\irCode{\irAddText} \; \mNT{SReg} \; \mNT{SReg}$
+          & $\mNT{SReg}$ & $\mNT{Reg}$  & $(r \gg 1)$\\
+        \bottomrule
+      \end{tabular}%
+    }
+
+  \caption{Example illustrating the limitation of block DAGs}
+  \labelFigure{block-dags-limit-example}
+\end{figure}
+%
+Assume that the arrays consist of fixed-point values.
+%
+For efficiency, a common idiosyncrasy in many \glspl{DSP} is that multiplication
+of two fixed-point values return a value that is shifted one bit to the left.
+%
+For such \glspl{target machine}, both the value~\irCode*{0} and the accumulator
+variable~\irVar*{s} should be in shifted mode throughout the entire
+\gls{function}, and only restored into normal mode before returning from the
+\gls{function}.
+%
+Otherwise the accumulated value would be needlessly shifted back and forth
+within the loop.
+%
+Achieving this, however, is difficult when limited to covering only a single
+\gls{block DAG} at a time.
+%
+Assume for example that the function had no multiplication.
+%
+In that case, deciding to load value~\irCode*{0} in shifted mode would instead
+lower code quality as the value would needlessly have to be shifted back before
+returning, which takes an extra \gls{instruction}.
+
+Lastly, most of these approaches are restricted to tree-shaped \glspl{pattern},
+meaning they only support \gls{single-output.ic} \glspl{instruction}.
+%
+Many \glspl{instruction set}, however, contain \gls{multi-output.ic}
+\glspl{instruction} which must be modeled as \glspl{pattern DAG}.
+
+
+\section{Graph Covering}
+\labelSection{ex-isel-rep-graph-covering}
+
+The most general principle is called \gls!{graph covering}, where entire
+\glspl{function} are modeled as \glspl{function graph} and \glspl{instruction}
+are allowed to be modeled using any shape of \glspl{pattern}.
+%
+Unfortunately, compared to the other \glspl{principle} there exist relatively
+few applications of \gls{graph covering}, the most well known appearing in the
+2000s.
+
+The main advantage is that \gls{graph covering} support selection of
+\gls{inter-block.ic} \glspl{instruction}, whose behavior entail both control and
+data flow and must therefore be captured as \glspl{pattern graph}.
+%
+The representations typically used, however, only model data flow, thus
+stressing the need for new representations in order to handle the
+\glspl{instruction} of modern and forthcoming processors which are growing
+increasingly complex.
+
+First we will look at a few representations for capturing entire
+\glspl{function} as \glspl{graph}.
+%
+Because they result in relatively high \glspl{node} counts, such representations
+are colloquially referred to as \glspl!{sea-of-nodes IR}.
+
+
+\subsection{Sea-of-Nodes IRs}
+
+In the context of \gls{instruction selection}, there are two \glspl{sea-of-nodes
+  IR} that are of interest.
+%
+The first captures the data flow for entire \glspl{function}, and the second is
+an extension of the first in order to also capture control flow.
+
+
+\paragraph{Capturing Data Flow of Entire Functions}
+
+In order to simply many \gls{compiler} tasks, \textcite{CytronEtAl:1991}
+introduced a \gls{function} representation called \gls!{SSA}[ form].
+
+A \gls{function} is said to be in \gls{SSA}~form if every variable is defined
+exactly once.
+%
+For example, the \gls{function} shown in \refFigure{sea-of-nodes-example-c} is
+not in \gls{SSA}~form as variables~\irCode*{f} and~\irCode*{n} are redefined
+within the loop.
+%
+\begin{filecontents*}{fact.c}
+int factorial(int n) {
+  entry:
+    int f = 1;
+  head:
+    if (n <= 1) goto end;
+  body:
+    f = f * n;
+    n = n - 1;
+    goto head;
+  end:
+    return f;
+}
+\end{filecontents*}
+%
+\begin{filecontents*}{fact-ssa.c}
+int factorial(int $\irVar{n}[1]$) {
+  entry:
+    int $\irVar{f}[1]$ = 1;
+  head:
+    int $\irVar{f}[2]$ = $\mPhi$($\irVar{f}[1]$:entry, $\irVar{f}[3]$:body);
+    int $\irVar{n}[2]$ = $\mPhi$($\irVar{n}[1]$:entry, $\irVar{n}[3]$:body);
+    if ($\irVar{n}[2]$ <= 1) goto end;
+  body:
+    int $\irVar{f}[3]$ = $\irVar{f}[2]$ * $\irVar{n}[2]$;
+    int $\irVar{n}[3]$ = $\irVar{n}[2]$ - 1;
+    goto head;
+  end:
+    return $\irVar{f}[2]$;
+}
+\end{filecontents*}
+%
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox{%
+                  C implementation of factorial%
+                  \labelFigure{sea-of-nodes-example-c}%
+                }%
+                [50mm]%
+                {%
+                  \begin{lstpage}{45mm}%
+                    \lstinputlisting[language=c]{fact.c}%
+                  \end{lstpage}%
+                }%
+  \hfill\hfill%
+  \subcaptionbox{Code in SSA form\labelFigure{sea-of-nodes-example-ssa-c}}%
+                {%
+                  \begin{lstpage}{59mm}%
+                    \lstinputlisting[language=c,mathescape]{fact-ssa.c}%
+                  \end{lstpage}%
+                }%
+  \hfill%
+  \mbox{}
+
+  \vspace*{\betweensubfigures}
+
+  \subcaptionbox{SSA graph\labelFigure{sea-of-nodes-example-ssa-graph}}%
+                {%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    sea-of-nodes-example-ssa-graph%
+                  }%
+                }
+
+  \caption{Example of an SSA graph}
+  \labelFigure{ssa-example}
+\end{figure}
+%
+By introducing new variables and connecting these using \glspl!{phi-function}
+where the value depends on control flow, the \gls{function} can be rewritten
+into \gls{SSA}~form, as shown in \refFigure{sea-of-nodes-example-ssa-c}.
+
+From an \gls{SSA}-based \gls{function}, we can construct a \gls{data-flow graph}
+called the \gls!{SSA graph}~\cite{GerlekEtAl:1995}.
+%
+Like in \glspl{data-flow graph}, each \gls{operation} in the \gls{function}
+(including the \glspl{phi-function}) is represented as a \gls{node}.
+%
+These nodes are connected using \glspl{data-flow edge}, ignoring the fact that
+the \glspl{operation} may belong to different \glspl{block}.
+%
+For the example above, this results in the \gls{SSA graph} shown in
+\refFigure{sea-of-nodes-example-ssa-graph}.
+%
+Since \glspl{operation} are not pre-assigned to specific \glspl{block}, the same
+\gls{IR} can be used for performing \gls{global code motion}.
+
+
+\paragraph{Capturing Both Data And Control Flow}
+
+\textcite{ClickPaleczny:1995} introduced a \gls{sea-of-nodes IR} that captures
+both data and control flow.
+%
+The data flow is modeled exactly as in the \gls{SSA graph}, and the control flow
+is captured using \glspl{node} to represent the \glspl{block} in the
+\gls{function} and \glspl{edge} to represent jumps between \glspl{block}.
+%
+To capture dependencies between the data and control flow -- for example, when
+the target of a jump depends on a Boolean value -- such jumps flow through
+special \irCode*{if}~\glspl{node}.
+%
+For lack of a better name we will call this the \gls!{Click-Paleczny graph},
+and an example is shown in \refFigure{click-paleczny-graph-example}.
+
+\begin{figure}
+  \centering%
+  \input{%
+    figures/existing-isel-techniques-and-reps/%
+    sea-of-nodes-example-click-paleczny-graph%
+  }
+
+  \caption[Example of a Click-Paleczny graph]%
+          {%
+            Example of a Click-Paleczny graph, corresponding to the function
+            shown in \refFigure{ssa-example}.
+            %
+            Thin-lined nodes and edges denote data operations and data flow.
+            %
+            Thick-lined nodes and edges denote control operations and control
+            flow.
+            %
+            Dashed edges indicate to which block an operation belongs%
+          }
+  \labelFigure{click-paleczny-graph-example}
+\end{figure}
+
+
+\subsection{Pattern Selection on the Click-Paleczny Graph}
+
+\textcite{PalecznyEtAl:2001} introduced an approach for performing
+\gls{instruction selection} based on the \gls{Click-Paleczny graph}.
+
+The approach first divides the \gls{function graph} into a set of possibly
+overlapping \glspl{expression tree}.
+%
+This is done by labeling certain \glspl{node} in the \gls{function graph} as
+tree roots.
+%
+Root candidates are \glspl{node} representing \glspl{operation} whose result are
+shared or \glspl{operation} with side effects and may therefore not be
+\glsshort{node duplication}[ed].
+%
+The selection of roots is geared towards duplicating address computations and
+other expressions that can be subsumed into a single \gls{instruction}.
+%
+Once labeled, each \gls{expression tree} is covered using a variant of
+\refAlgorithm{opt-pat-sel-labeling-algorithm}.
+%
+The \glspl{instruction} are then emitted and placed in \glspl{block} using a
+method described in~\cite{Click:1995}.
+
+Although the \gls{function} is represented as a \gls{function graph}, the
+\glspl{instruction} must still be modeled as \glspl{pattern tree}.
+%
+Consequently, only \gls{single-output.ic} \glspl{instruction} can be selected
+using this approach.
+
+
+\subsection{PBQP-based Approaches}
+
+Similar to \gls{IP}-based approaches, another method of modeling
+\gls{instruction selection} is to model it as a \gls!{PBQP}.
+%
+First introduced by \textcite{ScholzEckstein:2002} to perform \gls{register
+  allocation}, \gls{PBQP} is a variant of the \gls!{QAP}, which is a fundamental
+combinatorial optimization problem in the field of operations research (see
+\cite{LoiolaEtAl:2007} for a survey).
+%
+Although both problems are NP-complete in general, a subclass of \gls{PBQP} can
+be solved in linear time which inspired \citeauthor{ScholzEckstein:2002} in
+developing a greedy, linear-time solver.
+
+Formally, a \gls{PBQP} is defined as follows.
+%
+\begin{definition}[PBQP]
+  Let \mbox{$\mVector{c}_1, \ldots, \mVector{c}_n$} be integer vectors, and let
+  \mbox{$\mMatrix{C}_{1,1}, \mMatrix{C}_{1,2}, \ldots, \mMatrix{C}_{1,n}$},
+  \mbox{$\mMatrix{C}_{2,2}, \ldots, \mMatrix{C}_{n,n}$}
+  be integer matrices of size \mbox{$|c_i| \times |c_j|$} for \mbox{$i = 1,
+    \ldots, n$} and \mbox{$j = i, \ldots, n$}\hspace{-.8pt}.
+  %
+  Let also \mbox{$\mVector{\mVar{x}}_1, \ldots, \mVector{\mVar{x}}_n$} be
+  vectors of integer \glspl{variable}, where \mbox{$\mVar{x}_i \in \mSet{0,
+      1}^{|c_i|}$} for \mbox{$i = 1, \ldots, n$}\hspace{-.8pt}.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \begin{array}{rl}
+      \text{minimize}
+        & \displaystyle
+          \sum_{\mathclap{1 \leq i < j \leq n}}
+          \mVector{\mVar{x}}_i^{\mTransp} \mMatrix{C}_{ij} \, \mVector{\mVar{x}}_j +
+          \sum_{\mathclap{1 \leq i \leq n}}
+          \mVector{c}_i^{\mTransp} \mVector{\mVar{x}}_i, \\
+      \text{subject to}
+        & \forall 1 \leq i \leq n :
+          \mVector{1}^{\mTransp} \mVector{\mVar{x}}_i = 1. \\
+    \end{array}
+  \end{displaymath}
+  \labelDefinition{pbqp}
+\end{definition}
+
+Intuitively, one can interpret this definition as follows.
+%
+Assume that a problem consists of $n$~decisions, each with $k$~choices.
+%
+Then $\mVector{\mVar{x}}_i$ is a \gls{decision variable} with $k$~elements,
+where \mbox{$\mVector{\mVar{x}}_i[j] = 1$} means that choice~$j$ has been
+selected for decision~\mbox{$i$\hspace{-.8pt}.}
+%
+For each \gls{variable}, the condition
+\raisebox{0pt}[\height-2pt]{$\mVector{1}^{\mTransp} \mVector{\mVar{x}}_i = 1$}
+ensures that exactly one choice is selected.
+%
+The cost of selecting a particular choice for decision~$i$ is represented
+through a cost vector~$\mVector{c}_i$, and the cost of combining two
+decisions~$i$ and~$j$ are represented through a cost matrix~$\mMatrix{C}_{ij}$.
+
+In this context, $\mVector{\mVar{x}}_i$ decides whether to select a particular
+\gls{match} to cover \gls{node}~$i$, $\mVector{c}_i$ contains the cost for each
+such \gls{match}, and $\mMatrix{C}_{ij}$ contains the cost of additional
+\glspl{instruction} that may need to be selected due to certain combinations of
+\glspl{match}.
+%
+For example, assume two nodes~$i$ and~$j$ where $j$ depends
+on~\mbox{$i$\hspace{-.8pt}.}
+%
+Assume further that the \glspl{instruction} are represented as a
+\glshyphened{normal form.g} \gls{machine grammar}, and that~$i$ and~$j$ can be
+covered using two \glspl{rule}~$r_i$ and~$r_j$, with \glspl{production}
+\mbox{$\mNT{A} \rightarrow \irCode*{op}_{\mathit{i}} \; \mNT{A} \; \mNT{A}$} and
+\mbox{$\mNT{B} \rightarrow \irCode*{op}_{\mathit{j}} \; \mNT{B} \; \mNT{B}$},
+respectively.
+%
+Since the \glsshort{rule result} of $r_i$ does not match the operands of $r_j$,
+this \gls{rule} combination requires a \gls{chain.r} \gls{rule} -- or a
+combination of these, if necessary -- that derives $\mNT{B}$ from $\mNT{A}$.
+%
+Illegal combinations are prevented by assigning infinite cost.
+%
+An example of a \gls{PBQP} instance is shown in \refFigure{pbqp-example}.
+
+\begin{figure}
+  \centering%
+  \mbox{}%
+  \hfill%
+  \subcaptionbox%
+    {%
+      Rules.
+      %
+      For brevity, the actions are not included%
+    }%
+    [68mm]%
+    {%
+      \figureFontSize%
+      \begin{tabular}{r@{ $\rightarrow$ }lc}
+        \toprule
+        \multicolumn{2}{c}{\tabhead rules} & \tabhead cost\\
+        \midrule
+        $\mNT{Reg}$ & \irCode{var} & 0\\
+        $\mNT{Reg}$ & $\irCode{\irAddText} \; \mNT{Reg} \; \mNT{Reg}$ & 1\\
+        $\mNT{Reg}$ & $\irCode{\irLoadText} \; \mNT{Addr}$ & 3\\
+        $\mNT{Reg}$ & $\irCode{\irLoadText} \; \irAddText \; \mNT{Reg} \;
+                      \mNT{Reg}$
+                    & 5\\
+        $\mNT{Addr}$ & $\mNT{Reg}$ & 2\\
+        \bottomrule
+      \end{tabular}%
+    }%
+  \hfill%
+  \subcaptionbox{%
+                  SSA graph%
+                  \labelFigure{pbqp-example-ssa-graph}%
+                }{%
+                  \input{%
+                    figures/existing-isel-techniques-and-reps/%
+                    pbqp-example-ssa-graph%
+                  }%
+                }%
+  \hfill%
+  \mbox{}
+
+  \vspace{\betweensubfigures}
+
+  \subcaptionbox{%
+                  PBQP instance.
+                  %
+                  The rows and columns in the cost vectors and matrices are
+                  labeled with the matches they represent.
+                  %
+                  Cost matrices for uninteresting combinations are assumed to
+                  consist of~\num{0}s%
+                  \labelFigure{pbqp-example-instance}%
+                }{%
+                  \figureFontSize%
+                  \apptocmd{\irFont}{\scriptsize}{}{}%
+                  \newcommand{\newlineAndSep}[1][0pt]{%
+                    % Double-newline is to enforce equal spacing between
+                    % multi-row matrices (a single newline with offset does not
+                    % do the trick, apparently)
+                    \\[-1.5mm]
+                    \multicolumn{2}{c}{} \\[#1]
+                  }%
+                  \newcommand{\mLabel}[1]{{\scriptstyle #1}}%
+                  \newcommand{\mColLabel}[1]{%
+                    \raisebox{2mm}[0pt][0pt]{\clap{$\mLabel{#1}$}}%
+                  }%
+                  \newcommand{\mRowLabel}[1]{%
+                    \raisebox{.2ex}{$\mLabel{#1}$}%
+                  }%
+                  \def\Sstackgap{0pt}%
+                  \newcolumntype{R}{r@{\;=\;}}%
+                  \newdimen\labelHeight%
+                  \settoheight{\labelHeight}{$\mLabel{m_x}$}%
+                  \begin{minipage}{22mm}%
+                    \begin{displaymath}
+                      \begin{array}{r@{\;\in\;}l}
+                          \mVector{\mVar{x}}_{\irVar{a}} & \mSet{0, 1} \\[.7ex]
+                          \mVector{\mVar{x}}_{\irVar{b}} & \mSet{0, 1} \\[.7ex]
+                          \mVector{\mVar{x}}_{\irCode{\irAddText}}
+                        & \mSet{0, 1}^{2} \\[.7ex]
+                          \mVector{\mVar{x}}_{\irCode{\irLoadText}}
+                        & \mSet{0, 1}^{2}
+                      \end{array}
+                    \end{displaymath}%
+                  \end{minipage}%
+                  \hspace{5mm}%
+                  \begin{minipage}{27mm}%
+                    \begin{displaymath}
+                      \begin{array}{Rl}
+                          \mVector{c}_{\irVar{a}}
+                        & \begin{aMatrix}{c}
+                            0
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_1}
+                          \end{array}
+                        \newlineAndSep
+                          \mVector{c}_{\irVar{b}}
+                        & \begin{aMatrix}{c}
+                            0
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_2}
+                          \end{array}
+                        \newlineAndSep
+                          \mVector{c}_{\irCode{\irAddText}}
+                        & \begin{aMatrix}{c}
+                            1 \\
+                            5
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_3} \\
+                            \mRowLabel{m_5}
+                          \end{array}
+                        \newlineAndSep
+                          \mVector{c}_{\irCode{\irLoadText}}
+                        & \begin{aMatrix}{c}
+                            3 \\
+                            5
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_4} \\
+                            \mRowLabel{m_5}
+                          \end{array}
+                      \end{array}
+                    \end{displaymath}%
+                  \end{minipage}%
+                  \hspace{5mm}%
+                  \begin{minipage}{33mm}%
+                    \begin{displaymath}
+                      \begin{array}{Rl}
+                          \mMatrix{C}_{\irVar{a} \irCode{\irAddText}}
+                        & \begin{aMatrix}{cc}
+                              \Shortstack{$\mColLabel{m_3}$ $0$}
+                            & \Shortstack{$\mColLabel{m_5}$ $0$}
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_1}
+                          \end{array}
+                        \newlineAndSep[\labelHeight]
+                          \mMatrix{C}_{\irVar{b} \irCode{\irAddText}}
+                        & \begin{aMatrix}{cc}
+                              \Shortstack{$\mColLabel{m_3}$ $0$}
+                            & \Shortstack{$\mColLabel{m_5}$ $0$}
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_2}
+                          \end{array}
+                        \newlineAndSep[\labelHeight]
+                          \mMatrix{C}_{\irCode{\irAddText} \irCode{\irLoadText}}
+                        & \begin{aMatrix}{cc}
+                              \Shortstack{$\mColLabel{m_4}$ $2$}
+                            & \Shortstack{%
+                                $\mColLabel{m_5}$
+                                $\mathclap{\phantom{0}}% The \infty char is
+                                                       % shorter than a number,
+                                                       % so we need to make it
+                                                       % as tall as a number
+                                 \infty$%
+                              } \\
+                              \infty
+                            & 0
+                          \end{aMatrix}
+                          \begin{array}{@{}l@{}}
+                            \mRowLabel{m_3} \\
+                            \mRowLabel{m_5}
+                          \end{array}
+                      \end{array}
+                    \end{displaymath}%
+                  \end{minipage}%
+                }
+
+  \caption{Example of modeling instruction selection as a PBQP}
+  \labelFigure{pbqp-example}
+\end{figure}
+
+
+\paragraph{Handling Patterns DAG}
+
+The \gls{PBQP} model above assumes that all \glspl{pattern} are shaped as trees.
+%
+To handle \glspl{pattern DAG}, the model must be extended.
+%
+First assume an extended \gls{grammar} where \gls{multi-output.ic}
+\glspl{instruction} are described using \gls{complex.r} \glspl{rule} (described
+on \refPage{extended-machine-grammars}, see also
+\refFigure{extended-machine-grammar-rule-anatomy}).
+%
+For each combination of \glspl{match} derived from \gls{proxy.r} \glspl{rule}
+that can be combined into an instance of a \gls{complex.r} \gls{rule}, a
+\gls!{complex.m}[ \gls{match}] is created.
+%
+Each \gls{complex.m} \gls{match}~$i$ in turn introduces a
+\gls{variable}~\raisebox{0pt}[\height-2pt]{$\mVector{\mVar{x}}_i \in \mSet{0,
+    1}^2$} to decide whether $i$ is selected.
+%
+Because of the \raisebox{0pt}[\height-2pt]{$\mVector{1}^{\mTransp}
+  \mVector{\mVar{x}}_i = 1$} condition, every such \gls{variable} has exactly
+two elements (one representing \emph{on} and the other \emph{off}).
+%
+Like with the \gls{simple.r} \glspl{rule}, the costs of selecting a
+\gls{complex.m} \gls{rule} and interactions between these -- for example, two
+\gls{complex.m} \glspl{match} are not allowed to overlap or cause cyclic data
+dependencies -- are represented through the cost vectors and matrices.
+
+In order to select a \gls{complex.r} \gls{rule}, all of its \gls{proxy.r}
+\glspl{rule} must also be selected.
+%
+This is achieved by first extending, for each node~\mbox{$i$\hspace{-.8pt},} the
+domain of its \gls{variable}~$\mVector{\mVar{x}}_i$ with \glspl{match} derived
+from \gls{proxy.r} \glspl{rule}.
+%
+Then a new set of cost matrices~$D_{ij}$ is created such that, for a node~$i$
+and \gls{complex.m} \gls{match}~$j$, the costs are \num{0} if
+\mbox{$\mVector{\mVar{x}}_j = \text{\emph{off}}$} or $\mVector{\mVar{x}}_i$ is
+set to a \gls{proxy.r} \gls{rule} associated with~\mbox{$j$\hspace{-1pt}.}
+%
+Otherwise the costs are $\infty$.
+%
+Consequently, if a \gls{complex.m} \gls{match} covering some node~$n$ is
+selected, then the only choice for $\mVector{\mVar{x}}_n$ with non-infinite cost
+is an associated \gls{proxy.r} \gls{rule}.
+%
+The \gls{PBQP} model is thus augmented with another sum
+%
+\begin{equation}
+  \sum_{\mathclap{i \,\in\, N, \: j \,\in\, M_{\mathsc{c}}}}
+  \mVector{\mVar{x}}_i^{\mTransp} D_{ij} \, \mVector{\mVar{x}}_j
+\end{equation}
+%
+where $N$ denotes the set of \glspl{node} in the \gls{SSA graph} and
+$M_{\mathsc{c}}$ denotes the set of \gls{complex.m} \glspl{match}.
+
+This alone, however, allows \glspl{solution} where all \gls{proxy.r}
+\glspl{rule} but none of the \gls{complex.r} \glspl{rule} are selected.
+%
+This is resolved by assigning an artificially large cost~$K$ to the selection of
+\gls{proxy.r} \glspl{rule}, which is offset when selecting the corresponding
+\gls{complex.r} \gls{rule}.
+%
+For example, if a \gls{complex.r} \gls{rule}~$r$ with cost~\num{2} consists of
+three \gls{proxy.r} \glspl{rule}, then the new cost of selecting $r$ is \mbox{$2
+  - 3K$}.
+
+
+\paragraph{Applications}
+
+\textcite{EcksteinEtAl:2003} were first with modeling \gls{instruction
+  selection} as a \gls{PBQP}, and \textcite{EbnerEtAl:2008} extended their
+approach to support \gls{DAG}-shaped \glspl{pattern}.
+%
+\textcite{BuchwaldZwinkau:2010} reused the \gls{PBQP} model but replaced the use
+of \glspl{machine grammar} with rewrite rules based on algebraic graph
+transformations~\cite{LoweEhrig:1991}.
+
+
+\subsection{The VF2 Algorithm}
+\labelSection{ex-isel-rep-vf2-algorithm}
+
+For \gls{pattern matching}, most combinatorial approaches apply the
+\gls!{VF2}[~algorithm]~\cite{CordellaEtAl:2001}.
+%
+The algorithm, given in \refAlgorithm{vf2-algorithm}, recursively checks every
+\gls{node}-mapping candidate and applies a set of rules for checking whether the
+current mapping yields a \gls{match}.
+%
+\def\fG{G_{\mathsc{f}}}%
+\def\pG{G_{\mathsc{p}}}%
+\def\fN{N_{\mathsc{f}}}%
+\def\fE{E_{\mathsc{f}}}%
+\def\pN{N_{\mathsc{p}}}%
+\def\pE{E_{\mathsc{p}}}%
+\def\mCandSet{P(s)}%
+\def\mSynRuleCheck{R_{\mathsc{syn}}}%
+\def\mSemRuleCheck{R_{\mathsc{sem}}}%
+\def\fTout{T_{\!\mathsc{f}}^{\hspace{.5pt}\mathsc{out}}}%
+\def\pTout{T_{\!\mathsc{p}}^{\hspace{.5pt}\mathsc{out}}}%
+\def\fTin{T_{\!\mathsc{f}}^{\mathsc{in}}}%
+\def\pTin{T_{\!\mathsc{p}}^{\mathsc{in}}}%
+\begin{algorithm}[t]
+  \DeclFunction{FindMatches}{function graph $\fG = \mPair{\fN}{\fE}$,
+                             pattern graph $\pG = \mPair{\pN}{\pE}$}%
+  {%
+    $M$ \Assign $\emptyset$\;
+    \Call{FindMatchRec}{$\emptyset$}\;
+    \Return{$M$}\;
+    \DeclFunction{FindMatchRec}{set $s$ of mappings}%
+    {%
+      \If(\tcp*[f]{if match found}){$\mCard{s} = \mCard{\pN}$}{%
+        $M$ \Assign $M \cup \mSet{s}$\;
+      }
+      \Else{%
+        compute mapping candidate set $\mCandSet$
+        \tcp*{see \refDefinition{pm-cand-set}}
+        \ForEach{$\mPair{n}{m} \in \mCandSet$}{%
+          \If(\tcp*[f]{see \refDefinitionRange{pm-syntactic-rules}%
+                                              {pm-semantic-rules}})%
+             {$\mSynRuleCheck(s, n, m) \mAnd \mSemRuleCheck(s, n, m)$}%
+          {%
+            \Call{FindMatchRec}{$s \cup \mSet{\mPair{n}{m}}$}\;
+          }
+        }
+      }
+    }
+  }
+
+  \caption{VF2 algorithm}
+  \labelAlgorithm{vf2-algorithm}
+\end{algorithm}
+%
+The rules are categorized into syntactic and semantic rules.
+%
+The \emph{syntactic rules} check that the \gls{graph} structure is preserved,
+and the \emph{semantic rules} check that \gls{node} and \gls{edge} attributes
+are compatible.
+%
+In the worst case, \mbox{$\mBigO(N! N)$} mappings need to be checked.
+
+
+\paragraph{Computing the Mapping Candidate Set}
+
+The set of mapping candidates under consideration to be added to $s$ is called
+the \gls!{mapping candidate set}, denoted~$\mCandSet$.
+%
+The set is computed as follows.
+%
+\begin{definition}[Mapping Candidate Set]
+  Let \mbox{$\fG = \mPair{\fN}{\fE}$} and \mbox{$\pG = \mPair{\pN}{\pE}$} be a
+  \gls{function graph} respectively a \gls{pattern graph}, and $s$ be a set of
+  mappings from \glspl{node} in $\fG$ to \glspl{node} in $\pG$.
+  %
+  Let $\fN(s)$ and $\pN(s)$ denote the sets of \glspl{node} in $\fG$ and $\pG$,
+  respectively, that appear in~\mbox{$s$\hspace{-.8pt}.}
+  %
+  Also let $\fTout$ and $\pTout$ denote the set of \glspl{node} in $\fG$ and
+  $\pG$, respectively, that are targets of \glspl{edge} from \glspl{node}
+  appearing in~\mbox{$s$\hspace{-.8pt}.}
+  %
+  Likewise, let $\fTin$ and $\pTin$ denote the set of \glspl{node} in $\fG$ and
+  $\pG$, respectively, that are sources of \glspl{edge} to \glspl{node}
+  appearing in~\mbox{$s$\hspace{-.8pt}.}
+  %
+  Then
+  %
+  \begin{displaymath}
+    \mCandSet \equiv
+    \left\{
+    \begin{array}{ll}
+        \mSetBuilder{\mPair{n}{m}}{n \in \fTout, m \in \pTout}
+      & \text{if} \ \fTout \neq \emptyset \mAnd \pTout \neq \emptyset
+        \hspace{-1pt}, \\
+        \mSetBuilder{\mPair{n}{m}}{n \in \fTin, m \in \pTin}
+      & \text{if} \ \fTin \neq \emptyset \mAnd \pTin \neq \emptyset
+        \hspace{-1pt}, \\
+        \mSetBuilder{\mPair{n}{m}}{
+                                    n \in \fN \setminus \fN(s),
+                                    m \in \pN \setminus \pN(s)
+                                  }
+      & \text{otherwise}.
+    \end{array}
+    \right.
+  \end{displaymath}%
+  \labelDefinition{pm-cand-set}%
+\end{definition}
+%
+The last clause is needed when $\fG$ or $\pG$ consists of disconnected
+\glspl{subgraph}.
+
+
+\paragraph{Syntactic Rules}
+
+\def\mSynPredRule{R_{\mathsc{pred}}}
+\def\mSynSuccRule{R_{\mathsc{succ}}}
+\def\mSynInRule{R_{\mathsc{in}}}
+\def\mSynOutRule{R_{\mathsc{out}}}
+\def\mSynNewRule{R_\mathsc{new}}
+
+The syntactic rules check five properties:
+%
+\begin{equation}
+  \mSynRuleCheck(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv
+  \mSynPredRule(\ldots) \mAnd \mSynSuccRule(\ldots) \mAnd
+  \mSynInRule(\ldots) \mAnd \mSynOutRule(\ldots) \mAnd \mSynNewRule(\ldots).
+\end{equation}
+%
+The first two rules, $\mSynPredRule$ and $\mSynSuccRule$, check the consistency
+of the partial \gls{match} obtained when the candidate~\mbox{$\mPair{n}{m}$} is
+added to~\mbox{$s$\hspace{-.8pt}.}
+%
+Intuitively, if there exists an \gls{edge} between two mapped \glspl{node} in
+the \gls{pattern graph}, then a corresponding \gls{edge} must also exist in the
+\gls{function graph}.\!%
+%
+\footnote{%
+  In the paper \cite{CordellaEtAl:2001}, $\mSynPredRule$ and $\mSynSuccRule$
+  also check the inverse -- that is, an \gls{edge} between two mapped
+  \glspl{node} in the \gls{function graph} must have a corresponding \gls{edge}
+  in the \gls{pattern graph} -- thus requiring that $\pG$ is an induced
+  \gls{subgraph} of $\fG$.
+  %
+  In the context of \gls{instruction selection}, however, it is sufficient to
+  only maintain the structure of~$\pG$.
+  %
+  Hence the condition above has been removed from
+  \refDefinition{pm-syntactic-rules}.%
+}
+%
+The next two rules, $\mSynInRule$ and $\mSynOutRule$, are \num{1}-look-ahead
+rules that check whether there exists a sufficient number of unmapped
+\glspl{node} adjacent to $n$ in the \gls{function graph} for mapping the
+remaining \glspl{node} adjacent to $m$ in the \gls{pattern graph}.
+%
+The last rule, $\mSynNewRule$, is similar to $\mSynInRule$ and $\mSynOutRule$
+but perform a \num{2}-look-ahead check.
+%
+Formally, the rules are defined as follows.
+%
+\begin{definition}[Syntactic Rules]
+  \def\fT{T_{\!\mathsc{f}}}%
+  \def\pT{T_{\!\mathsc{p}}}%
+  \def\fNegN{\mkern2mu\overline{\mkern-2mu N}_{\mathsc{f}}}%
+  \def\pNegN{\mkern2mu\overline{\mkern-2mu N}_{\mathsc{p}}}%
+
+  Let \mbox{$\mPred(G\hspace{-.8pt}, n)$} and \mbox{$\mSucc(G\hspace{-.8pt},
+    n)$} denote the sets of predecessor and successor \glspl{node},
+  respectively, to \gls{node}~$n$ in \gls{graph}~$G$.
+  %
+  Also let \mbox{$\fT = \fTin \cup \fTout$} and \mbox{$\fNegN = \fN \setminus
+    \fN(s) \setminus \fT$}, with similar definitions for $\pT$ and $\pNegN$.
+  %
+  Then
+  %
+  \begin{displaymath}
+    \begin{array}{r@{}l}
+        \mSynPredRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & \forall m' \in \pN(s) \cap \mPred(\pG, m),
+        \exists n' \in \fN(s) :
+        \mPair{n'}{m'} \in s, \\[\abovedisplayskip]
+
+        \mSynSuccRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & \forall m' \in \pN(s) \cap \mSucc(\pG, m),
+        \exists n' \in \fN(s) :
+        \mPair{n'}{m'} \in s, \\[\abovedisplayskip]
+
+        \mSynInRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & \mCard{\mSucc(\fN, n) \cap \fTin} \geq
+        \mCard{\mSucc(\pN, n) \cap \pTin} \mAnd \mbox{} \\
+      & \mCard{\mPred(\fN, n) \cap \fTin} \geq
+        \mCard{\mPred(\pN, n) \cap \pTin}, \\[\abovedisplayskip]
+
+        \mSynOutRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & \mCard{\mSucc(\fN, n) \cap \fTout} \geq
+        \mCard{\mSucc(\pN, n) \cap \pTout} \mAnd \mbox{} \\
+      & \mCard{\mPred(\fN, n) \cap \fTout} \geq
+        \mCard{\mPred(\pN, n) \cap \pTout}, \\[\abovedisplayskip]
+
+        \mSynNewRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & \mCard{\fNegN \cap \mPred(\fG, n)} \geq
+        \mCard{\pNegN \cap \mPred(\pG, m)} \mAnd \mbox{} \\
+      & \mCard{\fNegN \cap \mSucc(\fG, n)} \geq
+        \mCard{\pNegN \cap \mSucc(\pG, m)}.
+    \end{array}
+  \end{displaymath}%
+  \labelDefinition{pm-syntactic-rules}%
+\end{definition}
+
+
+\paragraph{Semantic Rules}
+
+\def\mSemNodeRule{R_{\mathsc{node}}}
+\def\mSemEdgeRule{R_{\mathsc{edge}}}
+
+The semantic rules check two properties:
+%
+\begin{equation}
+  \mSemRuleCheck(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv
+  \mSemNodeRule(\ldots) \mAnd \mSemEdgeRule(\ldots).
+\end{equation}
+%
+The first rule checks that the \gls{node} types are compatible, while the second
+rule checks compatibility between \glspl{edge}.
+%
+Formally, the rules are defined as follows.
+%
+\begin{definition}[Semantic Rules]
+  Let $\mVFTwoAttrCmp$ represent a binary relation for comparing the
+  compatibility between \glspl{node} and \glspl{edge}.
+  %
+  Also let $\fE(s)$ and $\pE(s)$ denote the sets of \glspl{edge} in $\fG$ and
+  $\pG$, respectively, for all pairs of \glspl{node} appearing
+  in~\mbox{$s$\hspace{-.8pt}.}
+  %
+  Then
+  %
+  \begin{displaymath}
+    \begin{array}{r@{}l}
+        \mSemNodeRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & n \mVFTwoAttrCmp m, \\[\abovedisplayskip]
+        \mSemEdgeRule(s\hspace{-.8pt}, n\hspace{-.8pt}, m) \equiv \mbox{}
+      & \big(
+        \forall \mPair{n'}{m'} \in \fE(s) :
+        \mPair{n}{n'} \in \fE \mImp \mPair{n}{n'} \mVFTwoAttrCmp \mPair{m}{m'}
+        \big) \mAnd \mbox{} \\
+      & \big(
+        \forall \mPair{n'}{m'} \in \fE(s) :
+        \mPair{n'}{n} \in \fE \mImp \mPair{n'}{n} \mVFTwoAttrCmp \mPair{m'}{m}
+        \big).
+    \end{array}
+  \end{displaymath}%
+  \labelDefinition{pm-semantic-rules}%
+\end{definition}
+
+
+\section{Limitations of Existing Approaches}
+\labelSection{ex-isel-rep-limitations-of-existing-approaches}
+
+To solve the problems described in \refChapter{introduction} on
+\refPageOfSection{intro-motivation}, none of the approaches discussed in this
+chapter can be applied directly.
+%
+The greedy approaches are only concerned with \gls{pattern selection}, making it
+unclear how to extend these to integrate other \gls{code generation} tasks.
+%
+The combinatorial approaches show more promise in that regards as they apply
+generic solving techniques, but instead the models of these approaches are too
+limited.
+
+First, while many combinatorial approaches combine \gls{instruction
+  selection} with \gls{instruction scheduling}, none combines \gls{instruction
+  selection} with \gls{global code motion}.
+%
+For most of these, it is not clear how to extend the model to integrate this
+task.
+
+Second, all combinatorial approaches only handle \gls{tree}- and
+\gls{DAG}-shaped \glspl{pattern}.
+%
+This excludes support for \gls{inter-block.ic} \glspl{instruction} which extend
+over multiple \glspl{block} and must therefore be modeled as \glspl{pattern
+  graph} (one such example is given in \refChapter{introduction} on
+\refPageOfSection{intro-saturated-arithmetic}).
+
+Third, with the exception of \textcite{TanakaEtAl:2003}, no combinatorial
+approach takes the cost of \gls{data copying} into account.
+%
+Failing to consider this cost could lead to greedy use of \gls{SIMD.i}
+\glspl{instruction}, which in turn degrades code quality.
+
+Fourth and last, all combinatorial approaches only deal with data flow.
+%
+Problems concerning control flow, such as selection of branch
+\glspl{instruction} and \gls{block ordering}, must be handled separately, which
+could potentially result in suboptimal code.
+
+To summarize, we need a more general combinatorial model that integrates the
+problems described in \refChapter{introduction}.
+%
+To that end, we also need a more powerful means of representing \glspl{function}
+and \glspl{instruction}.

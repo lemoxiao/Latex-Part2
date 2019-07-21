@@ -1,0 +1,41 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize%
+\pgfdeclarelayer{background}%
+\pgfsetlayers{background,main}%
+\setlength{\nodeDist}{14pt}%
+\begin{tikzpicture}[
+    block node/.append style={
+      minimum width=4em,
+    },
+  ]
+
+  \node [block node] (entry) {\nBlock{entry}};
+  \node [block node, below=of entry] (A) {\nBlock{A}};
+  \node [block node, position=-135 degrees from A] (B) {\nBlock{B}};
+  \node [block node, position=- 45 degrees from A] (C) {\nBlock{C}};
+  \node [block node, position=- 45 degrees from B] (D) {\nBlock{D}};
+  \node [block node, below=of D] (E) {\nBlock{E}};
+  \begin{pgfonlayer}{background}
+    \begin{scope}[control flow]
+      \draw (entry) -- (A);
+      \draw [rounded corners=6pt]
+            (entry)
+            -|
+            ([xshift=-.75\nodeDist] B.west)
+            |-
+            (E);
+      \draw (A) -- (B);
+      \draw (A) -- (C);
+      \draw (B) -- (D);
+      \draw (C) -- (D);
+      \draw (D) -- (E);
+    \end{scope}
+  \end{pgfonlayer}
+\end{tikzpicture}%
+\endgroup%

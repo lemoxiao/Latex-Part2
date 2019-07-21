@@ -1,0 +1,1732 @@
+\documentclass{icmmcm}
+
+% Copyright (C) 2003-2016  Claire M. Connelly and the Department
+%                          of Mathematics, Harvey Mudd College.
+
+% This work may be distributed and/or modified under the conditions of
+% the LaTeX Project Public License, either version 1.3 of this license
+% or (at your option) any later version.
+
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+
+% This work has the LPPL maintenance status `maintained'.
+
+% The Current Maintainer of this work is Claire M. Connelly.
+
+
+
+\usepackage{url}              % For formatting URLs and other web or
+                              % file references.
+\usepackage{mflogo}           % Provides the METAFONT logo; you
+                              % won't need it for your report.
+\usepackage{graphicx}         % For importing graphics.
+\usepackage{natbib}
+
+%%% Sample ICM/MCM Contest Submission
+%%%
+%%% Based on sample senior thesis document
+%%% Last modified by Jeremy Rouse
+%%%   Summer 2000
+%%%
+%%% and on the LaTeX Hints document
+%%% created by C.M. Connelly <cmc@math.hmc.edu>
+%%%   Copyright 2002-2012
+
+
+%%% ---------------
+%%% Local Command and Environment Definitions
+
+%%% If you have any local command or environment definitions, put them
+%%% here or in a separate style file that you load with \usepackage.
+
+% \newtheorem declarations
+\newtheorem{Theo1}{Theorem}
+\newtheorem{Theo2}{Theorem}[section]
+\newtheorem{Lemma}[Theo2]{Lemma}
+% Each of the above defines a new theorem environment.
+% Multiple theorems can be done in the same environment.
+% Theo2's number is defined by the subsection it's in.
+% Theo3 uses the same numbering counter and numbering system as
+% Theo2 (that's the meaning of [Theo2]).
+
+
+%%% You probably won't want any of the following commands, which are
+%%% here to allow various the names of commands, make examples typeset
+%%% properly, and so on.  You can, of course, use them as examples for
+%%% your own user-defined commands.
+\newcommand{\bslash}{\symbol{'134}}%backslash
+\newcommand{\bsl}{{\texttt{\bslash}}}
+\newcommand{\com}[1]{\bsl\texttt{#1}\xspace}
+\newcommand{\file}[1]{\texttt{#1}\xspace}
+
+\newcommand{\pdftex}{PDF\tex}
+\newcommand{\pdflatex}{PDF\latex}
+\newcommand{\acronym}[1]{\textsc{#1}\xspace}
+\newcommand{\key}[1]{\textsf{\emph{#1}}\xspace}
+\newcommand{\class}[1]{\textsf{#1}\xspace}
+\newcommand{\package}[1]{\textsf{#1}\xspace}
+\newcommand{\env}[1]{\texttt{#1}\xspace}
+\newcommand{\prog}[1]{\texttt{#1}\xspace}
+\newcommand{\command}[1]{\texttt{\bsl{}#1}\xspace}
+\newcommand{\ctt}{\texttt{comp.text.tex}\xspace}
+\newcommand{\tex}{\TeX\xspace}
+\newcommand{\latex}{\LaTeX\xspace}
+
+%%% Note that the \xspace command comes from the xspace package.  It
+%%% allows you type a command that inserts text without having to
+%%% worry about how you ``end'' that command.
+%%%
+%%% Without \xspace, you would need to end a command with a backslash
+%%% followed by a space or with an empty set of braces if you followed
+%%% the command with a space.  For example,
+%%%
+%%%   \foo is a very important algorithm.
+%%%
+%%% might produce 
+%%%  
+%%%   The foobarbaz algorithmis a very important algorithm.
+%%%  
+%%% whereas with the \xspace command, the same code would produce
+%%%  
+%%%   The foobarbaz algorithm is a very important algorithm.
+%%%  
+%%%  If you need to butt a command that produces text against a letter
+%%%  of some sort -- say, to pluralize it -- you need to tell TeX
+%%%  where your command name ends so that it expands the correct
+%%%  macro.  So you might do
+%%% 
+%%%    \bar{}s are very busy creatures.
+
+
+%%% TeX has an amazingly good hyphenation algorithm, but sometimes it
+%%% gets confused and needs some help.
+%%%
+%%% For words that only occur once or twice, you can insert hints
+%%% directly into your text, as in
+%%%
+%%%    our data\-base system is one of the most complex ever devised
+%%%
+%%% For words that you use a lot, and that seem to keep ending up at
+%%% the end of a line, however, inserting the hints each time gets to
+%%% be a drag.  You can use the \hyphenation command  to globally tell
+%%% TeX where to hyphenate words it can't figure out on its own.
+
+\hyphenation{white-space}
+
+
+
+%%% End Local Command and Environment Definitions
+%%% ---------------
+
+
+%%% ---------------
+%%% Title Block
+
+\title{\latex Hints for ICM/MCM Contest Reports}
+
+%%% Which contest are you taking part in?  (Just one!)
+
+\contest{ICM/MCM}
+
+%%% The question you answered.  (Again, just the one.)
+
+\question{Report Sample}
+
+%%% Your Contest Team Control Number
+\team{12345}
+
+%%% A normal document would specify the author's name (and possibly
+%%% their affiliation or other information) in an \author command.
+%%% Because the ICM/MCM Contest rules specify that the names of the
+%%% team members, their advisor, and their institution should not
+%%% appear anywhere in the report, do *not* define an \author command.
+
+%%% Defining the \date command is optional.  If you leave it blank,
+%%% your document will include the date that the file is typeset, in
+%%% the form  ``Month dd, yyyy''.
+
+% \date{}
+
+%%% End Title Block
+%%% ---------------
+
+\begin{document}
+
+%%% ---------------
+%%% Summary
+
+\begin{summary}
+  This document is meant to give you a quick introduction to \TeX\ and
+  \LaTeX.  It covers a lot of material, but still barely manages to
+  scratch the surface.  It should provide you with some inspiration
+  and, I hope, with some useful code you can copy, modify, and use in
+  your report.
+
+  You should use the \file{blank-template.tex} file as a basis for
+  your report rather than this file.  Be sure to change its name to
+  something sensible (maybe your team control number), and to set the
+  values of the \com{title}, \com{question}, and \com{team} commands
+  to appropriate values.
+
+  Good luck!
+
+  \hfill{}-- Claire
+\end{summary}
+ 
+%%% End Summary
+%%% ---------------
+
+%%% ---------------
+%%% Print Title Block, Contents, et al.
+
+\maketitle
+\tableofcontents
+
+%%% Uncomment the following lines if you have figures or tables in
+%%% your report:
+\listoffigures
+\listoftables  
+ 
+%%% End Print Title Block, Contents, et al.
+%%% ---------------
+
+
+
+\section{Introduction: What Is \latex?}%
+\label{sec:introduction}
+
+\latex is a tool that allows you to concentrate on your writing while
+taking advantage of the \tex typesetting system to produce
+high-quality typeset documents.
+
+\latex's benefits include
+\begin{enumerate}
+\item Standardized document classes
+\item Structural frameworks for organizing documents
+\item Automatic numbering and cross-referencing of structural elements
+\item ``Floating'' figures and tables
+\item High-level programming interface for accessing \tex's
+  typesetting capabilities
+\item Access to \latex extensions through loading ``packages''
+\end{enumerate}
+
+
+\section{Structured Writing}%
+\label{sec:structured-writing}
+
+Like HTML,\footnote{HyperText Markup Language} \latex is a markup
+language rather than a \acronym{Wysiwyg}{}\footnote{What You See Is
+  What You Get.}  system.  You write plain text files that use special
+\key{commands} and \key{environments} that govern the appearance and
+function of parts of your text in your final typeset document.
+
+
+\subsection{Document Classes}%
+\label{sec:document-classes}
+
+The general appearance of your document is determined by your choice
+of \key{document class}.  Document classes also load \latex packages
+to provide additional functionality.
+
+\latex provides a number of basic classes, including \class{article},
+\class{letter}, \class{report}, and \class{book}.  There are also a
+large number of other document classes available, including
+\class{amsart} and \class{amsbook}, created by the American
+Mathematical Society and providing some additional mathematically
+useful structures and commands; \class{foils}, \class{prosper}, and
+\class{seminar}, which allow you to create ``slides'' for
+presentations; the math department's \class{thesis} class, for
+formatting senior theses; and many journal- or company-specific
+classes that format your document to match the ``house style'' of a
+particular periodical or publisher.
+
+
+\subsection{Packages}%
+\label{sec:packages}%
+\label{sec:ctan}
+
+\latex packages, or \key{style files}, define additional commands and
+environments, or change the way that previously defined commands and
+environments work.  By loading packages, you can change the fonts used
+in your document, write your document in a non-English language with a
+non-\acronym{Ascii} font encoding, include graphics, format program
+listings, add custom headers and footers to your document, and much
+more.
+
+A typical \tex installation includes hundreds of style files, and
+hundreds more are available from the Comprehensive \tex Archive
+Network (CTAN), at \url{http://www.ctan.org/}.
+
+
+\subsection{Structural Commands}%
+\label{sec:structural-commands}
+
+\begin{table}
+\centering
+\begin{tabular}{ll}
+\toprule
+Command           & Notes                               \\
+\midrule
+\com{part}        & \class{book} \& \class{report} only \\
+\com{chapter}     &\class{book} \& \class{report} only  \\
+\com{section}                                           \\
+\com{subsection}                                        \\
+\com{subsubsection}                                     \\
+\com{paragraph}                                         \\
+\com{subparagraph}                                      \\
+\bottomrule
+\end{tabular}
+\caption[Structural commands in \latex]{Structural commands in \latex.}%
+\label{tab:structural-commands}
+\end{table}
+
+\latex provides a set of structural commands for defining sections of
+your document, as shown in Table~\ref{tab:structural-commands}.
+
+Note that the argument to structural commands are moving arguments
+(see Section~\ref{sec:fragile-commands}) because they can be reused in
+the table of contents or in page headers or footers.  Structural
+commands can take an optional argument in which you specify nonfragile
+commands or a shorter version of the actual section title that fits.
+You'll generally know when you need to provide an optional argument by
+\TeX's behavior.
+
+
+\subsection{Labels and References}%
+\label{sec:labels-and-references}
+
+Sections are numbered automatically by \latex during typesetting.  If
+you change your mind and decide that a subsection should be promoted
+to a section, or moved to the end of your document, the sections will
+be renumbered so that the numbers are consistent. 
+
+Sections can also be \command{label}{}ed with a tag such as 
+\begin{quote}
+\begin{verbatim}
+\section{Our Complicated Equations}%
+\label{sec:complicated-eqs}
+\end{verbatim}
+\end{quote}
+and referred to with a \command{ref} or \command{pageref} command, as
+in
+\begin{quote}
+\begin{verbatim}
+In Section~\ref{sec:complicated-eqs}, we pointed out...
+\end{verbatim}
+\end{quote}
+or
+\begin{quote}
+\begin{verbatim}
+On page~\pageref{fig:gordian-knot}, we illustrated...
+\end{verbatim}
+\end{quote}
+
+\latex substitutes the correct section number when typesetting your
+document.
+
+The same commands can be used with numbered environments such as
+\env{equation}, \env{theorem}, and so forth.
+
+Use \emph{meaningful} labels---labeling a section as \texttt{sec12}
+may seem useful, but it will be confusing if you end up moving it to a
+different place in the document and its number changes to Section~34.
+It's also easier to remember what reference you want if you use a
+meaningful name.
+
+You may also want to impose some additional organization through the
+use of \emph{namespaces}, as I've done in this document.  Rather than
+give different types of objects undistinguished labels, I precede
+section labels with \texttt{sec:}, equations with \texttt{eq:},
+figures with \texttt{fig:}, tables with \texttt{tab:}, and so on.
+
+Emacs with Aux\tex and Ref\tex gives you easy access to these labels,
+as do many other editors with \tex-specific features.  It's much
+easier to find the particular label you're looking for if you have
+some additional information to help you.  Adding the prefixes also
+reminds you of what text should precede the \com{ref} command.
+
+
+\subsection{Commands}
+
+\latex uses commands for changes that are very limited in scope (a few
+words) or are unlimited in scope (the rest of a document).  For
+example, the commands
+\begin{quote}
+\begin{verbatim}
+\textbf{bold} 
+\emph{italic (emphasized)} 
+\textsf{sans serif}
+\end{verbatim}
+\end{quote}
+produce the following output in a typeset document:
+\begin{quote}
+\textbf{bold} \emph{italic (emphasized)} \textsf{sans serif}
+\end{quote}
+
+These are ``commands with arguments''---the command itself starts with
+a backslash (\bsl), and its \key{argument} appears inside braces
+{\verb+{ }+).  Some commands may also have \key{optional arguments},
+which are typed inside brackets (\verb+[ ]+).
+
+There are also commands that take no arguments, such as
+\command{noindent}, \command{raggedright}, and \command{pagebreak}.
+
+You can define your own commands, as discussed in
+Section~\ref{sec:customization}.
+
+
+\subsection{Environments}%
+\label{sec:environments}
+
+\latex provides a number of \key{environments} that affect the
+appearance of text, and are generally used for more structurally
+significant purposes.  For example, the commands listed above are
+typeset inside a \env{verbatim} environment typed inside a \env{quote}
+environment.  Their results were typeset inside a \env{quote}
+environment.
+
+Environments use special commands to start and close---\command{begin}
+and \command{end}, followed by the name of the environment in braces,
+as in
+\begin{quote}
+\begin{verbatim}
+\begin{quote}
+  ``This is disgusting---I can't eat this.  That arugala is so
+  bitter\ldots{} It's like my algebra teacher on bread.''
+  \flushright -- Julia Roberts in \emph{Full Frontal}
+\end{quote}
+\end{verbatim}
+\end{quote}
+producing
+\begin{quote}
+  ``This is disgusting---I can't eat this.  That arugala is so
+  bitter\ldots{} It's like my algebra teacher on bread.''
+  \flushright -- Julia Roberts in \emph{Full Frontal}
+\end{quote}
+
+Some environments may take additional arguments in braces (required)
+or brackets (optional).
+
+Note that the order in which environments nest is extremely important.
+If you type an environment inside another environment, the inner
+environment must be \command{end}{}ed \emph{before} the second
+environment is closed.  It's also vitally important that you have an
+\command{end} line for each \command{begin} line, or \latex will
+complain.
+
+\subsubsection{The \env{document} Environment and the Preamble}%
+\label{sec:document-environment}
+
+The most important environment is the \env{document} environment,
+which encloses the \key{body} of your document.  The code before the
+\command{begin}\verb+{document}+ line is called the \key{preamble},
+and includes the all-powerful \command{documentclass} command, which
+loads a particular document class (see
+Section~\ref{sec:document-classes}); optional \command{usepackage}
+commands, which load in additional \latex packages (see
+Section~\ref{sec:packages}); and other setup commands, such as
+user-defined commands and environments, counter settings, and so
+forth.
+
+I generally also include the commands defining the title, author, and
+date in my preambles, but other people include them just after
+\command{begin}\verb+{document}+, before the \command{maketitle}
+command, which creates the title block of your document.
+
+\subsubsection{Math Environments}%
+\label{sec:math-environments}
+
+One of the major hallmarks of \tex is its ability to typeset
+mathematical equations.
+
+The two primary ways of doing so are with the use of \key{inline} and
+\key{display math environments}.  These environments are used so
+often that there are shorthands provided for typing them.  Inline math
+environments, such as $a^2 + b^2 = c^2$, can be typed as
+\begin{quote}
+\begin{verbatim}
+\begin{math}
+a^{2} + b^{2} = c^{2}
+\end{math}
+\end{verbatim}
+\end{quote}
+or
+\begin{quote}
+\begin{verbatim}
+$a^{2} + b^{2} = c^{2}$.
+\end{verbatim}
+
+\end{quote}
+
+Display math environments set your equation apart from your running
+text.  They're generally used for more complicated expressions, such
+as
+\[
+f(x) = \int \left( \frac{x^2 + x^3}{1} \right)dx
+\]
+which can be typed as
+
+\begin{quote}
+\begin{verbatim}
+\begin{displaymath}
+f(x) = \int \left( \frac{x^2 + x^3}{1} \right)dx
+\end{displaymath}
+\end{verbatim}
+\end{quote}
+or
+\begin{quote}
+\begin{verbatim}
+\[
+f(x) = \int \left( \frac{x^2 + x^3}{1} \right)dx
+\]
+\end{verbatim}
+\end{quote}
+
+Generally, you'll want to use the \verb+$+ %$ <- fool font-lock-mode
+
+delimited form for inline math, and the \com{[} \com{]} form for
+display math environments.  [Besides being easy to type, these forms
+are \key{robust}, which means that they can be used in \key{moving
+  arguments}, elements that \tex may need to typeset in more than one
+place (such as a table of contents) or adjust (such as footnotes).]
+
+\paragraph{The \env{equation} Environment}%
+\label{sec:equation-environment}
+
+You'll probably want to use the \env{equation} environment for any
+formula you plan to refer to.  \latex not only typesets the contents
+of an \env{equation} environment in display mode, it also numbers it,
+as in
+\begin{equation}
+\label{eq:myequation}
+f(x) = \int \left( \frac{x^2 + x^3}{1} \right)dx
+\end{equation}
+written as
+\begin{quote}
+\begin{verbatim}
+\begin{equation}
+\label{eq:myequation}
+f(x) = \int \left( \frac{x^2 + x^3}{1} \right)dx
+\end{equation}
+\end{verbatim}
+\end{quote}
+
+Note that you can refer to this formula as
+Equation~\ref{eq:myequation} with
+\begin{verbatim}
+\ref{eq:myequation}.
+\end{verbatim}
+
+
+\subsection{Fonts}%
+\label{sec:fonts}
+
+Generally you'll want to let \latex handle the fonts for you---Knuth's
+Computer Modern fonts are used by default, and include a wide range of
+variations that can cover most any use you can think of.  
+
+If you want to get fancy (and portable; see
+Section~\ref{sec:fuzzy-fonts}), you can use Type~1 PostScript fonts,
+such as Times, Palatino, Utopia, and so forth.  These font sets are
+accessible with packages with names like \package{times},
+\package{palatino}, and \package{utopia}.  There are others, as
+well---a command such as \com{locate psnfss | grep sty} will find most
+of them.
+
+You can also get fonts from CTAN (see Section~\ref{sec:ctan}), both
+bitmap and Type 1.  There's even support for TrueType fonts in some
+\TeX\ systems.
+
+\subsubsection{Font Commands}%
+\label{sec:font-commands}
+
+Most of your concern about fonts is probably related to what you're
+writing.  You might want some \emph{emphasized} or \textbf{bold} text
+to stress a point or highlight a key term.  Filenames might be set in
+\texttt{typewriter text} (although you should consider using the
+\package{url} package to help you out---by default, text set in
+typewriter text isn't hyphenated, which can lead to some unattractive
+line breaks).
+
+You can also set text in \textsf{sans serif} or \textsc{small caps}.
+Table~\ref{tab:font-commands} shows you some of the most commonly used
+font commands provided by \latex.
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{ll}
+    \toprule
+    Command       &   Result\\
+    \midrule
+    \com{emph}    &   \emph{emphasized text}\\
+    \com{textsf}  &   \textsf{sans-serif text}\\
+    \com{texttt}  &   \texttt{typewriter text}\\
+    \com{textbf}  &   \textbf{bold text}\\
+    \com{textsc}  &   \textsc{small caps text}\\
+    \com{textsl}  &   \textsl{slanted text}\\
+    \com{textit}  &   \textit{italic text}\\
+    \bottomrule
+  \end{tabular}
+  \caption[Commonly used font commands]{Commonly used font commands.}
+  \label{tab:font-commands}
+\end{table}
+
+I recommend that you use \com{emph} in preference to \com{textit}, and
+use \com{textbf} sparingly.  \com{emph} is a smarter command than
+\com{textit}---it switches back to the roman font when necessary.  For
+example, \emph{She loved \emph{Scooby Doo}.} versus \textit{He loved
+  \textit{Titanic}.}
+
+For complicated font changes, or for special font usages that you're
+typing a lot, creating a macro (Section~\ref{sec:customization}) is
+the way to go.  I often just write, tossing in custom commands as I
+go, and waiting to define them until just before I compile the
+document.
+
+
+\subsection{Customization}%
+\label{sec:customization}
+
+The main advantage of using commands and environments is that they
+allow you to organize your writing.  A useful side-effect is that you
+can change your mind about the way an element is typeset, and change
+all the appearances of that element in document by editing one piece
+of code.  For example, in this document the names of environments have
+been set in ``typewriter text'', using a command I created called
+\command{env}, which is defined as
+\begin{quote}
+\begin{verbatim}
+\newcommand{\env}[1]{\texttt{#1}\xspace}
+\end{verbatim}
+\end{quote}
+
+All I have to do to make the names of all the environments in the
+document appear in sans-serif type instead is to change that one line
+to
+\begin{quote}
+\begin{verbatim}
+\newcommand{\env}[1]{\textsf{#1}\xspace}
+\end{verbatim}
+\end{quote}
+
+You can do the same with almost anything you can conceptualize---key
+terms, people's names (especially names of people from
+non-English-speaking countries), files, functions, and so on.
+
+
+\section{Mathematical Notation}%
+\label{sec:mathematical-notation}
+
+As we saw in Section~\ref{sec:math-environments}, math is typed into
+one of several kinds of math environments.  Choose your environment
+based on the context and importance of the content.  Any formula you
+plan to refer to should be typed in an \env{equation} environment (or
+a similar environment that supports labels).
+
+You should punctuate your mathematics as if the formulae were normal
+parts of English sentences.  Reading them aloud is often a useful
+method for ensuring that you have all the commas in the right places.
+Where appropriate, you should also follow a displayed formula at the
+end of a sentence with a period.
+
+\subsection{Sums and Products}%
+\label{sec:sums-n-products}
+
+It's easy to typeset sums and products.  For example,
+\begin{equation}
+f(n) = \sqrt[n]{\sum_{k=1}^{n} {n \choose k} f \left( n - k \right)},~
+\prod_{n=2}^{\infty} \frac{n^{3}-1}{n^{3}+1} = \frac{2}{3}.
+\end{equation}
+
+%%% The ~ in the equation puts a nonbreaking space (equivalent to an
+%%% interword space in text mode) between the two halves of the equation.
+%%%
+%%% Also, note that the use of the \choose command here causes the
+%%% amsmath package to issue the warning
+%%%
+%%%    Package amsmath Warning: Foreign command \atopwithdelims;
+%%%    (amsmath)                \frac or \genfrac should be used instead
+%%%    (amsmath)                 on input line 557.
+%%%
+%%% amsmath would prefer the use of the \binom command it supplies.
+
+
+\subsection{Matrices}%
+\label{sec:matrices}
+
+It's a little more difficult to create matrices, but not too bad:
+%%% In LaTeX, & is the alignment tab, and separates columns. \\ is the end of
+%%% line marker, and separates rows. The ccc denotes that there are three
+%%% columns.  The array environment and the tabular environment are
+%%% more or less identical, so what goes here also applies to a table.
+%%%
+\begin{equation}
+\left[ \begin{array}{ccc}
+     2 & 1 & 2\\
+     1 & 0 & 2\\
+     2 & 1 & 1
+     \end{array} \right]
+\left[ \begin{array}{ccc}
+     -2 & 1 & 2\\
+     3 & -2 & -2\\
+     1 & 0 & -1
+     \end{array} \right] = 
+\left[ \begin{array}{ccc}
+     1 & 0 & 0\\
+     0 & 1 & 0\\
+     0 & 0 & 1
+     \end{array} \right].
+\end{equation}
+
+
+\subsection{Symbols}%
+\label{sec:symbols}
+
+\LaTeX provides an enormous number of symbols.  Additional packages
+(loaded with \com{usepackage}) may provide additional symbols and
+fonts.
+
+For example, $\mathbb{N}$, $\mathbb{Z}$, $\mathbb{Q}$, $\mathbb{R}$,
+and $\mathbb{C}$ require you to load the \package{amsfonts} package
+(which is automatically loaded by the \texttt{icmmcm} class).  These
+symbols are generated by \com{mathbb}, which only works in math mode.
+
+Subscripts and superscripts are easy---\verb!$a_n$!  produces $a_n$,
+and \verb!$x^2$! produces $x^2$.  Ordinal numbers, such as
+$3^{\textrm{rd}}$, $n^{\textrm{th}}$, and so forth,\footnote{Some
+  fonts may include their own ordinals that can be accessed with
+  special commands.} can be produced with code like
+\verb!$3^{\textrm{rd}}$!, \verb!$n^{\textrm{th}}$!.
+Equation~\ref{eq:superscript} shows a formula with a superscript.
+\begin{equation}
+\label{eq:superscript}
+ \int_{0}^{\pi} \, \cos^{2n+1} x \, {\rm d} x = 0 \qquad
+\forall \, n \in \mathbb{N}. 
+\end{equation}
+Notice that \com{cos} produces a nice roman ``$\cos$'' within math
+mode. There are similar commands for common functions like \com{log},
+\com{exp}, and so forth.  More can be defined with the
+\com{DeclareMathOperator} command provided by the \package{amsmath}
+package.
+
+You can stack symbols over other symbols. In math formulas,
+\begin{equation}
+  m\ddot{x} + \gamma\dot{x} + kx  = 0,
+\end{equation}
+or to produce diacritical accents, as in
+\begin{quote}
+  Paul Erd\H{o}s s'est reveill\'{e} t\^{o}t pour enseigner le
+  fran\c{c}ais \`{a} son fr\`{e}re et sa s\oe{}ur.
+\end{quote}
+
+\LaTeX{} has lots of Greek letters and ellipses too, some of which are
+shown in Figure~\ref{fig:greek-symbols}.
+
+\begin{figure}
+  \begin{center}
+    \begin{equation}
+      \sqrt{ 
+        \left[ 
+          \begin{array}{cccccc}
+            \alpha & \beta    & \gamma & \delta  & \epsilon & \zeta  \\
+            \eta   & \theta   & \iota  & \kappa  & \lambda  & \mu    \\
+            \nu    & \xi      & o      & \rho    & \pi      & \sigma \\ 
+            \tau   & \upsilon & \phi   & \chi    & \psi     & \omega \\
+            \Gamma & \Delta   & \Theta & \Lambda & \Xi      & \Pi    \\
+            \Sigma & \Upsilon & \Phi   & \Psi    & \Omega   & \varphi\\
+            \cdots & \ldots   & \vdots & \ddots  & :        & \cdot
+          \end{array} 
+        \right ] }.
+    \end{equation}
+  \end{center}
+  \caption[Greek letters and some symbols]{Greek letters and some symbols.}%
+  \label{fig:greek-symbols}
+\end{figure}
+
+See \cite{gratzer-mil}, pp.~455--474, or \cite{kopka-daly-guide},
+pp.~123--127, for lists of the symbols available.  Intext, you might
+see some of these symbols used as
+\begin{quote}
+  The Strong Induction Principle asserts that if a statement holds for
+  the integers $1$,~$2$,\dots,~$n$, and if whenever it holds for $n =
+  1$, \dots,~$k$ then it also holds for $n = k+1$, then the statement
+  holds for the integers $1$,~$2$,~$3$, $\ldots\,$ Using this
+  Principle, it can be shown that $1+2+\cdots+n = n(n+1)/2$ for all
+  positive integers~$n$.
+\end{quote}
+Notice that in the lists of integers, the ellipsis was made using the
+\com{ldots} command, and that the periods were nicely spaced between
+the commas. In the sum, the dots were made with \com{cdots} and were
+centered on the line.  The \package{amsmath} package provides a
+``smart'' \com{dots} command that can generally get things right based
+on the context.
+
+So, with \com{dots} alone, the previous examples come out as
+\begin{quote}
+$1$,~$2$,~\dots,~$n$\\
+$n = 1$, \dots,~$k$\\
+$1$,~$2$,~$3$, $\dots\,$\\
+$1+2+\dots+n = n(n+1)/2$
+\end{quote}
+
+The general $n \times n$ matrix can be typeset as follows:
+\begin{equation}
+\left[
+\begin{array}{cccc}
+a_{11} & a_{12} & \ldots & a_{1n}\\
+a_{21} & a_{22} & \ldots & a_{2n}\\
+\vdots & \vdots & \ddots & \vdots\\
+a_{n1} & a_{n2} & \ldots & a_{nn}\\
+\end{array} 
+\right].
+\end{equation}
+
+
+A fine point: lists of numbers that you're using in a mathematical
+sense (as opposed to dates, numbers of objects, etc.) should be typed
+in math mode.  For example, $341$, $541$, $561$, and $641$.  The same
+numbers without math mode are 341, 541, 561, and 641.  Depending on
+the fonts and packages that you're using, you may notice a little bit
+more space around the first set than the second.  With some packages,
+numbers intext may be set using old-style figures by default, as in
+\oldstylenums{341}, \oldstylenums{541}, \oldstylenums{561}, and
+\oldstylenums{641}.  %%% But without the \oldstylenums commands!
+
+
+\subsection{More Math}
+
+In Fourier analysis, we talk about the $z$-domain.
+
+If $a$ is an even number, then
+\[ a + \phi(a) < \frac{3 a}{2}, \]
+and
+\[ \sigma(a) > \frac{2^{\alpha+1}-1}{2^{\alpha}} \, a \geq \frac{3
+  a}{2}, \]
+where $\alpha$ is the greatest power of 2 that divides $a$, $\phi(a)$
+is the number of integers less than $a$ and relatively prime
+to $a$, and $\sigma(a)$ is the sum of the divisors of $a$ (including
+$1$ and $a$). 
+
+Typeset a piecewise function using the \env{cases} environment (from
+the \package{amsmath} package) as follows:
+\[ |x| = 
+\begin{cases} 
+   x, & {\rm if~}x \geq 0;\\
+  -x, & {\rm otherwise.}\\
+\end{cases}
+\]
+
+In frosh physics, students come to know the true meaning of
+$\mathbf{F} = m \mathbf{a}$, $E = mc^{2}$, and $-\frac{\hbar^{2}}{2m} 
+\nabla^{2} \psi + V \psi = i \hbar \frac{\partial \psi}{\partial t}$.
+
+\subsection{Aligning Equations}%
+\label{sec:aligning-equations}
+
+In days gone by, people used the \env{eqnarray} environment to align
+equations.  \env{eqnarray} has generally been replaced by \env{align}
+and some variants such as \env{flalign}, which places the leftmost
+column as far left as possible and the rightmost column as far right
+as possible; \env{alignat}, which allows you to specify the spacing;
+and more.  See \cite{amsmath-doc}, \cite{gratzer-mil}, \cite{lamport},
+or \cite{kopka-daly-guide} for more information about the
+alternatives.
+
+In Equations~\ref{eq:eqnarray}--\ref{eq:eqnarray-last}, the $=$ signs
+have been aligned using the \env{eqnarray} environment.
+\begin{eqnarray}{3}%
+\label{eq:eqnarray}
+   x^4 + \frac{1}{x^4} & = & x^4 + 4 x^2 + 6 + \frac{4}{x^2} + \frac{1}{x^4} -
+   4 x^2 - 6 - \frac{4}{x^2}\\
+   & = & \left( x + \frac{1}{x} \right)^4 - 4 x^2 - 6 - \frac{4}{x^4}\\
+   & = & \left( x + \frac{1}{x} \right)^4 - 4 x^4 - 8 - \frac{4}{x^4} + 8 - 6\\
+   & = & \left( x + \frac{1}{x} \right)^4 - 4 \left( x + \frac{1}{x} \right)^2
+   - 6.%
+\label{eq:eqnarray-last}
+\end{eqnarray}
+
+Equations~\ref{eq:align}--\ref{eq:align-last} show the same set
+of equations aligned with the \env{align} environment.
+\begin{align}{3}%
+\label{eq:align}
+   x^4 + \frac{1}{x^4} &= x^4 + 4 x^2 + 6 + \frac{4}{x^2} + \frac{1}{x^4} -
+   4 x^2 - 6 - \frac{4}{x^2}\\
+   &=  \left( x + \frac{1}{x} \right)^4 - 4 x^2 - 6 - \frac{4}{x^4}\\
+   &=  \left( x + \frac{1}{x} \right)^4 - 4 x^4 - 8 - \frac{4}{x^4} + 8 - 6\\
+   &=  \left( x + \frac{1}{x} \right)^4 - 4 \left( x + \frac{1}{x} \right)^2
+   - 6.%
+\label{eq:align-last}
+\end{align}
+
+\subsection{Adjusting Spacing}%
+\label{sec:math-spacing}
+
+Sometimes you need to adjust the spacing and fonts inside integrals.
+Typically, the ``d'' (as in $\textrm{d}x$) is set in Roman type.
+Rather than
+\begin{equation} 
+\int \int \frac{1}{1-xy} dx dy.
+\end{equation}
+you want
+\begin{equation}
+\int \! \! \! \int \, \frac{1}{1-xy} \, \, {\rm d}x \, {\rm d}y.
+\end{equation}
+The integral signs have been moved together using the ``negative
+space'' command \com{!}.  Extra space has been added between the
+elements of integration, $\textrm{d}x$ and $\textrm{d}y$, and between
+those elements and the integrand with the ``thin space'' command,
+\com{,}.
+
+Table~\ref{tab:math-spacing} shows the different spacing commands
+available in math mode.  There are additional spacing commands
+provided by the \package{amsmath} package, not shown here.
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{llll}
+    \toprule
+            &                &\multicolumn{2}{l}{\LaTeX\ Command}\\
+    \cmidrule(l){3-4}
+    \multicolumn{2}{l}{Name} &  Short   & Long                   \\
+    \midrule
+     \multicolumn{2}{l}{Positive Space}                          \\
+     \quad{}& thinspace      &  \com{,} & \com{thinspace}        \\
+            & medspace       &  \com{:}                          \\
+            & thickspace     &  \com{;}                          \\
+            & 1 em           &          & \com{quad}             \\
+            & 2 em           &          & \com{qquad}            \\
+    \addlinespace
+    \multicolumn{2}{l}{Negative Space}                           \\
+            & thinspace      &  \com{!} & \com{negthinspace}     \\
+    \bottomrule
+  \end{tabular}
+  \caption[\protect\LaTeX\ math spacing commands]{\protect\LaTeX\ math spacing commands.}%
+  \label{tab:math-spacing}  
+\end{table}
+
+
+\subsection{Specifying Equation Numbers or Names}%
+\label{sec:specifying-eq-numbers}
+
+All the equations you've seen so far are numbered consecutively.  You
+can specify a number (or name) for a single equation by placing the
+formula in a display math environment (but not an \env{equation}
+environment) and giving the desired number or name as the argument to
+an \com{eqno} command.  For example,
+\[ \int_{0}^{\infty} \! e^{-x^{2}} \, {\rm d}x =
+\frac{\sqrt{\pi}}{2}. \eqno (42), \]
+or
+\[ \int_{0}^{\infty} \! e^{-x^{2}} \, {\rm d}x =
+\frac{\sqrt{\pi}}{2}. \eqno (\textrm{cool formula}), \]
+
+Note that you have to specify parentheses in the argument to the
+\com{eqno} command.  If you name a formula, you also have to enclose
+the text within a command such as \com{mathrm}, or it will be set as
+if it was a string of variables (and without any spaces).
+ 
+If you'd like to have many aligned equations without numbers, use the
+starred form of the \env{align} environment, \env{align*}, as in
+\begin{quote}
+The area $K$ of $\triangle ABC$ is given by
+\begin{align*}
+  K &= \frac{a h_{a}}{2}\\
+    &= \frac{a b}{2} \sin C\\
+    &= rs\\
+    &= \sqrt{s (s-a) (s-b) (s-c)}\\
+    &= \frac{a b c}{4 R}\\
+    &= \frac{a^{2} \sin B \sin C}{2 \sin A}\\
+    &= 2 R^{2} \sin A \sin B \sin C,
+\end{align*}
+where $A$, $B$, and $C$ are the angles in $\triangle ABC$, $r$ is the
+radius of the inscribed circle, $R$ is the radius of the circumscribed
+circle, $s$ is one-half of the perimeter, and $h_{a}$ is the length of
+the altitude from the vertex $A$ to the side $BC$.
+\end{quote}
+
+\subsection{Sizing Delimiters}%
+\label{sec:sizing-delimiters}
+
+The \com{left} and \com{right} commands, followed by a bracket, brace,
+or parenthesis, tell \TeX\ to adjust the size of the delimiter to its
+contents.
+\begin{equation}
+  f(x) = \left(1 + \left(1 + x \right)^{2} \right)^{n}.
+\end{equation}
+  You can also use commands such as \com{big}, \com{Big},
+\com{bigg}, or \com{Bigg} to specify larger delimiters (useful if
+  you have multiple levels of delimiters), as in
+\[ \big( \quad \Big( \quad \bigg(  \quad \Bigg( \]
+or
+\[ \Bigg( \bigg( \Big( \big( \, ( a + b ) + c \big) + d \Big) + e \bigg) + f \Bigg) \]
+
+
+\subsection{Theorems}%
+\label{sec:theorems}
+
+The \env{theorem} environment is an easy way to typeset theorems in
+the text.  To use it, type a \com{newtheorem} command in the preamble
+of your document like
+\begin{verbatim}
+   \newtheorem{Theo1}{Theorem}
+\end{verbatim}
+
+You can then type a theorem using your theorem environment. 
+
+This document includes three such definitions, 
+\begin{verbatim}
+   \newtheorem{Theo1}{Theorem}
+   \newtheorem{Theo2}{Theorem}[section]
+   \newtheorem{Lemma}[Theo2]{Lemma}
+\end{verbatim}
+which show you some of the possibilities available.  Examples of each
+appear below.
+
+\subsubsection{A \env{Theo1} Environment}
+
+\begin{Theo1}
+The equation $x^4 + y^4 = z^4$ has no solutions where $x$, $y$, and $z$ are
+positive integers.
+\end{Theo1}
+
+\subsubsection{A \env{Theo2} Environment}
+
+\begin{Theo2}[Wilson]
+% Wilson is the title of this theorem
+A positive integer $p$ is prime if and only if 
+$$(p-1)! \equiv -1 \pmod{p}.$$
+\end{Theo2}
+
+\subsubsection{A \env{Lemma} Environment}
+
+\begin{Lemma}
+\label{mug}
+Prof.~Bernoff's Putnam mug is a multiply connected 2-manifold of genus 1.
+\end{Lemma}
+
+\subsection{Proofs}%
+\label{sec:proofs}
+
+Adding a proof is very simple. Two positive integers $a$ and $b$ are
+amicable if $\sigma(a) = \sigma(b) = a + b$, where $\sigma(N)$ denotes
+the sum of the divisors of $N$, as above.  The following is a theorem
+with an associated proof.
+
+\begin{Theo2}
+There do not exist two consecutive integers which are amicable.
+\end{Theo2}
+{\bf Proof:}
+Since even numbers are annoying, no integers are amicable with even numbers.
+Thus, if two consecutive integers are amicable, they are both odd. However,
+two consecutive odd numbers do not exist. \hfill $\Box$
+
+\medskip
+
+To create the end-of-proof marker shown here, use 
+\verb!\hfill$\Box$!. The \verb!\hfill! makes the box print flush right
+at the end of the line, as here.
+
+You can also use the \env{proof} environment provided by the
+\package{amsthm} package.  
+
+
+\section{Figures and Tables---\protect\LaTeX's Float Environments}%
+\label{sec:figs-and-tabs}
+
+\LaTeX\ provides two ``float'' environments, \env{figure} and
+\env{table}.  Float environments are so called because they can be
+typeset on a later page in your document than their location in the
+source code.
+
+The \env{table} environment is generally used
+for---surprise!---tables.  The \env{figure} environment is often used
+for graphs or diagrams, but could also be used for other illustrative
+graphics.
+
+The basic float environments don't format their contents specially.
+If you want an illustration or table to appear centered, you will need
+to type it inside a \env{center} environment or add a \com{centering}
+command.
+
+\subsection{Captions}%
+\label{sec:captions}
+
+By adding a \com{caption} command, you can specify a caption that will
+appear with the float.  Its position depends on where in the
+environment you type it---if the command is at the top of the
+environment, the caption will be typeset above its contents; if at the
+bottom, the caption will appear beneath its contents.  Captions are
+usually set at the bottom of a float, but if a particular publisher or
+journal prefers the captions on top, you can accommodate them.
+
+Captions should generally be written as brief, complete sentences,
+ending with a period.  They should either be capitalized as normal
+sentences or use headline capitaliztion---capitalized as you would the
+title of a document or a section.  So
+\begin{quote}
+  Production Statistics from Soviet Russia, 1977--1987.
+\end{quote}
+or
+\begin{quote}
+  Production statistics from Soviet Russia, 1977--1987.
+\end{quote}
+rather than
+\begin{quote}
+  production statistics from Soviet Russia, 1977--1987
+\end{quote}
+Whichever style you choose, be consistent!
+
+Avoid explaining the whole float in the caption.  Do your explanation
+in the text that refers to the float.  
+
+The \com{caption} command takes an optional argument, which is typed
+inside brackets (\verb|[ ]|).  This argument is used in the list of
+tables or list of figures in place of your actual caption.
+
+
+\subsubsection{Fragile Commands and Moving Arguments}%
+\label{sec:fragile-commands}
+
+Both arguments to the \com{caption} command are \emph{moving
+  arguments} (because \TeX\ can move them).  Some commands are
+\emph{fragile}, that is, they produce output that can cause problems
+if the typeset text is moved somewhere other than the place that \TeX\ 
+originally thought it would be typeset.
+  
+  To prevent fragile commands from being expanded too early and
+  causing problems, you can use the \com{protect} command just before
+  the command you want to keep unexpanded.
+
+
+\subsubsection{Labels}%
+\label{sec:labeling-floats}
+
+The \com{label} command for a float is generally typed immediately
+after the \com{caption} command.
+
+
+\subsection{Figures}
+\label{sec:including-graphics}
+
+Graphic images are included in your document in a \env{figure}
+environment.  The state-of-the-art method requires you to load the
+\package{graphics} or \package{graphicx} package.  Both packages
+provide the same functionality, but take arguments in a slightly
+different format.\footnote{The \package{graphicx} package defines
+  commands that take their arguments in key--value pairs, and is
+  the one that most people use; the \package{graphics} package is
+  often loaded by document classes to avoid forcing the key--value
+  argument form on people who don't want to use them.}  More
+information about the \package{graphics} and \package{graphicx}
+packages is available in its manual, \texttt{grfguide}
+\cite{carlisle-grfguide}, which is included in DVI, PostScript, or
+PDF format with most \TeX\ systems and accessible by typing
+\texttt{texdoc grfguide} at a shell prompt.
+
+Modern \TeX\ systems use PDF as their default output format, and
+expects that your included graphics will be in PDF format (for
+vector images) or PNG or JPEG format (for bitmaps).  Note that
+whenever possible you should try to save graphics in the vector
+PDF format, because they can be rescaled to any size without
+losing detail and can be rendered clearly both on screen and on
+paper.
+
+\emph{Encapsulated PostScript} or \emph{EPS} is an older format
+used by the old \LaTeX\ to DVI to PostScript toolchain.  EPS files
+are special PostScript files that define their ``bounding box'',
+may include a bitmap representation for use in previewers, and are
+restricted from using some PostScript operators.
+
+EPS files are generally created with a vector graphics application
+such as Adobe Illustrator, Dia, OmniGraffle, or Visio.  They can also
+be created from \TeX\ files using the \texttt{-E} flag with
+\prog{dvips} or from \TeX\ code using an application such as
+\LaTeX{}iT.
+
+With the development of PDF\TeX, which is now the default \TeX\
+engine, generating Portable Document Format files has become much
+easier.  PDF\TeX\ requires that your graphics are also PDF files
+(or PNGs, if they're bitmaps).  See
+Section~\ref{sec:pdftex-graphics} for some hints.
+
+Both formats use the same command, however: \com{includegraphics}.
+
+The following code produces the graphic in
+Figure~\ref{fig:a-graphic}:
+\begin{verbatim}
+   \begin{figure}
+     \begin{center}
+       \scalebox{.50}{\includegraphics{shapes}}
+     \end{center}
+     \caption[Some shapes]{Some shapes.}%
+     \label{fig:a-graphic}
+   \end{figure}
+\end{verbatim}
+\begin{figure}
+  \begin{center}
+    \scalebox{.50}{\includegraphics{shapes}}
+  \end{center}
+  \caption[Some shapes]{Some shapes.}%
+  \label{fig:a-graphic}
+\end{figure}
+
+Notice that we didn't specify the extension in the filename
+argument to the \com{includegraphics} command.  By dropping the
+extension, we can typeset this document with PDF\LaTeX\ or with
+the older toolchain (provided that we have graphics in the
+appropriate formats) by changing the commands that we run.  The
+\com{includegraphics} package searches for the graphic formats
+supported by the particular engine you're using.
+
+
+\subsubsection{\LaTeX\ Diagrams}
+
+\LaTeX\ can also be used to create both simple pictures and
+sophisticated diagrams.  Figure~\ref{fig:step-function} shows a graph
+created with the \env{picture} environment.
+
+\begin{figure}[ht]
+\begin{center}
+\begin{picture}(256,300)(0,0)
+\put(0,0){\line(1,0){256}}
+\put(0,0){\line(0,1){300}}
+\put(0,58.6){\line(1,0){128}}
+\put(192,82.8){\line(1,0){64}}
+\put(160,117.2){\line(1,0){32}}
+\put(128,165.7){\line(1,0){16}}
+\put(144,234.3){\line(1,0){8}}
+\put(128,-2){\line(0,1){4}}
+\put(192,-2){\line(0,1){4}}
+\put(160,-2){\line(0,1){4}}
+\put(144,-2){\line(0,1){4}}
+\put(152,-2){\line(0,1){4}}
+\put(-2,100){\line(1,0){4}}
+\put(-2,200){\line(1,0){4}}
+\multiput(154,0)(0,8){35}{\line(0,1){2}}
+\put(153,-10){$t$}
+\put(-8,-10){$0$}
+\put(256,-10){$1$}
+\put(-10,100){$1$}
+\put(-10,200){$2$}
+\put(60,10){$\mathcal{F}_{0}$}
+\put(220,10){$\mathcal{F}_{1}$}
+\put(172,10){$\mathcal{F}_{2}$}
+\put(130,10){$\mathcal{F}_{3}$}
+\end{picture}
+\caption[A step function]{A step function with a peak at $t$. }%
+\label{fig:step-function}
+\end{center}
+\end{figure}
+
+Chapter~6 of \cite{kopka-daly-guide} describes how you can create diagrams
+such as that shown in Figure~\ref{fig:step-function}.
+
+
+\subsection{Tables}%
+\label{sec:tables}
+
+Tables are a complicated subject, not because they're difficult to do
+in \latex, but because they're difficult to do \emph{right}.  Most
+books on \latex cover tables, but present what Simon Fear, author of
+the \package{booktabs} package, calls ``tableaux''.  One such tableau
+is illustrated in Table~\ref{tab:tableau}.
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{||l|lr||} \hline
+      gnats     & gram      & \$13.65 \\ \cline{2-3}
+                & each      & .01     \\ \hline
+      gnu       & stuffed   & 92.50   \\ \cline{1-1} \cline{3-3}
+      emu       &           & 33.33   \\ \hline
+      armadillo & frozen    & 8.99    \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption[A tableau]{A tableau.  (Taken from \cite{lamport}, pg.~64.)}%
+  \label{tab:tableau}
+\end{table}
+
+\begin{table}[htbp]
+  \begin{center}
+    \begin{tabular}{@{}llr@{}} \toprule
+      \multicolumn{2}{c}{Item} \\ \cmidrule(r){1-2}
+      Animal    & Description & Price (\$)\\ \midrule    
+      Gnat      & per gram    & 13.65 \\                 
+                & each        & 0.01 \\                  
+      Gnu       & stuffed     & 92.50 \\                 
+      Emu       & stuffed     & 33.33 \\                 
+      Armadillo & frozen      & 8.99 \\ \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption[The tableau as a table]{The tableau as a table.}%
+  \label{tab:tableau-table}
+\end{table}
+
+Simon argues that such a tableau would be better presented as the
+table shown in Table~\ref{tab:tableau-table}.  \emph{The Chicago
+  Manual of Style}, \cite{chicago}, and Edward Tufte
+\citeyearpar{tufte-vdq} support his assertion, and provide excellent
+references and inspiration.
+
+The \package{booktabs} package, which is automatically loaded by the
+\file{icmmcm} class, has some special commands for creating lines of
+different thicknesses for use as top, bottom, and midrules.  It also
+has some code that provides the \com{cmidrule} command, for creating
+spanner rules for decked spanner heads.  The rest is up to you and
+your style guide.
+
+As an example of a table to strive towards,
+Table~\ref{tab:chicago-table} was taken from an example table in
+\emph{The Chicago Manual of Style}.  All the tables (except for those
+in the section describing tables, alas) in Gr\"{a}tzer's \emph{Math
+  into \LaTeX} were prepared with \package{booktabs}.
+
+\begin{table}
+\begin{center}
+{\hspace{-1in}
+\begin{minipage}{\textwidth}
+\fontsize{10}{12}\selectfont
+\begin{tabular}[c]{lrrrrrr}
+\toprule
+              & \multicolumn{2}{c}{1900} & \multicolumn{2}{c}{1906} & \multicolumn{2}{c}{1910}\\
+\cmidrule(r){2-3}\cmidrule(lr){4-5}\cmidrule(l){6-7}
+Party         & \% of Vote  & Seats Won  & \% of Vote  & Seats Won  & \% of Vote  & Seats Won \\
+\midrule
+\addlinespace
+              & \multicolumn{6}{c}{Provincial Assembly}\\
+\cmidrule{2-7}
+Conservative  & 35.6        &  47        & 26.0        & 37         & 30.9        & 52\\
+Socialist     & 12.4        &  18        & 27.1        & 44         & 24.8        & 39\\
+Christian Democrat & 49.2   &  85        & 41.2        & 68         & 39.2        & 59\\
+Other         & 2.8         &  0         & 5.7         & 1          & 5.1         & 0\\
+\addlinespace
+Total& 100.0       &  150       & 100.0       & 150        & 100.0       & 150\\
+\addlinespace
+              & \multicolumn{6}{c}{National Assembly}\\
+\cmidrule{2-7}
+Conservative  & 32.6        &   4        & 23.8        &  3         & 28.3        & 3\\
+Socialist     & 13.5        &   1        & 27.3        &  3         & 24.1        & 2\\
+Christian Democrat & 52.0   &   7        & 42.8        &  6         & 46.4        & 8\\
+Other         & 1.8         &   0        & 6.1         &  0         & 1.2         & 0\\
+\addlinespace
+Total& 100.0       &  12        & 100.0       & 12         & 100.0       & 13\\
+\bottomrule
+\end{tabular}
+\end{minipage}
+}
+\caption[Elections in G\"{o}tefrith province, 1900--1910]{Elections in
+  G\"{o}tefrith province, 1900--1910.  (Taken from \cite{chicago},
+  pg.~414.)}%
+\label{tab:chicago-table}
+\end{center}
+\end{table}
+
+
+
+\section{Typesetting}%
+\label{sec:typesetting}
+
+So you've got a \latex source document.  How do you get a typeset
+document that you can print or put on the web?
+
+Typesetting a document is referred to as ``\tex{}ing'', ``compiling'',
+or ``typesetting''.  Generally, you want to create a PostScript file
+(for printing) or a PDF file (for placing on the web).  There are
+multiple ways to do both tasks.
+
+
+\subsection{Getting to Paper}
+
+Starting with a \latex document, \file{foo.tex}, you can create a
+PDF file by running the following commands:
+\begin{quote}
+\begin{verbatim}
+unix% pdflatex foo
+\end{verbatim}
+\end{quote}
+
+
+\subsection{General Comments}
+
+\latex does its numbering (and some other functions) by writing
+information to an \key{auxiliary file}.  It then reads that
+information in on the next pass, and uses it to typeset references.
+Thus you have to run \prog{latex} or \prog{pdflatex} at least twice
+whenever you make a change that affects the numbering of elements or
+the flow of text across pages.  It's generally good practice to run
+\latex three times, or until it stops warning you about possible
+changes.
+
+\subsection{Additional Programs}
+
+There are some additional functions, such as indexing and
+bibliographies, that use external programs to read auxiliary files and
+produce \latex code for inclusion on later runs.  We won't cover those
+programs in this document.
+
+
+\section{Tips and Tricks}
+
+\latex is a very complicated and powerful language.  As a result,
+there are many sneaky aspects to it that will cause you problems if
+you don't know about them.  Here are a few.
+
+\subsection{Special Characters}%
+\label{sec:special-chars}
+
+\tex and \latex have a number of ``special'' characters that are
+reserved for use by the language.  Using these characters in your
+writing requires you to do a bit of extra work, as shown in
+Table~\ref{tab:special-chars}.
+
+\begin{table}
+\begin{tabular}{llll}
+\toprule
+\multicolumn{2}{l}{Character}   & Function     & To Typeset\\
+\midrule
+\#          & octothorp      & Macro parameter character  & \verb+\#+\\
+\$          & dollar sign    & Start/end inline math mode & \verb+\$+\\
+\%          & percent sign   & Comment character          & \verb+\%+\\
+\&          & ampersand      & Column separator           & \verb+\&+\\
+\_          & underscore     & Subscripts, as in $x_2$    & \verb+\_+\\
+\{, \}      & braces         & Parameters                 & \verb+\{, \}+\\
+\~{}        & tilde          & Nonbreaking space          & \verb+\~{}+ \\
+\^{}        & caret          & Superscripts, as in $x^2$  & \verb+\^{}+\\
+\verb+\+    & backslash      & Starts commands   & \command{verb}\verb+|\|+ \\
+\bottomrule
+\end{tabular}
+\caption[Special characters in \latex]{Special characters in \latex.}%
+\label{tab:special-chars}
+\end{table}
+
+
+\subsection{Comments and Spacing}
+
+You can add comments to your source file that won't appear in your
+typeset document by starting them with a \verb+%+.  Any line that
+starts with a \verb+%+ will be ``commented out'', and won't be
+interpreted.  You can also add a \verb+%+ at the end of a line, with
+or without text, and it will make the end of the line disappear.
+
+For example,
+\begin{quote}
+\begin{verbatim}
+% This is a comment line.
+This is not a comment line.
+
+This line has a comment at the end%
+% This line should be invisible.
+of the line.
+\end{verbatim}
+\end{quote}
+will typeset as
+\begin{quote}
+% This is a comment line.
+This is not a comment line.
+
+This line has a comment at the end%
+% This line should be invisible.
+of the line.
+\end{quote}
+
+Notice the lack of a space in ``endof'' on the last line of the
+typeset output.  \tex expects a carriage-return character at the end
+of a line, and interprets that carriage return as an interword space.
+If you comment out the end of a line, you also comment out the
+carriage return on that line, and you'll have words run into one
+another unless you have a space before the \verb+%+.
+
+\tex collapses multiple spaces into one, and ignores whitespace at the
+beginning of a line.  Thus
+\begin{quote}
+\begin{verbatim}
+No spaces.
+
+    Five spaces.
+
+    A tab.
+\end{verbatim}
+\end{quote}
+typesets as
+\begin{quote}
+No spaces.
+
+    Five spaces.
+
+    A tab.
+\end{quote}
+
+(The lines are indented because they are at the start of a paragraph.
+You can suppress paragraph indentation with \command{noindent}.)
+
+Paragraphs are delimited by two carriage returns (with or without
+whitespace between them).
+
+
+\subsection{Quotes and Dashes}
+
+Because \tex was designed to do high-quality typesetting, it cares
+about which quotation mark and dash you're using, and requires you to
+specify the correct punctuation (although most text editors with
+special \tex modes will do the substitution for you).
+
+Open and close double quotes---`` and ''---are created by typing
+\verb+``+ and \verb+''+, respectively.  The double-quote mark,
+\verb+"+, is typeset as " (and is useful for abbreviating ``inches'',
+as in 36").
+
+Single-quotes, ` and ', are typed with \verb+`+ and \verb+'+.
+
+There are three basic forms of dashes:
+\begin{enumerate}
+\item The hyphen, -, is typed as a single dash, \verb+-+
+\item The en dash, --, is typed as two dashes, \verb+--+
+\item The em dash, ---, is typed as three dashes, \verb+---+
+\end{enumerate}
+
+Hyphens are used in hyphenated words, as in ``complex-typesetting
+mechanism''.  En dashes are used to indicate ranges, as in ``there are
+35--50 of them''.  Em dashes are used to separate independent phrases,
+as in ``John believed---honestly believed---that he was right.''
+
+Note that you shouldn't type spaces around any of these dashes---they
+run directly against the words on either side, as in \verb+35--50+.
+
+
+\subsection{Controlling Pagination}%
+\label{sec:pagination}
+
+Sometimes you may need to override \LaTeX's choices for line or page
+breaks. your document into lines and/or pages.  The \com{pagebreak}
+command causes \LaTeX\ to start a new page immediately after the
+command appears.  The \verb|\\| command can be used to tell \LaTeX\
+where to break a line.
+
+In general, you should let \LaTeX\ have its way, especially if your
+document is going to be published by someone else, as they will
+undoubtedly have many changes that will have to be made before your
+document works for them.  If you do need to tinker with your
+document's layout, you should avoid doing so until you're very nearly
+done.  If you go back and add or remove text after forcing \LaTeX\ to
+do your will, you may find that new blank spaces appear as a result of
+your changes.
+
+George Gr\"{a}tzer's \emph{Math into \LaTeX} includes a chapter on
+preparing books that covers this topic in depth.
+
+
+\subsection{Updating EPS Graphics for Use With \pdftex}%
+\label{sec:pdftex-graphics}
+
+\pdftex supports PDF, PNG, and JPEG as native graphic file
+formats.  EPS is not directly supported---to use EPS figures with
+\pdftex, you must first convert your EPS files to PDF.
+
+If you're using a graphics program such as Adobe Illustrator to
+prepare your figures, just save them as PDF instead of (or in addition
+to) EPS.
+
+If you don't have access to the tool you used to create your images,
+but you still need to convert them, you can use the program
+\prog{epstopdf}.
+
+\prog{epstopdf} writes to standard output by default, so you'll have
+to redirect the output to a file, as in
+\begin{quote}
+\begin{verbatim}
+unix% epstopdf foo.eps > foo.pdf
+\end{verbatim}
+\end{quote}
+
+To convert a whole slew of files, you could use a command such as the
+following (for the C-shell):
+\begin{quote}
+\begin{verbatim}
+unix% foreach f ( `find . -type f -name '*.eps'`)
+foreach? eps2pdf $f -o=$f:r.pdf
+foreach? end
+\end{verbatim}
+\end{quote}
+
+
+\subsection{Fonts Look Fuzzy in PostScript or PDF Files}%
+\label{sec:fuzzy-fonts}
+
+When Knuth wrote \tex, typesetting was done by trained typesetters
+using expensive equipment to cast molten lead into runs of type.
+Knuth created his own font family, Computer Modern, by writing a tool
+called \MF{}.  \MF{} reads in programs that define various aspects of
+every character in a font, and generates bitmap representations of
+those characters at a particular resolution, ready for printing.
+
+Unfortunately, bitmaps with resolutions suited for printing look
+terrible on screen.  The solution is to use Type 1 PostScript fonts
+instead of bitmaps. If you're using \pdftex (or \pdflatex), you get
+Type 1 fonts without having to do anything special (but see
+Section~\ref{sec:pdftex-graphics}).
+
+If you're using \prog{dvips} to get PostScript as an intermediate step
+(using \prog{ps2pdf} or Acrobat Distiller to get PDF), you can force
+\prog{dvips} to use Type 1 fonts by specifying the \prog{-Ppdf} flag,
+as in
+\begin{quote}
+\begin{verbatim}
+unix% dvips -Ppdf foo.dvi -o foo.ps
+\end{verbatim}
+\end{quote}
+
+
+\subsection{Debugging}
+
+One of the trickiest things about using \latex is interpreting
+\latex's sometimes cryptic error messages.
+
+In particular, the line numbers that \latex reports are often not the
+line numbers where the problem \emph{is}, but the line numbers where
+\latex noticed there was a problem.
+
+One useful way of getting a bit more context to help you understand
+the problem is to put the line
+\begin{quote}
+\begin{verbatim}
+\setcounter{errorcontextlines}{1000}
+\end{verbatim}
+\end{quote}
+in the preamble of your document, which will provide you with a
+(perhaps excessive) amount of context for an error.
+
+The most common errors are probably
+\begin{itemize}
+\item Using one of the special characters (see
+Section~\ref{sec:special-chars})
+\item Leaving off or mismatching a brace or bracket
+\item Leaving out or swapping arguments to a command or environment
+\end{itemize}
+
+If you've tried everything and you can't find the source of an error
+message, try the following procedure:
+\begin{enumerate}
+\item Create a new file, copying your preamble into it
+\item Try typesetting it---if you have an error, the problem is in
+  your preamble
+\item If it typesets, copy half of your document's body into the new
+  file, and typeset that
+\item If you see your error, then continue halving the document until
+  you narrow it down to the problem section
+\item If you don't see your error, try the other half
+\end{enumerate}
+
+
+
+\section{Resources}
+
+There are lots of great resources available for using \tex and \latex.
+Here are a few (there are also links available online at
+\url{http://www.math.hmc.edu/computing/support/tex/}).
+
+
+\subsection{Online Documentation}
+
+Much of the documentation for \tex and \latex is available online, as
+part of the \tex system.  te\tex, the \tex system installed on the
+math lab computers, includes a script called \prog{texdoc} to access
+this documentation.  All you have to do is type \prog{texdoc} followed
+by a string that you believe is the name of the document you're
+looking for.  For example, \prog{texdoc booktabs} will give you the
+documentation for the \package{booktabs} package that I used to create
+the tables in this document.
+
+Unfortunately, \prog{texdoc} only works for documentation that is
+sensibly named.  The authors of the \package{graphics} package, for
+instance, called their manual \file{grfguide}.  Still others decided
+that \file{manual} was a good name for their manual (after all, it's
+the only \emph{manual} in their distribution).
+
+Sometimes you can find documentation using the \prog{locate} command,
+which lists all the files on your system that match a string that you
+provide.  For example, you could find \file{grfguide} by trying
+\prog{locate graphics} and \prog{grep}ping out the results with
+\file{texmf} in them, and passing that list to another \prog{grep} for
+the string \file{doc}:
+\begin{quote}
+\begin{verbatim}
+unix% locate graphics | grep texmf | grep doc
+\end{verbatim}
+\end{quote}
+
+Another hard to find, but very useful, document, is the ``User's Guide
+for the \package{amsmath} Package'' \citeyearpar{amsmath-doc}, which
+is called \file{amsldoc}.
+
+
+\subsection{UK-TUG FAQ}
+
+The primary list of frequently asked questions in the \tex world is
+the UK TUG FAQ, available at
+\url{http://www.tex.ac.uk/cgi-bin/texfaq2html}.  If you're not sure
+how to do something, or you've got a problem that you're pretty sure
+isn't being caused by a typo, check here first.
+
+
+\subsection{\ctt}
+
+If you can't find an answer in the UK-TUG FAQ, then your next step is
+to check \ctt, the Usenet newsgroup devoted to \tex and \latex.
+Chances are, whatever your problem is, someone else already had it,
+asked about it on \texttt{c.t.t}, and got an answer.  Thanks to Google, Usenet's
+past is preserved in an easily searchable format.  Go to Google Groups
+(\url{http://groups.google.com/}), type in some search terms, and
+check out the answers.  (If you specify \texttt{group:comp.text.tex}
+at the end of your search terms, you'll only see results from \ctt.)
+
+
+\section{Books}
+
+\url{http://www.math.hmc.edu/computing/support/tex/} has some brief
+reviews of a number of significant books about \tex and \latex.
+
+My pick for the best introductory/reference book is the third edition
+of George Gr\"{a}tzer's \emph{Math into \latex{}}
+\citeyearpar{gratzer-mil}.\footnote{Which I edited.}  It's the only book I'm
+aware of that discusses the latest version of AMS\latex in depth.  It
+also has excellent reference tables and a thorough index.
+
+Another book I highly recommend is Lyn Dupr\'{e}'s \emph{BUGS in
+  Writing} \citeyearpar{dupre-bugs}.  Dupr\'{e} is one of Addison Wesley's
+senior editors, and has edited many of the most significant books
+published by Addison Wesley.  \emph{BUGS} is an accessible guide to
+writing clearly and effectively.  It's the kind of book you leave in
+the bathroom so you'll always have something interesting and amusing
+to read.  Learning how to write better is almost a byproduct!
+
+If you get serious about typesetting, and want to start doing some
+fancy page design or want to be sure you're using the right kind of
+type, Robert Bringhurst's \emph{The Elements of Typographic Style}
+\citeyearpar{bringhurst-elements} will show you the way.
+
+\section{Acknowledgments}
+
+Thanks to Darryl Yong, who wrote a similar document in November, 2000,
+from which I borrowed some ideas.  Thanks also to Zeke Burgess, who
+wrote the \file{thesis.cls} class and, presumably, the original
+version of the \file{samplethesis.tex} file from which I stole some of
+the mathematical examples, and Jeremy Rouse, who modified that sample
+file.
+
+
+%%% ---------------
+%%% Bibliography
+
+\nocite{*}   %%% Include everything in the thesis.bib file.  Be
+             %%% careful---some journals and fields expect you to only
+             %%% include references for materials that you have
+             %%% actually cited in your paper, others allow you to
+             %%% include materials you used as ``background'' without
+             %%% actually citing specific pages or passages.
+\bibliographystyle{apalike}
+\bibliography{icmmcm}
+
+\end{document}
+
+
+

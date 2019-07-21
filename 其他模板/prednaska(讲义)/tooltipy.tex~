@@ -1,0 +1,647 @@
+\documentclass{article}
+
+\usepackage[metapost]{mfpic}
+\opengraphsfile{stac-body}
+% \pen{0.4pt}
+% \headlen=2pt
+\mfpicunit=0.8pt
+
+
+
+
+%\documentclass[twocolumn]{article}
+% \usepackage{hvmaths}
+% \usepackage{}
+\usepackage[latin2]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hvmaths}
+\usepackage[scaled]{helvet}
+\usepackage[czech]{babel}
+
+\usepackage{calc,bm}
+\usepackage{marvosym}
+\usepackage{multido}
+\usepackage{amsmath,amsfonts}
+
+\usepackage[createtips]{fancytooltips}
+\let\overbar\overline
+\newif\ifdebug
+\debugfalse
+%\debugtrue
+
+\usepackage{fancybox}
+\parindent 0 pt
+\usepackage[margin=1pt]{geometry}
+
+% \let\rmdefault\sfdefault
+\usepackage{color}
+\definecolor{gray}{rgb}{1, 0.85, 0.85}
+\definecolor{lightblue}{rgb}{0.8, 0.8, 1}
+\definecolor{lightgreen}{rgb}{0.8, 1, 0.8}
+\def\R{\mathbb{R}}
+
+\usepackage{multido,graphicx}
+%\long\def\stranka#1#2{
+\newcommand\stranka[3][3in]{
+\setbox0=\hbox{\begin{minipage}{#1}
+\fboxsep 0 pt
+\color{red}
+\shadowbox{{\fboxsep 4pt\colorbox{yellow}
+    {\begin{minipage}{\linewidth}\rightskip 0 pt plus 1 em
+      \color{black}#3
+    \end{minipage}}}}
+\end{minipage}\ \ \ \ }
+\ifdebug \leavevmode\copy0\hfil \else 
+\pdfpagewidth=\wd0
+\pdfpageheight=\ht0
+\advance \pdfpageheight by \dp0
+\copy0
+\keytip{#2}
+  \newpage
+\fi
+}
+
+\long\def\strankaB#1#2{
+\setbox0=\hbox{\fboxsep 0 pt
+\color{red}
+\shadowbox{{\fboxsep 4pt\colorbox{yellow}
+    {\color{black}#2}}}}
+\ifdebug \copy0 \else 
+\pdfpagewidth=\wd0
+\pdfpageheight=\ht0
+\advance \pdfpageheight by \dp0
+\copy0
+\keytip{#1}
+  \newpage
+\fi
+}
+
+
+\def\setpars{%\leftskip=1.5em \parindent=-1.5em}
+%        \hangindent 1.4em \hangafter -2
+\rightskip 0 pt plus 0.5 em
+}
+\long\def\definice#1{
+%   \begin{center}
+    \colorbox{gray}{\begin{minipage}{\linewidth-2\fboxsep} 
+        \setpars
+        \leavevmode
+        \hbox{\Large{\Info}} #1
+      \end{minipage}}
+
+\smallskip
+%   \end{center}
+}
+\long\def\vyuziti#1{
+%   \begin{center}
+    \colorbox{lightblue}{\begin{minipage}{\linewidth-2\fboxsep} 
+        \setpars
+        \leavevmode
+        \hbox{\Large{\Checkedbox}} 
+        \def\item{$\bullet$ }#1
+      \end{minipage}}
+
+\smallskip
+%   \end{center}
+}
+\long\def\vypocet#1{
+%   \begin{center}
+    \colorbox{lightgreen}{\begin{minipage}{\linewidth-2\fboxsep} 
+        \setpars \leavevmode
+        {\Large\Writinghand}
+        \def\item{$\bullet$ }#1
+      \end{minipage}}
+
+\smallskip
+%   \end{center}
+}
+
+% \newdimen \lengthA \lengthA=100cm
+% \newdimen \lengthB
+% \usepackage{multido}
+% \def\strankaopt#1#2{
+% \def\optwidth{1m}
+% {\multido{\ni=1.00+0.10}{40}{}}
+% }
+
+\everymath{\displaystyle}
+
+\let\oldtextbf\textbf
+\def\textbf#1{{\color{red}\oldtextbf{#1}}}
+\let\textit\textbf
+
+
+% \footnotesize
+% \let\normalsize\footnotesize
+
+\pdfpageheight=0pt
+
+\pdfpagewidth=0pt
+
+\def\obrazek#1{%
+\setbox0=\hbox{\color{red}%
+    \fboxsep 0 pt{\shadowbox{\colorbox{white}{\color{black}\includegraphics[width=3.5in, 
+        page=#1]{pics/tecna.pdf}}}}}
+\pdfpagewidth=\wd0
+\pdfpageheight=\ht0
+\advance \pdfpageheight by \dp0
+\copy0
+\newpage}
+
+\ifdebug
+\renewcommand\stranka[2][]{\par\hrule\bigskip \texttt{#2}\\}
+\def\obrazek#1{}
+\def\definice{}
+\def\vypocet{}
+\def\vyuziti{}
+\def\item{$\bullet$ }
+\def\textbf#1{{\oldtextbf{#1}}}
+\usepackage{a4wide}
+\fi
+
+% \renewcommand\stranka[3][2in]{
+%   \leavevmode\llap{#2: }#3\par}
+% \usepackage{a4wide}
+% \columnsep=2cm
+% \twocolumn
+% \def\obrazek#1{}
+% \long\def\colorbox#1#2{\leavevmode\fbox{#2}}
+
+\newenvironment{nopreview}{}{}
+
+\begin{document}
+
+\raggedright 
+
+\footnotesize
+
+\stranka{ohranicena-mnozina}{\definice{\textbf{Ohranièená mno¾ina} je
+    mno¾ina, která le¾í uvnitø nìjaké (dostateènì velké) koule v
+    $\R^n$.}  Èasto se pracuje s mno¾inami, které jsou uzavøené a
+  ohranièené, takové mno¾iny se nazývají \textbf{kompaktní}.}
+
+\stranka{izolovany-bod}{\definice{Bod $X\in\R^n$ je \textbf{izolovaným bodem}
+    mno¾iny $M$, pokud existuje okolí tohoto bodu, které nemá s
+    mno¾inou ¾ádný jiný spoleèný bod, ne¾ bod $X$.}}
+
+\stranka{vnitrni-bod}{\definice{Bod $X\in\R^n$ je \textbf{vnitøním bodem}
+    mno¾iny $M$, jestli¾e existuje okolí tohoto bodu, které le¾í
+    celé v mno¾inì $M$.}\definice{\textit{Vnitøek} mno¾iny je mno¾ina v¹ech
+    jejích vnitøních bodù.}}
+
+\stranka{otevrena mnozina}{\definice{\textbf{Otevøená mno¾ina} je
+    mno¾ina, její¾ ka¾dý bod je vnitøní.}\definice{Bod je
+    \textbf{vnitøním bodem} mno¾iny $M$,jestli¾e nìkteré okolí toho
+    bodu le¾í celé v mno¾inì $M$.} Otevøená mno¾ina neobsahuje svou
+  hranici, proto¾e ¾ádný hranièní bod není vnitøním bodem.}
+
+\stranka{uzavrena mnozina}{\definice{\textbf{Uzavøená mno¾ina} je
+    mno¾ina, která je sjednocením svého vnitøku a hranice. Èasto se
+    pracuje s mno¾inami, které jsou uzavøené a ohranièené, takové
+    mno¾iny se nazývají \textbf{kompaktní}.}}
+
+
+\stranka{vrstevnice}{ \definice{\textbf{Vrstevnice} funkce $f(x,y)$ na
+    úrovni $C$ je mno¾ina obsahující v¹echny body, v nich¾ funkce
+    nabývá funkèní hodnotu $C$. Rovnice vrstevnice je tedy
+    $f(x,y)=C$.}\vyuziti{V mnoha pøípadech vrstevnice poskytují
+    rychlou pøedstavu o tom, jak se mìní funkèní hodnoty funkce, kde
+    jsou extrémy, kde se funkèní hodnoty mìní rychle a kde
+    pomalu.}
+  Graf funkce dvou promìnných je mo¾no chápat jako plochu v
+  prostoru (napøíklad krajina) a vrstevnice jsou spojnice bodù, kde
+  funkce nabývá stejnou funkèní hodnotu (nadmoøskou vý¹ku).}
+
+\stranka{graf}{\definice{\textbf{Graf} funkce dvou promìnných $f(x,y)$
+    je mno¾ina v¹ech uspoøádaných trojic tvaru $[x,y,f(x,y)]$.}
+  Zpravidla se jedná o plochu v prostoru. Graf umo¾òuje pohodlnou
+  vizualizaci a usnadòuje geometrickou pøedstavu o funkci.}
+
+
+\stranka{limita}{\definice{\textbf{Limita:} Øekneme, ¾e funkce $f$ má
+    v~bodì $A$ \textit{limitu} rovnu èíslu $L\in\R$, jestli¾e pro
+    ka¾dé okolí $O(L)$ bodu $L$ existuje ryzí okolí $\overbar O(A)$
+    bodu $A$ takové, ¾e obrazy v¹ech bodù z~tohoto ryzího okolí bodu
+    $A$ le¾í v~okolí bodu $L$, tj. pro v¹echna $X\in \overbar O(A)$
+    platí $f(X)\in O(L)$. Pí¹eme
+  \begin{equation*}
+    \lim_{X\to A}f(X)=L.
+  \end{equation*}}
+Definice limity funkce dvou promìnných je analogická limitì funkce
+jedné promìnné, ale v praxi je tento pojem obtí¾nì studovatelný,
+proto¾e u¾ v rovinì je mnoho cest rùzných tvarù a z rùzných smìrù, po
+kterých je mo¾no se pøibli¾ovat k bodu $A$.}
+
+\stranka{spojitost}{\definice{Spojitost funkce více promìnných je
+    definována stejnì jako u funkce jedné promìnné:
+    \begin{itemize}
+    \item Funkce je \textbf{spojitá v bodì} $A$, jestli¾e má v tomto bodì
+      limitu a funkèní hodnotu a obì jsou stejné.
+    \item Funkce je \textbf{spojitá na otevøené mno¾inì}, jestli¾e je
+      spojitá v ka¾dém bodì této mno¾iny.
+    \end{itemize}
+}
+  Spojité funkce mají celou øadu intuitivnì zøejmých vlastností a
+  snadno se studují:
+  \begin{itemize}
+  \item platí zde Weierstrassova vìta \item elementární funkce
+    jsou spojité v ka¾dém bodì svého definièního oboru.
+  \end{itemize}
+}
+
+\stranka[3in]{derivace}{\definice{\textbf{Derivace} funkce jedné
+    promìnné $f(x)$ v~bodì $x$ je limita
+    \begin{equation*}
+    f'(x)=\lim_{h\to0}\frac{f(x+h)-f(x)}h,
+  \end{equation*}
+  pokud tato limita existuje a je koneèná}\vyuziti{Derivace slou¾í
+  k~urèení: \\\item rovnice teèny, tj. k~lineární aproximaci
+  nelineární funkce\\\item
+  rychlosti zmìny fyzikální velièiny\\
+\item výpoètu limity l'Hospitalovým pravidlem}\vypocet{Derivaci
+  vypoèteme pomocí vzorcù pro derivace základních elementárních funkcí
+  a pravidel pro derivování základních poèetních operací}}
+
+
+\stranka{parcder}{\definice{\textbf{Parciální derivace} funkce
+    $f(x,y)$ dvou promìnných jsou limity \begin{gather}
+    f'_x(x,y)=\lim_{\Delta x\to 0}{f(x+\Delta x,y)-f(x,y)\over \Delta x},\\
+    f'_y(x,y)=\lim_{\Delta y\to 0}{f(x, y+\Delta y)-f(x,y)\over \Delta y},
+  \end{gather}
+  pokud tyto limity existují a jsou koneèné.  }\vyuziti{Derivace
+  slou¾í k~urèení: \\\item rovnice teèné roviny, tj. k~lineární
+  aproximaci nelineární funkce více promìnných\\\item rychlosti zmìn
+  fyzikálních velièin}\vypocet{Derivaci vypoèteme pomocí vzorcù pro
+  derivace základních elementárních funkcí a pravidel pro derivování
+  základních poèetních operací. Postupujeme podobnì jako pøi
+  derivování funkce jedné promìnné, na promìnné, pøes které se
+  nederivuje, pohlí¾íme jako na konstanty.}}
+
+\stranka{schwarzova veta}{\textbf{Schwarzova vìta:} Za pøedpokladu
+  spojitosti parciálních derivací jsou obì smí¹ené parciální derivace
+  shodné. U derivací vy¹¹ích øádù nezále¾í na tom, v jakém poøadí
+  derivujeme, ale pouze kolikrát derivujeme podle ka¾dé z promìnných.}
+
+\stranka{hladkost}{\textbf{Hladké funkce} jsou funkce, které mají
+  spojité parciální derivace podle v¹ech promìnných.}
+
+\stranka{tecna rovina}{\definice{\textbf{Teèná rovina} ke grafu funkce
+    $f(x,y)$ v bodì $[x_0,y_0]$ je rovina o rovnici
+  \begin{equation*}
+      z=f(x_0, y_0)+f'_x(x_0,y_0)(x-x_0)+f'_y(x_0, y_0)(y-y_0).
+  \end{equation*}
+    Pro srovnání: teèna ke grafu funkce $y=f(x)$ v bodì $x_0$ má rovnici
+    \begin{equation*}
+      y=f(x_0)+f'(x_0)(x-x_0)
+    \end{equation*}
+}\vyuziti{V okolí bodu dotyku tato rovina pomìrnì pøesnì aproximuje funkci
+  $f(x,y)$ a je tedy mo¾no psát pøibli¾ný vzorec 
+    \begin{equation*}
+      f(x,y)\approx f(x_0, y_0)+f'_x(x_0,y_0)(x-x_0)+f'_y(x_0,
+      y_0)(y-y_0).
+    \end{equation*}
+    V~tomto vzorci je pøesnost tím vìt¹í, èím\\
+    \item je men¹í vzdálenost bodù $(x,y)$ a $(x_0, y_0)$,\\
+    \item jsou men¹í druhé derivace funkce $f$ (pokud existují).
+}}
+
+\stranka{totalni diferencial}{\definice{\textbf{Teèná rovina} ke grafu
+    funkce $f(x,y)$ v bodì $[x_0,y_0]$ je rovina o rovnici
+  \begin{equation*}
+      z-z_0=f'_x(x_0,y_0)(x-x_0)+f'_y(x_0, y_0)(y-y_0),
+  \end{equation*}
+  kde $z_0=f(x_0,y_0)$. Pro zmìny $\Delta x=x-x_0$, $\Delta y=y-y_0$, $\Delta z=z-z_0$ platí
+  \begin{equation*}
+      \Delta z={\color{blue}\bm{f'_x(x_0,y_0)}}\Delta x+{\color{blue}\bm{f'_y(x_0, y_0)}}\Delta y.
+  \end{equation*}
+  Výraz 
+  \begin{equation*}
+      {\color{blue}\bm{f'_x(x_0,y_0)}}\text{d}x+{\color{blue}\bm{f'_y(x_0, y_0)}}\text{d}y
+  \end{equation*}
+  se nazývá \textbf{totální diferenciál funkce} $f$.  }\vyuziti{\item
+  Totální diferenciál udává smìrové vektory teèné roviny a mù¾e být
+  vyu¾it pro lineární aproximaci funkce. \\ \item Totální diferenciál
+  souvisí s exaktní diferenciální rovnicí.  }}
+
+\stranka{implicitni funkce}{\definice{\textbf{Implicitní funkce} je
+    funkce daná rovnicí $f(x,y)=0$. Graf implicitní funkce tedy splývá
+    s vrstevnicí funkce $f$ na úrovni nula. Nìkdy je pro jednoznaènost
+    nutno zadat je¹tì alespoò jeden bod le¾ící na grafu funkce
+    (napøíklad vrstevnice ve tvaru kru¾nice definuje dvì spojité
+    funkce -- horní a dolní pùlkru¾nici.)}}
+
+\stranka{lokalni extrem}{\definice{Funkce má v bodì $(x_0,y_0)$
+    \textbf{lokální maximum}, jestli¾e v nìjakém okolí tohoto bodu
+    neexistuje bod s vy¹¹í funkèní hodnotou.} \vypocet{Lokální maximum
+    mù¾e být podle Fermatovy vìty jenom v podezøelých bodech --
+    bodech, kde ka¾dá parciální derivace je buï nula nebo
+    neexistuje. V pøípadì dostateènì hladkých funkcí zpravidla o
+    existenci a typu stacionárního bodu rozhodujeme pomocí Hessiánu.}
+  Lokální minimum definujeme analogicky.}
+
+\stranka{vazany extrem}{\definice{Funkce má v bodì $(x_0,y_0)$
+    \textbf{vázané lokální maximum}, jestli¾e v nìjakém okolí tohoto
+    bodu neexistuje bod, který by splòoval zadanou poèáteèní podmínku
+    a funkèní hodnota je vy¹¹í ne¾ v bodì $(x_0,y_0)$.} Vázané lokální
+  minimum definujeme analogicky.}
+
+\stranka{absolutni extrem}{\definice{Funkce má v bodì $(x_0,y_0)$
+    \textbf{absolutní maximum} na mno¾inì $M$, v mno¾inì $M$
+    neexistuje bod s vy¹¹í funkèní hodnotou.}Absolutní minimum definujeme analogicky.}
+
+\stranka{stacionarni bod}{\definice{Funkce $f(x,y)$ má v bodì
+    $(x_0,y_0)$ \textbf{stacionární bod}, jestli¾e jsou obì parciální
+    derivace v tomto bodì rovny nule.}  \vyuziti{V bodì, kde je
+    alespoò jedna z parciálních derivací nenulová, nemù¾e nastat
+    lokální extrém. Pøi hledání lokálních extrémù tedy staèí brát do
+    úvahy jenom stacionární body a body, kde nìkterá z parciálních
+    derivací neexistuje (\textbf{Fermatova vìta}).} }
+
+\stranka{hessian}{\definice{\textbf{Hessián} funkce $f(x,y)$ (se
+    spojitými druhými derivacemi) je determinant $
+    H=\begin{vmatrix}
+      f''_{xx}& f''_{xy}\\f''_{xy} & f''_{yy}
+    \end{vmatrix}
+$}\vyuziti{Hessián vyu¾íváme k posouzení, zda v daném stacionárním bodì má funkce lokální extrém èi nikoliv.}}
+
+\stranka[3.5in]{diferencialni rovnice}{\definice{\textbf{Diferenciální
+      rovnice} je rovnice, kde neznámou je funkce a tato funkce se v
+    rovnici vyskytuje i prostøednictvím svých derivací.}
+  \vypocet{Vyøe¹it obecnì jakoukoliv diferenciální rovnici není mo¾né,
+    ale umíme vyøe¹it celou øadu speciálních typù. Zejména se jedná o\\
+  \item rovnici se separovanými promìnnými $y'=f(x)g(y)$\\
+  \item homogenní rovnici $y'=f\left(\frac yx\right)$\\
+  \item lineární diferenciální rovnici prvního øádu $y'+a(x)y=b(x)$\\
+  \item lineární diferenciální rovnici druhého øádu s konstantními
+    koeficienty $y''+py'+qy=f(x)$} \vyuziti{Diferenciální rovnici
+    pou¾íváme k matematickému popisu vìt¹iny fyzikálních jevù a obecnì
+    k popisu systémù, jejich¾ dal¹í vývoj závisí na okam¾itém stavu
+    systému.}  }
+
+
+\stranka{reseni dr}{\definice{Diferenciální rovnice má zpravidla
+    nekoneènì mnoho øe¹ení, která se dají vyjádøit pomocí vzorce
+    obsahujícího jeden (u diferenciálních rovnic prvního øádu) nebo
+    dva (u~rovnic druhého øádu) parametry. Takové øe¹ení se nazývá
+    \textbf{obecné øe¹ení}. Pokud chceme ze v¹ech funkcí vybrat jednu
+    jedinou funkci, tzv. \textbf{partikulární øe¹ení}, musíme k zadání
+    diferenciální rovnice dodat \textbf{poèáteèní podmínku}.}}
+
+\stranka{partikularni reseni}{\definice{\textbf{Partikulární øe¹ení}
+    je øe¹ení poèáteèní úlohy (diferenciální rovnice s
+    \textbf{poèáteèní podmínkou}).} 
+
+  V ponìkud ¹ir¹ím slova smyslu tento pojem pou¾íváme i pro oznaèení
+  jednoho konkrétního øe¹ení diferenciální rovnice (øe¹ení, které na
+  rozdíl od obecného øe¹ení neobsahuje konstantu).
+  \vypocet{Partikulární øe¹ení nejèastìji hledáme tak, ¾e nejprve
+    urèíme øe¹ení obecné a poté dosazením poèáteèní podmínky urèíme,
+    jakou hodnotu musí nabývat konstanta v obecném øe¹ení, aby
+    po¾adovaná poèáteèní podmínka byla splnìna.}}
+
+\stranka{pocatecni uloha}{\definice{\textbf{Cauchyova (poèáteèní)
+      úloha} je úloha najít øe¹ení diferenciální rovnice, které
+    splòuje zadanou \textbf{poèáteèní podmínku} -- podmínku pøedepisující
+    funkèní hodnotu v pøedepsaném bodì.}\vypocet{Øe¹ení poèáteèní
+    úlohy hledáme tak, ¾e vyjdeme z obecného øe¹ení diferenciální
+    rovnice, dosadíme poèáteèní podmínku, vypoèteme hodnotu konstanty
+    z obecného øe¹ení, které zaruèí, aby poèáteèní podmínka byla
+    splnìna a nakonec tuto hodnotu konstanty pou¾ijeme v obecném
+    øe¹ení.}}
+
+\stranka{smerove pole}{\textbf{Smìrové pole diferenciální rovnice} je
+  systém orientovaných lineárních elementù v rovinì. Jednotlivé
+  elementy udávají smìr, kterým míøí øe¹ení procházející tímto bodem.
+  Smìrnice jednotlivých elementù je tedy dána derivací funkce, tak jak
+  tuto derivaci urèíme z diferenciální rovnice.}
+
+
+\stranka{trivialni}{\textbf{Triviální øe¹ení} lineární diferenciální
+  rovnice prvního nebo druhého øádu je øe¹ení, které je na uva¾ovaném
+  intervalu rovno nule pro v¹echna $x$. Ostatní øe¹ení jsou
+  \textbf{netriviální}.}
+
+\stranka{linearni kombinace}{\textbf{Lineární kombinací} funkcí $y_1$
+  a $y_2$ je ka¾dá funkce, kterou lze pro vhodnou volbu konstant $C_1$
+  a $C_2$ zapsat ve tvaru $y=C_1y_1+C_2y_2$. \par Platí-li
+  $C_1=0=C_2$, dostáváme tzv. \textbf{triviální lineární kombinaci}.}
+
+\stranka{fundamentalni system}{\definice{\textbf{Fundamentální systém}
+    øe¹ení lineární homogenní diferenciální rovnice druhého øádu je
+    libovolná dvojice netriviálních øe¹ení.}\vyuziti{Ka¾dé dal¹í
+    øe¹ení rovnice je lineární kombinací funkcí z fundamentálního
+    systému. Známe-li tedy fundamentální systém øe¹ení homogenní LDR
+    druhého øádu, sestavíme snadno øe¹ení obecné.}\vypocet{U
+    diferenciální rovnice druhého øádu s konstantními koeficienty
+    urèíme fundamentální systém ze znalosti koøenù charakteristické
+    rovnice.}}
+
+\stranka{wronskian}{\definice{\textbf{Wronskián} funkcí $y_1$ a $y_2$ je determinant 
+\begin{equation*}
+\begin{pmatrix}
+y_1&y_2\\y'_1&y'_2
+\end{pmatrix}.
+\end{equation*}}\vyuziti{
+Jsou-li obì funkce øe¹ení té¾e homogenní lineární diferenciální
+rovnice druhého øádu, je jejich wronskián nenulový právì tehdy, kdy¾
+jsou obì øe¹ení lineárnì nezávislá.}}
+
+\stranka{linearni rovnice}{\textbf{Lineární diferenciální rovnice} je
+  rovnice, kde na levé stranì je lineární diferenciální operátor a na
+  pravé stranì buïto nulová funkce (homogenní rovnice) nebo nenulová
+  funkce (nehomogení rovnice). Jedním z dùsledkù linearity je
+  skuteènost, ¾e \textbf{diferenciální operátor zachovává lineární kombinaci
+  funkcí}. Odsud lze snadno odvodit, ¾e k nalezení obecného øe¹ení
+  rovnice staèí nalézt nìkolik speciálních partikulárních øe¹ení této
+  nebo asociované homogenní rovnice a z tìchto øe¹ení poté snadno
+  sestavíme øe¹ení obecné.
+
+\bigskip
+V pøípadì nehomogení diferenciální rovnice prvního øádu staèí nalézt
+libovolné partikulární øe¹ení této rovnice a jedno netriviální øe¹ení
+asociované homogenní rovnice.
+
+\bigskip
+V pøípadì nehomogení diferenciální rovnice druhého øádu staèí nalézt
+partikulární øe¹ení této rovnice a dvì lineárnì nezávislá øe¹ení
+asociované homogenní rovnice.}
+
+\stranka{autonomni system}{\definice{Autonomní systém dvou diferenciální rovnic je soustava dvou diferenciálních rovnic prvního øádu, který na pravé stranì neobsahuje nezávislou promìnnou (zpravidla $t$).}
+Narozdíl od obecného systému diferenciálních rovnic
+  \begin{align*}
+    x'&=f(x,y,t)\\    y'&=g(x,y,t)
+  \end{align*}
+jsou pravé strany nezávislé na $t$ a autonomní systém je 
+  \begin{align*}
+    x'&=f(x,y)\\    y'&=g(x,y).
+  \end{align*}
+Pøedpokládáme, ¾e funkce $f$ a $g$ jsou dostateènì hladké, aby byla zaji¹tìna jednoznaèná øe¹itelnost ka¾dé poèáteèní úlohy.
+}
+
+
+\def\stabuzel{
+\begin{mfpic}[20][1]{-3}{3}{-27}{27}
+\arrowmid{Arrowhead}[f0.22]\lines{(xpos,0),(0,0)}
+\arrowmid{Arrowhead}[f0.22]\lines{(xneg,0),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\lines{(0,ypos),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\lines{(0,yneg),(0,0)}
+\arrowmid{Arrowhead}[f0.3]\function{3,0,-0.1}{x**3}
+\arrowmid{Arrowhead}[f0.3]\function{3,0,-0.1}{-x**3}
+\arrowmid{Arrowhead}[f0.3]\function{-3,0,0.1}{x**3}
+\arrowmid{Arrowhead}[f0.3]\function{-3,0,0.1}{-x**3}
+\end{mfpic}}
+
+\def\nestabuzel{
+\begin{mfpic}[20][1]{-3}{3}{-27}{27}
+\arrowmid{Arrowhead}[f0.78]\reverse\lines{(xpos,0),(0,0)}
+\arrowmid{Arrowhead}[f0.78]\reverse\lines{(xneg,0),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\reverse\lines{(0,ypos),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\reverse\lines{(0,yneg),(0,0)}
+\arrowmid{Arrowhead}[f0.7]\reverse\function{3,0,-0.1}{x**3}
+\arrowmid{Arrowhead}[f0.7]\reverse\function{3,0,-0.1}{-x**3}
+\arrowmid{Arrowhead}[f0.7]\reverse\function{-3,0,0.1}{x**3}
+\arrowmid{Arrowhead}[f0.7]\reverse\function{-3,0,0.1}{-x**3}
+\end{mfpic}}
+
+\def\sedlo{
+\begin{mfpic}[20][11]{-3}{3}{-3}{3}
+\arrowmid{Arrowhead}[f0.5]\reverse\lines{(xpos,0),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\reverse\lines{(xneg,0),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\lines{(0,ypos),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\lines{(0,yneg),(0,0)}
+\arrowmid{Arrowhead}[f0.5]\reverse\function{3,0.3,-0.1}{1/x}
+\arrowmid{Arrowhead}[f0.5]\reverse\function{3,0.3,-0.1}{-1/x}
+\arrowmid{Arrowhead}[f0.5]\reverse\function{-3,-0.3,0.1}{1/x}
+\arrowmid{Arrowhead}[f0.5]\reverse\function{-3,-0.3,0.1}{-1/x}
+\end{mfpic}}
+
+\def\stabohnisko{
+\begin{mfpic}[20][11]{-3}{3}{-3}{3}
+\arrowmid{Arrowhead}[f0.5]\parafcn{0,5,0.1}{(3*exp(-0.2*t)*cos(t),3*exp(-0.2*t)*sin(t))}
+\arrowmid{Arrowhead}[f0.5]\parafcn{5,20,0.1}{(3*exp(-0.2*t)*cos(t),3*exp(-0.2*t)*sin(t))}
+\end{mfpic}}
+
+\def\nestabohnisko{
+\begin{mfpic}[20][11]{-3}{3}{-3}{3}
+\arrowmid{Arrowhead}[f0.7]\reverse\parafcn{0,5,0.1}{(3*exp(-0.2*t)*cos(t),3*exp(-0.2*t)*sin(t))}
+\arrowmid{Arrowhead}[f0.7]\reverse\parafcn{5,20,0.1}{(3*exp(-0.2*t)*cos(t),3*exp(-0.2*t)*sin(t))}
+\end{mfpic}}
+
+\def\stred{
+\begin{mfpic}[20][11]{-3}{3}{-3}{3}
+\arrowmid{Arrowhead}[f0.7]\circle{(0,0),1.2}
+\arrowmid{Arrowhead}[f0.7]\circle{(0,0),2}
+\arrowmid{Arrowhead}[f0.7]\circle{(0,0),0.5}
+\end{mfpic}}
+
+\def\bodrotace{
+\begin{mfpic}[20][11]{-3}{3}{-3}{3}
+\arrowmid{Arrowhead}\parafcn{-3.6,3.3,0.1}{((0.55+1.4*(1/180*(atan(t)+90)))*cos(2*t),(0.55+1.4*(1/180*(atan(t)+90)))*sin(2*t))}
+\arrowmid{Arrowhead}[f0.7]\circle{(0,0),2}
+\arrowmid{Arrowhead}[f0.7]\circle{(0,0),0.5}
+\end{mfpic}}
+
+
+
+\stranka{AS-uzel}{\definice{Stacionární bod $(x^*,y^*)$ se nazývá
+    \textit{uzel}, jestli¾e v¹echny trajektorie $(x(t), y(t))$
+    z~nìjakého okolí tohoto bodu konvergují pro $t \to\infty $ nebo
+    $t\to-\infty$ k $(x^*, y^*)$ tak, ¾e nedochází k~oscilacím kolem
+    limitní hodnoty.}\vypocet{Stacionární bod je uzel, pokud jsou
+    vlastní èísla Jacobiho matice v tomto bodì \textbf{reálná} a mají
+    \textbf{stejné} znaménko. Pokud jsou kladná, jedná se o
+    nestabilní uzel, pokud záporná, jedná se o stabilní uzel.}
+
+Stabilní a nestabilní uzel:
+
+\stabuzel \qquad  \nestabuzel}
+
+\stranka{AS-ohnisko}{\definice{Stacionární bod $(x^*,y^*)$ se nazývá
+    \textit{ohnisko}, jestli¾e v¹echny trajektorie z~nìjakého okolí
+    tohoto stacionární bodu do tohoto bodu konvergují buï pro
+    $t\to\infty$ nebo pro $t\to-\infty$ a to tak, ¾e kolem tohoto bodu
+    oscilují se zmen¹ující se amplitudou.}\vypocet{Stacionární bod je
+    ohnisko, pokud jsou vlastní èísla Jacobiho matice v tomto bodì
+    \textbf{komplexní} a mají \textbf{nenulovou} reálnou èást. Pokud
+    je reálná èást kladná, jedná se o nestabilní ohnisko, pokud
+    záporná, jedná se o stabilní ohnisko.  (Pokud je reálná èást rovna
+    nule, je stacionární bod buï ohniskem nebo bodem rotace.)}
+
+Stabilní a nestabilní ohnisko: 
+
+\stabohnisko \qquad \nestabohnisko}
+
+\stranka{AS-sedlo}{\definice{Stacionární bod $(x^*,y^*)$ se nazývá
+    \textit{sedlo}, jestli¾e v~ka¾dém jeho okolí existuje pouze
+    koneèný poèet trajektorií, které pro $t\to\pm\infty$ konvergují
+    k~tomuto bodu.}\vypocet{Stacionární bod je sedlo, pokud jsou
+      vlastní èísla Jacobiho matice v tomto bodì \textbf{reálná} a
+      mají \textbf{rùzná} znaménka.}
+
+\sedlo}  
+
+\stranka{AS-stred}{\definice{Stacionární bod $(x^*,y^*)$ se nazývá
+    \textit{bod rotace}, jestli¾e ka¾dé jeho okolí obsahuje nekoneènì
+    mnoho trajektorií, které jsou cykly. Pokud v~nìjakém okolí
+    existují pouze cykly, nazývá se tento bod navíc
+    \textit{støed}.}\vypocet{Pokud jsou vlastní èísla Jacobiho matice
+      ve stacionárním bodì \textbf{komplexní} a mají \textbf{nulovou}
+      reálnou èást, je stacionární bod buï ohniskem nebo bodem
+      rotace.} 
+
+Bod rotace a støed:
+
+\bodrotace\qquad\stred
+
+}
+
+\stranka{AS-trajektorie}{\definice{Je-li dvojice funkcí $x(t)$, $y(t)$ øe¹ením autonomního, nazývá se mno¾ina bodù v~rovinì $(x,y)$
+  definovaná jako
+  \begin{equation*}
+    T=\{(\tilde x, \tilde y):\ x(\tilde t)=\tilde x \text{ a }y(\tilde
+    t)=\tilde 
+    y\text{ pro nìjaké }\tilde t\in\R\}
+  \end{equation*}
+  \textit{trajektorie systému}. } Trajektorie systému tedy
+charakterizuje posloupnost stavù, kterými autonomní systém prochází.
+Proto¾e na trajektoriích není zachycen èas, ztrácíme informaci o tom,
+jak dlouho trval pøechod z jednoho stavu do jiného. Dvì rùzné
+trajektorie se navzájem neprotínají a ka¾dá ohranièená trajektorie je
+buï stacionárním bodem, nebo cyklem, nebo konverguje ke stacionárnímu
+bodu, nebo k cyklu, nebo ke speciální mno¾inì tvoøené stacionárními
+body a jinými trajektoriemi.\definice{Trajektorie a smìrové pole tvoøí
+  \textit{fázový portrét} autonomního systému.}}
+
+
+\stranka{ukazka}{\definice{tady je uvedena nebo alespoò naznaèena
+    definice pojmu -- ta nám øíká, \textbf{co} daný pojem
+    znamená}\vyuziti{ka¾dý pojem který si uvedeme by mìl být nìjaké
+    vyu¾ití -- dùvod, \textbf{proè} bychom tento pojem mìli znát a
+    pou¾ívat} \vypocet{jen málokdy daný pojem poèítáme pøímo z~definice -- zde tedy uvedeme hlavní \textbf{metody výpoètu}}}
+
+
+\stranka{oblast}{ \textit{Oblast} je otevøená souvislá mno¾ina.
+  \textit{Uzavøená oblast} je uzavøená souvislá mno¾ina.}
+
+\stranka{supremum}{\definice{\textit{Supremum} mno¾iny $A$ je nejmen¹í
+    horní závora mno¾iny $A$.} \vypocet{Pokud má mno¾ina $A$ nejvìt¹í
+    prvek, je tento prvek supremem. Pokud mno¾ina $A$ ¾ádný nejvìt¹í
+    prvek nemá, je supremum \uv{nejbli¾í rozumná náhrada}
+    nejvìt¹ího prvku. Napøíklad otevøený interval $(0,1)$ nemá
+    nejvìt¹í prvek a supremem tohoto intervalu je èíslo $1$.}  }
+
+\stranka{infimum}{\definice{\textit{Infimum} mno¾iny $A$ je nejvìt¹í
+    dolní závora mno¾iny $A$.} \vypocet{Pokud má mno¾ina $A$ nejmen¹í
+    prvek, je tento prvek infimem. Pokud mno¾ina $A$ ¾ádný nejmen¹í
+    prvek nemá, je infimum \uv{nejbli¾í rozumná náhrada} nejmen¹ího
+    prvku. Napøíklad otevøený interval $(0,1)$ nemá nejmen¹í prvek a
+    infimem tohoto intervalu je èíslo $0$.}  }
+
+\stranka{hranice}{\definice{Bod $X\in\R^n$ je \textbf{hranièním bodem}
+    mno¾iny $M$, jestli¾e ka¾dé jeho okolí obsahuje i body, které le¾í
+    v mno¾inì $M$ a i body, které le¾í mimo mno¾inu
+    $M$.}\definice{\textit{Hranice} mno¾iny je mno¾ina v¹ech
+    hranièních bodù této mno¾iny.}}
+
+
+\end{document}

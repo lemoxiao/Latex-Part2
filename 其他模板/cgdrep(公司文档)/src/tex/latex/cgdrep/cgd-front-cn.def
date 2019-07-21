@@ -1,0 +1,87 @@
+% cgd-front-cn.def: Chinese front matter definitions
+% vim: ft=tex
+
+\newcommand\docattr[1]{\setkeys{docattr}{#1}}
+
+\renewcommand\maketitle{%
+\cleardoublepage\pagestyle{empty}\pagenumbering{roman}
+\noindent{\small\CGD@value@docid} \\
+\hfill \fbox{\bf\CGD@value@classification}
+\null\vspace{4.0cm}
+
+\begin{center}
+\CJKfamily{hei}\Huge~\CGD@value@title~\\
+\LARGE~\CGD@value@subtitle~
+\vfill
+\includegraphics[scale=0.6]{logo1.png} \\
+\CJKfamily{hei}\large 苏州珂晶达电子有限公司 \\
+{\small~\CGD@value@date~}\\
+\vspace{0.3cm} \null
+\end{center}
+}
+
+\newcommand\CGD@value@fulltitle{%
+ \ifdefvoid{\CGD@value@subtitle}{\CGD@value@title}{\mbox{\CGD@value@title：} \mbox{\CGD@value@subtitle}}%
+}
+
+\OverwriteEnviron{abstract}[1][]{
+\cleardoublepage
+\begin{center}
+\normalsize\bfseries
+\begin{tabular}{clcl} \thickhline
+标\hfill 题 & \multicolumn{3}{p{0.68\textwidth}}{\kt\CGD@value@fulltitle}
+\\ \hline
+编\hfill 号 & \multicolumn{1}{l}{\kt\CGD@value@docid} & 密\hfill 级 & \kt\CGD@value@classification \\
+类\hfill 别 & \multicolumn{1}{l}{\kt\CGD@value@doctype}  & 状\hfill 态 & \kt\CGD@value@docstatus \\ 
+关联文档 & \multicolumn{3}{l}{\kt\CGD@value@relatedid} \\
+\hline
+责任作者 & \kt\CGD@value@author & 客户单位 & \kt\CGD@value@clientname \\ 
+联系方式 & \kt\small\CGD@value@email & 联系方式 & \kt\small\CGD@value@clientemail\\
+ & \\ 
+签\hfill 署 & \hspace{0.33\textwidth}\null & 会\hfill 签 & \hspace{0.33\textwidth}\null\\
+ & \\
+日\hfill 期 &  & 日\hfill 期 \\  \hline 
+\multicolumn{4}{c}{摘\hspace{2em}要} \\ 
+\multicolumn{4}{c}{\parbox[t]{0.9\textwidth}{\small\kt\hspace{2em}\BODY}}\\
+\\ \thickhline 
+% \multirow{2}{*}{备\hfill 注}
+\end{tabular}\end{center}
+\null\hfill{\bf\copyright 苏州珂晶达电子有限公司}\hspace{0.5em}
+}
+
+\def\CGD@opt@customHdr{customHdr}
+\NewEnviron{revisions}[1][defaultHdr]{
+  \def\argtmp{#1}
+  \null\vfill
+  \begin{center}
+    修订记录\par\vspace{1ex}
+  \ifx\argtmp\CGD@opt@customHdr
+    \BODY
+  \else
+    \kt\small
+    \begin{tabular}{llll}
+    \thickhline
+    \bf 版本 &\bf 日期  & \bf 负责人 & \bf 备注 \\ \hline 
+    \BODY
+    \thickhline \end{tabular}
+  \fi
+  \end{center}
+}
+
+\newcommand\backcover{
+\cleartoleftpage\pagestyle{empty}\pagenumbering{roman}\setcounter{page}{0}
+\begin{flushright}
+{\small\CGD@value@docid} \\
+\fbox{\bf\CGD@value@classification} \\
+\CJKfamily{hei}\large~\CGD@value@fulltitle
+\end{flushright}
+\vfill
+\begin{center}
+\includegraphics[scale=0.6]{logo1.png} \\
+\CJKfamily{hei}\large 苏州珂晶达电子有限公司 \\
+\vspace{0.3cm} \null
+\end{center}
+}
+
+\endinput
+

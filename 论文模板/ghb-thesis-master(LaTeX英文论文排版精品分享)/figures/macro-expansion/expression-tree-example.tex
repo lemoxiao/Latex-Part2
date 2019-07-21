@@ -1,0 +1,28 @@
+% Copyright (c) 2017-2018, Gabriel Hjort Blindell <ghb@kth.se>
+%
+% This work is licensed under a Creative Commons Attribution-NoDerivatives 4.0
+% International License (see LICENSE file or visit
+% <http://creativecommons.org/licenses/by-nc-nd/4.0/> for details).
+%
+\begingroup%
+\figureFont\figureFontSize%
+\begin{tikzpicture}[%
+    value node/.style={%
+      computation node,
+    },
+  ]
+
+  % Graph
+  \node [computation node] (mul) {\nMul};
+  \node [computation node, position=-135 degrees from mul] (add) {\nAdd};
+  \node [value node, position=-45 degrees from mul] (const) {\nVar{2}};
+  \node [value node, position=-135 degrees from add] (a) {\nVar{a}};
+  \node [value node, position=- 45 degrees from add] (b) {\nVar{b}};
+  \begin{scope}[data flow]
+    \draw (mul) -- (const);
+    \draw (mul) -- (add);
+    \draw (add) -- (a);
+    \draw (add) -- (b);
+  \end{scope}
+\end{tikzpicture}%
+\endgroup%

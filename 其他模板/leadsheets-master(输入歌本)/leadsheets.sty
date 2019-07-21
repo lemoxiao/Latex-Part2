@@ -1,0 +1,254 @@
+% --------------------------------------------------------------------------
+% the LEADSHEETS package
+% 
+%   typesetting leadsheets and songbooks
+%
+% --------------------------------------------------------------------------
+% Clemens Niederberger
+% E-Mail: contact@mychemistry.eu
+% --------------------------------------------------------------------------
+% Copyright 2014-2017 Clemens Niederberger
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Clemens Niederberger.
+% --------------------------------------------------------------------------
+% required packages:
+\RequirePackage{expl3,l3keys2e,xparse,translations}
+
+% --------------------------------------------------------------------------
+% package information:
+\ExplSyntaxOn
+\tl_const:Nn \leadsheetsdate    {2017/09/26}
+\tl_const:Nn \leadsheetsversion {0.5b}
+\tl_const:Nn \leadsheetsinfo    {Typesetting leadsheets and songbooks}
+
+\ProvidesExplPackage
+  {leadsheets}
+  {\leadsheetsdate}
+  {\leadsheetsversion}
+  {\leadsheetsinfo \c_space_tl (CN)}
+
+% --------------------------------------------------------------------------
+% messages:
+\msg_new:nnn {leadsheets} {library-missing}
+  {
+    You've~ requested~ the~ leadsheets~ library~ `#1'~ but~ it~ appears~ to~
+    be~ missing~ on~ your~ system.~ Maybe~ you've~ misspelled~ the~ name?~
+    Loading~ the~ library~ will~ abort~ \msg_line_context:
+  }
+
+\msg_new:nnn {leadsheets} {loading-library}
+  {
+    (leadsheets) \c_space_tl \c_space_tl \c_space_tl \c_space_tl
+    Loading~ library~ `#1'...
+  }
+
+% --------------------------------------------------------------------------
+% variants of kernel functions:
+\cs_generate_variant:Nn \tl_if_eq:nnTF       { xx , V }
+\cs_generate_variant:Nn \seq_set_split:Nnn   { Nnx }
+\cs_generate_variant:Nn \prop_item:Nn        { NV }
+\cs_generate_variant:Nn \seq_item:Nn         { cV }
+\cs_generate_variant:Nn \int_to_arabic:n     { V }
+\cs_generate_variant:Nn \tl_replace_once:Nnn { NnV }
+\cs_generate_variant:Nn \prop_gput:Nnn       { cxx , NVf }
+\cs_generate_variant:Nn \msg_error:nnn       { nnV }
+\cs_generate_variant:Nn \msg_warning:nnn     { nnV }
+\cs_generate_variant:Nn \vbox_set:Nn         { NV }
+
+% --------------------------------------------------------------------------
+% temporary variables:
+\tl_new:N   \l__leadsheets_tmpa_tl
+\tl_new:N   \l__leadsheets_tmpb_tl
+\tl_new:N   \l__leadsheets_tmpc_tl
+\tl_new:N   \l__leadsheets_tmpd_tl
+\tl_new:N   \g__leadsheets_tmpa_tl
+
+\bool_new:N \l__leadsheets_tmpa_bool
+
+\dim_new:N  \l__leadsheets_tmpa_dim
+
+\seq_new:N  \l__leadsheets_tmpa_seq
+\seq_new:N  \l__leadsheets_tmpb_seq
+
+\int_new:N  \l__leadsheets_tmpa_int
+\int_new:N  \l__leadsheets_tmpb_int
+\int_new:N  \l__leadsheets_tmpc_int
+
+\box_new:N  \l__leadsheets_tmpa_box
+
+% --------------------------------------------------------------------------
+\prg_new_conditional:Npnn \leadsheets_if_package_loaded:n #1 {p,T,F,TF}
+  {
+    \cs_if_exist:cTF {ver@#1.sty}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+\DeclareExpandableDocumentCommand \leadsheetsifpackageloaded {m}
+  { \leadsheets_if_package_loaded:nTF {#1} }
+
+% % --------------------------------------------------------------------------
+% \seq_new:N \l__leadsheets_safed_commands_seq
+
+% \cs_new_protected:Npn \leadsheets_safe_define_protected:Npn #1
+%   {
+%     \seq_if_in:NnTF \l__leadsheets_safed_commands_seq {#1}
+%       {} % error
+%       {
+%         \seq_gput_right:Nn \l__leadsheets_safed_commands_seq {#1}
+%         \cs_gset_eq:cN {__leadsheets_ \cs_to_str:N #1:} #1
+%         \cs_set_protected:Npn #1
+%       }
+%   }
+
+% \cs_new_protected:Npn \leadsheets_restore:N #1
+%   {
+%     \seq_if_in:NnTF \l__leadsheets_safed_commands_seq {#1}
+%       { \cs_set_eq:Nc #1 {__leadsheets_ \cs_to_str:N #1:} }
+%       {} % error
+%     \seq_gremove_all:Nn \l__leadsheets_safed_commands_seq {#1}
+%   }
+  
+% --------------------------------------------------------------------------
+% library mechanism:
+\tl_const:Nn \c__leadsheets_library_extension_tl {code.tex}
+\tl_const:Nn \c__leadsheets_library_prefix_tl    {leadsheets.library}
+
+\cs_new_protected:Npn \leadsheets_load_libraries:n #1
+  { \clist_map_inline:nn {#1} { \leadsheets_load_library:n {##1} } }
+
+\cs_new_protected:Npn \leadsheets_load_library:n #1
+  {
+    \tl_set:Nx \l__leadsheets_tmpa_tl { \tl_trim_spaces:n {#1} }
+    \__leadsheets_load_library:V \l__leadsheets_tmpa_tl
+  }
+
+\prg_new_conditional:Npnn \leadsheets_if_library:n #1 {p,T,F,TF}
+  {
+    \cs_if_exist:cTF {leadsheets-library-#1-loaded}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+\DeclareExpandableDocumentCommand \leadsheetsiflibrary {m}
+  { \leadsheets_if_library:nTF {#1} }
+  
+\cs_new_protected:Npn \__leadsheets_load_library:n #1
+  {
+    \leadsheets_if_library:nF {#1}
+      {
+        \file_if_exist:nTF
+          {\c__leadsheets_library_prefix_tl.#1.\c__leadsheets_library_extension_tl}
+          {
+            \msg_log:nnn {leadsheets} {loading-library} {#1}
+            \@onefilewithoptions
+              {\c__leadsheets_library_prefix_tl.#1}[][]
+              \c__leadsheets_library_extension_tl
+          }
+          { \msg_warning:nnn {leadsheets} {library-missing} {#1} }
+      }
+  }
+\cs_generate_variant:Nn \__leadsheets_load_library:n { V }
+
+\cs_new_protected:Npn \__leadsheets_library:nn #1#2
+  {
+    \cs_new:cpn {leadsheets-library-#1-loaded} {leadsheets:~`#1'~library}
+    \ProvidesFile
+      {\c__leadsheets_library_prefix_tl.#1.\c__leadsheets_library_extension_tl}
+      [
+        \leadsheetsdate
+        \c_space_tl
+        v \leadsheetsversion
+        \c_space_tl
+        leadsheets~ library~ `#1'~ #2
+      ]
+  }
+
+% 
+\cs_new:Npn \LeadsheetSurvive #1 \LeadsheetEndSurvive {#1}
+
+% --------------------------------------------------------------------------
+% one of those defines a leadsheets library, either using expl syntax or 2e
+% package syntax:
+\NewDocumentCommand \LeadsheetsExplLibrary {mm}
+  { \__leadsheets_library:nn {#1} {#2} \ExplSyntaxOn }
+
+\NewDocumentCommand \LeadsheetsLibrary {mm}
+  { \__leadsheets_library:nn {#1} {#2} }
+
+% --------------------------------------------------------------------------
+% commands for loading libraries:
+\NewDocumentCommand \useleadsheetslibraries {m}
+  { \leadsheets_load_libraries:n {#1} }
+
+\NewDocumentCommand \useleadsheetslibrary {m}
+  { \leadsheets_load_library:n {#1} }
+
+% --------------------------------------------------------------------------
+% a setup command:
+\NewDocumentCommand \setleadsheets {m}
+  { \keys_set:nn {leadsheets} {#1} }
+
+% --------------------------------------------------------------------------
+% package options:
+\bool_new:N \l__leadsheets_with_options_bool
+
+\keys_define:nn {leadsheets}
+  {
+    musicsymbols .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool
+      \leadsheets_load_library:n {musicsymbols} ,
+    chords       .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool
+      \leadsheets_load_library:n {chords} ,
+    musejazz     .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool
+      \leadsheets_load_library:n {musejazz} ,
+    songs        .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool
+      \leadsheets_load_library:n {songs} ,
+    external     .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool
+      \leadsheets_load_library:n {external} ,
+    minimal      .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool ,
+    full         .code:n =
+      \bool_set_true:N \l__leadsheets_with_options_bool
+      \leadsheets_load_libraries:n
+        {
+          musicsymbols ,
+          chordnames ,
+          songs ,
+          chords ,
+          shorthands ,
+          properties ,
+          transposing ,
+          templates ,
+          translations ,
+          external
+        }
+  }
+\ProcessKeysOptions{leadsheets}
+
+\bool_if:NF \l__leadsheets_with_options_bool
+  { \leadsheets_load_library:n {songs} }
+  
+% --------------------------------------------------------------------------
+\file_input_stop:
+
+2016/08/18 - new commands: \leadsheetsifpackageloaded, \leadsheetsiflibrary
+           - new class `leadsheet'
+           - new library `external'
+           - minor chords can now be typeset with lowercase letters
+             (chordnames)
+

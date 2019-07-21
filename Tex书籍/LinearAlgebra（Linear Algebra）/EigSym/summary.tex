@@ -1,0 +1,115 @@
+%!TEX root = ../larxxia.tex
+
+\index{symmetric matrix|)}
+
+\section{Summary of symmetric eigen-problems}
+\label{sec:sumevs}
+
+
+\begin{itemize}
+\def\index#1{}% turn off indexing
+
+\item Eigenvalues and eigenvectors arise from the following important geometric question: for what vectors~\vv\ does multiplication by~\(A\) just stretch\slash shrink~\vv\ by some scalar factor~\(\lambda\)?
+
+\subsubsection{Introduction to eigenvalues and eigenvectors}
+
+\itemhi For every \idx{square matrix}~\(A\),  
+a scalar~\(\lambda\) is called an \bfidx{eigenvalue} of~\(A\) if 
+there is a nonzero vector~\xv\ such that \(A\xv=\lambda\xv\) (\autoref{def:evecval}). 
+Such a vector~\xv\ is called an \bfidx{eigenvector} of~\(A\) corresponding to the eigenvalue~\(\lambda\).   
+
+It is the direction of an eigenvector that is important, not its length.
+
+\item The eigenvalues of a diagonal matrix are the entries on the diagonal, and the unit vectors \hlist\ev n\ are corresponding eigenvectors (\autoref{eg:eigndiag}). 
+
+\item For every \idx{square matrix}~\(A\), 
+a scalar~\(\lambda\) is an \idx{eigenvalue} of~\(A\) iff the \idx{homogeneous} linear system \((A-\lambda I)\xv=\ov\) has nonzero solutions~\(\xv\) (\autoref{thm:espacedef}).  
+The set of all \idx{eigenvector}s corresponding to any one eigenvalue~\(\lambda\), together with the \idx{zero vector}, is a \idx{subspace}; the subspace is called the \bfidx{eigenspace} of~\(\lambda\) and is denoted by~\(\EE_\lambda\).
+
+\itemme For every real \idx{symmetric matrix}~\(A\), the \bfidx{multiplicity} of an \idx{eigenvalue}~\(\lambda\) of~\(A\) is the \idx{dimension} of the corresponding \idx{eigenspace}~\(\EE_\lambda\) (\autoref{def:eigsymult}).
+
+\item Symmetric matrices arise in many mechanical and physical problems due to Newton's Second Law that every action has an equal and opposite reaction.
+Symmetric matrices arise in many networking problems in the cases when every network connection is two-way. 
+
+\itemme For every \(n\times n\) \idx{square matrix}~\(A\) (not just symmetric),
+\hlist\lambda m\ are eigenvalues of~\(A\) with corresponding eigenvectors \hlist\vv m, for some~\(m\) (commonly \(m=n\)), iff \(AV=VD\) for diagonal matrix \(D=\diag(\hlist\lambda m)\) and \(n\times m\) matrix \(V=\begin{bmatrix} \vv_1&\vv_2&\cdots&\vv_m \end{bmatrix}\) for non-zero \hlist\vv m\ (\autoref{thm:avvd}).
+
+\item In \script:
+\begin{itemize}
+\itemhi \index{eig()@\texttt{eig()}}\verb|[V,D]=eig(A)| computes eigenvectors and the eigenvalues of the  \(n\times n\) \idx{square matrix}~\(A\).
+\begin{itemize}
+\item The \(n\)~\idx{eigenvalue}s of~\(A\) (repeated according to their \idx{multiplicity}, \autoref{def:eigsymult}) form the diagonal of \(n\times n\) square matrix \(D=\diag(\hlist\lambda n)\).
+\item Corresponding to the \(j\)th~eigenvalue~\(\lambda_j\), the \(j\)th~column of \(n\times n\) square matrix~\(V\) is an \idx{eigenvector} (of unit length).
+\end{itemize}
+\item \verb|eig(A)| reports a vector of the eigenvalues of square matrix~\(A\) (repeated according to their  \idx{multiplicity}, \autoref{def:eigsymult}).
+
+\item If the matrix~\(A\) is a real symmetric matrix, then the computed eigenvalues and eigenvectors are all real, and the eigenvector matrix~\(V\) is orthogonal.
+If the matrix~\(A\) is either not symmetric, or is complex valued, then the eigenvalues and eigenvectors may be complex valued.
+
+\end{itemize}
+
+
+\itemme \autoref{pro:eeh} finds by hand \idx{eigenvalue}s and \idx{eigenvector}s of a (small) \idx{square matrix}~\(A\):
+\begin{enumerate}
+\item find all \idx{eigenvalue}s by solving the \bfidx{characteristic equation} of~\(A\), \(\det(A-\lambda I)=0\) (using \eqref{eq:dets23});
+\item for each \idx{eigenvalue}~\(\lambda\), solve the homogeneous \((A-\lambda I)\xv=\ov\) to find the \idx{eigenspace}~\(\EE_\lambda\);
+\item write each eigenspace as the \idx{span} of a few chosen \idx{eigenvector}s.
+\end{enumerate}
+
+
+
+
+
+\subsubsection{Beautiful properties for symmetric matrices}
+
+\item A \idx{square matrix} is \idx{invertible} iff \idx{zero} is \emph{not} an \idx{eigenvalue} of the matrix (\autoref{thm:evalinv}).
+
+\itemme Let \(A\) be a \idx{square matrix} with \idx{eigenvalue}~\(\lambda\) and corresponding \idx{eigenvector}~\xv\ (\autoref{thm:ematpow}).
+\begin{itemize}
+\item For every positive integer~\(k\), \(\lambda^k\) is an \idx{eigenvalue} of~\(A^k\) with corresponding \idx{eigenvector}~\xv.
+\item If \(A\) is \idx{invertible}, then \(1/\lambda\) is an \idx{eigenvalue} of~\(A^{-1}\) with corresponding \idx{eigenvector}~\xv.
+\item If \(A\) is \idx{invertible}, then for every integer~\(k\), \(\lambda^k\) is an \idx{eigenvalue} of~\(A^k\) with corresponding \idx{eigenvector}~\xv.
+\end{itemize}
+
+\itemhi For every real \idx{symmetric matrix}~\(A\), the \idx{eigenvalue}s of~\(A\) are all real (\autoref{thm:realeigsym}).
+This marvellous reality often reflects the physical reality of many applications.
+
+\itemme Let \(A\) be a real \idx{symmetric matrix}, then for every two distinct \idx{eigenvalue}s of~\(A\), any corresponding two \idx{eigenvector}s are \idx{orthogonal} (\autoref{thm:orthoevec}).
+
+\item Every \(n\times n\) real \idx{symmetric matrix}~\(A\) has at most \(n\)~distinct \idx{eigenvalue}s (\autoref{thm:lenlam}).
+
+\itemme Let \(A\) be an \(n\times n\) real \idx{symmetric matrix} with \svd\ \(A=\usv\).
+If all the \idx{singular value}s are distinct or \idx{zero}, \(\sigma_1>\cdots>\sigma_r>\sigma_{r+1}=\cdots=\sigma_n=0\)\,, then \(\vv_j\)~is an \idx{eigenvector} of~\(A\) corresponding to an \idx{eigenvalue} of either \(\lambda_j=+\sigma_j\) or \(\lambda_j=-\sigma_j\) (not both)  (\autoref{thm:smevec}).
+
+\item A real \idx{square matrix}~\(A\) is \bfidx{orthogonally diagonalisable} if there exists an \idx{orthogonal matrix}~\(V\) and a \idx{diagonal matrix}~\(D\) such that \(\tr VAV=D\), equivalently \(AV=VD\), equivalently \(A=VD\tr V\) is a factorisation of~\(A\) (\autoref{def:odsble}).
+
+\itemhi For every real \idx{square matrix}~\(A\), 
+matrix~\(A\) is symmetric iff it is \idx{orthogonally diagonalisable} (\autoref{thm:symspec}).
+
+\item The conic sections of ellipses, hyperbolas and parabolas arise as solutions of quadratic equations \autoref{sec:cobcqs}.
+Changes in the coordinate system discover their shape, location and orientation.
+
+\item A \bfidx{quadratic form} in variables \(\xv\in\RR^n\) is a function \(q:\RR^n\to\RR\) that may be written as \(q(\xv)=\tr\xv A\xv\) for some real symmetric \(n\times n\) matrix~\(A\) (\autoref{def:qufo}).
+
+\item For every \idx{quadratic form}, there exists an \idx{orthogonal} coordinate system that diagonalises the quadratic form (\autoref{thm:patqform}).
+Specifically, for the quadratic form~\(\tr\xv A\xv\) find the \idx{eigenvalue}s~\hlist\lambda n\ and \idx{orthonormal} \idx{eigenvector}s~\hlist\vv n\ of symmetric~\(A\), and then in the new coordinate system~\((\hlist yn)\) with \idx{unit vector}s \(\{\hlist\vv n\}\) the quadratic form has the \bfidx{canonical form} \(\tr\xv A\xv=\lambda_1y_1^2+\lambda_2y_2^2+\cdots+\lambda_ny_n^2\).
+
+\item Let~\(A\) be an \(n\times n\) symmetric matrix with \idx{eigenvalue}s \(\lambda_1\leq\lambda_2\leq\cdots\leq\lambda_n\) (sorted). 
+Then for all \idx{unit vector}s \(\xv\in\RR^n\), the \idx{quadratic form}~\(\tr\xv A\xv\) has the following properties (\autoref{thm:optqform}):
+\begin{itemize}
+\item \(\lambda_1\leq \tr\xv A\xv\leq\lambda_n\)\,;
+\item the minimum of~\(\tr\xv A\xv\) is~\(\lambda_1\), and occurs when \(\xv\) is a (unit) eigenvector corresponding to~\(\lambda_1\);
+\item the maximum of~\(\tr\xv A\xv\) is~\(\lambda_n\), and occurs when \(\xv\) is a (unit) eigenvector corresponding to~\(\lambda_n\).
+\end{itemize}
+
+
+
+
+
+\end{itemize}
+
+
+
+
+
+\makeanswers

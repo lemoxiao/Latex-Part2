@@ -1,0 +1,955 @@
+\addtocontents{toc}{\protect\newpage} % cosmetic
+
+<%
+  require "./scripts/eruby_util.rb"
+%>
+
+<%
+  chapter(
+    '07',
+    %q{Coordinates},
+    'ch:coordinates'
+  )
+%>
+
+In your previous study of physics, you've seen many examples where one
+coordinate system makes life easier than another. For a block being pushed
+up an inclined plane, the most convenient choice may be to tilt the $x$
+and $y$ axes. To find the moment of inertia of a disk we
+use cylindrical coordinates. The same is true in relativity. Minkowski
+coordinates are not always the most convenient. 
+In chapter \ref{ch:waves} we learned to classify physical quantities as
+covectors, scalars, and vectors, and we learned rules for how these
+three types of quantities transformed in two special changes of coordinates:
+
+\begin{enumerate}\label{boost-and-scaling-rules}
+\item When we rescale all coordinates by a factor $\alpha$, the components of
+vectors, scalars, and covectors scale by $\alpha^p$, where $p=+1$, $0$, and $-1$, respectively.
+\item Under a boost, the three cases require respectively the Lorentz transformation, no transformation,
+and the inverse Lorentz transformation.
+\end{enumerate}
+
+\noindent In this chapter we'll learn how to generalize this to 
+any change of coordinates,\footnote{We do require the change of coordinates to be smooth in the sense
+defined on p.~\pageref{diffeomorphism}, i.e., it should be a diffeomorphism.}
+and also how to find the form of the metric expressed in non-Minkowski coordinates.
+
+<% begin_sec("An example: accelerated coordinates",nil,'rindler-coords') %>
+Let's start with a concrete example that has some physical interest.
+In section \ref{sec:ep}, p.~\pageref{sec:ep}, we saw that we
+could have ``gravity without gravity:'' an experiment
+carried out in a uniform gravitational
+field can be interpreted as an experiment in flat spacetime (so that special relativity applies),
+but with the measurements expressed in the accelerated frame of the earth's surface.
+In the Pound-Rebka experiment, all of the results could have been expressed in an inertial
+(free-falling) frame of reference, using Minkowski
+coordinates, but this would have been extremely inconvenient, because, for example, they didn't want
+to drop their expensive atomic clocks and take the readings before the clocks hit the floor and
+were destroyed.
+
+Since this is ``gravity without gravity,'' we don't actually need a planet cluttering up the
+picture. Imagine a universe consisting of limitless, empty, flat spacetime. Describe it
+initially using Minkowski coordinates $(t,x,y,z)$. Now suppose we want to find a new set of
+coordinates $(T,X,Y,Z)$ that correspond to the frame of reference of an observer aboard
+a spaceship accelerating
+in the $x$ direction with a constant acceleration. 
+
+The Galilean answer would be
+$X=x-\frac{1}{2}at^2$. But this is unsatisfactory from a relativistic point of view for
+several reasons. At $t=c/a$ the observer would be moving at the speed of light, but relativity
+doesn't allow frames of reference moving at $c$ (section \ref{sec:no-c-frame}, p.~\pageref{sec:no-c-frame}).
+At $t>c/a$, the observer's motion would be faster than $c$, but this is impossible in $3+1$
+dimensions (section \ref{sec:ftl-frames}, p.~\pageref{sec:ftl-frames}). 
+
+These problems are related to
+the fact that the observer's \emph{proper} acceleration, i.e., the reading on an accelerometer
+aboard the ship, isn't constant if $x=\frac{1}{2}at^2$.
+We saw in example \ref{eg:hyperbolic-motion} on p.~\pageref{eg:hyperbolic-motion} that constant
+proper acceleration is described by $x=\frac{1}{a}\cosh a\tau$,
+$t=\frac{1}{a}\sinh a\tau$, where $\tau$ is the proper time. For this motion, the
+velocity only approaches $c$ asymptotically. This suggests the following for the relationship 
+between the two sets of coordinates:
+\begin{align*}
+  t &= X\sinh T \\
+  x &= X\cosh T \\
+  y &= Y \\
+  z &= Z
+\end{align*}
+For example, if the ship follows a world-line $(T,X)=(\tau,1)$, then its motion in the unaccelerated
+frame is $(t,x)=(\sinh\tau,\cosh\tau)$, which is of the desired form with $a=1$.
+<% marg(50) %>
+<%
+  fig(
+    'rindler-wedge',
+    %q{The transformation between Minkowski coordinates $(t,x)$ and the accelerated coordinates $(T,X)$}
+  )
+%>
+<% end_marg %>
+
+The $(T,X,Y,Z)$ coordinates, called Rindler coordinates,\index{Rindler coordinates}
+have many, but not all, of the properties we would like for an accelerated frame. Ideally,
+we'd like to have all of the following: (1) the proper acceleration is constant for any
+world-line of constant $(X,Y,Z)$; (2) the proper acceleration is the same for all such
+world-lines, i.e., the fictitious gravitational field is \emph{uniform};
+and (3) the description of the accelerated frame \emph{is} just a change
+of coordinates, i.e., we're just talking about the flat spacetime of special relativity,
+with events renamed. It turns out that we can pick two out of three of these, but it's
+not possible to satisfy all three at the same time. Rindler coordinates satisfy conditions
+1 and 3, but not 2. This is because the proper acceleration of a world-line of constant
+$(X,Y,Z)$ can easily be shown to be $1/X$, which depends on $X$. Thus we
+don't speak of Rindler coordinates as ``the'' coordinates of an accelerated
+observer.
+
+Rindler coordinates have the property that if a rod extends along the $X$ axis,
+and external forces are applied to it in just such a way that every point on the rod has constant $X$,
+then it accelerates along its own length without any stress. (See problem \ref{hw:rindler-expansion},
+p.~\pageref{hw:rindler-expansion}.)
+
+The diagonals are event horizons (p.~\pageref{event-horizon}).
+Their intersection lies along every constant-$T$ line; cf.~example \ref{eg:there-you-go-again},
+p.~\pageref{eg:there-you-go-again}, and p.~\pageref{subsubsec:deja-vu-again}.
+<% end_sec('rindler-coords') %>
+
+<% begin_sec("Transformation of vectors",nil,'xfn-vectors') %>
+Now suppose we want to transform a vector whose components are expressed in the $(T,X)$
+coordinates into components expressed in $(t,x)$. Our most basic example of a vector is
+a dispacement $(\Delta T,\Delta X)$, and if we make this an infinitesimal $(\der T,\der X)$
+then we don't need to worry about the fact that the chart in figure \figref{rindler-wedge}
+has curves on it --- close up, curves look like straight lines.\footnote{Here we make use of the
+fact that the change of coordinate was smooth, i.e., a diffeomorphism. Otherwise the curves
+could have kinks in them that would still look like kinks under any magnification.}
+If we think of the coordinate $t$ as a function of two variables, $t=t(T,X)$, then
+$t$ is changing for two different reasons: its first input $T$ changes, and also its second
+input $X$. If $t$ were only a function of one variable $t(T)$, then the change in $t$ would
+be given simply by the chain rule, $\der t=\frac{\der t/\der T}\der T$. Since it actually has two
+such reasons to change, we add the two changes:
+\begin{equation*}
+  \der t = \frac{\partial t}{\partial T}\der T + \frac{\partial t}{\partial X}\der X 
+\end{equation*}
+The derivatives are partial derivatives, and these derivatives exist because, as we will
+always assume, the change of coordinates is smooth. An exactly analogous expression applies
+for $\der x$.
+\begin{equation*}
+  \der x = \frac{\partial x}{\partial T}\der T + \frac{\partial x}{\partial X}\der X 
+\end{equation*}
+
+Before we carry out the details of this calculation, let's stop and note that the results
+so far are completely general.
+Since we have so far made no use of the actual equations for this particular change of
+coordinates, these expressions would apply to \emph{any} such transformation, including the
+special cases we've encountered so far, such as Lorentz transformations and scaling.
+(For example, if we'd been scaling by a factor $\alpha$, then all of the partial derivatives
+would simply have equaled $\alpha$.) Furthermore, our definition of a vector is that a vector
+is anything that transforms like a vector. Since we've established that the rules above
+apply to a displacement vector, we conclude that they would also apply to any other vector,
+say an energy-momentum vector.
+
+Returning to this specific example,
+application of the facts \linebreak[4]
+$\der\sinh u/\der u=\cosh u$ and $\der\cosh u/\der u=\sinh u$ tells
+us that the vector
+\begin{equation*}
+  (\der T,\der X)
+\end{equation*}
+is transformed to:
+\begin{equation*}\label{rindler-vector-xfn}
+  (\der t,\der x)=(X\cosh T\der T+\sinh T\der X \: , \: X\sinh T\der T+\cosh T\der X)
+\end{equation*}
+
+As an example of how this applies universally to any type of vector, suppose that
+the observer aboard a spaceship with world-line $(T,X)=(\tau,1)$
+has a favorite paperweight with mass $m$. According
+to measurements carried out aboard her ship, its energy-momentum vector is
+\begin{equation*}
+  (p_T,p_X) = (m,0)\eqquad.
+\end{equation*}
+In the unaccelerated coordinates, this becomes
+\begin{align*}
+  (p_t,p_x) &= (X\cosh T \; p_T+\sinh T \; p_X \: , \: X\sinh T \; p_T+\cosh T \; p_X) \\
+            &= (m X \cosh T,m X \sinh T) \\
+            &= (m\cosh \tau,m\sinh \tau)\eqquad.
+\end{align*}
+Since the functions $\cosh$ and $\sinh$ behave like $e^x$ for large $x$,
+we find that after the astronaut has spent a reasonable amount of proper time $\tau$ accelerating,
+the paperweight's mass-energy and momentum will have grown to the point where it's
+an awesome weapon of mass destruction, capable of obliterating an entire galaxy.
+<% end_sec('xfn-vectors') %>
+
+<% begin_sec("Transformation of the metric",nil,'xfn-metric') %>
+Continuing with the example of accelerated coordinates, let's find what happens to the metric
+when we change from Minkowski coordinates. Minkowski coordinates are essentially defined so
+that the metric has the familiar form with coefficients $+1$ and $-1$. In relativity, one
+often presents the metric by showing its result when applied to an infinitesimal
+displacement $(\der t,\der x)$:
+\begin{equation*}
+  \der s^2 = \der t^2 - \der x^2
+\end{equation*}
+Here $\der s$ would represent proper time, in the case where the displacement was timelike.
+Since we've already determined that
+\begin{align*}
+  \der t &= X\cosh T\der T+\sinh T\der X \qquad \text{and} \\
+  \der x &= X\sinh T\der T+\cosh T\der X\eqquad,
+\end{align*}
+we can simply substitute into the expression for $\der s$ in order to find the form of
+the metric in $(T,X)$ coordinates. Employing the identity $\cosh^2-\sinh^2=1$, we
+find
+\begin{equation*}
+  \der s^2 = X^2\der T^2 -\der X^2\eqquad.
+\end{equation*}
+The varying value of the $\der T^2$ coefficient is in fact exactly the kind of gravitational
+time dilation effect whose existence we predicted in section \ref{subsec:varying-metric},
+p.~\pageref{subsec:varying-metric} based on the equivalence principle. The form of the
+metric inferred there was
+\begin{equation*}
+  \der s^2 \approx (1+2\Delta \Phi)\der T^2 -\der X^2\eqquad,
+\end{equation*}
+where $\Delta \Phi$ is the difference in gravitational potential relative to
+some reference height. One of the approximations employed was
+the assumption that the range of heights $X$ was small, but subject to that
+approximation, the two results should agree. For convenience, let's consider observers
+in the region $X\approx 1$, where the acceleration is approximately 1. Then the
+$\Delta\Phi = \Phi(1+\Delta X)-\Phi(1) \approx (\text{acceleration})(\text{height})\approx X$,
+so the time coefficient in the second form of the metric is $\approx 1+2\Delta\Phi\approx 1+2\Delta X$.
+But to within the desired level of approximation, this is the same as 
+$X^2=(1+\Delta X)^2\approx1+2\Delta X$.
+
+The procedure employed above works in general. To transform the metric from coordinates $(t,x,y,z)$
+to new coordinates $(t',x',y',z')$, we obtain the unprimed coordinates in terms of the primed ones,
+take differentials on both sides, and eliminate $t$, \ldots, $\der t$, \ldots in favor of
+$t'$, \ldots $\der t'$, \dots
+in the expression for $\der s^2$. We'll see in section \ref{subsec:rank-two},
+p.~\pageref{subsec:rank-two}, that this is an
+example of a more general transformation law for \emph{tensors}, mathematical objects
+that generalize vectors and covectors in the same way that matrices generalize row and column vectors.
+A scalar, with no indices, is called a tensor of rank 0. Vectors and covectors, having one index,
+are called rank-1 tensors.\index{rank of a tensor}\index{tensor!rank}
+
+<%
+  fig(
+    'lambert',
+    %q{%
+      Example \ref{eg:lambert}.
+    },
+    {
+      'width'=>'wide',
+      'sidecaption'=>true
+      # 'sidepos'=>'b'
+    }
+  )
+%>
+
+\begin{eg}{A map projection}\label{eg:lambert}
+Because the earth's surface is curved, it is not possible to represent it on a flat map without
+distortion. Let $\phi$ be the latitude, $\theta$ the angle measured down from the north pole
+(known as the colatitude),
+both measured in radians, and let $a$ be the earth's radius.
+Then by the definition of radian measure, an infinitesimal north-south displacement by $\der\theta$
+is a distance $a\der\theta$. A point at a given colatitude $\theta$ lies at a distance
+$a\sin\theta$ from the axis, so for an infinitesimal east-west distance we have
+$a\sin\theta\der\phi$. For convenience, let the units be chosen such that 
+$a=1$. Then the metric, with signature $++$, is 
+\begin{equation*}
+  \der s^2 = \der\theta^2 + \sin^2\theta\der\phi\eqquad.
+\end{equation*}
+One of the many possible ways of forming a flat map is the 
+Lambert cylindrical projection,\index{Lambert cylindrical projection}
+\begin{align*}
+  x &= \phi \\
+  y &= \cos\theta\eqquad,
+\end{align*}
+shown in figure \figref{lambert}.
+If we see a distance on the map and want to know how far
+it actually is on the earth's surface, we need to transform the metric into the $(x,y)$
+coordinates. The inverse coordinate transformation is
+\begin{align*}
+  \phi &= x \\
+  \theta &= \cos^{-1} y\eqquad.
+\end{align*}
+Taking differentials on both sides, we get
+\begin{align*}
+  \der\phi &= \der x \\
+  \der \theta &= -\frac{\der y}{\sqrt{1-y^2}}\eqquad.
+\end{align*}
+We take the metric and eliminate $\theta$, $\phi$, $\der\theta$, and $\der\phi$, finding
+\begin{equation*}
+  \der s^2 = (1-y^2)\der x^2 + \frac{1}{1-y^2} \der y^2\eqquad.
+\end{equation*}
+In figure \figref{lambert}, the polka-dot pattern is made of figures that are actually circles,
+all of equal size,
+on the earth's surface. Since they are fairly small, we can approximate $y$ as having a single
+value for each circle, which means that they are represented on the flat map as
+approximate ellipses with their east-west dimensions having
+been stretched by $(1-y^2)^{-1/2}$ and their north-south
+ones shrunk by $(1-y^2)^{1/2}$. Since these two factors are reciprocals of one another, the area of each
+ellipse is the same as the area of the original circle, and therefore the same as those of
+all the other ellipses. They are a visual representation of the metric, and they demonstrate the
+equal-area property of this projection.
+\end{eg}
+
+<% end_sec('xfn-metric') %>
+
+<% begin_sec("Summary of transformation laws",nil,'xfn-summary') %>
+Having worked through one example in detail, let's progress from the specific to the general.
+In the Einstein concrete index notation, let
+coordinates $(x^0,x^1,x^2,x^3)$ be
+transformed to new coordinates $(x'^0,x'^1,x'^2,x'^3)$. Then vectors transform according to the rule
+\begin{equation}\label{eqn:vector-xfn-rule}
+  v'^\mu =  v^\kappa \frac{\partial x'^\mu}{\partial x^\kappa}\eqquad,
+\end{equation}
+where the Einstein summation convention implies a sum over the repeated index $\kappa$.
+By the same reasoning as in section \ref{subsec:change-of-basis}, p.~\pageref{subsec:change-of-basis},
+the transformation for a covector $\omega$ is
+\begin{equation}\label{eqn:covector-xfn-rule}
+  \omega'_\mu =  \omega_\kappa \frac{\partial x^\kappa}{\partial x'^\mu}\eqquad.
+\end{equation}
+Note the inversion of the partial derivative in one equation compared to the other.
+Because these equations describe a change from one coordinate system to another,
+they clearly depend on the coordinate system, so we use Greek indices rather than
+the Latin ones that would indicate a coordinate-independent abstract index equation.
+
+The letter $\mu$ in these equations always appears as an index referring to the
+new coordinates, $\kappa$ to the old ones. For this reason, we can get away with
+dropping the primes and writing, e.g., $v^\mu=v^\kappa \partial x'^\mu/\partial x^\kappa$
+rather than $v'$, counting on context to show that $v^\mu$ is the vector expressed in the
+new coordinates, $v^\kappa$ in the old ones. This becomes especially natural if we start
+working in a specific coordinate system where the coordinates have names. For example,
+if we transform from coordinates $(t,x,y,z)$ to $(a,b,c,d)$, then it is clear that
+$v^t$ is expressed in one system and $v^c$ in the other.
+
+In equation \eqref{eqn:covector-xfn-rule}, $\mu$ appears as a subscript on the left side of the
+equation, but as a superscript on the right. This would appear to violate the grammatical rules
+given on p.~\pageref{index-grammar}, but the interpretation here is that in expressions of the form $\partial/\partial x^i$
+and $\partial/\partial x_i$, the superscripts and subscripts should be understood as being
+turned upside-down. Similarly, \eqref{eqn:vector-xfn-rule} appears to have the implied sum over $\kappa$
+written ungrammatically, with both $\kappa$'s appearing as superscripts.
+Normally we only have implied sums in which the index appears once as a superscript and once
+as a subscript. With our new rule for interpreting indices on the bottom of derivatives,
+the implied sum is seen to be written correctly. This rule is similar to the one for
+analyzing the units of derivatives written in Leibniz notation, with, e.g., $\der^2 x/\der t^2$ having
+units of meters per second squared.\label{derivative-flip-indices}
+That is, the flipping of the indices like this is required for  consistency so that
+everything will work out properly when we change our units of measurement, causing all our
+vector components to be rescaled.
+
+\begin{eg}{The identity transformation}
+In the case of the identity transformation $x'^\mu=x^\mu$, equation \eqref{eqn:vector-xfn-rule} clearly gives $v'=v$,
+since all the mixed partial derivatives $\partial x'^\mu/\partial x^\kappa$ with $\mu \ne \kappa$ are
+zero, and all the derivatives for $\kappa=\mu$ equal 1.
+
+In equation \eqref{eqn:covector-xfn-rule}, it is tempting to write
+\begin{equation*}
+  \frac{\partial x^\kappa}{\partial x'^\mu} = \frac{1}{\frac{\partial x'^\mu}{\partial x^\kappa}} \qquad \text{(wrong!)}\eqquad,
+\end{equation*}
+but this would give infinite results for the mixed terms! Only in the case of functions of a single
+variable is it possible to flip derivatives in this way; it doesn't work for partial derivatives.
+To evaluate these partial derivatives, we have to invert the transformation (which in this example
+is trivial to accomplish) and then take the partial derivatives.
+\end{eg}
+
+\begin{eg}{Polar coordinates}\label{eg:polar-coodinates}
+None of the techniques discussed here are particular to relativity. For example,
+consider the transformation from polar coordinates $(r,\theta)$ in the plane
+to Cartesian coordinates
+\begin{align*}
+  x &= r\cos\theta \\
+  y &= r\sin\theta\eqquad.
+\end{align*}
+A bug sits on the edge of a phonograph turntable, at $(r,\theta)=(1,0)$.
+The turntable rotates clockwise, giving the bug a velocity vector
+$v^\kappa=(v^r,v^\theta)=(0,-1)$, i.e., the angular velocity is
+one radian per second in the negative (counterclockwise) direction.
+Let's find the bug's velocity vector in Cartesian coordinates.
+The transformation law for vectors gives.
+\begin{equation*}
+  v^x = v^\kappa \frac{\partial x}{\partial x^\kappa}\eqquad.
+\end{equation*}
+Expanding the implied sum over the repeated index $\kappa$, we have
+\begin{align*}
+  v^x &= v^r \frac{\partial x}{\partial r} 
+       +v^\theta \frac{\partial x}{\partial \theta} \\
+      &= (0) \frac{\partial x}{\partial r} 
+       +(-1) \frac{\partial x}{\partial \theta} \\
+      &= -r\sin\theta \\
+      &= 0\eqquad.
+\end{align*}
+For the $y$ component,
+\begin{align*}
+  v^y &= v^r \frac{\partial y}{\partial r} 
+       +v^\theta \frac{\partial y}{\partial \theta} \\
+      &= (0) \frac{\partial y}{\partial r} 
+       +(-1) \frac{\partial y}{\partial \theta} \\
+      &= -r\sin\theta \\
+      &= -1\eqquad.
+\end{align*}
+\end{eg}
+
+<% end_sec('xfn-summary') %>
+
+<% begin_sec("Inertia and rates of change",nil,'xfn-derivatives') %>
+Suppose that we describe a flying bullet in polar coordinates. We neglect the vertical dimension, so
+the bullet's motion is linear.
+If the bullet has a displacement of $(\Delta r_1,\Delta\theta_1)$ in an short time interval $\Delta t$,
+then clearly at a later point in its motion, during an equal interval,
+it will have a displacement $(\Delta r_2,\Delta\theta_2)$ with two \emph{different} numbers inside the
+parentheses. This isn't because its velocity or momentum really changed. It's because the coordinate
+system is curvilinear. There are three ways to get around this:
+
+\begin{enumerate}
+\item Use only Minkowski coordinates.
+\item Instead of characterizing inertial motion as motion with constant velocity components,
+      we can instead characterize it as motion that maximizes the proper time
+      (section \ref{subsec:maximal-time}, p.~\pageref{subsec:maximal-time}).
+\item Define a correction term to be added when taking the derivative of a vector or covector
+      expressed in non-Minkowski coordinates.
+\end{enumerate}
+
+\noindent These issues become more acute in general relativity, where curvature of spacetime
+can make option 1 impossible. Option 3, called the covariant derivative,\index{covariant derivative}
+is discussed in optional section \ref{sec:covariant-derivative} on p.~\pageref{sec:covariant-derivative}.
+If you aren't going to read that section, just keep in mind that in non-Minkowski coordinates,
+you cannot naively use changes in the components of a vector as a measure of a change in the vector
+itself.
+
+<% end_sec('xfn-derivatives') %>
+
+<% begin_sec("Volume, orientation, and the Levi-Civita tensor",nil,'levi-civita',{'optional'=>true}) %>\index{volume!affine}
+This optional section introduces some geometrical machinery that is used in both special and general relativity.
+<% begin_sec("Volume",nil,'volume') %>
+<% begin_sec("Desirable properties",nil,'volume-desirable') %>
+In $3+1$ dimensions, we have a natural way of defining four-dimensional volume, which is to
+pick a frame of reference and let the element of volume be $\der t\der x\der y\der z$ in
+the Minkowski coordinates of that frame. Although this definition of 4-volume is stated in terms of
+certain coordinates, it turns out to be Lorentz-invariant (section \ref{sec:area-is-scalar},
+p.~\pageref{sec:area-is-scalar}). It also has the following desirable properties, which we state for
+an arbitrary value of $m$ from 1 to 4:
+
+V1. Any two $m$-volumes can be compared in terms of their ratio.\label{volume-properties}
+
+V2. For any $m$ nonzero vectors, the $m$-volume of the parallelepiped they span is
+nonzero if and only if the vectors are linearly independent (that is, if none of them can be
+expressed in terms of the others using scalar multiplication and vector addition).
+
+We would also like to have convenient methods for working with three-volume, two-volume (area),
+and one-volume (length). But the $m$-volumes for $m<4$ give us headaches if we try to define
+them so that they obey both V1 and V2. For example, the obvious way to define length ($m=1$) is to
+use the metric, but then lightlike vectors would violate V2.
+<% marg(-20) %>
+<%
+  fig(
+    'lattice-construction',
+    %q{Using parallelism to define 1-volume.}
+  )
+%>
+<% end_marg %>
+<% end_sec('volume-desirable') %> 
+
+<% begin_sec("Affine measure",nil,'affine-measure') %>
+If we're willing to abandon V1, then the following approach succeeds. Consider the $m=1$ case.
+We ignore the metric completely and exploit the
+fact that in special relativity, spacetime is flat (postulate P2, p.~\pageref{subsec:flatness-postulate}),
+so that parallelism works the same way as in Euclidean geometry. 
+Let $\ell$ be
+a line, and suppose we want to define a number system on this line that measures how far apart events are.
+Depending on the type of line, this could be a measurement of time, of spatial distance, or a mixture of the
+two. First we arbitrarily single out two distinct points on $\ell$ and label them 0 and 1,
+as in figure \figref{lattice-construction}. Next, pick some
+auxiliary point $\zu{q}_0$ not lying on $\ell$. Construct
+$\zu{q}_0\zu{q}_1$ and parallel to $01$ and $1\zu{q}_1$ parallel to $0\zu{q}_0$, forming the parallelogram
+shown in the figure.
+Continuing in this way, we have a scaffolding of parallelograms adjacent
+to the line, determining an infinite lattice of points 1, 2, 3, \ldots on the line, which
+represent the positive integers. Fractions can be defined in a similar way. For example, $\frac{1}{2}$ is defined
+as the point such that when the initial lattice segment $0\frac{1}{2}$ is extended by the same construction, the next point
+on the lattice is 1. 
+The continuously varying variable constructed in this way is called an \emph{affine parameter}.\index{affine parameter}
+The time measured by a free-falling clock is an example of an affine parameter, as is the distance measured
+by the tick marks on a free-falling ruler. An affine parameter can only be defined along a straight
+world-line, not an arbitrary curve. The affine measurement of 1-volume violates V1,
+because it only allows us to compare distances that lie on $\ell$ or parallel to it. On the other hand,
+it has the advantage over metric measurement that it allows us to measure lengths along lightlike lines.
+
+Figure \figref{affine-area-lattice} shows how to define an affine measure of 2-volume, and a similar
+method works for 3-volume.
+<% marg(300) %>
+<%
+  fig(
+    'affine-area-lattice',
+    %q{The area of the viola can be determined by counting the
+           parallelograms formed by the lattice. The area can be determined to any desired precision,
+           by dividing the parallelograms into fractional parts that are as small as necessary.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'linearity-of-area',
+    %q{Linearity of area. Doubling the vector $\vc{a}$ doubles the area.}
+  )
+%>
+<% end_marg %>
+<% marg(-300) %>
+<%
+  fig(
+    'change-of-basis',
+    %q{The viola has a different area when measured using a different parallelogram as the unit.}
+  )
+%>
+<% end_marg %>
+<% end_sec('affine-measure') %> 
+
+<% begin_sec("Linearity",nil,'volume-linearity') %>\label{volume-linearity}
+
+Suppose that a parallelogram is formed with vectors $\vc{a}$ and $\vc{b}$ as two of its sides.
+It we double $\vc{a}$, then the area doubles as well,
+\begin{equation*}
+  \operatorname{area}(2\vc{a},\vc{b}) = 2\operatorname{area}(\vc{a},\vc{b})\eqquad.
+\end{equation*}
+In general, if we scale either of the
+vectors by a factor $c$, the area scales by the same factor, provided that we set some rule
+for handling signs --- an issue that we'll postpone until section \ref{subsec:orientation}. Something similar happens
+when we add two vectors, e.g.,
+\begin{equation*}
+  \operatorname{area}(\vc{a},\vc{b}+\vc{c}) =  \operatorname{area}(\vc{a},\vc{b})
+                                              +\operatorname{area}(\vc{a},\vc{c})\eqquad,
+\end{equation*}
+again postponing issues with signs.
+We refer to these properties as \emph{linearity} of the affine 2-volume. Any sensible measure
+of $m$-volume should have similar linearity properties.
+
+<% end_sec('volume-linearity') %> 
+<% begin_sec("Change of basis",nil,'volume-basis-change') %>
+Because we have not made use of the metric so far, all of our measures of area have been relative rather
+than absolute. As shown in figure \figref{change-of-basis}, they depend on what parallelogram we choose as
+our unit of area. The unit cell in \subfigref{change-of-basis}{2} is smaller than the one in
+\subfigref{change-of-basis}{1}, for two reasons: the vectors defining the edges are shorter, and
+the angle between them is smaller. Words like ``shorter'' and ``angle'' show us resorting to metric
+measurement, but we could also perform the comparison without using the metric, simply by using 
+parallelogram 1 to measure parallelogram 2, or 2 to measure 1.
+If we think of such a pair of vectors as basis vectors for the plane, then
+switching our choice of unit parallelogram is equivalent to a change of basis.
+Areas change in proportion to the determinant of the matrix specifying the change of basis.
+
+\begin{eg}{A halfling basis}
+Suppose that $\vc{a}'=\vc{a}/2$, and $\vc{b}'=\vc{b}/2$. The change of basis from the unprimed pair to the
+primed pair is given by the matrix
+\begin{equation*}
+  \left( \begin{matrix}
+         2 & 0 \\
+         0 & 2
+      \end{matrix} \right),
+\end{equation*}
+which has determinant 4. Scaling down both basis vectors by a factor of 2 has caused a reduction by a factor of
+4 in the area of the unit parallelogram.
+If we use the primed parallelogram to measure other areas, then all the areas will
+come out bigger by a factor of 4.
+\end{eg}
+
+Rotations and Lorentz boosts are changes of basis. They have determinants equal to 1, i.e., they preserve spacetime
+volume.
+
+<% end_sec('volume-basis-change') %> 
+<% end_sec('volume') %> 
+<% begin_sec("Orientation",nil,'orientation') %>\index{orientation}
+As shown in figure \figref{negative-area}, linearity of area requires that some areas be assigned negative values.
+If we compare the areas $+1$ and $-1$, we see that the only difference is one of orientation, or handedness.
+In the case to which we have arbitrarily assigned area $+1$, vector $\vc{b}$ lies counterclockwise from
+vector $\vc{a}$, but when $\vc{a}$ is flipped, the relative orientation becomes clockwise.
+<% marg(-300) %>
+<%
+  fig(
+    'negative-area',
+    %q{Linearity of area requires that some areas be assigned negative values.}
+  )
+%>
+<% end_marg %>
+
+If you've had the usual freshman physics background, then you've seen this issue dealt with in a particular
+way, which is that we assume a third dimension to exist, and\label{no-rel-cross-product}
+define the area to be the vector cross product $\vc{a}\times\vc{b}$, which is perpendicular
+to the plane inhabited by $\vc{a}$ and $\vc{b}$. The trouble
+with this approach is that it only works in three dimensions.
+In four dimensions, suppose that $\vc{a}$ lies along the $x$ axis, and $\vc{b}$ along the $t$ axis.
+Then if we were to define $\vc{a}\times\vc{b}$, it should be in a direction perpendicular to both
+of these, but we have more than one such direction. We could pick anything in the $y$-$z$ plane.
+
+To get started on this issue in $m$ dimensions, where $m$ does not necessarily equal 3, we can consider
+the $m$-volume of the $m$-dimensional parallelepiped spanned by $m$ vectors. For example, suppose that
+in 4-dimensional spacetime we pick our $m$ vectors to be the unit vectors lying along the four axes
+of the Minkowski coordinates,
+$\hat{\vc{t}}$, $\hat{\vc{x}}$, $\hat{\vc{y}}$, and $\hat{\vc{z}}$. From experience with the vector cross
+product, which is anticommutative, we expect that the sign of the result will depend on the order of the vectors,
+so let's take them in that order. Clearly there are only two reasonable values we could imagine for this
+volume: $+1$ or $-1$. The choice is arbitrary, so we make an arbitrary choice. Let's say that it's $+1$ for
+this order. This amounts to choosing an \emph{orientation} for spacetime.
+
+A hidden and nontrivial assumption was that once we made this choice\label{spacetime-not-orientable}
+at one point in spacetime, it could be carried over to other regions of spacetime in a consistent way.
+This need not be the case, as suggested in figure \figref{mobius-strip}. However, our topic at the moment
+is special relativity, and as discussed briefly on p.~\pageref{trivial-topology},
+it is usually assumed in special relativity that spacetime is topologically trivial,
+so that this issue arises only in general relativity, and only in  spacetimes that probably
+are not realistic models of our universe.\index{topology}
+<% marg(300) %>
+<%
+  fig(
+    'mobius-strip',
+    %q{A M\"{o}bius strip is not an orientable surface.}
+  )
+%>
+\spacebetweenfigs
+<%
+  fig(
+    'levi-civita-portrait',
+    %q{Tullio Levi-Civita (1873-1941) worked on models of number systems possessing infinitesimals and on differential
+               geometry. He invented the tensor notation, which Einstein learned from his textbook. He was appointed to
+               prestigious endowed chairs at
+               Padua and the University of Rome, but was fired in 1938 because
+               he was a Jew and an anti-fascist.}
+  )
+%>
+<% end_marg %>
+
+Since 4-volume is invariant under rotations and Lorentz transformations, our choice of an orientation
+suffices to fix a definition of 4-volume that is a Lorentz invariant. If vectors 
+$\vc{a}$, $\vc{b}$, $\vc{c}$, and $\vc{d}$ span a 4-parallelepiped, then the linearity of
+volume is expressed by saying that there is a set of coefficients $\epsilon_{ijkl}$
+such that
+\begin{equation*}
+  V = \epsilon_{ijkl} a^i b^j c^k d^l.
+\end{equation*}
+Notating it this way suggests that we interpret it as abstract index notation, in which case the lack
+of any indices on $V$ means that it is
+not just a Lorentz invariant but also a scalar.\footnote{For the distinction, see
+p.~\pageref{scalar-vs-lorentz-invariant}.} 
+
+\begin{eg}{Halfling coordinates}\label{eg:epsilon-under-rescaling}
+Let $(t,x,y,z)$ be Minkowski coordinates, and let $(t',x',y',z')=(2t,2x,2y,2z)$. Let's consider how each
+of the factors in our volume equation is affected as we do this change of coordinates.
+\begin{equation*}
+  \underbrace{V}_\text{no change} = 
+        \underbrace{\epsilon_{\kappa\lambda\mu\nu}}_{\times1/16}
+        \underbrace{a^\kappa}_{\times2} \underbrace{b^\lambda}_{\times2}
+        \underbrace{c^\mu}_{\times2} \underbrace{d^\nu}_{\times2}
+\end{equation*}
+Since our convention is that $V$ is a scalar, it doesn't change under a change of coordinates.
+This forces us to say that the components of $\epsilon$ change by a factor of 1/16 in this example.
+\end{eg}
+
+The result of example \ref{eg:epsilon-under-rescaling} tells us that under our convention that
+volume is a scalar, the components of $\epsilon$ must change when we change coordinates.
+One could argue that it would be more logical to think of the transformation in this
+example as a change of units, in which case the value of $V$ would be different in the new units;
+this is a possible alternative convention, but it would have the disadvantage of making it impossible
+to read off the transformation properties of an object from the number and position of its indices.
+Under our convention, we can read off the transformation properties in this way. Although section
+\ref{sec:xfn-summary} only presented these properties in the case of tensors of rank 0 and 1,
+deferring the general description of higher-rank tensors to  sec.~\ref{subsec:rank-two},
+p.~\pageref{subsec:rank-two},
+$\epsilon$'s transformation properties are, as implied by its four subscripts, those of a tensor
+of rank 4. Different authors use different conventions regarding the definition of $\epsilon$,
+which was originally described by the mathematician Levi-Civita.
+Since by our convention $\epsilon$ is a tensor, we refer to it as the Levi-Civita tensor.\index{Levi-Civita tensor}
+In other conventions, where $\epsilon$ is not a tensor, it may be referred to as the Levi-Civita symbol.
+Since the notation is not standardized, I will occasionally put a reminder next to important equations
+containing $\epsilon$ stating that this is the tensorial $\epsilon$.
+
+The Levi-Civita tensor has lots and lots of indices. Scary! Imagine the complexity of this beast. (Sob.)
+We have four choices for the first index, four for the second, and so on, so that the total number
+of components is 256. Wait, don't reach for the kleenex. The following example shows that
+this complexity is illusory.
+
+\begin{eg}{Volume in Minkowski coordinates}\label{eg:minkowski-volume}
+We've set up our definitions so that for the parallelepiped 
+$\hat{\vc{t}}$, $\hat{\vc{x}}$, $\hat{\vc{y}}$, $\hat{\vc{z}}$, we have $V=+1$. Therefore
+\begin{equation*}
+  \epsilon_{txyz} = +1
+\end{equation*}
+by definition, and because 4-volume is Lorentz invariant, this holds for \emph{any} set of Minkowski coordinates.
+
+If we interchange $x$ and $y$ to make the list $\hat{\vc{t}}$, $\hat{\vc{y}}$, $\hat{\vc{x}}$, $\hat{\vc{z}}$,
+then as in figure \figref{negative-area}, the volume becomes $-1$, so
+\begin{equation*}
+  \epsilon_{tyxz} = -1.
+\end{equation*}
+
+Suppose we take the edges of our parallelepiped to be $\hat{\vc{t}}$, $\hat{\vc{x}}$, $\hat{\vc{x}}$, $\hat{\vc{z}}$,
+with $y$ omitted and $x$ duplicated. These four vectors are not linearly independent, so our parallelepiped is
+degenerate and has zero volume.
+\begin{equation*}
+  \epsilon_{txxz} = 0.
+\end{equation*}
+
+From these examples, we see that once any element of $\epsilon$ has been fixed, all of the others can be
+determined as well. The rule is that interchanging any two indices flips the sign, and any repeated index
+makes the result zero.
+\end{eg}
+
+Example \ref{eg:minkowski-volume} shows that the the fancy symbol $\epsilon_{ijkl}$, which looks
+like a secret Mayan hieroglyph invoking 256 different numbers, actually encodes only \emph{one} number's
+worth of information; every component of the tensor either equals this number, or minus this number, or zero.
+Suppose we're working in some set of coordinates, which may not be Minkowski,
+and we want to find this number. A complicated way to find it would be to use the tensor transformation
+law for a rank-4 tensor (sec.~\ref{subsec:rank-two}, p.~\pageref{subsec:rank-two}). A much simpler way
+is to make use of the determinant of the metric, discussed in example \ref{eg:det-g}
+on p.~\pageref{eg:det-g}. For a list of coordinates $ijkl$ that are sorted out in the order that we
+define to be a positive orientation, the result is simply $\epsilon_{ijkl}=\sqrt{|\operatorname{det} g|}$.
+The absolute value sign is needed because a relativistic metric has a negative determinant.
+
+\begin{eg}{Cartesian coordinates and their halfling versions}\label{eg:lc-cartesian-and-halfling}
+Consider Euclidean coordinates in the plane, so that the metric is a $2\times2$ matrix, and
+$\epsilon_{ij}$ has only two indices.
+In standard Cartesian coordinates, the metric is
+$g=\operatorname{diag}(1,1)$, which has $\operatorname{det} g=1$. The Levi-Civita tensor therefore
+has $\epsilon_{xy}=+1$, and its other three components are uniquely determined from this one by the
+rules discussed in example \ref{eg:minkowski-volume}. (We could have flipped all the signs if we
+had wanted to choose the opposite orientation for the plane.) In matrix form, these rules result in
+\begin{equation*}
+  \epsilon =   \left( \begin{matrix}
+         0 & 1 \\
+         -1 & 0
+      \end{matrix} \right).
+\end{equation*}
+
+Now transform to coordinates $(x',y')=(2x,2y)$. In these coordinates, the metric is
+$g'=\operatorname{diag}(1/4,1/4)$, with $\operatorname{det} g=1/16$, so that
+$\epsilon_{x'y'}=1/4$, or in matrix form,
+\begin{equation*}
+  \epsilon' =   \left( \begin{matrix}
+         0 & 1/4 \\
+         -1/4 & 0
+      \end{matrix} \right).
+\end{equation*}
+\end{eg}
+
+\begin{eg}{Polar coordinates}\label{eg:lc-polar}
+In polar coordinates $(r,\theta)$, the metric is $g=\operatorname{diag}(1,r^2)$
+(problem \ref{hw:polar-metric}, p.~\pageref{hw:polar-metric}),
+which has determinant $r^2$. The Levi-Civita tensor is
+\begin{equation*}
+  \epsilon =   \left( \begin{matrix}
+         0 & r \\
+         -r & 0
+      \end{matrix} \right)
+\end{equation*}
+(taking the same orientation as in example \ref{eg:lc-cartesian-and-halfling}).
+\end{eg}
+
+\begin{eg}{Area of a circle}\label{eg:area-of-circle}
+Let's find the area of the unit circle.
+Its (signed) area is
+\begin{equation*}
+  A = \int \text{2-volume}(\der\vc{r},\der\vc{\btheta}),
+\end{equation*}
+where the order of $\der\vc{r}$ and $\der\vc{\theta}$ is chosen so that, with the
+orientation we've been using for the plane, the result will come out positive.
+Using the definition of the Levi-Civita tensor, we have
+\begin{align*}
+  A &= \int \epsilon_{r\theta}\der x^r\der x^\theta \\
+    &= \int_{r=0}^1 \int_{\theta=0}^{2\pi} r \der r \der\theta \qquad \text{[example \ref{eg:lc-polar}]}\\
+    &= \pi
+\end{align*} 
+\end{eg}
+
+<% end_sec('orientation') %> 
+<% begin_sec("The 3-volume covector",nil,'three-volume') %>\label{three-vol-covector}
+
+Consider the volume of a three-dimensional subspace of four-dimensional spacetime.
+Linearity leads to an especially simple characterization
+of the 3-volume. Let a 3-volume be defined by the parallelepiped spanned by vectors
+$\vc{a}$, $\vc{b}$, and $\vc{c}$. If we threw in a fourth vector $\vc{d}$, we would have
+a 4-volume, and 4-volume is a scalar. This 4-volume would depend in a linear way on
+all four vectors, and in particular it would depend linearly on $\vc{d}$. But this means
+we have a scalar that is a linear function of a vector, and such a function is
+exactly what we mean by a covector. We can therefore define a volume covector\index{volume!3-volume covector}
+$\vc{S}$ according to
+\begin{equation*}
+  S_l d^l = \operatorname{4-volume}(\vc{a},\vc{b},\vc{c},\vc{d})
+\end{equation*}
+or
+\begin{equation*}
+  S_l = \epsilon_{ijkl}a^i b^j c^k. \qquad \text{[tensorial $\epsilon$]}
+\end{equation*}
+The volume covector collects the information about the volume of the 3-parallelepiped,
+encapsulating it in a convenient form with known transformation properties. In particular,
+the statement and proof of Gauss's theorem in $3+1$ dimensions are greatly simplified
+by the use of this tool (p.~\pageref{covector-used-in-gauss-proof}).
+The 3-volume covector, unlike the affine 3-volume, is defined in
+an absolute sense rather than in relation to some parallelepiped arbitrarily chosen as
+a standard. Both the covector and the affine volume fail to satisfy the ratio-comparison
+property V1 on p.~\pageref{volume-properties}, since we can't compare volumes unless they
+lie in parallel 3-planes.
+<% marg(100) %>
+<%
+  fig(
+    'three-volume-covector',
+    %q{Interpretation of the 3-volume covector.}
+  )
+%>
+<% end_marg %>
+
+We've been visualizing covectors in $n$ dimensions as stacks of $(n-1)$-dimensional planes
+(figure \subfigref{vector-measuring-covector}{2}, p.~\pageref{fig:vector-measuring-covector};
+figure \subfigref{surfer-phase}{2}, p.~\pageref{fig:surfer-phase}). The volume three-vector
+should therefore be visualized as a stack of 3-planes in a four-dimensional space. Since most
+of us can't visualize things very well in four dimensions, figure \figref{three-volume-covector}
+omits one of the dimensions, so that the 3-surfaces appear as two-dimensional planes.
+The small hand \subfigref{three-volume-covector}{1} has a certain 3-volume, and the
+covector that measures it is represented
+by the stack of 3-planes parallel to it, \subfigref{three-volume-covector}{2}.
+The bigger hand \subfigref{three-volume-covector}{3} has twice the 3-volume, and
+its covector is represented by a stack of planes with half the spacing.
+
+If we step down from four dimensions to three, then the volume covector formed by
+vectors $\vc{u}$ and $\vc{v}$ becomes the vector cross product $\vc{S}=\vc{u}\times\vc{v}$,
+i.e., $S_k=\epsilon_{ijk} u^i v^j$.
+
+\begin{eg}{A vector cross product}
+Consider Euclidean 3-space in Cartesian coordinates. We know from freshman physics that
+\begin{equation*}
+  \hat{\vc{z}} = \hat{\vc{x}}\times\hat{\vc{y}}.
+\end{equation*}
+Reexpressing this in the notation above, we have $u^x=1$, $v^y=1$, and zero for all the other components of
+$\vc{u}$ and $\vc{v}$. Since the Levi-Civita tensor vanishes if we have any duplicated indices, its only
+nonvanishing component that can be relevant here is $\epsilon_{xyz}=1$. (Here we assume the standard
+right-handed orientation for Cartesian coordinates, and we make use of the fact that
+$g=\operatorname{diag}(1,1,1)$, so that $\operatorname{det}g=1$.) The result is
+\begin{equation*}
+  S_z=\epsilon_{xyz} u^x v^x = 1,
+\end{equation*}
+as expected. (It doesn't matter here whether we talk about $S_z$ or $S^z$, because with this metric,
+raising and lowering indices doesn't change the components of a vector.)
+\end{eg}
+<% begin_sec("Classification of 3-surfaces",nil,'classification-of-surfaces') %>\index{surfaces!classification of}
+A useful application of the 3-volume covector is in classifying 3-surfaces by how they relate to the light cone.
+If I nail together three sticks, all at right angles to one another, then I can consider them as a set of basis vectors
+spanning a three-dimensional space of events. This three-space is flat, so we can call it a hyperplane --- or just a plane
+if, as throughout this section, there is no danger of forgetting that it has three dimensions rather than two.
+All of the events in this plane are simultaneous in my frame of reference. None
+of these facts depends on the use of right angles;
+we just need to make sure that the sticks don't all lie in the same plane.
+
+The business of a physicist is ultimately
+to make predictions. That is, if given a set of initial conditions, we can say how our system will evolve through time.
+These initial conditions are in principle measured throughout all of space, and a plane of simultaneity would be
+a natural choice for the set of points at which to take the measurements.
+A surface used for this purpose is called a Cauchy surface.\index{surfaces!Cauchy}\index{Cauchy surface}
+
+If a plane is a surface of simultaneity according to some observer, then we call it \emph{spacelike}.
+Any particle's world-line must intersect such a plane exactly once, and this is why
+it works as a Cauchy surface: we are guaranteed to detect the particle, so that we can account for
+its effect on the evolution of the cosmos. 
+We could take a spacelike plane and reorient it.
+For a small enough change in the orientation (that is, a change that could be described by small enough
+changes in the basis vectors), it will remain spacelike.
+
+When a plane is not spacelike, and remains so under any sufficiently small change in orientation, we call it \emph{timelike}.
+In Minkowski coordinates, an example would be the $t$-$x$-$y$ plane. A given particle's world-line might never cross
+such a surface, and therefore a timelike plane cannot be used as a Cauchy surface.
+
+A plane that is neither spacelike nor timelike is called \emph{lightlike}. An example is the surface defined by
+the equation $x=t$ in Minkowski coordinates.
+
+The above classification can be stated very succinctly by using the 3-volume covector defined in 
+section \ref{subsec:volume}. A plane is spacelike, lightlike, or timelike, respectively, if
+the regions it contains are described by 3-volume covectors that are timelike, lightlike, or spacelike.
+A surface that is smooth but not necessarily flat can be be described locally according to
+these categories by considering its tangent plane. For example, a light cone is lightlike at each of
+its points, and since it is lightlike everywhere, we call it a lightlike surface. The event horizon
+of a black hole is also a lightlike surface. Any spacelike surface,
+whether curved or flat, can be used as a Cauchy surface. 
+
+Lightlike surfaces have some funny properties. 
+Using birdtracks notation,
+suppose that we form such a surface as the space spanned by
+the three basis
+vectors $__birdvec(\vc{a})$, $__birdvec(\vc{b})$, and $__birdvec(\vc{c})$,
+and let $__birddualvec(\vc{S})$ be the corresponding 3-volume covector.
+The surface is lightlike, so
+\begin{equation}\label{eq:lightlike-s}
+  __birdscalarproduct(\vc{S},\vc{S})=0\eqquad.
+\end{equation}
+Because $__birddualvec(\vc{S})$ is defined as the function giving the 4-volume of a parallelepiped spanned
+by the bases with a fourth vector $__birdvec(\vc{d})$, and because this volume vanishes
+when $__birdvec(\vc{d})$ is tangent to the surface (property V2, p.~\pageref{volume-properties}),
+we have,
+\begin{equation}
+   __birdscalarproduct(\vc{S},\vc{a})=__birdscalarproduct(\vc{S},\vc{b})=__birdscalarproduct(\vc{S},\vc{c})=0\eqquad.
+\end{equation}
+So in this sense $__birddualvec(\vc{S})$ is perpendicular to the surface.
+In Euclidean space we are used to describing the orientation of a surface in terms of the unit normal vector,
+and this is very nearly what $__birddualvec(\vc{S})$ is, except that it's a covector rather than a vector,
+and it also can't be made to have unit length, since its magnitude is zero.
+We could fix the first of these two problems by constructing the vector $__birdvec(\vc{S})$ that is
+dual to $__birddualvec(\vc{S})$, but this has a disconcerting effect.
+Combining \eqref{eq:lightlike-s}
+with the definition of $__birddualvec(\vc{S})$, we find that $__birdvec(\vc{S})$ spans
+a vanishing 4-volume with the basis vectors, and therefore by V2 we find that $__birdvec(\vc{S})$
+is tangent to the surface. Thus in some sense we have a vector that is both parallel to and tangent to
+a surface --- which avoids being absurd because we are really referring to two \emph{different} objects,
+the covector $__birddualvec(\vc{S})$ and the vector $__birdvec(\vc{S})$.
+
+<% end_sec('classification-of-surfaces') %> 
+
+<% end_sec('three-volume') %> 
+<% end_sec('levi-civita') %> 
+
+
+<% begin_hw_sec %>
+
+
+<% begin_hw('polar-metric') %>
+Example \ref{eg:polar-coodinates} on p.~\pageref{eg:polar-coodinates} discussed polar
+coordinates in the Euclidean plane. Use the technique demonstrated
+in section \ref{sec:xfn-metric} to find the metric in these coordinates.
+<% end_hw %>
+
+<% marg(50) %>
+<%
+  fig(
+    'oblique-metric',
+    %q{Problem \ref{hw:oblique-metric}.}
+  )
+%>
+<% end_marg %>
+
+<% begin_hw('oblique-metric') %>
+Oblique Cartesian coordinates are like 
+normal Cartesian coordinates in the plane, but their axes are at at 
+an angle $\varphi \ne \pi/2$ to one another. Show that the metric in these coordinates is
+\begin{equation*}
+  \der s^2 = \der x^2 + \der y^2 + 2\cos\varphi\der x\der y\eqquad.
+\end{equation*}
+<% end_hw %>
+
+<% begin_hw('lightlike-normal-vector') %>
+Let a 3-plane U be defined in Minkowski coordinates by the equation $x=t$.
+Is this plane spacelike, timelike, or lightlike?
+Find a covector $__birddualvec(\vc{S})$ that is normal to U in the sense described on
+p.~\pageref{subsubsec:classification-of-surfaces}, describing it in terms 
+of its components. Compute the vector $__birdvec(\vc{S})$, also in component form.
+Verify that $__birdscalarproduct(\vc{S},\vc{S})=0$.
+Show that $__birdvec(\vc{S})$ is tangent to M.
+<% end_hw %>
+
+<% begin_hw('oblique-lc') %>
+For the oblique Cartesian coordinates defined in problem \ref{hw:oblique-metric},
+use the determinant of the metric to show that the Levi-Civita tensor is
+\begin{equation*}
+  \epsilon =   \left( \begin{matrix}
+         0 & \sin\varphi \\
+         -\sin\varphi & 0
+      \end{matrix} \right).
+\end{equation*}
+
+<% end_hw %>
+
+<% begin_hw('volume-of-sphere') %>
+Use the technique demonstrated in example \ref{eg:area-of-circle},
+p.~\pageref{eg:area-of-circle}, to find the volume of the unit sphere.
+<% end_hw %>
+
+
+<% end_hw_sec %>
+
+
+<% end_chapter %>

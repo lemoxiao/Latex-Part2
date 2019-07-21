@@ -1,0 +1,146 @@
+% BIT ME REPORT COVER STYLE 北京理工大学机械工程专业技术报告
+% Provides a command, \makecover, that produces 
+% the cover for a UW EE technical report.
+% Modified form  UWEEtechrep by Jeff Bilmes(bilmes@ee.washington.edu)
+% Author: Yu Zhang
+% Email: yu.zhang.bit@gmail.com
+
+
+% Intructions:
+%
+% 1) Copy bitmetr.sty and bitmelogo.eps to the directory where
+%    you would plan to work.
+% 2) Include in your latex header something like:
+%    \documentclass{article}
+%    \usepackage{bitmetr}
+% 3) Define the title and author fields in latex, e.g.,
+%
+%      \title{北京理工大学, 机械工程学院 技术报告系列}
+%      
+%      \author{张玉  \\
+%      {\tt\{yu.zhang.bit\}@gmail.com}\\
+%      \\
+%      机械工程学院, 北京理工大学 \\
+%      中国北京, 100086\\
+%      }
+%      \reportmonth{March}
+%      \reportyear{2016}
+%      \reportnumber{3141}
+% 4) Put the \makecover and \maketitle command just
+%    after your \begindocument.
+% 5) run latex and you are all set.
+%
+%
+%  See example_uwtr.tex for an example of a complete UWEETR
+
+
+\oddsidemargin  0truein
+\evensidemargin 0truein
+\topmargin 0truein
+\headheight 0.0truein
+\headsep 0truein
+\textheight 9truein
+\textwidth 6.5truein
+
+
+\font\smallheadfont=cmss9
+\font\largeheadfont=cmss17
+
+\def\@coverart{\special{psfile=logo.png voffset=-160 hoffset=-10 hscale=34 vscale=34}}
+\def\reportnumber#1{\def\@reportnumber{#1}}
+\def\reportmonth#1{\def\@reportmonth{#1}}
+\def\reportyear#1{\def\@reportyear{#1}}
+\def\@reportnumber{????}
+\def\@reportmonth{}
+\def\@reportyear{????}
+\def\@numberformatter{\largeheadfont BIT Technical Report \\ Number~BITMETR-\@reportdesignator}
+
+\def\makecover{
+\titlepage   
+\def\thanks##1{\relax}
+\setcounter{page}{1}
+\ifx\@empty\@reportyear%
+    \def\@reportdesignator{\@reportnumber}
+\else%
+    \date{\@reportmonth\ \@reportyear}%
+    \@tempcnta\@reportyear%
+    \divide\@tempcnta by 100%
+    \multiply\@tempcnta by 100%
+    \@tempcntb\@reportyear%
+    \advance\@tempcntb-\@tempcnta%
+    \edef\@reportdesignator{\@reportyear-\@reportnumber}%
+\fi
+\shipout
+\vbox to 9.4true in
+{
+\hsize=6.5true in\parindent=0.5true in
+{
+
+\hrule
+\vbox to 1.0true in{\vfil}
+\vbox to 0.25true in{\vfil}
+\noindent\begin{minipage}[t]{6.5 true in}
+\LARGE\bf
+\begin{center}
+\@title
+\end{center}
+\end{minipage}
+
+\vbox to 0.625true in{\vfil}
+
+\noindent\begin{minipage}[t]{6.5 true in}
+\Large\it
+\begin{center}
+{\lineskip .75em\begin{tabular}[t]{c}\@author\end{tabular}\par}%
+\end{center}
+\end{minipage}
+
+% \vbox to 2.625true in{\vfil}
+
+\vfill
+
+\hrule
+
+\vbox to 0.2true in{\vfil}
+
+{
+\@coverart
+\hspace{2.95true in}
+\begin{minipage}[t]{3.5true in}
+\large\parindent=0pt
+{\bf \@numberformatter} \\
+\vspace{1ex}
+\noindent\@date \\
+\vspace{2ex} \\
+北京理工大学\\
+机械工程学院\\
+中国,北京 100081 \\
+网址: http://www.bit.edu.cn
+\end{minipage}
+}}
+}
+\renewcommand{\@oddfoot}{
+BITMETR-\@reportdesignator \hfil \thepage }%
+}
+
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 2em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1.5em%
+    {\large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\em Beijing Institute of Technology, School of ME, BITMETR-\@reportdesignator}%
+    \vskip .5em%
+    {\large \@date}%
+  \end{center}%
+  \par
+  \vskip 1.5em
+}

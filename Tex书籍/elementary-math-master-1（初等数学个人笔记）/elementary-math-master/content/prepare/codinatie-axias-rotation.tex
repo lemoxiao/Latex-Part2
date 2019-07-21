@@ -1,0 +1,243 @@
+
+\section{坐标变换}
+\label{sec:codinatie-axias-rotation}
+
+在高级中学数学教材中，三角函数的伸缩变换已经为人所熟知，而本文要讨论的是坐标变换的一般性理论。
+
+这些变换包括平移、旋转、伸缩、对称，通常所说的位似变换可以通过伸缩变换得到，其中，平移、旋转、对称都是恒等变换，即不改变平面图形的形状和大小，或者说变换前后的图形是全等的，而位似变换前后的图象则是相似的，形状不变，大小可以改变。
+
+\subsection{平移}
+
+平移变换由平移向量$\vv{s}=(a,b)$唯一确定，平面上任意一点$P$与它在变换下的像$P'$满足$\vv{PP'}=\vv{s}$为常向量，因此如果点$P$的坐标是$(x,y)$，点$P'(x',y')$的坐标将是$(x+a, y+b)$，即
+\begin{equation}
+  \label{eq:shift-translation-coordinate-formula}
+  \left\{
+      \begin{array}{ccc}
+        x' & = & x + a \\
+        y' & = & y + b
+      \end{array}
+  \right.
+\end{equation}
+写成矩阵形式则是:
+\begin{equation}
+  \label{eq:shift-translation-coordinate-formula-matrix}
+  \left(
+    \begin{array}{c}
+      x' \\
+      y' \\
+      1
+    \end{array}
+  \right)
+  =
+  \left(
+    \begin{array}{ccc}
+      1 & 0 & a \\
+      0 & 1 & b \\
+      0 & 0 & 1
+    \end{array}
+  \right)
+  \left(
+    \begin{array}{c}
+      x \\
+      y \\
+      1
+    \end{array}
+  \right)
+\end{equation}
+
+我们把平移向量为$\vv{s}=(a,b)$的平移变换记作$S(a,b)$。
+
+\begin{example}
+  本目中来建立曲线$f(x,y)=0$在平移向量为$\vv{s}=(a,b)$的平移变换下的新方程，假使点$P(x,y)$为新曲线上任一点，则它在变换前的坐标则是$(x-a,y-b)$，而变换前的点是满足原曲线方程的，所以得到新坐标所满足的方程$f(x-a,y-b)=0$，此即原曲线在平移变换下的新的曲线的方程。比如说，以原点为圆心的圆$x^2+y^2=r^2$在此平移变换下的新方程即为$(x-a)^2+(y-b)^2=r^2$。对于一般函数$y=g(x)$而言，把它写成$f(x,y)=g(x)-y$即可应用此结论。
+\end{example}
+
+\subsection{旋转}
+假如在平面直角坐标系中，有一个点的坐标是$P(x,y)$，现在我们把它绕着原点逆时针方向转动一个角度$\theta$，我们来寻求这个点的新坐标$P'=(x', y')$与原坐标之间的关系。
+
+设向量$\overrightarrow{OP}$与坐标系$x$轴正向成角$\alpha$，则向量$\vv{OP'}$与坐标系$x$轴正向成角$\alpha+\theta$，记向量$\overrightarrow{OP}$长度为$r$，则
+\begin{equation*}
+  x=r\cos{\alpha},y=r\sin{\alpha}
+\end{equation*}
+同样有
+\begin{equation*}
+  x'=r\cos{(\alpha+\theta)},y'=r\sin{(\alpha+\theta)}
+\end{equation*}
+于是就有
+\begin{equation}
+  \label{eq:formulas-rotation-axias}
+  \begin{split}
+  x' & = x\cos{\theta} - y\sin{\theta} \\
+  y' & = x\sin{\theta} + y\cos{\theta}
+  \end{split}
+\end{equation}
+写成矩阵形式就是:
+\begin{equation*}
+  \left(
+    \begin{array}{c}
+      x' \\
+      y'
+    \end{array}
+  \right)
+    =
+    \left(
+      \begin{array}{cc}
+        \cos{\theta} & -\sin{\theta} \\
+        \sin{\theta} & \cos{\theta}
+      \end{array}
+    \right)
+  \left(
+    \begin{array}{c}
+      x \\
+      y
+    \end{array}
+  \right)
+\end{equation*}
+
+我们把这个旋转变换记作$R(\theta)$。
+
+\begin{example}
+  反比例函数$xy=1$的图象位于一三象限并且关于这两个象限的角平分线对称，我们尝试把它的图象绕原点顺时针旋转45度，看看新的曲线方程的模样。为此目的，记反比例曲线为$C$，顺时针旋转45度后得到的新曲线记为$C'$，我们反过来把$C$看成是由$C'$绕原点逆时针旋转45度得到的，就有关系式$x=\frac{\sqrt{2}}{2}(x'-y'), y=\frac{\sqrt{2}}{2}(x'+y')$，因此新曲线$C'$上的点$P(x',y')$都满足方程$\frac{\sqrt{2}}{2}(x'-y') \cdot \frac{\sqrt{2}}{2}(x'+y')=1$，即$x'^2-y'^2=2$，这是一个离心率为$\sqrt{2}$的双曲线，所以反比例函数的图象是双曲线。
+\end{example}
+
+\begin{example}
+  在上例的基础上，我们来证明：函数 $y=ax+\frac{b}{x}(a \neq 0, b \neq 0)$的图象也是双曲线，为此同样期望通过旋转变换，把它变换成为双曲线的标准方程。
+
+  首先把函数的解析式改写为以下的曲线方程
+  \[ x(y-ax)=b \]
+  为了方便应用前面的公式，我们设想这函数的图象是旋转后的图象，那么在旋转前的曲线的方程则是
+  \[ (x\cos{\theta}-y\sin{\theta})[(x\cos{\theta}+y\cos{\theta})-a(x\cos{\theta}-y\sin{\theta})]=b \]
+  把上式整理为关于 $x$ 和 $y$的二元二次方程
+  \begin{equation*}
+    \begin{split}
+      & \cos{\theta}(\sin{\theta}-a\cos{\theta})x^2 \\
+      - & \sin{\theta}(\cos{\theta}+a\sin{\theta})y^2 \\
+      + & [\cos{\theta}(\cos{\theta}+a\sin{\theta})-\sin{\theta}(\sin{\theta}-a\cos{\theta})]xy \\
+      = & b
+    \end{split}
+  \end{equation*}
+  为了让它成为双曲线的标准方程，令 $xy$ 项的系数为零，即
+  \[ \cos{\theta}(\cos{\theta}+a\sin{\theta})-\sin{\theta}(\sin{\theta}-a\cos{\theta}) = 0 \]
+  整理得
+  \[ \cos{2\theta}+a\sin{2\theta}=0 \]
+  于是可取
+  \[ \cos{2\theta} = \frac{a}{\sqrt{1+a^2}}, \  \sin{2\theta}=-\frac{1}{\sqrt{1+a^2}} \]
+  双曲线的标准方程中除了没有 $xy$项之外，还要求$x^2$与$y^2$的系数符号相反，现在来检验一下，$x^2$项的系数是
+  \[ \cos{\theta}(\sin{\theta}-a\cos{\theta})=\frac{1}{2}\sin{2\theta}-\frac{a}{2}(1+\cos{2\theta}) = -\frac{\sqrt{1+a^2}+a}{2}<0 \]
+  而$y^2$的系数是
+  \[ -\sin{\theta}(\cos{\theta}+a\sin{\theta})=-\frac{1}{2}\sin{2\theta}-\frac{a}{2}(1-\cos{2\theta})=\frac{\sqrt{1+a^2}-a}{2}>0 \]
+  因此如果设
+  \[\frac{\sqrt{1+a^2}+a}{2}=r^2, \  \frac{\sqrt{1+a^2}-a}{2}=s^2 \]
+  则方程化为
+  \[ -r^2x^2+s^2y^2=b^2 \]
+  这正是双曲线的标准方程.
+\end{example}
+
+\subsection{伸缩}
+
+伸缩变换是以原点为基准，把平面沿着坐标轴的两个方向进行拉伸或压缩，两个方向上各有一个 \emph{伸缩因子}，分别用$\lambda(>0)$和$\mu(>0)$代表$x$和$y$方向的伸缩因子，则显然新旧坐标之间的关系是:
+\begin{equation}
+  \label{eq:scale-translation-coordinate-formula}
+  \left\{
+    \begin{array}{ccc}
+      x' & = & \lambda x \\
+      y' & = & \mu y
+    \end{array}
+  \right.
+\end{equation}
+矩阵形式为
+\begin{equation*}
+  \left(
+    \begin{array}{c}
+      x' \\
+      y'
+    \end{array}
+  \right)
+    =
+    \left(
+      \begin{array}{cc}
+        \lambda & 0 \\
+        0 & \mu
+      \end{array}
+    \right)
+  \left(
+    \begin{array}{c}
+      x \\
+      y
+    \end{array}
+  \right)
+\end{equation*}
+或者写成这样:
+\begin{equation*}
+  \label{eq:scale-translation-coordinate-formula-matrix}
+  \left(
+    \begin{array}{c}
+      x' \\
+      y' \\
+      1
+    \end{array}
+  \right)
+    =
+    \left(
+      \begin{array}{ccc}
+        \lambda & 0 & 0 \\
+        0 & \mu & 0 \\
+        0 & 0 & 1
+      \end{array}
+    \right)
+  \left(
+    \begin{array}{c}
+      x \\
+      y \\
+      1
+    \end{array}
+  \right)
+\end{equation*}
+
+如果两个方向上的伸缩因子相等，则称它为以原点为中心的 \emph{位似变换}.
+
+我们把伸缩因子分别为$\lambda$和$\mu$的伸缩变换记作$L(\lambda, \mu)$。
+
+如果以空间的视角来看伸缩变换，它也可以看作把平面倾斜一定角度后在原平面上的投影，所以关于投影有许多跟伸缩变换完全类似的结论，比如说投影下的面积。
+
+\begin{example}[二次曲线的离心率决定其形状]
+  抛物线的标准方程$y^2=2px(p>0)$，对它进行位似变换，记原抛物线为$C$，新的曲线为$C'$，那么$C$也可以由新曲线进行位似变换得到，假定这个变换的伸缩因子为$\lambda$，就有$x=\lambda x', y=\lambda y'$，于是新的曲线方程是$\lambda^2y'^2=2p\lambda x'$，取$\lambda = p$，则得$y'^2=2x'$，这表明任何一个抛物线$y^2=2px(p>0)$的图象的形状都是一样的，不同的只是大小。事实上，同样的方法应用到圆、椭圆、双曲线上，得出的结论是: 率心率相同的二次曲线都是相似的，换句话说，离心率是确定二次曲线形状的参数，离心率相同，则形状相同，不同的只是大小。
+\end{example}
+
+\begin{example}[伸缩变换下的面积\ 椭圆的面积]
+  讨论一下伸缩变换对平面图形面积的影响，根据祖暅原理，如果两个几何体在任一水平面上的截面积都相同，那么它俩体积相等。同理也有，如果两个平面图形被某一方向上的任一直线所截得的线段长度都相等，那么它俩面积也相等，进一步，如果它俩被某一方向的任意直线所截得的线段长度都有相同的比例，那么它们面积之比也为此固定比例。而伸缩变换$L(\lambda, \mu)$可以通过两次单方向的伸缩变换$L(\lambda, 1)$和$L(1, \mu)$来实现，易见前者把面积放大$\lambda$倍，后者放大$\mu$倍，所以如果一个平面图形在变换前后的面积分别为$S$和$S'$，那么就有
+  \begin{equation}
+    \label{eq:area-for-scale-translation}
+  S'=\lambda \mu S
+  \end{equation}
+这是一个有趣的结论，比如说我们可以通过它得到椭圆的面积，因为标准椭圆$\frac{x^2}{a^2}+\frac{y^2}{b^2}=1(a>b>0)$在伸缩变换$L(\frac{1}{a}, \frac{1}{b})$下将变为单位圆，单位圆面积是$\pi$，所以椭圆面积就是$S=\pi a b$。
+\end{example}
+
+\begin{example}[伸缩变换下直线的斜率\ 椭圆的切线]
+  \label{ep:the-tangent-after-scale-translation}
+  在伸缩变换$L(\lambda, \mu)$ 下，假定一条直线$l$被变换成了直线$l'$(直线在伸缩变换下仍旧是直线这一事实，可以通过直线方程在变换之后仍旧是一个二元一次方程这一点上看出)，记原直线斜率为$k$，新直线斜率为$k'$，那么对直线上两点有
+  \begin{equation}
+    \label{eq:tangent-of-scale-translation}
+  k'=\frac{y_1'-y_2'}{x_1'-x_2'}=\frac{\mu}{\lambda}\cdot \frac{y_1-y_2}{x_1-x_2}=\frac{\mu}{\lambda}k
+  \end{equation}
+  因此新旧直线斜率之比是与伸缩因子有关的固定比例。有了这个结论，我们可以利用它求出椭圆曲线在任一点处的切线方程来，因为椭圆$\frac{x^2}{a^2}+\frac{y^2}{b^2}=1(a>b>0)$在伸缩变换$L(\frac{b}{a},1)$下成为圆$x^2+y^2=b^2$，因为圆的切线与过切点处的半径互相垂直，也就是斜率之积为$-1$，因此椭圆上任一点处的切线的斜率，与该点与椭圆中心连线的斜率之积为$-\frac{b^2}{a^2}$，这是一个椭圆中非常有用的结论，在椭圆上任取一点$P(x_0,y_0)$，那么可以写出过该点的切线方程
+  \begin{equation*}
+  y-y_0=-\frac{b^2x_0}{a^2y_0}(x-x_0)
+  \end{equation*}
+  利用$\frac{x_0^2}{a^2}+\frac{y_0^2}{b^2}=1$即可将它化简为
+  \begin{equation*}
+  \frac{x_0x}{a^2}+\frac{y_0y}{b^2}=1
+  \end{equation*}
+\end{example}
+
+\begin{example}
+  如果允许伸缩因子是虚数，那么在伸缩变换$L(1,i)$下($i$是虚数单位)，双曲线将被变换为椭圆! 然而这对现阶段的我们似乎也没有什么用处。
+\end{example}
+
+还有一种变换称为 \emph{反射变换}，也称为对称变换，即把平面上所有的点关于某一直线作对称，如果该对称轴与坐标轴成倾斜角度，可以先做旋转变换，使得对称轴与坐标轴平行或者垂直，再通过平移使对称轴与坐标轴重合，这时只需要关于坐标轴作对称之后再反平移和反旋转，即可实现一般的反射变换，所以只要讨论关于坐标轴的反射变换就可以了，然而这一点如果允许伸缩变换中的伸缩因子为负就可以得到，所以反射变换本质上是平移、旋转和伸缩的叠加，就不单独讨论了。
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../elementary-math-note"
+%%% End:

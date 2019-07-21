@@ -1,0 +1,339 @@
+%========================================================================
+% NIP'AJIN Autorenpaket v1.1, (C) Markus Leupold-Löwenthal
+%========================================================================
+% Dieses Werk untersteht folgender Lizenz:
+% Namensnennung–Weitergabe unter gleichen Bedingungen 3.0 Österreich
+% (CC BY-SA 3.0) http://creativecommons.org/licenses/by-sa/3.0/at/
+%========================================================================
+
+% Dieser LaTeX-Style definiert das Layout von NIP'AJIN Regel- und Szenario-PDFs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ProvidesFile{ludusleonis.sty}
+\ProvidesPackage{nipajin}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% weitere Pakete
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{textpos}   % für z.B. Cover Page
+\usepackage{units}     % schöne Brüche (z.B. "1/2")
+\usepackage{multicol}  % 2-Spalten
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TeX & LaTeX Grundeinstellungen 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\unitlength}{1mm}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{0mm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Sprache: Deutsch
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{polyglossia}
+\setdefaultlanguage[spelling=new]{german}
+
+\hyphenation{LUDUS}
+\hyphenation{LEONIS}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Schriftarten & Schriftkonfiguration 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fontspec}
+\usepackage{xltxtra}
+\usepackage{xunicode}
+
+\defaultfontfeatures{Mapping=tex-text}    
+    
+\newcommand{\fftext}{\fontfamily{lmr}\selectfont}
+\newcommand{\ffextra}{\fontfamily{lmss}\selectfont}
+\newcommand{\fffancy}{\fontfamily{lmss}\selectfont}
+
+%\newfontfamily{\fftext}{Gentium Book Basic}
+\newfontfamily\fftext[  Path            = fonts/,
+                           BoldFont        = GenBkBasB.ttf,
+                           ItalicFont      = GenBkBasI.ttf,
+                           BoldItalicFont  = GenBkBasBI.ttf,
+                           Mapping         = tex-text]{GenBkBasR.ttf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Überschriften & Beschriftungen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{sectsty}
+
+\setcounter{secnumdepth}{-1} % keine Überschrift-Nummern
+\setcounter{figure}{-1}      % keine Bildernummern
+
+\newcommand{\partfontsize}{\fontsize{20pt}{18pt}}
+\newcommand{\chapterfontsize}{\fontsize{20pt}{18pt plus 6pt minus 6pt}}
+\newcommand{\sectionfontsize}{\fontsize{12pt}{12pt plus 6pt minus 6pt}}
+\newcommand{\subsectionfontsize}{\fontsize{10pt}{10pt}}
+
+\partfont{\color{Hauptfarbe}\fffancy\partfontsize\selectfont}
+\chapterfont{\color{Hauptfarbe}\sc\fffancy\chapterfontsize\selectfont\sectionrule{0ex}{0pt}{-1ex}{2pt}}
+\sectionfont{\color{Hauptfarbe}\raggedleft\fffancy\sectionfontsize\selectfont}
+\subsectionfont{\color{Hauptfarbe}\raggedright\fffancy\subsectionfontsize\selectfont}
+\subsubsectionfont{\fffancy\raggedright\scshape}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Seitengrößen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[dvipdfm]{geometry}
+
+\geometry{% A5
+	papersize={148mm,210mm},
+	textwidth=132mm,
+	textheight=190mm,
+	inner=8mm,
+	top=10mm,
+	columnsep=4mm,
+	footskip=2mm,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Text-Satz Detaileinstellungen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% keine Hurenkinder/Schusterjungen
+\clubpenalty = 10000 
+\widowpenalty = 10000 
+\displaywidowpenalty = 10000 
+\finalhyphendemerits = 10000 
+\brokenpenalty = 7500
+
+% sonstige Absatzformatierung
+\pretolerance 2500
+\tolerance 500
+\hyphenpenalty 250
+\exhyphenpenalty 100
+\doublehyphendemerits 7500
+\finalhyphendemerits 7500
+\lefthyphenmin 3
+\righthyphenmin 3
+\looseness 1
+
+% Spaltenformatierung
+\multicolpretolerance 2500
+\multicoltolerance 500
+\setcounter{collectmore}{-1}
+
+% hochgestellt in Normalschrift
+\newcommand{\superscript}[1]{\ensuremath{^{\fftext\scriptsize#1}}} 
+
+% Schriftgrößen und Absatz-Stretch
+\newcommand{\textnormalfontsize}{\fontsize{9.5pt}{11pt plus 0.125pt minus 0.125pt}}
+\newcommand{\textsmallfontsize}{\fontsize{8.5pt}{9.5pt plus 0.125pt minus 0.125pt}}
+\renewcommand{\normalsize}{%
+   \textnormalfontsize\selectfont
+}  
+\renewcommand{\small}{%
+   \textsmallfontsize\selectfont
+}
+
+\usepackage{microtype}
+\usepackage{ellipsis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Farben
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\usepackage[usenames,dvipsnames,table]{xcolor}
+\usepackage[cmyk,table,usenames,dvipsnames]{xcolor}
+
+\DefineNamedColor{named}{Hauptfarbe}{cmyk}{0.7187,0.5313,0.3750,0.2578}
+\DefineNamedColor{named}{Nebenfarbe}{cmyk}{0.3203,0.1602,0.1172,0.0000}
+\DefineNamedColor{named}{Textfarbe}{named}{black}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PDF-Besonderheiten 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{hyperref}
+\hypersetup{
+	pdfpagelayout=TwoPageRight,
+	pdfstartview=Fit,
+	pdfpagemode=UseOutlines,
+	pdfprintscaling=None,
+	colorlinks=true,
+	urlcolor=Textfarbe,
+	linkcolor=Textfarbe,
+	bookmarksnumbered=false,
+	bookmarksopen=false
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Seitenhintergrund
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{eso-pic} % für AddToShipoutPicture
+
+\newcommand{\hintergrund}{}  % hier kommt das jeweils aktuelle Hintergrundbild rein
+\AddToShipoutPicture{\put(0,0){\parbox[b][\paperheight]{\paperwidth}{\vfill\centering\includegraphics[width=\paperwidth,height=\paperheight]{\hintergrund}\vfill}}}
+
+% hiermit erzwingen wir RGB-rendering und damit treffsicherere Farben, wenn transparenzen im Spiel sind
+\AddToShipoutPicture{%
+\makeatletter%
+\special{pdf: put @thispage <</Group << /S /Transparency /I true /CS /DeviceRGB>> >>}%
+\makeatother%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Querverweise
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{zref-user,zref-titleref,zref-hyperref}
+
+\newcommand{\seite}[1]{S.\,\zpageref{#1}}
+\newcommand{\abschnitt}[1]{\zitat{\ztitleref{#1}}  (\seite{#1})}
+\newcommand{\siehe}[1]{(siehe \zitat{\ztitleref{#1}}, \seite{#1})}
+\newcommand{\referenz}[2]{\mbox{#1, S.\,\,#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kopf- und Fußzeilen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfootoffset[RO,LE]{0mm}
+\fancyfoot[C]{\bf\color{Hauptfarbe}\fffancy\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Überschriften
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[abs]{overpic}
+
+\newcommand{\banner}[2]{%
+\phantomsection\addcontentsline{toc}{section}{#2}%
+\vspace*{-4mm}{
+\noindent\hspace*{-11.6mm}
+\begin{overpic}[width=151mm]%
+	{images/banner.png}
+	\put(0,11.1){\parbox{\textwidth}{\hspace*{17mm}\bf\color{Hauptfarbe}\fffancy\chapterfontsize\selectfont\centering#1}}
+\end{overpic}
+}\vspace*{-9mm}}
+
+\newcommand{\mysection}[1]{\section*{..:: #1 ::}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tabellen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{ragged2e}
+\usepackage{multirow}
+
+\renewcommand{\tabcolsep}{1mm} % auch mit diesem Wert spielen
+
+\newcolumntype{x}[1]{%
+>{\raggedright\hspace{0pt}}p{#1}%
+}
+\newcolumntype{y}[1]{%
+>{\centering\hspace{0pt}}p{#1}%
+}
+\newcolumntype{z}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}%
+}
+
+\newcommand{\thead}[1]{\textbf{\color{white}#1}}
+\newcommand{\tn}{\tabularnewline}
+
+\newcommand{\tabelle}[3]{{
+{\ffextra\small
+\vspace{2pt plus 6pt}
+\noindent
+\rowcolors[]{1}{Nebenfarbe}{}
+\RaggedRight
+\begin{tabularx}{\columnwidth}{#1}
+\hline
+\rowcolor{Hauptfarbe}
+#2
+\hline
+#3
+\hline
+\end{tabularx}\vspace{2pt plus 6pt}}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% weitere Layoutelemente
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\wichtig}{\textbf}
+\newcommand{\hervor}[1]{\textbf{#1:}}
+\newcommand{\aufzaehlung}[1]{\begin{list}{\color{Hauptfarbe}\textbullet}{\leftmargin=1.5em\itemsep=3pt\parsep=0pt}#1\end{list}}
+
+\newcommand{\zitat}[1]{„\textit{#1}“}
+\newcommand{\todo}[1]{{\color{red} #1}}
+
+\newcommand{\spacer}{\vspace*{20mm}}
+\newcommand{\spacerA}{\vspace*{10mm}}
+\newcommand{\spacerB}{\vspace*{7.5mm}}
+\newcommand{\spacerem}{\vspace*{1em}}
+\newcommand{\spacerhem}{\vspace*{0.5em}}
+
+\usepackage{lipsum} % Fülltext
+
+\usepackage{rotating}
+
+\newcommand{\charakter}[1]{%
+\thispagestyle{empty}
+
+\vspace*{182mm}
+
+\begin{rotate}{90}\begin{minipage}[t]{80mm}#1\end{minipage}\end{rotate}
+
+\newpage
+}
+
+\newcommand{\ludusleoniskasten}{%
+\vspace*{1em}%
+\fbox{\parbox{10cm}{%
+\ffextra\small
+Dieses Werk nutzt das freie \nipajin-System von \textbf{Markus Leupold-Löwenthal (\ludusleonis)} im Rahmen einer Creative Commons Lizenz. 
+Das Werk spiegelt daher Meinungen und Ansichten des Lizenznehmers wider, die sich nicht mit jenen des Lizenzgebers decken müssen.
+
+\vspace{0.5em}
+
+Das original \nipajin-System sowie das \nipajin-Autorenpaket sind unter \href{http://nipajin.ludus-leonis.com/}{\emph{http://nipajin.ludus-leonis.com/}} zu finden. 
+}}%
+\vspace*{1em}%
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Makros für RPGDings und andere Symbole
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\ziel}{$\bf\odot$}
+\newcommand{\WW}{WW}
+\newcommand{\AW}{AW}
+\newcommand{\RW}{RW}
+\newcommand{\VZ}{VZ}
+\newcommand{\NWZ}{NZ}
+\newcommand{\nipajin}{NIP'AJIN}
+\newcommand{\trias}{TRiAS}
+\newcommand{\ludusleonis}{LUDUS LEONIS}
+
+\newcommand{\logonipajin}{\nipajin}
+\newcommand{\logotrias}{\trias}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% häufig benutze Abkürzungen und Textbausteine
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\zB}{z.\,B.}
+\newcommand{\zZ}{z.\,Z.}
+\newcommand{\usw}{u.\,s.\,w.}
+\newcommand{\uA}{u.\,A.}
+\newcommand{\sg}{s.\,g.}
+\newcommand{\uU}{u.\,U.}
+\newcommand{\idR}{i.\,d.\,R.}

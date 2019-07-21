@@ -1,0 +1,143 @@
+% change la fonte
+\usepackage[default]{sourcesanspro}
+
+% on insert TikZ et des sous-packages
+% très utiles
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{tikzpagenodes}
+
+% modification des titres
+\usepackage{titlesec}
+
+% création de couleurs
+\usepackage{color}
+
+% entêtes et pieds de page
+\usepackage{fancyhdr}
+\definecolor{white}{rgb}{1,1,1}
+\definecolor{myblue}{RGB}{126,136,150}
+
+\titleformat{\chapter} % type
+    {\Huge\color{white}} % style
+    {\thechapter} % quoi afficher
+    {0pt} % espacement
+    {\begin{tikzpicture}[remember picture,overlay]
+      \draw[fill=myblue] (current page.north west)
+        -- (current page.north east)
+        -- ++ (0, -8)
+        -- ++ (-\paperwidth, -2)
+        -- cycle;
+    \end{tikzpicture}
+    } % "before"
+
+% on déplace un peu le titre vers le haut
+\titlespacing*{\chapter}{-18pt}{0pt}{50pt}
+
+
+
+% package "fancyhdr"
+\pagestyle{fancyplain} % ou "fancy", testez
+\fancyhf{} % vire le contenu de header et footer
+\renewcommand{\headrulewidth}{0pt} % vire la barre de séparation
+
+
+ 
+
+\chead{%
+    \begin{tikzpicture}[remember picture, overlay]
+    \node [yshift=-100, inner sep=0, outer sep=0]
+        at (current page.north){\includegraphics[width=\paperwidth]{head.png}};
+    \node[yshift=-40,rotate=5, text width=0.5\paperwidth]
+        at (current page.north) {%
+            \Huge
+            \textbf{``} % un guillemet à l'envers
+            \textcolor{myblue}{\leftmark} % le titre
+            \textbf{''} % un guillemet à l'endroit
+        };
+    \end{tikzpicture}
+}
+
+
+\fancyfoot[CE]{%
+\begin{tikzpicture}[remember picture, overlay]
+    \draw [fill=myblue]
+        (current page.south east)
+        -- (current page.south west)
+        -- ++ (0, 4)
+        -- cycle;
+    \node [yshift=28pt,xshift=50pt]
+        at (current page.south west)
+        {\color{white}\rightmark};
+    \node [yshift=28pt]
+        at (current page.south)
+        {\color{white}\thepage};
+\end{tikzpicture}
+}
+
+
+\fancyfoot[CO]{%
+\begin{tikzpicture}[remember picture, overlay]
+    \draw [fill=myblue]
+        (current page.south west)
+        -- (current page.south east)
+        -- ++ (0, 2)
+        -- cycle;
+    \node [yshift=28pt, xshift=-50pt]
+        at (current page.south east)
+        {\color{white}\thepage};
+\end{tikzpicture}
+}
+\usepackage{titling}
+
+% je définis le titre
+\title{Mon example de thème}
+% l'auteur (moi)
+\author{%
+    Patrice FERLET\\
+    metal3d@gmail.com
+}
+
+% et la page de titre
+\renewcommand{\maketitle}{%
+    \begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+
+    \node [yshift=-230, inner sep=0, outer sep=0]
+        at (current page.north)
+        {\includegraphics[width=\paperwidth]{head.png}};
+
+    \node [shape=rectangle,
+            fill=myblue,
+            anchor=west,
+            minimum width=1.4\paperwidth,
+            xshift=-0.7\paperwidth,
+            inner sep=2cm,
+            rotate=10]
+        at (current page.center)
+        {\Huge\textcolor{white}{\textbf{\thetitle}}};
+
+    \node [yshift=120, text width=\paperwidth, align=center]
+        at (current page.south)
+        {\Huge\color{myblue}\theauthor};
+    \end{tikzpicture}
+    \end{titlepage}
+}
+\setlength{\parindent}{12pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}
+
+\chead{%
+\begin{tikzpicture}[remember picture, overlay]
+    \node [yshift=-100, inner sep=0, outer sep=0] at (current page.north) {\includegraphics[width=\paperwidth]{head.png}};
+    \node[yshift=-40,rotate=5, text width=0.5\paperwidth] at (current page.north) {%
+    \ifnum\value{page}>2
+        \Huge
+        \textbf{``}
+        \textcolor{myblue}{\leftmark}
+        \textbf{''}
+    \fi
+    };
+\end{tikzpicture}
+}
+

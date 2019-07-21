@@ -1,0 +1,423 @@
+
+\section{整除理论}
+\label{sec:integer-division}
+
+\subsection{整除的概念与带余除法}
+\label{sec:concept-of-integer-indivision-and-devision-with-remainder}
+
+\begin{definition}
+  对于两个整数$a$和$b$，如果存在某个整数$c$使得$a=bc$成立，就称$b$能整除$a$，或者$a$能被$b$所 \emph{整除}，记为$b \mid a$，这时，$b$称为$a$的 \emph{因数}，$a$称为$b$的 \emph{倍数}.
+\end{definition}
+
+显然，任何整数都能被1整除，也能被它自己整除。
+
+易知整除具有下列性质:
+\begin{property}
+  设$a$、$b$都是整数，若$a \mid b$且$b \mid c$，则$a \mid c$，即整除的传递性。
+\end{property}
+
+\begin{property}
+  设$a$、$b$、$k$都是整数，若$k \mid a$且$k \mid b$，则$k \mid (a \pm b)$
+\end{property}
+
+\begin{property}
+  设$k$、$a_i(i=1,2,\ldots,n)$都是整数，若$k \mid a_i(i=1,2,\ldots,n)$，则$k \mid \sum_{i=1}^n \lambda_i a_i$，这里$\lambda_i(i=1,2,\ldots,n)$都是整数.
+\end{property}
+
+\begin{property}
+  \label{property:b-mid-a-to-b-leqslant-a}
+  设$a$和$b$是两个正整数，若$b \mid a$，则$b \leqslant a$.
+\end{property}
+
+\begin{proof}[证明]
+  因为存在整数$c$使得$a=bc$，又$a$、$b$都是正的，所以$c$也必是正整数，所以$c \geqslant 1$，从而$a=bc \geqslant b$.
+\end{proof}
+
+下面的结论是本小节最重要的结论:
+\begin{theorem}[带余除法]
+  设$a$、$b$是任意两个整数，其中$b$是正的，则存在唯一的整数$q$和唯一的非负整数$r$使得$a=qb+r(0 \leqslant r < b)$成立，$q$称为$a$除以$b$所得的 \emph{商}，$r$称为$a$除以$b$所得的 \emph{余数}.
+\end{theorem}
+
+\begin{proof}[证明]
+  由$b$是正整数，作无穷序列$\cdots, -2b, -b, 0, b, 2b,\cdots$，利用这些节点把全体整数划分在左闭右开区间序列$[tb, (t+1)b)$上，任何一个整数必定落在其中某个区间上，而且不能同时两个区间上，对于整数$a$，假设这区间是$[qb, (q+1)b)$，这时就有$qb \leqslant a \leqslant (q+1)b$，令$r=a-qb$就有$0 \leqslant r < b$，得证。
+\end{proof}
+
+\subsection{最大公因数与辗转相除法}
+\label{sec:greatest-common-factor}
+
+\begin{definition}
+  设$a$和$b$都是整数，如果整数$c$能同时整除$a$和$b$，就称$c$是$a$和$b$的一个 \emph{公因数}.
+\end{definition}
+
+显见公因数与$a$和$b$的符号无关，今后我们都将只讨论正整数的正的公因数。
+
+显然1是任何两个整数的公因数，于是公因数的存在性得以解决，对于两个正整数$a$和$b$而言，若$c$是它俩的公因数，则由\autoref{property:b-mid-a-to-b-leqslant-a}，有$c$不超过$a$和$b$中的较小者，从而公因数必定只有有限个，其中最大的那一个就称为$a$和$b$的 \emph{最大公因数}，并把它记为$(a,b)$，公因数和最大公因数的概念不难推广到多个数的情况，符号仍采用相同的小括号。
+
+如果两个正整数$a$和$b$的最大公因数是1，即$(a,b)=1$，则称这两个正整数 \emph{互素} 或者 \emph{互质}，多个数的情形仍类似，但需要区别的是多个数互素与它们之间两两互素是不同的，例如三个数2,3,4互素，显然并非两两互素。
+
+显然，对于任意非零整数，它自己是它与零的公因式，其绝对值便是最大公因数。
+
+接下来我们讨论 \emph{辗转相除法}，也称 \emph{欧几里德除法}。
+
+\begin{theorem}
+  对于等式$a=qb+r$，如果其中所涉及的四个数都是整数，则$a$与$b$的公因数集合，跟$b$与$r$的公因数集合相等，从而也有相同的最大公因数.
+\end{theorem}
+
+证明很简单，能同时整除$a$和$b$的，按等式也能整除$r$，反之，能同时整除$b$和$r$的，也必定能整除$a$，所以定理是显然的。
+
+利用这个定理，我们可以通过如下的辗转相除法来求出两个正整数的最大公因数，对于任意两个正整数$a$和$b$，不妨假定$a \geqslant b$，否则就交换$a$和$b$这两个符号，所以这是合理的，根据带余除法，我们有一连等式:
+\begin{align*}
+  a  ={} & q_0 b + r_0 \\
+  b  ={} &q_1 r_0 + r_1 \\
+  r_0  ={}  &q_2 r_1 + r_2 \\
+    {}&\ldots \\
+  r_{n-1}  ={} &q_{n+1} r_n + r_{n+1}
+\end{align*}
+
+因为余数总是比除数小，所以有$b > r_0 > r_1 > \cdots > r_n > r_{n+1} \geqslant 0$，所以这个步骤进行有限步之后，必定得出$r_{n+1}=0$，根据刚才所得的定理，就有$(a,b)=(b,r_0)=(r_0,r_1)=\cdots=(r_n, r_{n+1})=(r_n,0)=r_n$，这就是说，这个除法序列进行到余数为零时，最后一个除数便是正整数$a$和$b$的最大公因数，这个反复做除法的方法就叫做辗转相除法，也叫欧几里德除法。
+
+\begin{example}[辗转相除法所需的步数]
+  关于辗转相除法所需的步数，设$a>b$，有一连串等式
+\begin{align*}
+a & =  q_0b+r_1 \\
+r & = q_1 r_1+r_2 \\
+&\cdots \\
+r_{k-1}&=q_k r_k + r_{k+1} \\
+&\cdots \\
+r_{n-2}&=q_{n-1}r_{n-1}+r_n
+\end{align*}
+最后一式中$r_n=0$，易知$r_i$依次递减，且相邻两个$r_i$至少相差1，所以
+\[ r_{k-1}=q_k r_k + r_{k+1} \geqslant r_k + r_{k+1}  \]
+联系到斐波那契数列，令$s_k=r_{n-k}$，则$s_0=r_n=0, s_1=r_{n-1} \geqslant 1,  s_2=r_{n-2} \geqslant 2$，且
+\[ s_{n-k+1} \geqslant s_{n-k}+s_{n-k-1}   \]
+即
+\[ s_{k+1} \geqslant s_{k}+s_{k-1} \]
+于是按照数学归纳法，易知$s_k \geqslant F_k(k \geqslant 1)$，这里$F_k$是第$k$个斐波那契数。
+
+而$s_n=r_0=b$，所以$b \geqslant F_n$，所以得到结论：假如辗转相除法进行了$n$步除法后才得出余数为零，那么$\min\{a,b\} \geqslant F_n$.
+\end{example}
+
+从辗转相除法，我们还得出一个重要结论:
+\begin{theorem}
+  设正整数$d$是正整数$a$和$b$的最大公因数，则存在整数$s$和$t$使得$d=sa+tb$.
+\end{theorem}
+
+\begin{proof}[证明]
+  根据辗转相除法，设$a \geqslant b$，设$r_0=a$, $r_1=b$，则有下面一连串等式
+  \begin{align*}
+    r_0 ={}  & q_1r_1 + r_2 \\
+    r_1 ={} & q_2r_2 + r_3 \\
+    & \cdots \\
+    r_{k-1} ={} & q_kr_k + r_{k+1} \\
+             & \cdots \\
+    r_{n-1} ={} & q_nr_n + 0
+  \end{align*}
+  其中$r_n$便是$a$和$b$的最大公因数，上式中第$k$个等式是
+  \[ r_{k-1} = q_kr_k + r_{k+1} \]
+  所以得到
+  \[ r_k = r_{k-2}-q_{k-1}r_{k-1} \]
+  这说明，每一个$r_k$都可以通过比它下标较小的相邻两个$r_m$表示表示成形状$u_kr_{k-1}+v_kr_{k-2}$，而$r_{k-1}$又可以进一步利用用$r_{k-2}$和$r_{k-3}$来表达，反复继续下去，最终$r_n$就可以由$r_1$和$r_0$(也就是$a$和$b$)通过类似的形状来表达，我们把这过程写成数学归纳法的形式。
+
+  我们来证明，最大公因数$r_n$可以表成下面的形式
+  \[ r_n = P_kr_{n-k+1}+Q_kr_{n-k} \]
+  其中$P_k$和$Q_k$都是整数。
+
+  我们对$k$施行数学归纳法，当$k=1$时，由$r_n=r_{n-2}-q_{n-1}r_{n-1}$知$k=2$时成立，并且$P_2=-q_{n-1}$，$Q_k=1$，假定$r_n=P_kr_{n-k+1}+Q_kr_{n-k}$，那么由将等式$r_{n-k+1}=r_{n-k-1}-q_{n-k}r_{n-k}$代入其中，则得
+  \[ r_n = (Q_k-q_{n-k}P_k)r_{n-k}+P_kr_{n-k-1} \]
+  于是令$P_{k+1}=Q_k-q_{n-k}P_k$, $Q_{k+1}=P_k$，就有$r_n=P_{k+1}r_{n-k}+Q_{k+1}r_{n-k-1}$，于是这个表达式总是成立的，还顺便得到了系数$P_k$和$Q_k$的递推公式。
+
+  在上述表达式中令$k=n$便得$r_n=P_nr_1+Q_nr_0=P_na+Q_nb$，所以定理结论得证，但是要指出的是，定理中的$s$和$t$并不是唯一的，因为假若$s_0$和$t_0$是这样的一对整数，则对任意整数$t$，易知$s_0+bt$和$t_0-at$也能满足定理中的等式。
+\end{proof}
+
+\begin{inference}
+  两个整数$a$和$b$互素的充分必要条件是，存在整数$s$和$t$使得$sa+tb=1$成立。
+\end{inference}
+
+\begin{proof}[证明]
+  如若这两个整数互素，则1作为它俩的最大公因数，自然是存在满足这等式的整数$s$和$t$的。反之，如果存在两个整数满足这等式，而$d$是$a$和$b$的最大公因数，按这等式必有$d \mid 1$，所以$d=1$，于是$a$和$b$互素。
+\end{proof}
+
+\begin{inference}
+  正整数$a$和$b$的任一公因数，都是它俩的最大公因数的因数，反之，最大公因数的因数，也都是公因数。
+\end{inference}
+
+定理的前半部分这由等式$(a,b)=sa+tb$便可直接得出，后半部分由整除的传递性乃显然。
+
+
+关于这定理中的等式，我们还有以下的更详细的结论:
+\begin{theorem}
+  设$a$和$b$是两个非零整数，那么集合$\{m|m=xa+yb, x,y \in Z \}$中的所有数按从小到大排列成一个正负对称的(双向)无穷序列，这个序列将是一个等差数列，其公差便是$a$和$b$的最大公因数，同时因为零也在这序列中，这序列中的最小正数也就正是这个最大公因数。
+\end{theorem}
+
+\begin{proof}[证明]
+  首先这集合是正负对称的，并且零也列于其中，作为一个无限的整数集合，其中必有一个最小的正的整数，假定便是$x_0a+y_0b>0$，我们来证明，它能整除这个集合中的全部数。
+
+  由带余数法，存在整数$q$及$r(0 \leqslant r < x_0a+y_0b)$，使得
+  \[ xa+yb = q(x_0a+y_0b) + r \]
+  这里的余数$r$必定是零，这是因为$r=(x-qx_0)a+(y-qy_0)b$也从属于这集合，如果它是正的，即$0 < r < x_0a+y_0b$，这便与$x_0a+y_0b$是这集合中的最小正整数相矛盾，所以$r=0$，即这集合中的最小正整数$x_0a+y_0b$能够整除集合中的任意一个数。
+
+  其次证明这个$x_0a+y_0b$就是$a$和$b$的最大公因数，因为$a$和$b$本来也在这集合中，所以$x_0a+y_0b$能同时整除它俩，即为它俩的公因数，如果这还不是最大公因数的话，假定最大公因数是$d$，而由于存在整数$s$和$t$，使得$d=sa+tb$，所以$d$也属于这集合，从而$(x_0a+y_0b) \mid d$，而又显然$d \mid (x_0a+y_0b)$，所以$x_0a+y_0b=d$。
+
+  最后来证明这集合从小到大构成一个等差数列，且公差就是$a$和$b$的最大公因数，显然$nd=n(x_0a+y_0b)=(nx_0)a+(ny_0)b$，这就是说，最大公因数$d$的任意倍数都在这集合中，而前面已经证得集合中的任意数都是最大公因数的倍数，所以这集合就等于$\{m | m=nd, n\in Z \}$，定理得证。
+\end{proof}
+
+由这定理即知，除了最大公因数，别的公因数无法表示成$sa+tb$的形式，也就是说，在$a$和$b$的公因数中，只有最大公因数能表示成这种形式，这就是如下的结果:
+\begin{theorem}
+  设正整数$d$是整数$a$和$b$的一个公因数，如果又存在整数$s$和$t$使得$d=sa+tb$，则$d$是$a$和$b$的最大公因数。
+\end{theorem}
+
+\begin{proof}[证明]
+  假定$a$和$b$的最大公因数是$k$，因为公因数都是最大公因数的因数，所以$d \mid k$，又显然$k \mid (sa+tb)$，即$k \mid d$，所以$d=k$.
+\end{proof}
+
+\begin{theorem}
+  \label{theorem:a-prime-b--a-c--a--bc}
+  设整数$a$与$b$互素，$c$是一个整数，则$a$,$c$的公因数和$a$,$bc$的公因数相同，从而也有相同的最大公因数。
+\end{theorem}
+
+\begin{proof}[证明]
+  显然$a$,$c$的公因数也都是$a$和$bc$的公因数，只要再证明$a$,$bc$的公因数也都是$a$,$c$的公因数即可，由条件$a$,$b$互素，存在整数$s$和$t$使得$sa+tb=1$，两边乘以$c$得$(cs)\cdot a+t\cdot bc=c$，所以$a$,$bc$的公因数必然整除$c$，从而它也是$a$,$c$的公因数，既然两对数有着相同的公因数集合，自然也有相同的最大公因数。
+\end{proof}
+
+\begin{inference}
+  \label{inference:a-prime-b-and-a-mid-bc-so-a-mid-c}
+  如果$a$与$b$互素，并且$a \mid bc$，则有$a \mid c$.
+\end{inference}
+
+\begin{proof}[证明]
+  因为$a \mid bc$知$a$是$a$,$bc$的最大公因数，由\autoref{theorem:a-prime-b--a-c--a--bc}知它也是$a$,$c$的最大公因数，即$a \mid c$.
+\end{proof}
+
+\begin{inference}
+  如果$(a,b)=1$，且$a \mid c$, $b \mid c$，则$ab \mid c$.
+\end{inference}
+
+\begin{proof}[证明]
+  设$c=aa_1$，则$b \mid aa_1$，由上一推论，有$b \mid a_1$，从而$ab \mid aa_1=c$.
+\end{proof}
+
+\begin{proof}[证明二]
+  由条件，存在整数$s$和$t$使$sa+tb=1$，又设$c=ak$，则$sak+tbk=k$，即$sc+tbk=k$，显然$b$能够整除等式的左端，因而也能整除右端，即$b \mid k$，从而$ab \mid ak=c$.
+\end{proof}
+
+\begin{inference}
+  \label{inference:a-prime-b-and-a-prime-c-so-a-prime-bc}
+  若$(a,b)=1$,且$(a,c)=1$，则$(a,bc)=1$.
+\end{inference}
+
+\begin{proof}[证明]
+  设$d=(a,bc)$，由$(a,b)=1$，显然有$(d,b)=1$，这是因为$d$与$b$的公因式必然也是$a$与$b$的公因式，所以$(d,b)=1$.又$d \mid bc$，由\autoref{inference:a-prime-b-and-a-mid-bc-so-a-mid-c}，有$d \mid c$，于是$d$成为$a$与$c$的公因式，但$(a,c)=1$，所以$d=1$，即$(a,bc)=1$.
+\end{proof}
+
+\begin{proof}[证明二]
+  把等式$s_1a+t_1b=1$和$s_2a+t_2c=1$相乘，得$(s_1s_2a+s_1c+s_2b)a+t_1t_2bc=1$，即知$(a,bc)=1$.
+\end{proof}
+
+这个推论还可以推广为下述的定理
+\begin{theorem}
+  \label{theorem:two-group-prime-without-repeat-prime-each-other}
+  若$a=p_1p_2 \cdots p_n$，$b=q_1q_2 \cdots q_m$，且对于任意$i$和$j$都有$(p_i,q_j)=1$，那么$(a,b)=1$.
+\end{theorem}
+
+\begin{proof}[证明]
+ 由$(p_i,q_j)=1$，根据\autoref{inference:a-prime-b-and-a-prime-c-so-a-prime-bc}便知$(p_i, b)=1(i=1,2,\ldots,n)$，进一步便有$(a,b)=1$.
+\end{proof}
+
+\begin{theorem}
+  如果$(a,b)=1$，$n$是一个正整数，则$(a,b^n)=1$.
+\end{theorem}
+
+\begin{proof}[证明]
+  由$a$、$b$互素，存在整数$s$和$t$，使得$sa+tb=1$，于是$(1-sa)^n=t^nb^n$，左边按二项式定理展开，并把含有$a$的项归并到一起，得$1+au=t^nb^n$，即$-ua+t^nb^n=1$，故$(a,b^n)=1$.
+\end{proof}
+
+再补充一个关于最大公因数的结论:
+\begin{theorem}
+  设有整数$a$和$b$，最大公因数是$(a,b)$，那么
+  \begin{enumerate}
+  \item 对于任意正整数$m$，有$(ma, mb)=m(a,b)$.
+  \item 设$\delta$是最大公因数$(a,b)$的一个因子，则有$(\frac{a}{\delta}, \frac{b}{\delta})=\frac{(a,b)}{\delta}$.
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}[证明]
+  (1). 因为存在整数$s$和$t$，使得$(a,b)=sa+tb$，所以$m(a,b)=s(ma)+t(mb)$，即$m(a,b)$能表示成$ma$和$mb$的组合形式，又显然$m(a,b)$是$ma$和$mb$的公因数，所以它是$ma$和$mb$的最大公因数。
+  (2). 类似的可以证明，略去。
+\end{proof}
+
+对于多个整数的情形，我们也有类似的结论:
+\begin{theorem}
+  如果$d$是若干个整数$a_i(i=1,2,\ldots,n)$的最大公因数，那么存在整数$s_i(i=1,2,\ldots,n)$使得$d=\sum_{i=1}^n s_ia_i$.
+\end{theorem}
+
+\begin{inference}
+  整数$a_i(i=1,2,\ldots,n)$的公因数，与$(a_1,a_2,\ldots,a_n)$的因数相同。
+\end{inference}
+
+\begin{theorem}
+  设整数$d$是若干个整数$a_i(i=1,2,\ldots,n)$的一个公因数，如果存在$n$个整数$s_i(i=1,2,\ldots,n)$使得$d=\sum_{i=1}^n s_ia_i$，那么$d$便是这$n$个整数的最大公因数。
+\end{theorem}
+
+最后给出多个整数的最大公因数的一个实际的求法:
+\begin{theorem}
+  对于若干个正整数$a_i(i=1,2,\ldots,n)$，若记$d_1=a_1, d_2=(d_1,a_2), d_3=(d_2, a_3),\ldots,d_n=(d_{n-1},a_n)$，则$d_n$就是这$n$个整数的最大公因数，即$d_n=(a_1,a_2,\ldots,a_n)$.
+\end{theorem}
+
+\begin{proof}[证明]
+  因为$d_k=(d_{k-1},a_k)$，所以$d_k \mid a_k$，$d_k \mid d_{k-1}$，由数学归纳法即可容易得到$d_n \mid a_i(i=1,2,\dots,n)$，即$d_n$是这$n$个整数的一个公因数.
+
+  记这$n$个整数的最大公因数为$d$，那么由前一推论，有$d_n \mid d$，又有 $d \mid a_1=d_1$，又$d \mid a_2$，即$d$同时整除$d_1$和$a_2$，于是就有$d \mid d_2$，依次下去，有$d \mid d_i(i=1,2,\ldots,n)$，所以$d \mid d_n$，即$d$跟$d_n$能互相整除，所以$d=d_n$。
+
+  要证明它是最大公因数也可以通过这个$d_n$可以表示为$\sum_{i=1}^n s_ia_i$的形式，此处略去。
+\end{proof}
+
+\subsection{最小公倍数}
+\label{sec:least-common-multiple}
+
+\begin{definition}
+  如果整数$c$既是$a$的倍数，也是$b$的倍数，即它能同时被$a$和$b$所整除，则称它是$a$和$b$的一个 \emph{公倍数}.
+\end{definition}
+显然整数$a$和$b$的乘积$ab$便是它俩的一个公倍数。
+
+只考虑正整数的情形，显然两个正整数的公倍数同时大于等于$a$和$b$，于是在它俩的所有公倍数中，必定有一个最小的，称之为这两个正整数的 \emph{最小公倍数}，记为$[a,b]$，多个数的情形仍有类似的定义及符号。
+
+\begin{theorem}
+  对于两个整数$a$和$b$，
+  \begin{enumerate}
+  \item 它俩所有的公倍数，都是最小公倍数的倍数.
+  \item 它俩的最小公倍数与最大公因数的乘积，等于$a$和$b$的乘积.
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}[证明]
+  设$m$是$a$,$b$的最小公倍数，而$M$是它俩的任一公倍数，由带余带法，存在整数$q$和小于$m$的非负整数$r$，使得$M=qm+r(0 \leqslant r <m)$，显然按这式子，$r$也必然是$a$,$b$的公倍数，所以只能$r=0$，否则与$m$是最小公倍数矛盾，所以$m\mid M$。
+
+  再来证明最小公倍数与最大公因数的乘积等于$ab$，分别用$d$和$m$表示$a$,$b$的最大公因数和最小公倍数，则存在整数$a_1$,$b_1$,$a_2$,$b_2$使得
+  \begin{align*}
+    a = a_1d, & \  b = b_1d \\
+    m = a_2a, & \  m = b_2b
+  \end{align*}
+  这时必然有$(a_1,b_1)=1$和$(a_2,b_2)=1$，若不然，$a$,$b$就会有比$d$更大的公因数和比$m$更小的公倍数。
+  记$M=a_1b_1d$，显然$M$是$a$,$b$的一个公倍数，因而它一定是$m$的倍数，所以$m \mid M$，即$m=a_1a_2d \mid a_1b_1d = M$，所以$a_2 \mid b_1$，同样由$m=b_1b_2d \mid a_1b_1d = M$，得$b_2 \mid a_1$.
+
+  另一方面，因为$m=a_2a=b_2b$，所以$a_1a_2d=b_1b_2d$，即$a_1a_2=b_1b_2$，所以$a_1 \mid b_1b_2$，但$(a_1,b_1)=1$，所以$a_1 \mid b_2$，同样由$b_1 \mid a_1a_2$并且$(a_1,b_1)=1$可得$b_1 \mid a_2$.
+
+  于是$a_1$与$b_2$互相整除，$a_2$与$b_1$互相整除，所以$a_1=b_2$,$a_2=b_1$，从而$m=M$，即$a_1b_1d$便是$a$,$b$的最小公倍数，所以$dm=ab$.
+\end{proof}
+
+但要注意的是，对于多个整数，最大公因数与最小公倍数的乘积就不一定等于这些整数的乘积了，例如2,4,8的最大公因数是2，最小公倍数是8，显然不满足，只有在这组整数两两互素的情况下才有这结论，这时最大公因数是1，最小公倍数便是它们的乘积。
+
+对于多个整数的公倍数，我们有以下结论:
+\begin{theorem}
+  设$a_i(i=1,2,\ldots,n)$是$n$个整数，记$m_1=a_1, m_2=[m_1,a_2], m_3=[m_2,a_3],\ldots,m_n=[m_{n-1},a_n]$，那么$m_n$便是这$n$个整数的最小公倍数。
+\end{theorem}
+
+\begin{proof}[证明]
+  $m_n$是这$n$个整数的公倍数是明显的，记$M$是这$n$个整数的任一公倍数，则$m_1 = a_1 \mid M$，又$a_2 \mid M$，所以$m_2 \mid M$，如此继续下去，便有$m_n \mid M$，所以$m_n$便是最小公倍数。
+\end{proof}
+
+\subsection{素数与算术基本定理}
+\label{sec:prime-number-and-fundamental-theorem-of-arithmetic}
+
+\begin{definition}
+  如果一个整数除1与自身以外没有其它因数，则称之为一个 \emph{素数}.
+\end{definition}
+
+素数是数论中极其重要的一个概念。
+
+\begin{theorem}
+  \label{theorem:prime-with-any-integer-relation}
+  设$p$为一个素数，而$a$为任一整数，则要么$(p,a)=1$，要么$p \mid a$.
+\end{theorem}
+
+\begin{proof}[证明]
+  设$d=(p,a)$，$d$作为$p$的一个因数，由素数定义，或者$d=1$，或者$d=p$，若$d=1$，即$(p,a)=1$，若$d=p$，即$p \mid a$.
+\end{proof}
+
+\begin{inference}
+  设$p$为一素数，$a$和$b$为两个整数，若$p \mid ab$，则必有$p \mid a$或者$p \mid b$.
+\end{inference}
+
+\begin{proof}[证明]
+  若$p \mid a$则结论成立，而$p \nmid a$时，由\autoref{theorem:prime-with-any-integer-relation}知$(p,a)=1$，此时由\autoref{inference:a-prime-b-and-a-mid-bc-so-a-mid-c}知必有$p \mid b$，得证。
+\end{proof}
+
+利用归纳法，这结论可以推广到多个数的情形:
+\begin{inference}
+  设$p$为一素数，如果$p \mid a_1a_2\cdots a_n$，则$p$必能整除诸$a_i$中至少一个。
+\end{inference}
+
+\begin{definition}
+  如果一个整数不是素数，则称它为一个 \emph{合数}.
+\end{definition}
+
+由定义，设$a$为一合数，则其必存在因子$b$，使得$1<b<a$，即$a=bb_1$，换句话说，合数必能被分解为比它小的两个数之乘积，进一步，如果分解出来的这两个数中还有合数，则继续进行分解，直到乘积中全部是素数为止，这样我们就得到以下著名的定理:
+
+\begin{theorem}[算术基本定理]
+  \label{theorem:arithmetic-base-theorem}
+  任一大于1的正整数$a$都能表成一些素数的乘积，即
+  \[ a=p_1p_2 \cdots p_n \]
+  诸$p_i$均为素数并可以相等，并且这分解式在不考虑各因子的顺序的情况下是唯一的。
+\end{theorem}
+
+\begin{proof}[证明]
+  先证明可分解性，使用数学归纳法，对于$a=2$时，已经表成一个素数之积了，假定对于小于$a$的正整数都能分解为素数之积，则对于$a$，若它本身是素数，则勿需再分解，若不是素数，则必然可表示为两个比它小的两个因数之乘积，根据归纳假设，这两个因数均能分解为素数之积，把这两个因式的分解式合起来，就是$a$的分解式，这就是证明了$a$也能表为素数之积。
+
+  再证明分解式的唯一性，设$a$还有另一种素数分解
+  \[ a=q_1q_2 \cdots q_m \]
+  其中诸$q_i$也是素数，则有
+  \[ p_1p_2 \cdots p_n = q_1q_2 \cdots q_m \]
+  则每一个$p_i$都能整除诸$q_i$之积，由素数性质，它必然能整除$q_i$中的某一个，比如说是$q_s$，但$q_i$本身是素数，除1及自身之外没有其它因数，所以只能$p_i=q_s$，这就是说，左边每一个$p$都必然等于右边的某个$q$，同理，右边的每个$q$也必然等于左边的某个$p$，但此时还不能断定左右两个分解式是相同的，因为分解式中允许有相同的素数重复出现的情况，我们还必须证明相同素数出现的重复次数也相同，设某个素数$r$在两个分解式中分解出现$s$次和$t$次，则$r^s$能够整除诸$q_i$之积，由\autoref{theorem:two-group-prime-without-repeat-prime-each-other}，有$r^s$与$q_i$之积中除去$r^t$之外的各项乘积是互素的，所以只能$r^s \mid r^t$，同理有$r^t \mid r^s$，所以$s=t$，这就证明了结论。
+\end{proof}
+
+对于任意正整数$a$，在它的分解式中把相同的素数写成幂的形式，就得出如下的 \emph{标准分解式}:
+\[ a = p_1^{\alpha_1}p_2^{\alpha_2} \cdots p_m^{\alpha_m}, \  \alpha_i > 0 (i=1,2,\ldots m) \]
+在讨论两个乃至多个正整数时，可以把只出现在其中某个正整数的分解式中的素数也合并到别的数的分解式中去并标以零次，这通常对于讨论问题是有用的，这样对于两个数$a$和$b$，就有分解式
+\[ a = p_1^{\alpha_1}p_2^{\alpha_2} \cdots p_m^{\alpha_n}, \  \alpha_i \geqslant 0 (i=1,2,\ldots n) \]
+和
+\[ b = p_1^{\beta_1}p_2^{\beta_2} \cdots p_n^{\beta_n}, \  \beta_i \geqslant 0 (i=1,2,\ldots n) \]
+
+在此分解式基础上，有如下的重磅结论:
+\begin{theorem}
+  \label{theorem:integer-division-with-prime-decompose}
+  设两个正整数$a$和$b$有分解式
+\[ a = p_1^{\alpha_1}p_2^{\alpha_2} \cdots p_m^{\alpha_n}, \  \alpha_i \geqslant 0 (i=1,2,\ldots n) \]
+和
+\[ b = p_1^{\beta_1}p_2^{\beta_2} \cdots p_n^{\beta_n}, \  \beta_i \geqslant 0 (i=1,2,\ldots n) \]
+  则$a \mid b$的充分必要条件是$\alpha_i \leqslant \beta_i(i=1,2,\ldots,n)$.
+\end{theorem}
+
+\begin{proof}[证明]
+  充分性是显然的，只证必要性，由$a \mid b$知$p_i^{\alpha_i} \mid b$，但根据\autoref{theorem:two-group-prime-without-repeat-prime-each-other}，$p_i^{\alpha_i}$与$b$的分解式中除$p_i^{\beta_i}$以外的那部分子乘积是互素的，所以必然$p_i^{\alpha_i} \mid p_i^{\beta_i}$，因此$\alpha_i \leqslant \beta_i(i=1,2,\ldots,n)$.
+\end{proof}
+
+由此得
+\begin{inference}
+  设$a$的标准分解式为
+\[ a = p_1^{\alpha_1}p_2^{\alpha_2} \cdots p_m^{\alpha_m}, \  \alpha_i > 0 (i=1,2,\ldots m) \]
+则$a$的所有因数都具有形式
+\[ d = p_1^{\beta_1}p_2^{\beta_2} \cdots p_m^{\beta_m}, \  0 \leqslant \beta_i \leqslant \alpha_i (i=1,2,\ldots m) \]
+\end{inference}
+
+进一步可得
+\begin{theorem}
+  仍设两个正整数$a$和$b$有分解式
+\[ a = p_1^{\alpha_1}p_2^{\alpha_2} \cdots p_m^{\alpha_n}, \  \alpha_i \geqslant 0 (i=1,2,\ldots n) \]
+和
+\[ b = p_1^{\beta_1}p_2^{\beta_2} \cdots p_n^{\beta_n}, \  \beta_i \geqslant 0 (i=1,2,\ldots n) \]
+则它俩的最大公因数和最小公倍数分别是
+\[ (a,b) = p_1^{\gamma_1}p_2^{\gamma_2} \cdots p_m^{\gamma_n}, \  \gamma_i=\min\{\alpha_i,\beta_i\} (i=1,2,\ldots n) \]
+和
+\[ [a,b] = p_1^{\delta_1}p_2^{\delta_2} \cdots p_m^{\delta_n}, \  \delta_i=\max\{\alpha_i,\beta_i\} (i=1,2,\ldots n) \]
+\end{theorem}
+
+这几个定理和推论，利用素数分解把整除理论推上了巅峰，提示了整除性的本质，而这一切的基础，正是整数的素数分解，正是基于此理由，素数分解定理才被称为算术基本定理。
+
+\subsection{高斯函数}
+\label{sec:gauss-function}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../elementary-math-note"
+%%% End:
